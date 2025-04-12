@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250406132700_First")]
+    [Migration("20250407160932_First")]
     partial class First
     {
         /// <inheritdoc />
@@ -27,8 +27,11 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Entities.Admin", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -49,14 +52,14 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Entities.Assignment", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
-
-                    b.Property<string>("CourseId1")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("Deadline")
                         .HasColumnType("datetime2");
@@ -71,19 +74,25 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CourseId1");
+                    b.HasIndex("CourseId");
 
                     b.ToTable("Assignments");
                 });
 
             modelBuilder.Entity("Backend.Entities.Course", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -96,8 +105,11 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Entities.Material", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -106,25 +118,24 @@ namespace Backend.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CourseId1")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CourseId1");
+                    b.HasIndex("CourseId");
 
                     b.ToTable("Materials");
                 });
 
             modelBuilder.Entity("Backend.Entities.Payment", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<double>("Amount")
                         .HasColumnType("float");
@@ -136,20 +147,20 @@ namespace Backend.Migrations
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
-                    b.Property<string>("StudentId1")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("StudentId1");
+                    b.HasIndex("StudentId");
 
                     b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("Backend.Entities.Student", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -179,29 +190,25 @@ namespace Backend.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CourseId1")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
-                    b.Property<string>("StudentId1")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("CourseId1");
+                    b.HasIndex("CourseId");
 
-                    b.HasIndex("StudentId1");
+                    b.HasIndex("StudentId");
 
                     b.ToTable("studentCourses");
                 });
 
             modelBuilder.Entity("Backend.Entities.Teacher", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -224,7 +231,9 @@ namespace Backend.Migrations
                 {
                     b.HasOne("Backend.Entities.Course", "Course")
                         .WithMany("Assignments")
-                        .HasForeignKey("CourseId1");
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Course");
                 });
@@ -232,8 +241,8 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Entities.Material", b =>
                 {
                     b.HasOne("Backend.Entities.Course", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId1")
+                        .WithMany("materials")
+                        .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -244,7 +253,9 @@ namespace Backend.Migrations
                 {
                     b.HasOne("Backend.Entities.Student", "Student")
                         .WithMany("Payments")
-                        .HasForeignKey("StudentId1");
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Student");
                 });
@@ -253,13 +264,15 @@ namespace Backend.Migrations
                 {
                     b.HasOne("Backend.Entities.Course", "Course")
                         .WithMany("studentCourses")
-                        .HasForeignKey("CourseId1")
+                        .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Backend.Entities.Student", "Student")
                         .WithMany("StudentCourses")
-                        .HasForeignKey("StudentId1");
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Course");
 
@@ -269,6 +282,8 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Entities.Course", b =>
                 {
                     b.Navigation("Assignments");
+
+                    b.Navigation("materials");
 
                     b.Navigation("studentCourses");
                 });

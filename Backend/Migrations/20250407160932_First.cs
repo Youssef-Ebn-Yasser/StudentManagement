@@ -15,7 +15,8 @@ namespace Backend.Migrations
                 name: "Admins",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -29,9 +30,11 @@ namespace Backend.Migrations
                 name: "Courses",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Price = table.Column<double>(type: "float", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -42,7 +45,8 @@ namespace Backend.Migrations
                 name: "students",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -56,7 +60,8 @@ namespace Backend.Migrations
                 name: "Teachers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -70,39 +75,40 @@ namespace Backend.Migrations
                 name: "Assignments",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Deadline = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CourseId = table.Column<int>(type: "int", nullable: false),
-                    CourseId1 = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Assignments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Assignments_Courses_CourseId1",
-                        column: x => x.CourseId1,
+                        name: "FK_Assignments_Courses_CourseId",
+                        column: x => x.CourseId,
                         principalTable: "Courses",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Materials",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CourseId = table.Column<int>(type: "int", nullable: false),
-                    CourseId1 = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Materials", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Materials_Courses_CourseId1",
-                        column: x => x.CourseId1,
+                        name: "FK_Materials_Courses_CourseId",
+                        column: x => x.CourseId,
                         principalTable: "Courses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -112,20 +118,21 @@ namespace Backend.Migrations
                 name: "Payments",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Amount = table.Column<double>(type: "float", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StudentId1 = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     StudentId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Payments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Payments_students_StudentId1",
-                        column: x => x.StudentId1,
+                        name: "FK_Payments_students_StudentId",
+                        column: x => x.StudentId,
                         principalTable: "students",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -135,50 +142,49 @@ namespace Backend.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CourseId = table.Column<int>(type: "int", nullable: false),
-                    CourseId1 = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    StudentId1 = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     StudentId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_studentCourses", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_studentCourses_Courses_CourseId1",
-                        column: x => x.CourseId1,
+                        name: "FK_studentCourses_Courses_CourseId",
+                        column: x => x.CourseId,
                         principalTable: "Courses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_studentCourses_students_StudentId1",
-                        column: x => x.StudentId1,
+                        name: "FK_studentCourses_students_StudentId",
+                        column: x => x.StudentId,
                         principalTable: "students",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Assignments_CourseId1",
+                name: "IX_Assignments_CourseId",
                 table: "Assignments",
-                column: "CourseId1");
+                column: "CourseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Materials_CourseId1",
+                name: "IX_Materials_CourseId",
                 table: "Materials",
-                column: "CourseId1");
+                column: "CourseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Payments_StudentId1",
+                name: "IX_Payments_StudentId",
                 table: "Payments",
-                column: "StudentId1");
+                column: "StudentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_studentCourses_CourseId1",
+                name: "IX_studentCourses_CourseId",
                 table: "studentCourses",
-                column: "CourseId1");
+                column: "CourseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_studentCourses_StudentId1",
+                name: "IX_studentCourses_StudentId",
                 table: "studentCourses",
-                column: "StudentId1");
+                column: "StudentId");
         }
 
         /// <inheritdoc />

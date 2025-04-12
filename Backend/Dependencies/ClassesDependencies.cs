@@ -1,7 +1,4 @@
-﻿using Backend.Repository;
-using Backend.UniteOfWork;
-
-namespace Backend.Dependencies;
+﻿namespace Backend.Dependencies;
 
 public static class ClassesDependencies
 {
@@ -9,6 +6,12 @@ public static class ClassesDependencies
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+        //Configuration Of Auto mapper
+        services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+        services.AddTransient<ICourseService, CourseService>();
+        services.AddTransient<IAssignmentServices, AssignmentServices>();
 
         return services;
     }

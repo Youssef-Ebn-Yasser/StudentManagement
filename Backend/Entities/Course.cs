@@ -1,11 +1,11 @@
 ﻿namespace Backend.Entities;
 
-public class Course
+public class Course : BaseEntity
 {
-    [Key] public string Id { get; set; } = string.Empty;
-    public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
+    public double Price { get; set; }
 
-    public List<StudentCourse> studentCourses { get; set; } = new List<StudentCourse>();
-    public List<Assignment> Assignments { get; set; } = new List<Assignment>();
+    public List<StudentCourse> studentCourses { get; set; }
+    public List<Assignment> Assignments { get; set; }
+    public List<Material> materials { get; set; }
 }

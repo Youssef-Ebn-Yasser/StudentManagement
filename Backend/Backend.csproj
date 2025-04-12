@@ -19,11 +19,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.0" />
+
+      <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\Interfaces\" />
-    <Folder Include="Services\Implementation\" />
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
 </Project>

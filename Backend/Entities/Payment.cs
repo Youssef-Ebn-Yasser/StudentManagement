@@ -2,12 +2,12 @@
 
 public class Payment
 {
-    [Key] public string Id { get; set; } = string.Empty;
+    [Key] public int Id { get; set; }
     public double Amount { get; set; }
     public string Status { get; set; } = string.Empty;
 
 
-    public Student Student { get; set; } = new Student();
+    public Student Student { get; set; }
     [ForeignKey(nameof(Student))]
-    public string StudentId { get; set; } = string.Empty;
+    public int StudentId { get; set; }
 }

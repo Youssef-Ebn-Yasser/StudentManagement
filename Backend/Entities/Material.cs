@@ -1,13 +1,10 @@
 ﻿namespace Backend.Entities;
 
-public class Material
+public class Material : BaseEntity
 {
-    [Key] public string Id { get; set; } = string.Empty;
-    public string Title { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
 
-
-    public Course Course { get; set; } = new Course();
+    public Course Course { get; set; }
     [ForeignKey(nameof(Course))]
-    public string CourseId { get; set; } = string.Empty;
+    public int CourseId { get; set; }
 }

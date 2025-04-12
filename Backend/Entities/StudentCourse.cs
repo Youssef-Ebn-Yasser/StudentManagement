@@ -3,11 +3,11 @@
 public class StudentCourse
 {
     [Key] public int Id { get; set; }
-    public Course Course { get; set; } = new Course();
+    public Course Course { get; set; }
     [ForeignKey(nameof(Course))]
-    public string CourseId { get; set; } = string.Empty;
+    public int CourseId { get; set; }
 
-    public Student Student { get; set; } = new Student();
+    public Student Student { get; set; }
     [ForeignKey(nameof(Student))]
-    public string StudentId { get; set; } = string.Empty;
+    public int StudentId { get; set; }
 }

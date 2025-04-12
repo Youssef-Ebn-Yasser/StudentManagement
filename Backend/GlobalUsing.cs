@@ -1,6 +1,16 @@
-﻿global using Backend.BaseResponse;
+﻿global using AutoMapper;
+global using Backend.BaseResponse;
 global using Backend.Dependencies;
+global using Backend.DTOs.AssignmentDTO;
+global using Backend.DTOs.CourseDTO;
+global using Backend.Entities;
+global using Backend.Repository;
+global using Backend.Services.Implementation;
+global using Backend.Services.Interfaces;
+global using Backend.UniteOfWork;
 global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.EntityFrameworkCore;
 global using System.ComponentModel.DataAnnotations;
 global using System.ComponentModel.DataAnnotations.Schema;
 global using System.Net;
+global using System.Reflection;
