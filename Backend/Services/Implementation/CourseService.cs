@@ -29,7 +29,7 @@ public class CourseService : ResponseHandler, ICourseService
         if (createCourseDto == null)
             return _responseHandler.BadRequest<string>("Course data is required");
 
-        // 1. رفع الصورة لو موجودة
+        
         string? imagePath = null;
         if (createCourseDto.Image != null)
         {
@@ -66,7 +66,7 @@ public class CourseService : ResponseHandler, ICourseService
             return _responseHandler.NotFound<string>("Course not found");
         }
 
-        // 2. حذف الكورس من الـ Repository
+        
         _unitOfWork.Repository<Course>().Delete(course);
 
        
