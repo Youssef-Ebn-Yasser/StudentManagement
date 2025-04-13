@@ -24,4 +24,29 @@ public class CourseController : AppControllerBase
         var result = await _courseService.GetAllAsync();
         return NewResult(result);
     }
+
+
+    [HttpGet("Course/Get/{id}")]
+    public async Task<IActionResult> GetCourseById(int id)
+    {
+        var result = await _courseService.GetCourseByIdAsync(id);
+        return NewResult(result);
+    }
+
+    [HttpPut("Course/Update/{id}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateCourseDto updateCourseDto)
+    {
+       
+        updateCourseDto.Id = id.ToString();
+
+        var result = await _courseService.UpdateAsync(updateCourseDto);
+        return NewResult(result);
+    }
+
+    [HttpDelete("Course/Delete/{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var result = await _courseService.DeleteAsync(id);
+        return NewResult(result);
+    }
 }
