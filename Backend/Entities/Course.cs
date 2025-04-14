@@ -8,4 +8,6 @@ public class Course : BaseEntity
     public List<StudentCourse> studentCourses { get; set; }
     public List<Assignment> Assignments { get; set; }
     public List<Material> materials { get; set; }
+    public string? ImagePath { get; set; }
+
 }

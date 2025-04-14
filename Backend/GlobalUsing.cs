@@ -1,7 +1,7 @@
 ﻿global using AutoMapper;
 global using Backend.BaseResponse;
 global using Backend.Dependencies;
-global using Backend.DTOs.AssignmentDTO;
+
 global using Backend.DTOs.CourseDTO;
 global using Backend.Entities;
 global using Backend.Repository;

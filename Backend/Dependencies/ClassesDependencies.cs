@@ -11,7 +11,7 @@ public static class ClassesDependencies
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
         services.AddTransient<ICourseService, CourseService>();
-        services.AddTransient<IAssignmentServices, AssignmentServices>();
+       
 
         return services;
     }
