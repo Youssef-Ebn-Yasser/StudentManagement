@@ -1,4 +1,5 @@
-﻿namespace Backend.Services.Implementation;
+﻿
+namespace Backend.Services.Implementation;
 
 public class CourseService : ResponseHandler, ICourseService
 {
@@ -12,6 +13,31 @@ public class CourseService : ResponseHandler, ICourseService
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+    }
+
+    public Task<Response<string>> CreateAsync(CreateCourseDto createCourseDto)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Response<string>> DeleteAsync(int id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Response<List<ShowAllCoursesDto>>> GetAllAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Response<ShowCourseDto>> GetCourseByIdAsync(int id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Response<string>> UpdateAsync(UpdateCourseDto createCourseDto)
+    {
+        throw new NotImplementedException();
     }
     #endregion
 
