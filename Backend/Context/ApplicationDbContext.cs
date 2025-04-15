@@ -12,7 +12,7 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Student> students { get; set; }
     public DbSet<Course> Courses { get; set; }
-    public DbSet<Assignment> Assignments { get; set; }
+    public DbSet<StudentAssignment> StudentAssignments { get; set; }
     public DbSet<Material> Materials { get; set; }
     public DbSet<Teacher> Teachers { get; set; }
     public DbSet<Admin> Admins { get; set; }
