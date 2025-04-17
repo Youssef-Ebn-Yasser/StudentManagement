@@ -2,9 +2,13 @@
 
 public class Material : BaseEntity
 {
-    public string Content { get; set; } = string.Empty;
+    public string? Content { get; set; }
+    public bool IsDeleted { get; set; }
+    public string? Path { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public MaterialTypeId Type { get; set; }
 
-    public Course Course { get; set; }
-    [ForeignKey(nameof(Course))]
-    public int CourseId { get; set; }
+    [ForeignKey("LessonId")]
+    public Lesson? Lesson { get; set; }
+    public int LessonId { get; set; }
 }

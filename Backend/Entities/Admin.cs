@@ -2,4 +2,5 @@
 
 public class Admin : User
 {
+    public string? NationalId { get; set; }
 }

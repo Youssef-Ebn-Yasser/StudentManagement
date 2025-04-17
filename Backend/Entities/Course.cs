@@ -2,10 +2,14 @@
 
 public class Course : BaseEntity
 {
-    public string Description { get; set; } = string.Empty;
+    public string? Description { get; set; }
     public double Price { get; set; }
-
-    public List<StudentCourse> studentCourses { get; set; }
-    public List<Assignment> Assignments { get; set; }
-    public List<Material> materials { get; set; }
+    public bool IsDeleted { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public string? ImagePath { get; set; }
+    public List<Lesson>? lessons { get; set; }
+    [ForeignKey("TecherId")]
+    public Teacher? Teacher { get; set; }
+    public int? TecherId { get; set; }
+    public List<StudentCourse>? StudentCourses { get; set; }
 }

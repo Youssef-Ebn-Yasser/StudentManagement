@@ -7,7 +7,8 @@ public class Payment
     public DateTime PaymentDate { get; set; } = DateTime.Now;
     public string TransactionId { get; set; } = string.Empty;
     public string Currency { get; set; } = string.Empty;
-    public Student Student { get; set; }
-    [ForeignKey(nameof(Student))]
-    public int StudentId { get; set; }
+
+    [ForeignKey("StudentId")]
+    public Student? Student { get; set; }
+    public int? StudentId { get; set; }
 }
