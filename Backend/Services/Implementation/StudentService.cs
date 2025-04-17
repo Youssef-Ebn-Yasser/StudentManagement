@@ -7,19 +7,17 @@ namespace Backend.Services.Implementation
 
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly ResponseHandler _responseHandler;
 
-        public StudentService(IUnitOfWork unitOfWork, IMapper mapper, ResponseHandler responseHandler)
+        public StudentService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _responseHandler = responseHandler;
         }
         public async Task<Response<List<ShowStudentDto>>> GetAllAsync()
         {
             var students = await _unitOfWork.Repository<Student>().GetTableNoTracking().ToListAsync();
             var mappedStudents = _mapper.Map<List<ShowStudentDto>>(students);
-            return _responseHandler.Success(mappedStudents);
+            return Success(mappedStudents);
         }
 
         public async Task<Response<List<ShowStudentWithCoursesDto>>> GetAllInCourseByCourseNameAsync(string courseName)
@@ -32,27 +30,27 @@ namespace Backend.Services.Implementation
              .ToListAsync();
 
             var mappedStudents = _mapper.Map<List<ShowStudentWithCoursesDto>>(students);
-            return _responseHandler.Success(mappedStudents);
+            return Success(mappedStudents);
         }
 
         public async Task<Response<ShowStudentDto>> GetByIdAsync(int id)
         {
             var student = await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => s.Id == id);
             if (student == null)
-                return _responseHandler.NotFound<ShowStudentDto>("Student Not Found");
+                return NotFound<ShowStudentDto>("Student Not Found");
 
             var mappedStudent = _mapper.Map<ShowStudentDto>(student);
-            return _responseHandler.Success(mappedStudent);
+            return Success(mappedStudent);
         }
 
         public async Task<Response<ShowStudentDto>> GetByNameAsync(string name)
         {
             var student = await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => s.Name.ToLower() == name.ToLower());
             if (student == null)
-                return _responseHandler.NotFound<ShowStudentDto>("Student Not Found");
+                return NotFound<ShowStudentDto>("Student Not Found");
 
             var mappedStudent = _mapper.Map<ShowStudentDto>(student);
-            return _responseHandler.Success(mappedStudent);
+            return Success(mappedStudent);
         }
     }
 }
