@@ -13,6 +13,8 @@ public class CourseService : ResponseHandler, ICourseService
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
+
+
     #endregion
 
     #region   Handle Methods
@@ -59,19 +61,22 @@ public class CourseService : ResponseHandler, ICourseService
         if (course == null)
             return NotFound<string>("Course not found");
 
-        // Soft Delete
-        course.IsDeleted = true;
-        _unitOfWork.Repository<Course>().Update(course);
+        if (!string.IsNullOrWhiteSpace(course.ImagePath))
+        {
+            var imageFullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", course.ImagePath.TrimStart('/'));
+            if (File.Exists(imageFullPath))
+                File.Delete(imageFullPath);
+        }
 
-        return Success("Course deleted successfully (soft delete)");
+        _unitOfWork.Repository<Course>().Delete(course);
+        return Success("Course deleted successfully");
     }
 
     public async Task<Response<List<ShowAllCoursesDto>>> GetAllAsync()
     {
         var courses = await _unitOfWork.Repository<Course>()
-    .GetTableNoTracking()
-    .Where(c => !c.IsDeleted)
-    .ToListAsync();
+         .GetTableNoTracking()
+         .ToListAsync();
 
         var result = _mapper.Map<List<ShowAllCoursesDto>>(courses);
         return Success(result);
@@ -80,9 +85,8 @@ public class CourseService : ResponseHandler, ICourseService
     public async Task<Response<ShowCourseDto>> GetCourseByIdAsync(int id)
     {
         var course = await _unitOfWork.Repository<Course>()
-                                             .GetTableNoTracking()
-                                             .Where(c => !c.IsDeleted && c.Id == id)
-                                             .FirstOrDefaultAsync();
+         .GetTableNoTracking()
+         .FirstOrDefaultAsync(c => c.Id == id);
 
         if (course == null)
             return NotFound<ShowCourseDto>("Course not found");

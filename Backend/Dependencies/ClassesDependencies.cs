@@ -12,6 +12,7 @@ public static class ClassesDependencies
 
         services.AddTransient<ICourseService, CourseService>();
 
+
         return services;
     }
 }
