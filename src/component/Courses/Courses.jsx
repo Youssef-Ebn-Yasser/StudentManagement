@@ -1,8 +1,8 @@
 import React from 'react'
 
-function Home() {
+function Courses() {
   return <>
-  <div className='bg-amber-200'>home
+  <div className='bg-amber-200'>Courses
     <br />
     <br />
     <br />
@@ -46,4 +46,4 @@ function Home() {
   </div></>
 }
 
-export default Home
+export default Courses
