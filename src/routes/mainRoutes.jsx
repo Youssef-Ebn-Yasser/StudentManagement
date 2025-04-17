@@ -7,7 +7,7 @@ import Profile from '../component/Profile/Profile';
 const isAuth = true; // Replace with actual authentication logic
 
 const routesConfig = [
-  { path: '', element: <Home />, isProtected: false, accessRole: 'all' },
+  { path: '', element: <Home/>, isProtected: false, accessRole: 'all' },
   { path: 'profile', element: <Profile />, isProtected: true, accessRole: 'all' },
   { path: 'dashboard', element: <Dashboard />, isProtected: true , accessRole: 'admin' },
 ];
