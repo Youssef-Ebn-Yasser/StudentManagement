@@ -7,6 +7,7 @@ public class Lesson : BaseEntity
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     public List<Material>? materials { get; set; }
+    [ForeignKey("CourseId")]
     public Course? Course { get; set; }
-    public int CourseId { get; set; }
+    public int? CourseId { get; set; }
 }

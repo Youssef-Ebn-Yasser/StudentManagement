@@ -8,7 +8,8 @@ public class Course : BaseEntity
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public string? ImagePath { get; set; }
     public List<Lesson>? lessons { get; set; }
+    [ForeignKey("TecherId")]
     public Teacher? Teacher { get; set; }
-    public int TecherId { get; set; }
+    public int? TecherId { get; set; }
     public List<StudentCourse>? StudentCourses { get; set; }
 }

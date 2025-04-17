@@ -11,6 +11,10 @@ public static class ClassesDependencies
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
         services.AddTransient<ICourseService, CourseService>();
+        services.AddTransient<IStudentService, StudentService>();
+        services.AddTransient<IMaterialService, MaterialService>();
+        services.AddTransient<ILessonService, LessonService>();
+
 
 
         return services;

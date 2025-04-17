@@ -7,7 +7,7 @@ namespace Backend.Services.Implementation
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public LessonService(IUnitOfWork unitOfWork, IMapper mapper, ResponseHandler responseHandler)
+        public LessonService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;

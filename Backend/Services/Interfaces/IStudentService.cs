@@ -1,12 +1,13 @@
 ﻿using Backend.DTOs.StudentDOs;
 
-namespace Backend.Services.Interfaces
+namespace Backend.Services.Interfaces;
+
+public interface IStudentService
 {
-    public interface IStudentService
-    {
-        Task<Response<ShowStudentDto>> GetByIdAsync(int id);
-        Task<Response<ShowStudentDto>> GetByNameAsync(string name);
-        Task<Response<List<ShowStudentDto>>> GetAllAsync();
-        Task<Response<List<ShowStudentWithCoursesDto>>> GetAllInCourseByCourseNameAsync(string courseName);
-    }
+    Task<Response<ShowStudentDto>> GetByIdAsync(int id);
+    Task<Response<ShowStudentDto>> GetByNameAsync(string name);
+    Task<Response<List<ShowStudentDto>>> GetAllAsync();
+    Task<Response<List<ShowStudentWithCoursesDto>>> GetAllInCourseByCourseNameAsync(string courseName);
+
+    // enroll to course
 }

@@ -22,53 +22,6 @@ namespace Backend.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-
-
-            modelBuilder.Entity("Backend.Entities.Admin", b =>
-
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Deadline")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NationalId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-
-                    b.HasIndex("CourseId");
-
-                    b.ToTable("Assignment");
-                });
-
             modelBuilder.Entity("Backend.Entities.Comment", b =>
                 {
                     b.Property<int>("Id")
@@ -90,7 +43,7 @@ namespace Backend.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<int>("StudentId")
+                    b.Property<int?>("StudentId")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
@@ -102,9 +55,6 @@ namespace Backend.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("Comments");
-
-                    b.ToTable("Admins");
-
                 });
 
             modelBuilder.Entity("Backend.Entities.Course", b =>
@@ -119,23 +69,22 @@ namespace Backend.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
                     b.Property<string>("ImagePath")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<double>("Price")
+                        .HasMaxLength(10)
                         .HasColumnType("float");
 
-                    b.Property<int?>("TeacherId")
+                    b.Property<int?>("TecherId")
                         .HasColumnType("int");
-
-                    b.Property<int>("TecherId")
-                        .HasColumnType("int");
-
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -143,12 +92,9 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TeacherId");
-
-                    b.ToTable("Course");
+                    b.HasIndex("TecherId");
 
                     b.ToTable("Courses");
-
                 });
 
             modelBuilder.Entity("Backend.Entities.Lesson", b =>
@@ -159,7 +105,7 @@ namespace Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CourseId")
+                    b.Property<int?>("CourseId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -179,7 +125,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Lesson");
+                    b.ToTable("Lessons");
                 });
 
             modelBuilder.Entity("Backend.Entities.Material", b =>
@@ -191,7 +137,9 @@ namespace Backend.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -203,7 +151,9 @@ namespace Backend.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Path")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -216,7 +166,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("Material");
+                    b.ToTable("Materials");
                 });
 
             modelBuilder.Entity("Backend.Entities.Payment", b =>
@@ -241,7 +191,7 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("StudentId")
+                    b.Property<int?>("StudentId")
                         .HasColumnType("int");
 
                     b.Property<string>("TransactionId")
@@ -252,7 +202,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Payment");
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("Backend.Entities.StudentAssignment", b =>
@@ -263,7 +213,7 @@ namespace Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("LessonId")
+                    b.Property<int?>("LessonId")
                         .HasColumnType("int");
 
                     b.Property<string>("Path")
@@ -304,7 +254,7 @@ namespace Backend.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<int>("StudentId")
+                    b.Property<int?>("StudentId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -377,6 +327,18 @@ namespace Backend.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("Backend.Entities.Admin", b =>
+                {
+                    b.HasBaseType("Backend.Entities.User");
+
+                    b.Property<string>("NationalId")
+                        .IsRequired()
+                        .HasMaxLength(14)
+                        .HasColumnType("nvarchar(14)");
+
+                    b.HasDiscriminator().HasValue("Admin");
+                });
+
             modelBuilder.Entity("Backend.Entities.Student", b =>
                 {
                     b.HasBaseType("Backend.Entities.User");
@@ -415,11 +377,20 @@ namespace Backend.Migrations
                     b.HasDiscriminator().HasValue("Teacher");
                 });
 
+            modelBuilder.Entity("Backend.Entities.Comment", b =>
+                {
+                    b.HasOne("Backend.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId");
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("Backend.Entities.Course", b =>
                 {
                     b.HasOne("Backend.Entities.Teacher", "Teacher")
-                        .WithMany()
-                        .HasForeignKey("TeacherId");
+                        .WithMany("Courses")
+                        .HasForeignKey("TecherId");
 
                     b.Navigation("Teacher");
                 });
@@ -428,29 +399,9 @@ namespace Backend.Migrations
                 {
                     b.HasOne("Backend.Entities.Course", "Course")
                         .WithMany("lessons")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CourseId");
 
                     b.Navigation("Course");
-                });
-
-            modelBuilder.Entity("Backend.Entities.Comment", b =>
-                {
-                    b.HasOne("Backend.Entities.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Student");
-                });
-
-            modelBuilder.Entity("Backend.Entities.Course", b =>
-                {
-                    b.HasOne("Backend.Entities.Teacher", null)
-                        .WithMany("Courses")
-                        .HasForeignKey("TeacherId");
                 });
 
             modelBuilder.Entity("Backend.Entities.Material", b =>
@@ -469,8 +420,7 @@ namespace Backend.Migrations
                     b.HasOne("Backend.Entities.Student", "Student")
                         .WithMany("Payments")
                         .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Student");
                 });
@@ -479,9 +429,7 @@ namespace Backend.Migrations
                 {
                     b.HasOne("Backend.Entities.Lesson", "Lesson")
                         .WithMany()
-                        .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LessonId");
 
                     b.HasOne("Backend.Entities.Student", "Student")
                         .WithMany()
@@ -497,7 +445,7 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Entities.StudentCourse", b =>
                 {
                     b.HasOne("Backend.Entities.Course", "Course")
-                        .WithMany()
+                        .WithMany("StudentCourses")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -505,8 +453,7 @@ namespace Backend.Migrations
                     b.HasOne("Backend.Entities.Student", "Student")
                         .WithMany("StudentCourses")
                         .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Course");
 
@@ -515,6 +462,8 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Entities.Course", b =>
                 {
+                    b.Navigation("StudentCourses");
+
                     b.Navigation("lessons");
                 });
 
