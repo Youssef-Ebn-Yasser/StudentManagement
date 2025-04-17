@@ -10,4 +10,5 @@ public interface IStudentService
     Task<Response<List<ShowStudentWithCoursesDto>>> GetAllInCourseByCourseNameAsync(string courseName);
 
     // enroll to course
+    // first should check in payment table
 }
