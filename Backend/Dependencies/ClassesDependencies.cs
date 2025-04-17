@@ -12,6 +12,7 @@ public static class ClassesDependencies
         // Configuration Of Auto mapper
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
+<<<<<<< HEAD
         // Register IEmailSender service
         services.AddScoped<IEmailSender, EmailSender>();
         
@@ -21,6 +22,9 @@ public static class ClassesDependencies
         // services.AddTransient<ICourseService, CourseService>();
         // services.AddTransient<IAssignmentServices, AssignmentServices>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
+=======
+        services.AddTransient<ICourseService, CourseService>();
+>>>>>>> First Commit Renad Emad
 
         return services;
     }
