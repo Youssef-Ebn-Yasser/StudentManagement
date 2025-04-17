@@ -24,7 +24,10 @@ public static class ClassesDependencies
         services.AddScoped<IAuthenticationService, AuthenticationService>();
 =======
         services.AddTransient<ICourseService, CourseService>();
+<<<<<<< HEAD
 >>>>>>> First Commit Renad Emad
+=======
+>>>>>>> main
 
         return services;
     }

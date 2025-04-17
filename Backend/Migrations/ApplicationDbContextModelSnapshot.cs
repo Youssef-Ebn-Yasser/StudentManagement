@@ -153,6 +153,16 @@ namespace Backend.Migrations
                         .HasColumnType("float");
 
                     b.Property<string>("Currency")
+<<<<<<< HEAD
+=======
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+>>>>>>> main
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -160,10 +170,15 @@ namespace Backend.Migrations
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
+                    b.Property<string>("TransactionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("StudentId");
 
+<<<<<<< HEAD
                     b.ToTable("Payments");
                 });
 
@@ -229,6 +244,8 @@ namespace Backend.Migrations
 
                     b.HasIndex("StudentId");
 
+=======
+>>>>>>> main
                     b.ToTable("Payment");
                 });
 
@@ -360,6 +377,7 @@ namespace Backend.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasDiscriminator().HasValue("Teacher");
+<<<<<<< HEAD
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -558,6 +576,8 @@ namespace Backend.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("UserTokens", (string)null);
+=======
+>>>>>>> main
                 });
 
             modelBuilder.Entity("Backend.Entities.Assignment", b =>

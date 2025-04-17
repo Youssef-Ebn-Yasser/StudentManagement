@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Backend.Context;
@@ -9,6 +10,12 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 using Backend.Entities;
 using Microsoft.EntityFrameworkCore;
 namespace Backend.Context;
+=======
+﻿using Backend.Constraints;
+using Backend.Entities;
+using Microsoft.EntityFrameworkCore;
+namespace Backend.Context;
+>>>>>>> main
 public class ApplicationDbContext : DbContext
 >>>>>>> First Commit Renad Emad
 {
@@ -22,15 +29,38 @@ public class ApplicationDbContext : DbContext
    // public DbSet<Material> Materials { get; set; }
     public DbSet<Teacher> Teachers { get; set; }
 <<<<<<< HEAD
+<<<<<<< HEAD
     public DbSet<Admin> Admins { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<StudentCourse> studentCourses { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 =======
+=======
+>>>>>>> main
    // public DbSet<Admin> Admins { get; set; }
    // public DbSet<Payment> Payments { get; set; }
     public DbSet<StudentCourse> StudentCourses { get; set; }
     public DbSet<Comment> Comments { get; set; }
+<<<<<<< HEAD
+=======
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.ApplyConfiguration(new UserConstraints());
+        modelBuilder.ApplyConfiguration(new StudentConstraints());
+       // modelBuilder.ApplyConfiguration(new CourseConstraints());
+       // modelBuilder.ApplyConfiguration(new AssignmentConstraints());
+       // modelBuilder.ApplyConfiguration(new MaterialConstraints());
+        modelBuilder.ApplyConfiguration(new TeacherConstraints());
+       // modelBuilder.ApplyConfiguration(new AdminConstraints());
+       // modelBuilder.ApplyConfiguration(new PaymentConstraints());
+        modelBuilder.ApplyConfiguration(new StudentCourseConstraints());
+        modelBuilder.ApplyConfiguration(new CommentConstraints());
+
+    }
+>>>>>>> main
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
