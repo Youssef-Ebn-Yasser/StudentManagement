@@ -4,6 +4,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+<<<<<<< HEAD
 
 @theme {
   --color-primary: #4850E4;
@@ -123,3 +124,5 @@ h1 {
 @import './styles/cards.css';
 @import './styles/tables.css';
 @import './styles/buttons.css';
+=======
+>>>>>>> a8aecec97703908beb2e84591fe38c7d1999971d

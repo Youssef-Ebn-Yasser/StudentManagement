@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import Button from './Button';
@@ -196,6 +197,16 @@ function Navbar() {
             </div>
         </>
     );
+=======
+import React from 'react'
+import { Link } from 'react-router-dom'
+
+function Navbar() {
+    return <>
+
+    <Link to={'/auth/register'}>Register</Link>
+    </>
+>>>>>>> a8aecec97703908beb2e84591fe38c7d1999971d
 }
 
 export default Navbar;

@@ -10,7 +10,7 @@ import Courses from './../component/Courses/Courses';
 const isAuth = true; // Replace with actual authentication logic
 
 const routesConfig = [
-  { path: '', element: <Home />, isProtected: false, accessRole: 'all' },
+  { path: '', element: <Home/>, isProtected: false, accessRole: 'all' },
   { path: 'profile', element: <Profile />, isProtected: true, accessRole: 'all' },
   { path: 'courses', element: <Courses />, isProtected: false, accessRole: 'all' },
   { path: 'teachers', element: <Teachers />, isProtected: false, accessRole: 'all' },
