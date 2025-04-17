@@ -1,6 +1,4 @@
-﻿using Backend.Context;
-
-namespace Backend.Dependencies;
+﻿namespace Backend.Dependencies;
 
 public static class ClassesDependencies
 {
@@ -12,22 +10,19 @@ public static class ClassesDependencies
         // Configuration Of Auto mapper
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
-<<<<<<< HEAD
         // Register IEmailSender service
         services.AddScoped<IEmailSender, EmailSender>();
-        
+
         // Register ResponseHandler
         services.AddScoped<ResponseHandler>();
 
-        // services.AddTransient<ICourseService, CourseService>();
-        // services.AddTransient<IAssignmentServices, AssignmentServices>();
+
         services.AddScoped<IAuthenticationService, AuthenticationService>();
-=======
         services.AddTransient<ICourseService, CourseService>();
-<<<<<<< HEAD
->>>>>>> First Commit Renad Emad
-=======
->>>>>>> main
+        services.AddTransient<IStudentService, StudentService>();
+        services.AddTransient<IMaterialService, MaterialService>();
+        services.AddTransient<ILessonService, LessonService>();
+
 
         return services;
     }

@@ -1,17 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+
+	  <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>3625c041-3902-477b-a304-cfa186736ac8</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+
     <PackageReference Include="MailKit" Version="4.11.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
+
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
+
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
@@ -29,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="DTOs\AssignmentDTO\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 

@@ -2,6 +2,7 @@
 global using Backend.BaseResponse;
 global using Backend.Constraints;
 global using Backend.Dependencies;
+
 global using Backend.DTOs.CourseDTO;
 global using Backend.Entities;
 global using Backend.Repository;
