@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Backend.Constraints
-{ 
-    public class TeacherConstraints :IEntityTypeConfiguration<Teacher>
+{
+    public class TeacherConstraints : IEntityTypeConfiguration<Teacher>
     {
         public void Configure(EntityTypeBuilder<Teacher> builder)
         {
@@ -13,7 +13,7 @@ namespace Backend.Constraints
             builder.Property(t => t.Age)
                    .IsRequired()
                    .HasAnnotation("MinimumAge", 20);
-            
+
             builder.Property(t => t.AdditionalInfo)
                    .HasMaxLength(500);
 
@@ -29,10 +29,6 @@ namespace Backend.Constraints
                    .IsRequired()
                    .HasMaxLength(500);
 
-            //builder.HasMany(t => t.Courses)
-            //    .WithOne(c => c.Teacher)
-            //    .HasForeignKey(c => c.TeacherId)
-            //    .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

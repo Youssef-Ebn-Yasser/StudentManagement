@@ -12,7 +12,7 @@ public class CourseController : AppControllerBase
 
     [HttpPost("Course/Create")]
 
-    public async Task<IActionResult> Create(CreateCourseDto createCourseDto)
+    public async Task<IActionResult> Create([FromBody] CreateCourseDto createCourseDto)
     {
         var result = await _courseService.CreateAsync(createCourseDto);
         return NewResult(result);
@@ -34,10 +34,8 @@ public class CourseController : AppControllerBase
     }
 
     [HttpPut("Course/Update/{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] UpdateCourseDto updateCourseDto)
+    public async Task<IActionResult> Update([FromBody] UpdateCourseDto updateCourseDto)
     {
-       
-        updateCourseDto.Id = id.ToString();
 
         var result = await _courseService.UpdateAsync(updateCourseDto);
         return NewResult(result);
