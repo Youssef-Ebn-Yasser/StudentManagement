@@ -18,14 +18,7 @@
 
         #region   Handle function
 
-        [HttpGet("")]
-        public async Task<string> get()
-        {
-            var comment = await commentService.GetAllCommentsAsync();
 
-            return NewResult(comment);
-
-        }
         #endregion
     }
 }

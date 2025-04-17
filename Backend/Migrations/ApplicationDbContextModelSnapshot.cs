@@ -22,11 +22,10 @@ namespace Backend.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-<<<<<<< HEAD
-            modelBuilder.Entity("Backend.Entities.Assignment", b =>
-=======
+
+
             modelBuilder.Entity("Backend.Entities.Admin", b =>
->>>>>>> origin/HasnaaHassan
+
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -34,7 +33,6 @@ namespace Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-<<<<<<< HEAD
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
@@ -45,8 +43,8 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Title")
-=======
+                    b.Property<string>("Title");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -59,13 +57,13 @@ namespace Backend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
->>>>>>> origin/HasnaaHassan
+
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-<<<<<<< HEAD
+
                     b.HasIndex("CourseId");
 
                     b.ToTable("Assignment");
@@ -104,9 +102,9 @@ namespace Backend.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("Comments");
-=======
+
                     b.ToTable("Admins");
->>>>>>> origin/HasnaaHassan
+
                 });
 
             modelBuilder.Entity("Backend.Entities.Course", b =>
@@ -135,12 +133,10 @@ namespace Backend.Migrations
                     b.Property<int?>("TeacherId")
                         .HasColumnType("int");
 
-<<<<<<< HEAD
-=======
                     b.Property<int>("TecherId")
                         .HasColumnType("int");
 
->>>>>>> origin/HasnaaHassan
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -149,11 +145,10 @@ namespace Backend.Migrations
 
                     b.HasIndex("TeacherId");
 
-<<<<<<< HEAD
                     b.ToTable("Course");
-=======
+
                     b.ToTable("Courses");
->>>>>>> origin/HasnaaHassan
+
                 });
 
             modelBuilder.Entity("Backend.Entities.Lesson", b =>
