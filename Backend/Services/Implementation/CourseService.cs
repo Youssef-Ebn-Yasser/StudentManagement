@@ -5,13 +5,15 @@ public class CourseService : ResponseHandler, ICourseService
     #region   Fields
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly IFileService _fileService;
     #endregion
 
     #region   Counstructor
-    public CourseService(IUnitOfWork unitOfWork, IMapper mapper)
+    public CourseService(IUnitOfWork unitOfWork, IMapper mapper,IFileService fileService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _fileService = fileService;
     }
 
 
@@ -20,39 +22,34 @@ public class CourseService : ResponseHandler, ICourseService
     #region   Handle Methods
     public async Task<Response<string>> CreateAsync(CreateCourseDto createCourseDto)
     {
-        //if (createCourseDto == null)
-        //    return BadRequest<string>("Course data is required");
+        if (createCourseDto == null)
+            return BadRequest<string>("Course data is required");
 
-        //if (string.IsNullOrWhiteSpace(createCourseDto.Title))
-        //    return BadRequest<string>("Course title is required");
+        if (string.IsNullOrWhiteSpace(createCourseDto.Title))
+            return BadRequest<string>("Course title is required");
 
-        //if (createCourseDto.Price == null || createCourseDto.Price <= 0)
-        //    return BadRequest<string>("Course price must be greater than 0");
+        if (createCourseDto.Price == null || createCourseDto.Price <= 0)
+            return BadRequest<string>("Course price must be greater than 0");
 
-        //if (createCourseDto.TeacherId == null || createCourseDto.TeacherId <= 0)
-        //    return BadRequest<string>("Valid teacher ID is required");
+        if (createCourseDto.TeacherId == null || createCourseDto.TeacherId <= 0)
+            return BadRequest<string>("Valid teacher ID is required");
 
-        string? imagePath = null;
+        string? imageUrl = null;
 
         if (createCourseDto.Image != null)
         {
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Images");
-            Directory.CreateDirectory(uploadsFolder);
+            imageUrl = await _fileService.UploadFileAsync(createCourseDto.Image);
 
-            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(createCourseDto.Image.FileName);
-            var filePath = Path.Combine(uploadsFolder, fileName);
-
-            using var stream = new FileStream(filePath, FileMode.Create);
-            await createCourseDto.Image.CopyToAsync(stream);
-
-            imagePath = $"/Images/{fileName}";
+            if (imageUrl == null)
+                return BadRequest<string>("Image upload failed");
         }
 
         var course = _mapper.Map<Course>(createCourseDto);
-        course.ImagePath = imagePath;
+        course.ImagePath = imageUrl;
 
         await _unitOfWork.Repository<Course>().AddAsync(course);
         _unitOfWork.Complete();
+
         return Created<string>("Course created successfully");
     }
 
@@ -64,15 +61,16 @@ public class CourseService : ResponseHandler, ICourseService
 
         if (!string.IsNullOrWhiteSpace(course.ImagePath))
         {
-            var imageFullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", course.ImagePath.TrimStart('/'));
-            if (File.Exists(imageFullPath))
-                File.Delete(imageFullPath);
+            var deleteResult = await _fileService.DeleteImageByUrlAsync(course.ImagePath);
+            if (!deleteResult.Success)
+                return BadRequest<string>($"Failed to delete image: {deleteResult.Message}");
         }
 
         _unitOfWork.Repository<Course>().Delete(course);
+        _unitOfWork.Complete();
+
         return Success("Course deleted successfully");
     }
-
     public async Task<Response<List<ShowAllCoursesDto>>> GetAllAsync()
     {
         var courses = await _unitOfWork.Repository<Course>()

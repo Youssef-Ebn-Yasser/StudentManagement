@@ -4,11 +4,28 @@
     {
         public CourseMapping()
         {
-            CreateMap<Course, ShowAllCoursesDto>();
-            CreateMap<CreateCourseDto, Course>();
+            // CreateCourseDto → Course
+            CreateMap<CreateCourseDto, Course>()
+                .ForMember(dest => dest.TecherId, opt => opt.MapFrom(src => src.TeacherId));
+
+            // UpdateCourseDto → Course
+            CreateMap<UpdateCourseDto, Course>()
+                .ForMember(dest => dest.TecherId, opt => opt.MapFrom(src => src.TeacherId));
+
+            // Course → ShowAllCoursesDto
+            CreateMap<Course, ShowAllCoursesDto>()
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => (int?)src.Price));
+
+            // Course → ShowCourseDto
+            CreateMap<Course, ShowCourseDto>()
+                .ForMember(dest => dest.TeacherName, opt => opt.MapFrom(src => src.Teacher != null ? src.Teacher.Name : null))
+                .ForMember(dest => dest.lessonInfo, opt => opt.MapFrom(src => src.lessons));
+
+            // Lesson → LessonInfo
+            CreateMap<Lesson, LessonInfo>();
+
+            // Course → CoursesProfile (assuming CoursesProfile is defined elsewhere)
             CreateMap<Course, CoursesProfile>();
-
-
         }
     }
 }
