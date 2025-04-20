@@ -24,16 +24,16 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.ApplyConfiguration(new UserConstraints());
-        modelBuilder.ApplyConfiguration(new StudentConstraints());
-        // modelBuilder.ApplyConfiguration(new CourseConstraints());
-        // modelBuilder.ApplyConfiguration(new AssignmentConstraints());
-        // modelBuilder.ApplyConfiguration(new MaterialConstraints());
-        modelBuilder.ApplyConfiguration(new TeacherConstraints());
-        // modelBuilder.ApplyConfiguration(new AdminConstraints());
-        // modelBuilder.ApplyConfiguration(new PaymentConstraints());
-        modelBuilder.ApplyConfiguration(new StudentCourseConstraints());
-        modelBuilder.ApplyConfiguration(new CommentConstraints());
+        //modelBuilder.ApplyConfiguration(new UserConstraints());
+        //modelBuilder.ApplyConfiguration(new StudentConstraints());
+        //// modelBuilder.ApplyConfiguration(new CourseConstraints());
+        //// modelBuilder.ApplyConfiguration(new AssignmentConstraints());
+        //// modelBuilder.ApplyConfiguration(new MaterialConstraints());
+        //modelBuilder.ApplyConfiguration(new TeacherConstraints());
+        //// modelBuilder.ApplyConfiguration(new AdminConstraints());
+        //// modelBuilder.ApplyConfiguration(new PaymentConstraints());
+        //modelBuilder.ApplyConfiguration(new StudentCourseConstraints());
+        //modelBuilder.ApplyConfiguration(new CommentConstraints());
 
         // override the defaults
         modelBuilder.Entity<IdentityUser>().ToTable("Users");

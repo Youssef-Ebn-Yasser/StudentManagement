@@ -1,3 +1,5 @@
+using Backend.Settings;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -9,15 +11,19 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 // Dependencies
 builder.Services.AddConnectionDependency(builder.Configuration)
                 .AddCustomAuthentication(builder.Configuration)
+                .AddFilesDependencies(builder.Configuration)
                 .AddClassesDependencies();
 
+builder.Services.AddHttpClient();
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

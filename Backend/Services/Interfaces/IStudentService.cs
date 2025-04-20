@@ -4,10 +4,15 @@ namespace Backend.Services.Interfaces;
 
 public interface IStudentService
 {
-    Task<Response<ShowStudentDto>> GetByIdAsync(int id);
-    Task<Response<ShowStudentDto>> GetByNameAsync(string name);
-    Task<Response<List<ShowStudentDto>>> GetAllAsync();
-    Task<Response<List<ShowStudentWithCoursesDto>>> GetAllInCourseByCourseNameAsync(string courseName);
+    public Task<Response<ShowStudentDto>> GetByIdAsync(int id);
+    public Task<Response<ShowStudentDto>> GetByNameAsync(string name);
+    public Task<Response<List<ShowStudentDto>>> GetAllAsync();
+    public Task<Response<List<ShowStudentWithCoursesDto>>> GetAllInCourseByCourseNameAsync(string courseName);
+
+    public Task<Response<string>> CreateAsync(CreateStudentDto createStudent);
+    public Task<Response<string>> UpdateAsync(UpdateStudentDto updateStudentDto);
+    public Task<Response<string>> DeleteAsync(int id);
+
 
     // enroll to course
     // first should check in payment table

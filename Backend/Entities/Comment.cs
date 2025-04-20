@@ -1,14 +1,13 @@
-﻿namespace Backend.Entities
+﻿namespace Backend.Entities;
+
+public class Comment : BaseEntity
 {
-    public class Comment : BaseEntity
-    {
-        public string? Content { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public string? Content { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        public bool IsDeleted { get; set; } = false;
+    public bool IsDeleted { get; set; } = false;
 
-        [ForeignKey("StudentId")]
-        public Student? Student { get; set; }
-        public int? StudentId { get; set; }
-    }
+    [ForeignKey("StudentId")]
+    public Student? Student { get; set; }
+    public int? StudentId { get; set; }
 }

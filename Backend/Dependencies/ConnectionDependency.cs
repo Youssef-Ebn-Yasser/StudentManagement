@@ -1,5 +1,4 @@
 ﻿using Backend.Context;
-using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Dependencies;
 
@@ -10,6 +9,9 @@ public static class ConnectionDependency
         services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
+        //        services.AddDbContext<ApplicationDbContext>(options =>
+        //        options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
+        //sqlOptions => sqlOptions.EnableRetryOnFailure()));
 
         return services;
     }

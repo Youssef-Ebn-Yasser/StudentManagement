@@ -22,6 +22,8 @@ public static class ClassesDependencies
         services.AddTransient<IStudentService, StudentService>();
         services.AddTransient<IMaterialService, MaterialService>();
         services.AddTransient<ILessonService, LessonService>();
+        services.AddTransient<ITeacherService, TeacherService>();
+
 
 
         return services;
