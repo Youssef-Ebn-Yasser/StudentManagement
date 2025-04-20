@@ -6,6 +6,7 @@ import Profile from '../component/Profile/Profile';
 import Teachers from './../component/Teachers/Teachers';
 import About from './../component/About/About';
 import Courses from './../component/Courses/Courses';
+import CoursesDetails from './../component/CoursesDetails/CoursesDetails';
 
 const isAuth = true; // Replace with actual authentication logic
 
@@ -15,6 +16,7 @@ const routesConfig = [
   { path: 'courses', element: <Courses />, isProtected: false, accessRole: 'all' },
   { path: 'teachers', element: <Teachers />, isProtected: false, accessRole: 'all' },
   { path: 'about', element: <About />, isProtected: false, accessRole: 'all' },
+  { path: 'coursesDetails', element: <CoursesDetails />, isProtected: false, accessRole: 'all' },
   { path: 'dashboard', element: <Dashboard />, isProtected: true , accessRole: 'admin' },
 ];
 
