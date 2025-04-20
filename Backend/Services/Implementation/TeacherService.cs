@@ -1,0 +1,187 @@
+﻿namespace Backend.Services.Implementation;
+
+public class TeacherService : ResponseHandler, ITeacherService
+{
+    #region   Fields
+    public IUnitOfWork _unitOfWork { get; }
+    public IFileService _fileService { get; }
+    public IMapper _mapper { get; }
+    #endregion
+
+    #region   Constructor
+    public TeacherService(IUnitOfWork unitOfWork,
+                          IFileService fileService,
+                          IMapper mapper)
+    {
+        _unitOfWork = unitOfWork;
+        _fileService = fileService;
+        _mapper = mapper;
+    }
+    #endregion
+
+    #region   Handle Methods
+    public async Task<Response<List<ShowAllTeacherDto>>> GetAllAsync()
+    {
+        var teachers = await _unitOfWork.Repository<Teacher>()
+                                                    .GetTableNoTracking()
+                                                    .Include(t => t.Courses)
+                                                    .Where(t => t.IsDeleted == false)
+                                                    .ToListAsync();
+
+        if (teachers == null)
+            return NotFound<List<ShowAllTeacherDto>>($"there is no teachers");
+
+        var result = _mapper.Map<List<ShowAllTeacherDto>>(teachers);
+
+        return Success(result);
+    }
+    public async Task<Response<List<ShowAllTeacherWithDetailsDto>>> GetAllDeletedAsync()
+    {
+        var teachers = await _unitOfWork.Repository<Teacher>()
+                                                    .GetTableNoTracking()
+                                                    .Include(t => t.Courses)
+                                                    .Where(t => t.IsDeleted == true)
+                                                    .ToListAsync();
+
+        if (teachers == null)
+            return NotFound<List<ShowAllTeacherWithDetailsDto>>($"there is no teachers");
+
+        var result = _mapper.Map<List<ShowAllTeacherWithDetailsDto>>(teachers);
+
+        return Success(result);
+    }
+    public async Task<Response<TeacherProfileDto>> GetByIdAsync(int id)
+    {
+        var teacher = await _unitOfWork.Repository<Teacher>()
+                                              .GetTableNoTracking()
+                                              .Include(t => t.Courses)
+                                              .FirstOrDefaultAsync(t => t.Id == id && t.IsDeleted == false);
+
+        if (teacher == null)
+            return NotFound<TeacherProfileDto>($"this teacher with this {id} not exist");
+
+        var teacherProfile = _mapper.Map<TeacherProfileDto>(teacher);
+
+        return Success(teacherProfile);
+    }
+
+    public async Task<Response<GetTeacherDto>> GetByNameAsync(string name)
+    {
+        var teacher = await _unitOfWork.Repository<Teacher>()
+                                              .GetTableNoTracking()
+                                              .FirstOrDefaultAsync(t => t.Name == name && t.IsDeleted == false);
+
+        if (teacher == null)
+            return NotFound<GetTeacherDto>($"this teacher {name} not exist");
+
+        var newTeacher = _mapper.Map<GetTeacherDto>(teacher);
+
+        return Success(newTeacher);
+    }
+
+
+    public async Task<Response<string>> CreateAsync(CreateTeacherDto createTeacherDto)
+    {
+        // check if exist by name 
+        var exist = await _isTeacherExistByNameAsync(createTeacherDto.Name);
+        if (exist) return BadRequest<string>($"this teacher is already exist");
+
+        var teacher = _mapper.Map<Teacher>(createTeacherDto);
+
+        if (createTeacherDto.Image is not null)
+        {
+            var ImageUrl = await _fileService.UploadFileAsync(createTeacherDto.Image);
+            teacher.ProfileImagePath = ImageUrl;
+        }
+
+        await _unitOfWork.Repository<Teacher>().AddAsync(teacher);
+        var result = _unitOfWork.Complete();
+
+        return result > 0 ? Success<string>("Created Teacher Successfully") :
+                            BadRequest<string>($"can not add this teacher");
+    }
+
+    public async Task<Response<string>> UpdateAsync(UpdateTeacherDto updateTeacherDto)
+    {
+        var exist = await _isTeacherExistByIdAsync(updateTeacherDto.Id);
+        if (!exist) return BadRequest<string>($"this teacher is not exist");
+
+        var nameExist = await _isTeacherNameExistBeforeAsync(updateTeacherDto.Name, updateTeacherDto.Id);
+        if (nameExist) return BadRequest<string>($"this teacher name is not valid is already exist");
+
+        var emailExist = await _isTeacherEmailExistBeforeAsync(updateTeacherDto.Email, updateTeacherDto.Id);
+        if (emailExist) return BadRequest<string>($"this teacher Email is not valid is already exist");
+
+        var teacher = await _unitOfWork.Repository<Teacher>()
+                                              .GetTableAsTracking()
+                                              .FirstOrDefaultAsync(t => t.Id == updateTeacherDto.Id);
+
+        var newTeacher = _mapper.Map(updateTeacherDto, teacher);
+
+        if (updateTeacherDto.Image is not null)
+        {
+            var ImageUrl = await _fileService.DeleteImageByUrlAsync(teacher!.ProfileImagePath!);
+
+            var newImageUrl = await _fileService.UploadFileAsync(updateTeacherDto.Image);
+
+            newTeacher!.ProfileImagePath = newImageUrl;
+        }
+        else
+        {
+            newTeacher.ProfileImagePath = string.Empty;
+        }
+        _unitOfWork.Repository<Teacher>().Update(newTeacher!);
+
+        var result = _unitOfWork.Complete();
+
+        return result > 0 ? Success<string>("Teacher Updated Successfully") :
+                            BadRequest<string>($"can not delete this teacher");
+    }
+    public async Task<Response<string>> DeleteAsync(int id)
+    {
+        var exist = await _isTeacherExistByIdAsync(id);
+        if (!exist) return BadRequest<string>($"this teacher is not exist");
+
+        var teacher = await _unitOfWork.Repository<Teacher>()
+                                              .GetTableAsTracking()
+                                              .FirstOrDefaultAsync(t => t.Id == id);
+
+        teacher!.IsDeleted = true;
+        var result = _unitOfWork.Complete();
+
+        return result > 0 ? Delete<string>() :
+                            BadRequest<string>($"can not delete this teacher");
+    }
+
+
+    private async Task<bool> _isTeacherExistByNameAsync(string? name)
+    {
+        var isExist = await _unitOfWork.Repository<Teacher>()
+                                .GetTableNoTracking()
+                                .AnyAsync(t => t.Name == name && t.IsDeleted == false);
+        return isExist;
+    }
+    private async Task<bool> _isTeacherExistByIdAsync(int id)
+    {
+        var isExist = await _unitOfWork.Repository<Teacher>()
+                                .GetTableNoTracking()
+                                .AnyAsync(t => t.Id == id && t.IsDeleted == false);
+        return isExist;
+    }
+
+    private async Task<bool> _isTeacherNameExistBeforeAsync(string name, int id)
+    {
+        var isExist = await _unitOfWork.Repository<Teacher>()
+                                           .GetTableNoTracking()
+                                           .AnyAsync(t => t.Name == name && t.IsDeleted == false && t.Id != id);
+        return isExist;
+    }
+    private async Task<bool> _isTeacherEmailExistBeforeAsync(string email, int id)
+    {
+        var isExist = await _unitOfWork.Repository<Teacher>()
+                                           .GetTableNoTracking()
+                                           .AnyAsync(t => t.Email == email && t.IsDeleted == false && t.Id != id);
+        return isExist;
+    }
+    #endregion
+}

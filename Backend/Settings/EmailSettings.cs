@@ -1,4 +1,4 @@
-﻿namespace Backend.Constraints
+﻿namespace Backend.Settings
 {
     public class EmailSettings
     {

@@ -12,7 +12,7 @@ public class CourseController : AppControllerBase
 
     [HttpPost("Course/Create")]
 
-    public async Task<IActionResult> Create([FromBody] CreateCourseDto createCourseDto)
+    public async Task<IActionResult> Create(CreateCourseDto createCourseDto)
     {
         var result = await _courseService.CreateAsync(createCourseDto);
         return NewResult(result);

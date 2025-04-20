@@ -1,10 +1,9 @@
-﻿using Backend.DTOs.TeacherDTOs;
-
-namespace Backend.Services.Interfaces;
+﻿namespace Backend.Services.Interfaces;
 
 public interface ITeacherService
 {
-    public Task<Response<ShowAllTeacherDto>> GetAllAsync();
+    public Task<Response<List<ShowAllTeacherDto>>> GetAllAsync();
+    public Task<Response<List<ShowAllTeacherWithDetailsDto>>> GetAllDeletedAsync();
     public Task<Response<TeacherProfileDto>> GetByIdAsync(int id);
     public Task<Response<GetTeacherDto>> GetByNameAsync(string name);
 

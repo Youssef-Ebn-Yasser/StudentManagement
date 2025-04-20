@@ -20,17 +20,17 @@ public class CourseService : ResponseHandler, ICourseService
     #region   Handle Methods
     public async Task<Response<string>> CreateAsync(CreateCourseDto createCourseDto)
     {
-        if (createCourseDto == null)
-            return BadRequest<string>("Course data is required");
+        //if (createCourseDto == null)
+        //    return BadRequest<string>("Course data is required");
 
-        if (string.IsNullOrWhiteSpace(createCourseDto.Title))
-            return BadRequest<string>("Course title is required");
+        //if (string.IsNullOrWhiteSpace(createCourseDto.Title))
+        //    return BadRequest<string>("Course title is required");
 
-        if (createCourseDto.Price == null || createCourseDto.Price <= 0)
-            return BadRequest<string>("Course price must be greater than 0");
+        //if (createCourseDto.Price == null || createCourseDto.Price <= 0)
+        //    return BadRequest<string>("Course price must be greater than 0");
 
-        if (createCourseDto.TeacherId == null || createCourseDto.TeacherId <= 0)
-            return BadRequest<string>("Valid teacher ID is required");
+        //if (createCourseDto.TeacherId == null || createCourseDto.TeacherId <= 0)
+        //    return BadRequest<string>("Valid teacher ID is required");
 
         string? imagePath = null;
 
@@ -52,6 +52,7 @@ public class CourseService : ResponseHandler, ICourseService
         course.ImagePath = imagePath;
 
         await _unitOfWork.Repository<Course>().AddAsync(course);
+        _unitOfWork.Complete();
         return Created<string>("Course created successfully");
     }
 
@@ -84,9 +85,9 @@ public class CourseService : ResponseHandler, ICourseService
 
     public async Task<Response<ShowCourseDto>> GetCourseByIdAsync(int id)
     {
-        var course = await _unitOfWork.Repository<Course>()
+        var course = _unitOfWork.Repository<Course>()
          .GetTableNoTracking()
-         .FirstOrDefaultAsync(c => c.Id == id);
+         .FirstOrDefault(c => c.Id == id);
 
         if (course == null)
             return NotFound<ShowCourseDto>("Course not found");

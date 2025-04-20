@@ -1,10 +1,10 @@
 ﻿global using AutoMapper;
 global using Backend.BaseResponse;
-global using Backend.Constraints;
 global using Backend.Dependencies;
-
 global using Backend.DTOs.CourseDTO;
+global using Backend.DTOs.TeacherDTOs;
 global using Backend.Entities;
+global using Backend.Helper;
 global using Backend.Repository;
 global using Backend.Services.Implementation;
 global using Backend.Services.Interfaces;
