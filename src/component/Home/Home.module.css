@@ -1,1 +1,15 @@
-.Home {}
+/* Home.module.css */
+.primary {
+    color: var(--color-primary); /* Replace with your primary color variable or hex code */
+  }
+  .primary:hover {
+    color: #3a42b3;
+  }
+  .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: scale(1.05); /* Slightly scale the card */
+    box-shadow: 0 4px 15px rgba(72, 80, 228, 0.5); /* Primary color shadow */
+  }
