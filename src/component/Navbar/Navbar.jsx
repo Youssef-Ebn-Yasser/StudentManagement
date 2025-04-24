@@ -17,13 +17,9 @@ function Navbar() {
     };
 
     return (
-<<<<<<< HEAD
         <div className='h-[56px]'>
             <div className={`fixed top-0 left-0 right-0 h-[56px] bg-white shadow-xs flex items-center px-6 ${styles.navbar} z-50`}>
-=======
-        <>
-            <div className={`fixed top-0 left-0 right-0 h-[56px] bg-white shadow-xs flex items-center mb-[100px] px-6 ${styles.navbar} z-50`}>
->>>>>>> 0fcdbce (updated files)
+
                 {/* Logo */}
                 <div className={`absolute top-[10px] left-[24px] w-[106px] h-[36px] text-black text-center text-lg font-extrabold flex items-center justify-center rounded-md ${styles.logo}`}>
                     E-learning
