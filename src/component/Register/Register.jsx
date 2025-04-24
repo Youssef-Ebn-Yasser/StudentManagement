@@ -1,4 +1,3 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
 import img from '@/assets/studentReg.png'
 import logoImg from '@/assets/online-course.png'
