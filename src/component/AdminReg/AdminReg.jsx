@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import img from '../../assets/StudentReg.png'
-import {useFormik} from 'formik'
+import img from '@/assets/studentReg.png'
+import { useFormik } from 'formik'; 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup'
@@ -32,10 +32,7 @@ function AdminReg() {
             name:'',
             email:'',
             password:'',
-            rePassword:'',
-            education:'',
-            age:0,
-            photo:null
+            rePassword:''
         },
         onSubmit:handleReg,
         
@@ -43,7 +40,7 @@ function AdminReg() {
 
     return <>
 
-            <div className='mx-auto flex flex-row flex-wrap justify-cnter items-center'>
+            <div className='mx-auto flex flex-row flex-wrap justify-center items-center'>
             <div className='basis-[100%]'>
                         <i onClick={()=>{handleGoBack()}} className="fa-solid fa-chevron-left text-gray-400 text-3xl mb-3 rounded p-2 hover:cursor-pointer hover:shadow-2xl hover:bg-red-600 hover:text-white transition-all duration-300 ease "></i>
                 </div>
@@ -66,18 +63,6 @@ function AdminReg() {
 
                                 <div className=" mb-3">
                                     <input type="password" className='border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease' value={formik.values.rePassword} name="rePassword" onChange={formik.handleChange} onBlur={formik.handleBlur} id="rePassword" placeholder="rePassword" required/>
-                                </div>
-
-                                <div className=" mb-3">
-                                    <input type="number" className='border-1 border-gray-400 rounded  p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease' value={formik.values.age} name="age" onChange={formik.handleChange} onBlur={formik.handleBlur} id="age" placeholder="age" required/>
-                                </div>
-
-                                <div className=" mb-3">
-                                    <input type="file" accept='image/*'  className='border-1 border-gray-400 rounded  p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease' value={formik.values.photo} name="photo" onChange={formik.handleChange} onBlur={formik.handleBlur} id="photo" placeholder="photo" required/>
-                                </div>
-
-                                <div className=" mb-3">
-                                    <input type="text" className='border-1 border-gray-400 rounded  p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease' name="education" value={formik.values.education} onChange={formik.handleChange} onBlur={formik.handleBlur} id="education" placeholder="Education" required/>
                                 </div>
 
                                     <div className=" flex justify-center my-3">
