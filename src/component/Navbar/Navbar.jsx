@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import Button from './Button';
 import styles from './Navbar.module.css'; // Import the CSS module
 
@@ -95,9 +95,12 @@ function Navbar() {
                             </div>
                         )}
                     </div>
-                    <div className={`w-[24px] h-[24px] text-neutral-700 ${styles.cartIcon}`}>
-                        <i className="fa-solid fa-cart-shopping"></i>
+                    <Link to={"/profile"}>
+                    <div className={`w-[36px] h-[36px] text-neutral-700 text-4xl ${styles.cartIcon}`}>
+                        <i className="fa-solid fa-circle"></i>
                     </div>
+                    </Link>
+
                 </div>
 
                 {/* Hamburger Menu Button, Bell, and Cart Icons (Small Screens) */}
@@ -116,9 +119,11 @@ function Navbar() {
                             </div>
                         )}
                     </div>
-                    <div className={`w-[24px] h-[24px] text-neutral-700 ${styles.cartIcon}`}>
-                        <i className="fa-solid fa-cart-shopping"></i>
+                    <Link to={"/profile"}>
+                    <div className={`w-[36px] h-[36px] text-neutral-700 text-4xl ${styles.cartIcon}`}>
+                        <i className="fa-solid fa-circle"></i>
                     </div>
+                    </Link>
                     <button
                         onClick={toggleMenu}
                         className={`text-black focus:outline-none ${styles.menuButton}`}
@@ -192,7 +197,8 @@ function Navbar() {
                             <i className={`fa-solid fa-magnifying-glass absolute top-[10px] left-[12px] text-neutral-900 ${styles.searchIcon}`}></i>
                         </span>
                     </div>
-                    <Button />
+                    <Link to={"/auth/login"}> <Button /></Link>
+                    
                 </div>
             </div>
         </div>
