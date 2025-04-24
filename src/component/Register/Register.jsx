@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import img from '../../assets/StudentReg.png'
-import logoImg from '../../assets/online-course.png'
+import img from '@/assets/studentReg.png'
+import logoImg from '@/assets/online-course.png'
 
 function Register() {
     return <>
