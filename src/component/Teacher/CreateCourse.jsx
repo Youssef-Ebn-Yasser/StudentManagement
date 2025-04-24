@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './CreateCourse.css';
 
-const App = () => {
+const CreateCourse = () => {
   // ====================== Navigation and State Hooks ======================
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('courses');
@@ -1789,4 +1789,4 @@ const App = () => {
   );
 };
 
-export default App; 
+export default CreateCourse; 
