@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import img1 from '../../assets/homepicstatic1.jpg';
 import img2 from '../../assets/homepicstatic2.jpg';
-import img3 from '../../assets/homepicstatic3.jpg';
-import img4 from '../../assets/homepicstatic4.jpg';
+import img3 from '../../assets/homepicstatic2.jpg';
+import img4 from '../../assets/homepicstatic1.jpg';
 import img from '../../assets/sliderpic.jpg';
 import styles from './Home.module.css';
 
@@ -137,7 +137,7 @@ function Home() {
           >
             <div className="relative overflow-hidden">
               <img
-                src={img3}
+                src={img1}
                 alt="Video Editing Clapperboard with Popcorn"
                 className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
               />
@@ -167,7 +167,7 @@ function Home() {
           >
             <div className="relative overflow-hidden">
               <img
-                src={img4}
+                src={img2}
                 alt="Video Editing Clapperboard with Popcorn"
                 className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
               />
@@ -332,7 +332,7 @@ function Home() {
           >
             <div className="relative overflow-hidden">
               <img
-                src={img3}
+                src={img1}
                 alt="Video Editing Clapperboard with Popcorn"
                 className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
               />
@@ -362,7 +362,7 @@ function Home() {
           >
             <div className="relative overflow-hidden">
               <img
-                src={img4}
+                src={img2}
                 alt="Video Editing Clapperboard with Popcorn"
                 className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
               />
@@ -479,7 +479,7 @@ function Home() {
           >
             <div className="relative overflow-hidden">
               <img
-                src={img3}
+                src={img1}
                 alt="Video Editing Clapperboard with Popcorn"
                 className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
               />
@@ -509,7 +509,7 @@ function Home() {
           >
             <div className="relative overflow-hidden">
               <img
-                src={img4}
+                src={img2}
                 alt="Video Editing Clapperboard with Popcorn"
                 className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
               />
