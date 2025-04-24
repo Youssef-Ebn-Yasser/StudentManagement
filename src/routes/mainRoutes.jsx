@@ -19,7 +19,7 @@ const routesConfig = [
   { path: 'teachers', element: <Teachers />, isProtected: false, accessRole: 'all' },
   { path: 'about', element: <About />, isProtected: false, accessRole: 'all' },
   { path: 'coursesDetails', element: <CoursesDetails />, isProtected: false, accessRole: 'all' },
-  { path: 'dashboard', element: <Dashboard />, isProtected: true , accessRole: 'admin' },
+  { path: 'dashboard', element: <Dashboard />, isProtected: false , accessRole: 'all' },
   { path: 'teacher/profile', element: <TeacherProfile />, isProtected: false , accessRole: 'all' },
   { path: 'teacher/profile/createcourse', element: <CreateCourse />, isProtected: false , accessRole: 'all' },
 ];
