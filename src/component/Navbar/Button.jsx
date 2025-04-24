@@ -1,10 +1,19 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 const Button = () => {
+  const navigate = useNavigate();
+
   return (
     <StyledWrapper>
-      <button className="cta">
+      <button 
+        type="button"
+        onClick={() => {
+          navigate('/auth/login');
+        }}
+        className="cta"
+      >
         <span>Sign in</span>
         <svg width="12px" height="8px" viewBox="0 0 13 10">
           <path d="M1,5 L11,5" />

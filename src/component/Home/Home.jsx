@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import img1 from '../../assets/homepicstatic1.jpg';
 import img2 from '../../assets/homepicstatic2.jpg';
-import img3 from '../../assets/homepicstatic3.jpg';
-import img4 from '../../assets/homepicstatic4.jpg';
+import img3 from '../../assets/homepicstatic2.jpg';
+import img4 from '../../assets/homepicstatic1.jpg';
 import img from '../../assets/sliderpic.jpg';
 import styles from './Home.module.css';
 
