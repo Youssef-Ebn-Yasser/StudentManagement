@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './CreateCourse.css';
+import "./CearteCourse.css"
 
 const CreateCourse = () => {
   // ====================== Navigation and State Hooks ======================
