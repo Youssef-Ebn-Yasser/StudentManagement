@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import img from '../../assets/StudentReg.png'
+import img from '@/assets/studentReg.png'
 import { useNavigate } from 'react-router-dom';
 
 
