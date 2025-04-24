@@ -1,0 +1,8 @@
+.teacherprofile-content{
+    width: 90%;
+    margin: 5vh auto 0 ;
+}
+.box{
+    filter: drop-shadow(rgba(0, 0, 0, 0.167) 1px 1px 4px);
+
+}
