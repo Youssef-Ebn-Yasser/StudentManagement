@@ -312,4 +312,47 @@ public class AuthenticationService : IAuthenticationService
 
         return refreshTokenEntity;
     }
+
+    public async Task<Response<UserDto>> GetUserByToken(string refreshToken)
+    {
+
+        var storedToken = _context.RefreshTokens.FirstOrDefault(x => x.Token == refreshToken);
+        if (storedToken == null)
+        {            
+            return _responseHandler.BadRequest<UserDto>("Invalid refresh token");
+        };
+        // Check if token is used or revoked
+        if (storedToken.IsUsed || storedToken.IsRevoked)
+        {            
+            return _responseHandler.BadRequest<UserDto>("Token has been used or revoked");
+        }
+        // Check if token is expired
+        if (storedToken.ExpiryDate < DateTime.Now)
+        {            
+            return _responseHandler.BadRequest<UserDto>("Token has expired");
+        }
+
+        var user = await _userManager.FindByIdAsync(storedToken.UserId);
+        
+
+        if (user == null)
+        {            
+            return _responseHandler.BadRequest<UserDto>("User not found");
+        }
+
+        var userDto = new UserDto
+        {
+            Id = int.Parse(user.Id),
+            Name = user.UserName,
+            Email = user.Email,
+            Phone = user.PhoneNumber,
+            CreatedAt = DateTime.Now,
+            // ProfileImagePath = user.ProfileImagePath,
+            Roles = await _userManager.GetRolesAsync(user)
+
+        };
+
+        return _responseHandler.Success(userDto);
+    }
+    
 }

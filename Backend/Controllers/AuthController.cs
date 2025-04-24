@@ -40,4 +40,23 @@ public class AuthController : AppControllerBase
         var result = await _authService.RegisterAdminAsync(model);
         return NewResult(result);
     }
+
+    [HttpGet("GetUserByToken")]
+    public async Task<IActionResult> GetUserByToken([FromHeader] string refreshToken)
+    {
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            return BadRequest("Refresh token is required.");
+        }
+
+        var result = await _authService.GetUserByToken(refreshToken);
+
+        if (result == null)
+        {
+            return Unauthorized("Invalid refresh token.");
+        }
+
+        return NewResult(result);
+    }
 }
+
