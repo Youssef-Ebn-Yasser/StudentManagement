@@ -162,12 +162,12 @@ function Navbar() {
                     </li>
                     <li>
                         <NavLink
-                            to="/teachers"
+                            to="/dashboard"
                             className={({ isActive }) =>
                                 isActive ? `${styles.navlink} ${styles.active}` : styles.navlink
                             }
                         >
-                            Teachers
+                            Dashboard
                         </NavLink>
                     </li>
                     <li>

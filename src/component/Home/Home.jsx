@@ -137,7 +137,7 @@ function Home() {
           >
             <div className="relative overflow-hidden">
               <img
-                src={img3}
+                src={img1}
                 alt="Video Editing Clapperboard with Popcorn"
                 className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
               />
@@ -167,7 +167,7 @@ function Home() {
           >
             <div className="relative overflow-hidden">
               <img
-                src={img4}
+                src={img2}
                 alt="Video Editing Clapperboard with Popcorn"
                 className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
               />
@@ -332,7 +332,7 @@ function Home() {
           >
             <div className="relative overflow-hidden">
               <img
-                src={img3}
+                src={img1}
                 alt="Video Editing Clapperboard with Popcorn"
                 className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
               />
@@ -362,7 +362,7 @@ function Home() {
           >
             <div className="relative overflow-hidden">
               <img
-                src={img4}
+                src={img2}
                 alt="Video Editing Clapperboard with Popcorn"
                 className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
               />
@@ -479,7 +479,7 @@ function Home() {
           >
             <div className="relative overflow-hidden">
               <img
-                src={img3}
+                src={img1}
                 alt="Video Editing Clapperboard with Popcorn"
                 className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
               />
@@ -509,7 +509,7 @@ function Home() {
           >
             <div className="relative overflow-hidden">
               <img
-                src={img4}
+                src={img2}
                 alt="Video Editing Clapperboard with Popcorn"
                 className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
               />
