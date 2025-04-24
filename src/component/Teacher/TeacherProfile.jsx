@@ -4,6 +4,7 @@ import './TeacherProfile.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faVideo, faCheck, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
 import { faSellcast } from '@fortawesome/free-brands-svg-icons';
+
 function TeacherProfile() {
   const [batchs, setBatchs]= useState([
     {
