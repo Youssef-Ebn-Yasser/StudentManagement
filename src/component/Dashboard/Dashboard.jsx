@@ -1,7 +1,7 @@
 import React from 'react'
-import img1 from '../../assets/Programing.png'
-import img2 from '../../assets/online-learning.png'
-import img3 from '../../assets/illustration.png'
+import img1 from '../../assets/online-course.png'
+import img2 from '../../assets/online-course.png'
+import img3 from '../../assets/online-course.png'
 import styles from './Dashboard.module.css';
 import { Link } from 'react-router-dom';
 import {
