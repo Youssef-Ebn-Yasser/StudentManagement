@@ -1,5 +1,4 @@
-﻿
-using Backend.DTOs.AuthDTOs;
+﻿using Backend.DTOs.AuthDTOs;
 
 namespace Backend.Services.Interfaces;
 
@@ -14,4 +13,7 @@ public interface IAuthenticationService
     Task<Response<string>> ConfirmEmailAsync(string userId, string token);
     Task<Response<string>> ForgotPasswordAsync(string email);
     Task<Response<string>> ResetPasswordAsync(string email, string token, string newPassword);
+    
+
+    Task<Response<UserDto>> GetUserByToken(string token);
 }
