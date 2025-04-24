@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import Button from './Button';
 import styles from './Navbar.module.css'; // Import the CSS module
+import img from '../../assets/avatar.png'; // Import the logo image
 
 function Navbar() {
     const [isNotificationVisible, setIsNotificationVisible] = useState(false); // State for notification dropdown
@@ -16,8 +17,13 @@ function Navbar() {
     };
 
     return (
-        <>
+<<<<<<< HEAD
+        <div className='h-[56px]'>
             <div className={`fixed top-0 left-0 right-0 h-[56px] bg-white shadow-xs flex items-center px-6 ${styles.navbar} z-50`}>
+=======
+        <>
+            <div className={`fixed top-0 left-0 right-0 h-[56px] bg-white shadow-xs flex items-center mb-[100px] px-6 ${styles.navbar} z-50`}>
+>>>>>>> 0fcdbce (updated files)
                 {/* Logo */}
                 <div className={`absolute top-[10px] left-[24px] w-[106px] h-[36px] text-black text-center text-lg font-extrabold flex items-center justify-center rounded-md ${styles.logo}`}>
                     E-learning
@@ -48,12 +54,12 @@ function Navbar() {
                         </li>
                         <li>
                             <NavLink
-                                to="/teachers"
+                                to="/dashboard"
                                 className={({ isActive }) =>
                                     isActive ? `${styles.navlink} ${styles.active}` : styles.navlink
                                 }
                             >
-                                Teachers
+                                Dashboard
                             </NavLink>
                         </li>
                         <li>
@@ -95,9 +101,12 @@ function Navbar() {
                             </div>
                         )}
                     </div>
-                    <div className={`w-[24px] h-[24px] text-neutral-700 ${styles.cartIcon}`}>
-                        <i className="fa-solid fa-cart-shopping"></i>
+                    <Link to={"/profile"}>
+                    <div className={`w-[30px] h-[30px] text-neutral-700 text-3xl ${styles.cartIcon}`}>
+                    <img src={img} alt="user picture" />
                     </div>
+                    </Link>
+
                 </div>
 
                 {/* Hamburger Menu Button, Bell, and Cart Icons (Small Screens) */}
@@ -116,9 +125,11 @@ function Navbar() {
                             </div>
                         )}
                     </div>
-                    <div className={`w-[24px] h-[24px] text-neutral-700 ${styles.cartIcon}`}>
-                        <i className="fa-solid fa-cart-shopping"></i>
+                    <Link to={"/profile"}>
+                    <div className={`w-[30px] h-[30px] text-neutral-700 text-3xl ${styles.cartIcon}`}>
+                        <img src={img} alt="user picture" />
                     </div>
+                    </Link>
                     <button
                         onClick={toggleMenu}
                         className={`text-black focus:outline-none ${styles.menuButton}`}
@@ -162,12 +173,12 @@ function Navbar() {
                     </li>
                     <li>
                         <NavLink
-                            to="/teachers"
+                            to="/dashboard"
                             className={({ isActive }) =>
                                 isActive ? `${styles.navlink} ${styles.active}` : styles.navlink
                             }
                         >
-                            Teachers
+                            Dashboard
                         </NavLink>
                     </li>
                     <li>
@@ -192,10 +203,11 @@ function Navbar() {
                             <i className={`fa-solid fa-magnifying-glass absolute top-[10px] left-[12px] text-neutral-900 ${styles.searchIcon}`}></i>
                         </span>
                     </div>
-                    <Button />
+                    <Link to={"/auth/login"}> <Button /></Link>
+                    
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 

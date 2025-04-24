@@ -3,6 +3,7 @@ import Login from '../component/Login/Login';
 import Register from '../component/Register/Register';
 import StudentReg from '@/component/StudentReg/StudentReg';
 import AdminReg from '@/component/AdminReg/AdminReg';
+import ForgetPassword from '@/component/ForgetPassword/ForgetPassword';
 
 const authRoutes = ([
   {
@@ -13,6 +14,7 @@ const authRoutes = ([
       { path: 'teacherRegister', element: <TeacherReg /> },
       { path: 'studentRegister', element: <StudentReg /> },
       { path: 'adminRegister', element: <AdminReg /> },
+      { path: 'forgetpassword', element: <ForgetPassword /> },
     ]
   }
 ]);
