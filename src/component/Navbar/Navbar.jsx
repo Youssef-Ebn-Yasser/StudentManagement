@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import Button from './Button';
 import styles from './Navbar.module.css'; // Import the CSS module
+import img from '../../assets/avatar.png'; // Import the logo image
 
 function Navbar() {
     const [isNotificationVisible, setIsNotificationVisible] = useState(false); // State for notification dropdown
@@ -96,8 +97,8 @@ function Navbar() {
                         )}
                     </div>
                     <Link to={"/profile"}>
-                    <div className={`w-[36px] h-[36px] text-neutral-700 text-4xl ${styles.cartIcon}`}>
-                        <i className="fa-solid fa-circle"></i>
+                    <div className={`w-[30px] h-[30px] text-neutral-700 text-3xl ${styles.cartIcon}`}>
+                    <img src={img} alt="user picture" />
                     </div>
                     </Link>
 
@@ -120,8 +121,8 @@ function Navbar() {
                         )}
                     </div>
                     <Link to={"/profile"}>
-                    <div className={`w-[36px] h-[36px] text-neutral-700 text-4xl ${styles.cartIcon}`}>
-                        <i className="fa-solid fa-circle"></i>
+                    <div className={`w-[30px] h-[30px] text-neutral-700 text-3xl ${styles.cartIcon}`}>
+                        <img src={img} alt="user picture" />
                     </div>
                     </Link>
                     <button
