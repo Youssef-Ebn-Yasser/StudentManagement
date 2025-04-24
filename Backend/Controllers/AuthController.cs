@@ -44,6 +44,7 @@ public class AuthController : AppControllerBase
     [HttpGet("GetUserByToken")]
     public async Task<IActionResult> GetUserByToken([FromHeader] string refreshToken)
     {
+        
         if (string.IsNullOrEmpty(refreshToken))
         {
             return BadRequest("Refresh token is required.");
