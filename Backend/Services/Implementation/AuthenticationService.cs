@@ -1,4 +1,5 @@
 using Backend.BaseResponse;
+using Backend.Constraints;
 using Backend.DTOs.AuthDTOs;
 using Backend.Entities;
 using Backend.Services.Interfaces;
@@ -50,20 +51,20 @@ public class AuthenticationService : IAuthenticationService
         var user = await _userManager.FindByEmailAsync(model.Email);
 
         if (user == null)
-        {            
+        {
             return _responseHandler.BadRequest<TokenDto>("Invalid credentials");
         }
 
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, model.Password);
 
         if (!isPasswordValid)
-        {            
+        {
             return _responseHandler.BadRequest<TokenDto>("Invalid credentials");
         }
 
         // Check if email is confirmed
         if (!await _userManager.IsEmailConfirmedAsync(user))
-        {            
+        {
             return _responseHandler.BadRequest<TokenDto>("Email not confirmed");
         }
 
@@ -80,7 +81,7 @@ public class AuthenticationService : IAuthenticationService
         var user = await _userManager.FindByIdAsync(userId);
 
         if (user == null)
-        {            
+        {
             return _responseHandler.BadRequest<TokenDto>("User not found");
         }
 
@@ -94,19 +95,19 @@ public class AuthenticationService : IAuthenticationService
         var storedToken = _context.RefreshTokens.FirstOrDefault(x => x.Token == refreshToken);
 
         if (storedToken == null)
-        {            
+        {
             return _responseHandler.BadRequest<TokenDto>("Invalid refresh token");
         }
 
         // Check if token is used or revoked
         if (storedToken.IsUsed || storedToken.IsRevoked)
-        {            
+        {
             return _responseHandler.BadRequest<TokenDto>("Token has been used or revoked");
         }
 
         // Check if token is expired
         if (storedToken.ExpiryDate < DateTime.Now)
-        {            
+        {
             return _responseHandler.BadRequest<TokenDto>("Token has expired");
         }
 
@@ -143,9 +144,9 @@ public class AuthenticationService : IAuthenticationService
     private async Task<Response<TokenDto>> RegisterUserAsync(RegisterDto model, string role)
     {
         var userExists = await _userManager.FindByEmailAsync(model.Email);
-        
+
         if (userExists != null)
-        {            
+        {
             return _responseHandler.BadRequest<TokenDto>("User already exists");
         }
 
@@ -176,9 +177,9 @@ public class AuthenticationService : IAuthenticationService
         // Generate email confirmation token and send email
         var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(confirmationToken));
-        
+
         var callbackUrl = $"{_baseUrl}/confirm-email?userId={user.Id}&token={encodedToken}";
-        
+
         await _emailSender.SendEmailAsync(
             user.Email,
             "Confirm your email",
@@ -196,7 +197,7 @@ public class AuthenticationService : IAuthenticationService
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
-        {            
+        {
             return _responseHandler.BadRequest<string>("User not found");
         }
 
@@ -204,7 +205,7 @@ public class AuthenticationService : IAuthenticationService
         var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
 
         if (!result.Succeeded)
-        {            
+        {
             return _responseHandler.BadRequest<string>("Email confirmation failed");
         }
 
@@ -215,7 +216,7 @@ public class AuthenticationService : IAuthenticationService
     {
         var user = await _userManager.FindByEmailAsync(email);
         if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
-        {            
+        {
             return _responseHandler.Success("Password reset link has been sent if the email exists");
         }
 
@@ -236,7 +237,7 @@ public class AuthenticationService : IAuthenticationService
     {
         var user = await _userManager.FindByEmailAsync(email);
         if (user == null)
-        {            
+        {
             return _responseHandler.BadRequest<string>("User not found");
         }
 
@@ -244,7 +245,7 @@ public class AuthenticationService : IAuthenticationService
         var result = await _userManager.ResetPasswordAsync(user, decodedToken, newPassword);
 
         if (!result.Succeeded)
-        {            
+        {
             var errors = result.Errors.Select(e => e.Description).ToList();
             return _responseHandler.BadRequest<string>(string.Join(", ", errors));
         }
@@ -312,4 +313,48 @@ public class AuthenticationService : IAuthenticationService
 
         return refreshTokenEntity;
     }
+
+    public async Task<Response<UserDto>> GetUserByToken(string refreshToken)
+    {
+
+        var storedToken = _context.RefreshTokens.FirstOrDefault(x => x.Token == refreshToken);
+        if (storedToken == null)
+        {
+            return _responseHandler.BadRequest<UserDto>("Invalid refresh token");
+        }
+        ;
+        // Check if token is used or revoked
+        if (storedToken.IsUsed || storedToken.IsRevoked)
+        {
+            return _responseHandler.BadRequest<UserDto>("Token has been used or revoked");
+        }
+        // Check if token is expired
+        if (storedToken.ExpiryDate < DateTime.Now)
+        {
+            return _responseHandler.BadRequest<UserDto>("Token has expired");
+        }
+
+        var user = await _userManager.FindByIdAsync(storedToken.UserId);
+
+
+        if (user == null)
+        {
+            return _responseHandler.BadRequest<UserDto>("User not found");
+        }
+
+        var userDto = new UserDto
+        {
+            Id = int.Parse(user.Id),
+            Name = user.UserName,
+            Email = user.Email,
+            Phone = user.PhoneNumber,
+            CreatedAt = DateTime.Now,
+            // ProfileImagePath = user.ProfileImagePath,
+            Roles = await _userManager.GetRolesAsync(user)
+
+        };
+
+        return _responseHandler.Success(userDto);
+    }
+
 }
