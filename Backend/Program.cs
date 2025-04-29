@@ -15,7 +15,46 @@ builder.Services.AddConnectionDependency(builder.Configuration)
                 .AddClassesDependencies();
 
 builder.Services.AddHttpClient();
+
+
+
+//#region   CORS
+//var CORS = "_cors";
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy(name: CORS,
+//       policy =>
+//       {
+//           policy.AllowAnyHeader()
+//                 .AllowAnyMethod()
+//                 .SetIsOriginAllowed(origin =>
+//                 {
+//                     return !string.IsNullOrEmpty(origin) && origin.Contains("localhost");
+//                 })
+//                 .AllowCredentials();
+//       });
+//});
+//#endregion
+
+#region   CORS
+var CORS = "_cors";
+builder.Services.AddCors(Options =>
+{
+    Options.AddPolicy(name: CORS,
+       policy =>
+       {
+           policy.AllowAnyHeader();
+           policy.AllowAnyMethod();
+           policy.WithOrigins("*");
+       });
+});
+#endregion
+
+
+
 var app = builder.Build();
+
+
 
 //if (app.Environment.IsDevelopment())
 //{
@@ -25,11 +64,29 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
+app.Use(async (context, next) =>
+{
+    if (context.Request.Method == "OPTIONS")
+    {
+        context.Response.StatusCode = 200;
+        await context.Response.CompleteAsync();
+    }
+    else
+    {
+        await next();
+    }
+});
+
+app.UseCors(CORS);
+
+
 app.UseHttpsRedirection();
+
 
 // Auth Middleware
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 
