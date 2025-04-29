@@ -10,12 +10,18 @@
 
   <ItemGroup>
 
+    <PackageReference Include="Emgu.CV" Version="4.10.0.5680" />
+
     <PackageReference Include="MailKit" Version="4.11.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
 
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
+
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="9.0.4" />
+
+    <PackageReference Include="Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime" Version="3.0.0" />
 
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
@@ -27,7 +33,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.ML" Version="4.0.2" />
+    <PackageReference Include="Microsoft.ML.Recommender" Version="0.22.2" />
     <PackageReference Include="MimeKit" Version="4.11.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.0" />
 
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />

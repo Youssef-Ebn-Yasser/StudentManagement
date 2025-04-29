@@ -11,4 +11,5 @@ public class User
     public bool IsDeleted { get; set; } = false;
     public string? ProfileImagePath { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
+  
 }

@@ -1,3 +1,4 @@
+using Backend.DTOs;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Backend.Context;
@@ -18,6 +19,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Payment> Payments { get; set; }
     public DbSet<StudentCourse> studentCourses { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<CheatEvent> CheatEvents { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
