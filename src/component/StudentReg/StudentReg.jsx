@@ -2,12 +2,17 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import img from '@/assets/studentReg.png'
 import {useFormik} from 'formik'
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup'
+import { registerStudent } from '@/Redux/features/registerStudent/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 
 function StudentReg() {
+
+    const dispatch= useDispatch()
+    const {loading, error}= useSelector((state)=>state.auth || {})
+
 
     const navigate= useNavigate()
     const handleGoBack=()=>{
@@ -15,28 +20,39 @@ function StudentReg() {
     }
 
     const handleReg = async(formsData) =>{
-        try{
-         console.log('Registered',formsData);
-         navigate('/auth/login')
- 
- 
-        }catch(error){
-         console.log('error',error);
-         
+        const action= await dispatch(registerStudent(formsData))
+
+        if(registerStudent.fulfilled.match(action)){
+            console.log('Registered');
+            navigate('/auth/login')
+            
+        }else{
+            console.log("Registration failed:", error);
         }
             
      }
+
+    let validationSchema=Yup.object(
+        {
+            name:Yup.string().required('name is required').min(3,'min length is 3'). max(10,'max lenght is 10'),
+            email:Yup.string().required('email is required').email('invalid email'),
+            password:Yup.string().required('password is required').matches(/^.{6,}$/),
+            confirmPassword:Yup.string().required('rePassword is required').oneOf([Yup.ref('password')],'password not match')
+        }
+    )
 
     let formik= useFormik({
         initialValues:{
             name:'',
             email:'',
             password:'',
-            rePassword:''
+            confirmPassword:''
         },
+        validationSchema:validationSchema,
         onSubmit:handleReg,
         
     })
+
 
     return <>
 
@@ -68,7 +84,9 @@ function StudentReg() {
                                 </div>
 
                                 <div className=" flex justify-center my-3">
-                                    <button className="bg-blue-600 text-white px-6 py-2 rounded text-xl  hover:cursor-pointer hover:shadow-sm hover:shadow-blue-500 transition-all duration-300 ease" type="submit">Register</button>
+                                    <button className="bg-blue-600 text-white px-6 py-2 rounded text-xl  hover:cursor-pointer hover:shadow-sm hover:shadow-blue-500 transition-all duration-300 ease" type="submit" disabled={loading}>
+                                        {loading ? <Loader /> : 'Register'}
+                                    </button>
                                 </div>
 
                                 <div >

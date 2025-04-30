@@ -97,8 +97,8 @@ function Navbar() {
                             </div>
                         )}
                     </div>
-                    <Link to={"/profile"}>
-                    <div className={`w-[30px] h-[30px] text-neutral-700 text-3xl ${styles.cartIcon}`}>
+                    <Link to={"/teacher/profile"}>
+                    <div className={`w-[20px] h-[25px] text-neutral-700 text-3xl ${styles.cartIcon}`}>
                     <img src={img} alt="user picture" />
                     </div>
                     </Link>

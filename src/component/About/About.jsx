@@ -70,8 +70,10 @@ export default function About() {
             <p className='text-lg'>We respond to questions and complaints quickly to keep users supported.</p>
 
           </div>
+          
+         
           <div>
-            <span><i className="fa-solid fa-check border-4 border-gray-100 shadow-lg shadow-gray-300 p-2 rounded-3xl text-white bg-[#545AE8] text-2xl hover:text-[#545AE8] hover:bg-white hover:cursor-pointer transition-all duration-300 ease"></i></span>
+            <span><i className="fa-solid fa-check border-4 border-gray-200 shadow-lg shadow-gray-400  p-2 rounded-3xl text-white bg-[#545AE8] text-2xl hover:text-[#545AE8] hover:bg-white hover:cursor-pointer transition-all duration-300 ease"></i></span>
             <p className='font-bold text-2xl py-3'>High Success Rate</p>
             <p className='text-lg'>Thousands of learners have completed courses and achieved their goals.</p>
           </div>

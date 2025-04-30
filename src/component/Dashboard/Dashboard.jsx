@@ -95,20 +95,20 @@ function Dashboard() {
             </div>
 
             <div className='shadow-xl shadow-gray-400 px-3 rounded-2xl'>
-                <h2 className='text-2xl font-bold py-5'>Upcoming Lessons</h2>
+                <h2 className='text-2xl font-bold py-5'>Registered students</h2>
                 <div className='py-3 px-5'>
                     <ul className="list-disc marker:text-yellow-500">
-                        <div className='py-3'>
-                            <li className='text-2xl'>Object-Oriented Programming</li>
-                            <span className='text-gray-600'>Apr 25, 1:00 PM</span>
+                        <div className=''>
+                            <li className='text-xl'>Hadeer Emad Mohamed</li>
+                            <span className='text-gray-900'><span className='text-xl text-gray-600'>Enrolled Course: </span>Javascript OOP</span>
                         </div>
-                        <div className='py-3'>
-                            <li className='text-2xl'>Data Visulization Techniques</li>
-                            <span className='text-gray-600'>Apr 25, 1:00 PM</span>
+                        <div className=''>
+                            <li className='text-xl'>Hadeer Emad Mohamed</li>
+                            <span className='text-gray-900'><span className='text-xl text-gray-600'>Enrolled Course: </span>Javascript OOP</span>
                         </div>
-                        <div className='py-3'>
-                        <li className='text-2xl'>Typography in Degign</li>
-                            <span className='text-gray-600'>Apr 25, 1:00 PM</span>
+                        <div className=''>
+                            <li className='text-xl'>Hadeer Emad Mohamed</li>
+                            <span className='text-gray-900'><span className='text-xl text-gray-600'>Enrolled Course: </span>Javascript OOP</span>
                         </div>
                         
                     </ul>

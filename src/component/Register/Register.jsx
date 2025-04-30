@@ -1,10 +1,14 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import img from '@/assets/studentReg.png'
 import logoImg from '@/assets/online-course.png'
 
+
 function Register() {
+
+
+   
     return <>
-        <div className='mx-auto flex flex-wrap flex-row justify-cnter items-center'>
+        <div className='mx-auto flex flex-wrap flex-row justify-center items-center'>
             <div className='flex flex-col-reverse  sm:flex-col-reverse  md:flex-col-reverse lg:flex-row justify-between items-center content-center w-[100%] h-full'>
                 <div className="welcome mx-auto flex flex-col justify-center items-center gap-10">
                     <div className="img">

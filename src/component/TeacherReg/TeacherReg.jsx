@@ -2,11 +2,17 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import img from '@/assets/studentReg.png'
 import {useFormik} from 'formik'
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerTeacher } from '@/Redux/features/registerTeacher/authSlice';
 import * as Yup from 'yup'
+import Loader from '../Loader/Loader';
 
 function TeacherReg() {
+
+    const dispatch= useDispatch()
+    const {loading, error}= useSelector((state)=>state.auth || {})
+
 
     const navigate= useNavigate()
     const handleGoBack=()=>{
@@ -14,25 +20,35 @@ function TeacherReg() {
     }
 
     const handleReg = async(formsData) =>{
-        try{
-         console.log('Registered',formsData);
-         navigate('/auth/login')
- 
- 
-        }catch(error){
-         console.log('error',error);
-         
+        const action= await dispatch(registerTeacher(formsData))
+
+        if(registerTeacher.fulfilled.match(action)){
+            console.log('Registered');
+            navigate('/auth/login')
+            
+        }else{
+            console.log("Registration failed:", error);
         }
             
      }
+
+    let validationSchema=Yup.object(
+        {
+            name:Yup.string().required('name is required').min(3,'min length is 3'). max(10,'max lenght is 10'),
+            email:Yup.string().required('email is required').email('invalid email'),
+            password:Yup.string().required('password is required').matches(/^.{6,}$/),
+            confirmPassword:Yup.string().required('rePassword is required').oneOf([Yup.ref('password')],'password not match')
+        }
+    )
 
     let formik= useFormik({
         initialValues:{
             name:'',
             email:'',
             password:'',
-            rePassword:''
+            confirmPassword:''
         },
+        validationSchema:validationSchema,
         onSubmit:handleReg,
         
     })
@@ -49,7 +65,7 @@ function TeacherReg() {
             
                         <form onSubmit={formik.handleSubmit} action="#!">
                             <div className="flex flex-col gap-2 ">
-                                <div className="mb-3">
+                                <div className="mb-3 w-[100%]">
                                     <input type="text" className='border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease' value={formik.values.name} name="name" onChange={formik.handleChange} onBlur={formik.handleBlur} id="UserName" placeholder="UserName" required/>
                                 </div>
 
@@ -62,11 +78,14 @@ function TeacherReg() {
                                 </div>
 
                                 <div className=" mb-3">
-                                    <input type="password" className='border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease' value={formik.values.rePassword} name="rePassword" onChange={formik.handleChange} onBlur={formik.handleBlur} id="rePassword" placeholder="rePassword" required/>
+                                    <input type="password" className='border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease' value={formik.values.confirmPassword} name="confirmPassword" onChange={formik.handleChange} onBlur={formik.handleBlur} id="confirmPassword" placeholder="confirmPassword" required/>
                                 </div>
 
+
                                 <div className=" flex justify-center my-3">
-                                    <button className="bg-blue-600 text-white px-6 py-2 rounded text-xl  hover:cursor-pointer hover:shadow-sm hover:shadow-blue-500 transition-all duration-300 ease" type="submit">Register</button>
+                                    <button className="bg-blue-600 text-white px-6 py-2 rounded text-xl  hover:cursor-pointer hover:shadow-sm hover:shadow-blue-500 transition-all duration-300 ease" type="submit" disabled={loading} >
+                                        {loading ? <Loader /> : 'Register'}
+                                    </button>
                                 </div>
 
                                 <div>
@@ -81,7 +100,6 @@ function TeacherReg() {
                     <img src={img} alt="studentImg" className='max-h-lvh  ' width={'700px'}/>
                 </div>
             </div>
-            
         </div>
     </>
 }
