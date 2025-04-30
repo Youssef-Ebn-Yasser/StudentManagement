@@ -1,17 +1,12 @@
 using Backend.BaseResponse;
 using Backend.Constraints;
 using Backend.DTOs.AuthDTOs;
-using Backend.Entities;
-using Backend.Services.Interfaces;
 using Backend.Settings;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace Backend.Services.Implementation;
 
