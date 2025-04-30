@@ -20,23 +20,6 @@ builder.Services.AddHttpClient();
 
 
 
-//#region   CORS
-//var CORS = "_cors";
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy(name: CORS,
-//       policy =>
-//       {
-//           policy.AllowAnyHeader()
-//                 .AllowAnyMethod()
-//                 .SetIsOriginAllowed(origin =>
-//                 {
-//                     return !string.IsNullOrEmpty(origin) && origin.Contains("localhost");
-//                 })
-//                 .AllowCredentials();
-//       });
-//});
-//#endregion
 
 #region   CORS
 var CORS = "_cors";
@@ -47,7 +30,7 @@ builder.Services.AddCors(Options =>
        {
            policy.AllowAnyHeader();
            policy.AllowAnyMethod();
-           policy.WithOrigins("*");
+           policy.WithOrigins("http://localhost:5175");
        });
 });
 #endregion
