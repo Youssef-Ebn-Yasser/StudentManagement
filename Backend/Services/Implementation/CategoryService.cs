@@ -2,7 +2,7 @@
 
 namespace Backend.Services.Implementation
 {
-    public class CategoryService:ResponseHandler, ICategoryService
+    public class CategoryService: ResponseHandler, ICategoryService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
