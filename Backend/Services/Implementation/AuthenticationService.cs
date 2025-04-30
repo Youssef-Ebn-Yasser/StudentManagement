@@ -17,8 +17,8 @@ namespace Backend.Services.Implementation;
 
 public class AuthenticationService : IAuthenticationService
 {
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly UserManager<User> _userManager;
+    private readonly RoleManager<IdentityRole<int>> _roleManager;
     private readonly JwtSettings _jwtSettings;
     private readonly ILogger<AuthenticationService> _logger;
     private readonly Context.ApplicationDbContext _context;
@@ -27,8 +27,8 @@ public class AuthenticationService : IAuthenticationService
     private readonly ResponseHandler _responseHandler;
 
     public AuthenticationService(
-        UserManager<IdentityUser> userManager,
-        RoleManager<IdentityRole> roleManager,
+        UserManager<User> userManager,
+        RoleManager<IdentityRole<int>> roleManager,
         IOptions<JwtSettings> jwtSettings,
         ILogger<AuthenticationService> logger,
         Context.ApplicationDbContext context,
@@ -117,7 +117,13 @@ public class AuthenticationService : IAuthenticationService
         await _context.SaveChangesAsync();
 
         // Get user and generate new tokens
-        var user = await _userManager.FindByIdAsync(storedToken.UserId);
+        var user = await _userManager.FindByIdAsync(storedToken.UserId.ToString());
+        
+        if (user == null)
+        {
+            return _responseHandler.BadRequest<TokenDto>("User not found");
+        }
+        
         var jwtToken = await GenerateJwtToken(user);
         var newRefreshToken = await GenerateRefreshToken(user);
 
@@ -150,11 +156,12 @@ public class AuthenticationService : IAuthenticationService
             return _responseHandler.BadRequest<TokenDto>("User already exists");
         }
 
-        var user = new IdentityUser
+        var user = new User
         {
             Email = model.Email,
             UserName = model.Email,
-            SecurityStamp = Guid.NewGuid().ToString()
+            SecurityStamp = Guid.NewGuid().ToString(),
+            Name = model.Name
         };
 
         var result = await _userManager.CreateAsync(user, model.Password);
@@ -168,7 +175,7 @@ public class AuthenticationService : IAuthenticationService
         // Ensure role exists (If we added it Manually, Remove this)
         if (!await _roleManager.RoleExistsAsync(role))
         {
-            await _roleManager.CreateAsync(new IdentityRole(role));
+            await _roleManager.CreateAsync(new IdentityRole<int>(role));
         }
 
         // Add user to role
@@ -180,10 +187,13 @@ public class AuthenticationService : IAuthenticationService
 
         var callbackUrl = $"{_baseUrl}/confirm-email?userId={user.Id}&token={encodedToken}";
 
-        await _emailSender.SendEmailAsync(
-            user.Email,
-            "Confirm your email",
-            $"Please confirm your account by <a href='{callbackUrl}'>clicking here</a>.");
+        if (user.Email != null)
+        {
+            await _emailSender.SendEmailAsync(
+                user.Email,
+                "Confirm your email",
+                $"Please confirm your account by <a href='{callbackUrl}'>clicking here</a>.");
+        }
 
         // Generate token
         var token = await GenerateJwtToken(user);
@@ -215,7 +225,7 @@ public class AuthenticationService : IAuthenticationService
     public async Task<Response<string>> ForgotPasswordAsync(string email)
     {
         var user = await _userManager.FindByEmailAsync(email);
-        if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+        if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)) || user.Email == null)
         {
             return _responseHandler.Success("Password reset link has been sent if the email exists");
         }
@@ -253,17 +263,17 @@ public class AuthenticationService : IAuthenticationService
         return _responseHandler.Success("Password has been reset successfully");
     }
 
-    private async Task<TokenDto> GenerateJwtToken(IdentityUser user)
+    private async Task<TokenDto> GenerateJwtToken(User user)
     {
         var userRoles = await _userManager.GetRolesAsync(user);
 
         var authClaims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email)
+            new Claim(JwtRegisteredClaimNames.Sub, user.Email ?? string.Empty),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty)
         };
 
         foreach (var userRole in userRoles)
@@ -288,7 +298,7 @@ public class AuthenticationService : IAuthenticationService
         };
     }
 
-    private async Task<RefreshToken> GenerateRefreshToken(IdentityUser user)
+    private async Task<RefreshToken> GenerateRefreshToken(User user)
     {
         // Generate random token
         var randomNumber = new byte[32];
@@ -316,13 +326,12 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<Response<UserDto>> GetUserByToken(string refreshToken)
     {
-
         var storedToken = _context.RefreshTokens.FirstOrDefault(x => x.Token == refreshToken);
         if (storedToken == null)
         {
             return _responseHandler.BadRequest<UserDto>("Invalid refresh token");
         }
-        ;
+        
         // Check if token is used or revoked
         if (storedToken.IsUsed || storedToken.IsRevoked)
         {
@@ -334,8 +343,7 @@ public class AuthenticationService : IAuthenticationService
             return _responseHandler.BadRequest<UserDto>("Token has expired");
         }
 
-        var user = await _userManager.FindByIdAsync(storedToken.UserId);
-
+        var user = await _userManager.FindByIdAsync(storedToken.UserId.ToString());
 
         if (user == null)
         {
@@ -344,17 +352,15 @@ public class AuthenticationService : IAuthenticationService
 
         var userDto = new UserDto
         {
-            Id = int.Parse(user.Id),
-            Name = user.UserName,
+            Id = user.Id,
+            Name = user.Name,
             Email = user.Email,
             Phone = user.PhoneNumber,
-            CreatedAt = DateTime.Now,
+            CreatedAt = user.CreatedAt,
             // ProfileImagePath = user.ProfileImagePath,
             Roles = await _userManager.GetRolesAsync(user)
-
         };
 
         return _responseHandler.Success(userDto);
     }
-
 }

@@ -17,10 +17,10 @@ public class RefreshToken
     
     public bool IsRevoked { get; set; }
     
-    public string UserId { get; set; } = string.Empty;
+    public int UserId { get; set; }
     
     [ForeignKey(nameof(UserId))]
-    public Microsoft.AspNetCore.Identity.IdentityUser User { get; set; }
+    public User User { get; set; }
     
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 }
