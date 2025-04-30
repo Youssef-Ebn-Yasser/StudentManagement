@@ -17,7 +17,7 @@ public static class AuthenticationDependency
         }
 
         // Configure Identity
-        services.AddIdentity<IdentityUser, IdentityRole>(options =>
+        services.AddIdentity<User, IdentityRole<int>>(options =>
         {
             options.Password.RequireDigit = true;
             options.Password.RequireLowercase = true;

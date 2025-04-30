@@ -10,7 +10,7 @@ public interface IAuthenticationService
     Task<Response<TokenDto>> RegisterAdminAsync(RegisterDto model);
     Task<Response<TokenDto>> GetJWTToken(string userId);
     Task<Response<TokenDto>> GetRefreshToken(string refreshToken);
-    Task<Response<string>> ConfirmEmailAsync(string userId, string token);
+    Task<Response<string>> ConfirmEmailAsync(int userId, string token);
     Task<Response<string>> ForgotPasswordAsync(string email);
     Task<Response<string>> ResetPasswordAsync(string email, string token, string newPassword);
 

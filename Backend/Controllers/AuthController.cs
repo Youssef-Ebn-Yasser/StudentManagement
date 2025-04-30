@@ -1,4 +1,5 @@
 using Backend.DTOs.AuthDTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers;
 
@@ -34,6 +35,15 @@ public class AuthController : AppControllerBase
         return NewResult(result);
     }
 
+
+    [HttpPost("confirm-email")]
+    public async Task<IActionResult> Verify([FromQuery] int userId, [FromQuery] string token)
+    {
+        var result = await _authService.ConfirmEmailAsync(userId, token);
+        return NewResult(result);
+    }
+  
+
     [HttpPost("register/admin")]
     public async Task<IActionResult> RegisterAdmin([FromBody] RegisterDto model)
     {
@@ -57,6 +67,23 @@ public class AuthController : AppControllerBase
             return Unauthorized("Invalid refresh token.");
         }
 
+        return NewResult(result);
+    }
+
+
+    
+    [HttpGet("GetJWTToken")]
+    
+    public async Task<IActionResult> GetJWTToken([FromQuery] string userId)
+    {
+        var result = await _authService.GetJWTToken(userId);
+        return NewResult(result);
+    }
+
+    [HttpGet("GetRefreshToken")]
+    public async Task<IActionResult> GetRefreshToken([FromQuery] string refreshToken)
+    {
+        var result = await _authService.GetRefreshToken(refreshToken);
         return NewResult(result);
     }
 }
