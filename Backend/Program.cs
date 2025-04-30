@@ -30,7 +30,7 @@ builder.Services.AddCors(Options =>
        {
            policy.AllowAnyHeader();
            policy.AllowAnyMethod();
-           policy.WithOrigins("http://localhost:5175", "http://localhost:5173", "http://localhost:5174");
+           policy.WithOrigins("http://localhost:5175", "http://127.0.0.1:5500", "http://localhost:5173", "http://localhost:5174");
        });
 });
 #endregion
@@ -49,24 +49,10 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.Use(async (context, next) =>
-{
-    if (context.Request.Method == "OPTIONS")
-    {
-        context.Response.StatusCode = 200;
-        await context.Response.CompleteAsync();
-    }
-    else
-    {
-        await next();
-    }
-});
-
-app.UseCors(CORS);
-
 
 app.UseHttpsRedirection();
 
+app.UseCors(CORS);
 
 // Auth Middleware
 app.UseAuthentication();
