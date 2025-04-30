@@ -14,12 +14,14 @@
 
             // Course → ShowAllCoursesDto
             CreateMap<Course, ShowAllCoursesDto>()
-                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => (int?)src.Price));
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => (int?)src.Price))
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.CategoryName)); 
 
             // Course → ShowCourseDto
             CreateMap<Course, ShowCourseDto>()
                 .ForMember(dest => dest.TeacherName, opt => opt.MapFrom(src => src.Teacher != null ? src.Teacher.Name : null))
-                .ForMember(dest => dest.lessonInfo, opt => opt.MapFrom(src => src.lessons));
+                .ForMember(dest => dest.lessonInfo, opt => opt.MapFrom(src => src.lessons))
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.CategoryName));
 
             // Lesson → LessonInfo
             CreateMap<Lesson, LessonInfo>();
