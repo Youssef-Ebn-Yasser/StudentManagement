@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { courseService } from '../../services/courseService';
-import "./CearteCourse.css"
+import "./CreateCourse.css"
 import axios from 'axios';
 
 const CreateCourse = () => {

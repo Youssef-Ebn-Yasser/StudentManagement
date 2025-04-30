@@ -1,13 +1,11 @@
 import { createSlice , createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-export const registerTeacher= createAsyncThunk(
-    'auth/RegisterTeacher',
+export const login= createAsyncThunk(
+    'auth/Login',
     async (formsData, {rejectWithValue})=>{
        try{
-        console.log(formsData);
-        
-        const response = await axios.post('http://e-learn-v1.runasp.net/api/Auth/register/teacher', formsData)
+        const response = await axios.post('http://e-learn-v1.runasp.net/api/Auth/login', formsData)
         return response.data
        }catch(error){
         if (error.response && error.response.data) {
@@ -38,7 +36,7 @@ const getTokenFromLocalStorage = () => {
 //create the slice
 
 const authSlice = createSlice({
-    name:'authTeacher',
+    name:'login',
     initialState:{
         userToken: getTokenFromLocalStorage(),
         loading:false,
@@ -48,16 +46,16 @@ const authSlice = createSlice({
     reducers:{},
 
     extraReducers:(builder)=>{
-        builder.addCase(registerTeacher.pending,(state)=>{
+        builder.addCase(registerStudent.pending,(state)=>{
             state.loading=true;
             state.error=null
         })
-        builder.addCase(registerTeacher.fulfilled,(state,action)=>{
+        builder.addCase(registerStudent.fulfilled,(state,action)=>{
             state.loading=false;
             state.userToken= action.payload.token
             localStorage.setItem('userToken', action.payload.token);
         })
-        builder.addCase(registerTeacher.rejected,(state,action)=>{
+        builder.addCase(registerStudent.rejected,(state,action)=>{
             state.loading=false;
             state.error=action.payload
         })

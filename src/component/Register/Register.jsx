@@ -12,7 +12,7 @@ function Register() {
             <div className='flex flex-col-reverse  sm:flex-col-reverse  md:flex-col-reverse lg:flex-row justify-between items-center content-center w-[100%] h-full'>
                 <div className="welcome mx-auto flex flex-col justify-center items-center gap-10">
                     <div className="img">
-                    <img src={logoImg} alt="logoImg" width={'85px'} className='inline-block m-2' /> <span className='text-4xl font-medium'> <span className='text-pink-800 italic text-shadow-lg text-shadow-gray-600'><i class="fa-solid fa-e"></i></span>-learning</span>
+                    <img src={logoImg} alt="logoImg" width={'85px'} className='inline-block m-2' /> <span className='text-4xl font-medium'> <span className='text-pink-800 italic text-shadow-lg text-shadow-gray-600'><i className="fa-solid fa-e"></i></span>-learning</span>
                     </div>
                     
                     <div className="userLink flex flex-col md:flex-row gap-3 justify-evenly items-center  rounded-3xl p-1">

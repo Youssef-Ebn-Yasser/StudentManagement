@@ -6,12 +6,12 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup'
 import { registerAdmin } from '@/Redux/features/registerAdmin/authSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 function AdminReg() {
 
     const dispatch= useDispatch()
-    const {loading, error}= useSelector((state)=>state.auth || {})
+    const {loading, error}= useSelector((state)=>state.authAdmin || {})
 
 
     const navigate= useNavigate()
@@ -78,7 +78,7 @@ function AdminReg() {
                                 </div>
 
                                 <div className=" mb-3">
-                                    <input type="password" className='border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease' value={formik.values.rePassword} name="rePassword" onChange={formik.handleChange} onBlur={formik.handleBlur} id="rePassword" placeholder="rePassword" required/>
+                                    <input type="password" className='border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease' value={formik.values.confirmPassword} name="confirmPassword" onChange={formik.handleChange} onBlur={formik.handleBlur} id="confirmPassword" placeholder="confirmPassword" required/>
                                 </div>
 
                                     <div className=" flex justify-center my-3">

@@ -11,7 +11,7 @@ import Loader from '../Loader/Loader';
 function TeacherReg() {
 
     const dispatch= useDispatch()
-    const {loading, error}= useSelector((state)=>state.auth || {})
+    const {loading, error}= useSelector((state)=>state.authTeacher || {})
 
 
     const navigate= useNavigate()
@@ -89,7 +89,7 @@ function TeacherReg() {
                                 </div>
 
                                 <div>
-                                <p className="m-0 text-secondary text-center">Already have an account? <Link to={'/auth/login'}  class="text-blue-600 hover:underline transition-all duration-300 ease">Sign in</Link></p>
+                                <p className="m-0 text-secondary text-center">Already have an account? <Link to={'/auth/login'}  className="text-blue-600 hover:underline transition-all duration-300 ease">Sign in</Link></p>
                                 </div>
                     </div>
                     </form>

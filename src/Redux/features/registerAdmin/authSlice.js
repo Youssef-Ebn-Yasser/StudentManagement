@@ -36,7 +36,7 @@ const getTokenFromLocalStorage = () => {
 //create the slice
 
 const authSlice = createSlice({
-    name:'auth',
+    name:'authAdmin',
     initialState:{
         userToken: getTokenFromLocalStorage(),
         loading:false,

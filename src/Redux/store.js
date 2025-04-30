@@ -1,9 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
-import  authReducer  from "./features/registerTeacher/authSlice";
+import  authReducerTeacher  from "./features/registerTeacher/authSlice";
+import authReducerStudent from "./features/registerStudent/authSlice";
+import authReducerAdmin from "./features/registerAdmin/authSlice";
 
 let store = configureStore({
     reducer:{
-        auth: authReducer
+        authTeacher: authReducerTeacher,
+        authStudent:authReducerStudent,
+        authAdmin:authReducerAdmin
+
     }
 })
 export default store;
