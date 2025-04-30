@@ -23,6 +23,8 @@ public static class ClassesDependencies
         services.AddTransient<IMaterialService, MaterialService>();
         services.AddTransient<ILessonService, LessonService>();
         services.AddTransient<ITeacherService, TeacherService>();
+        services.AddTransient<ICategoryService, CategoryService>();
+
 
 
 
