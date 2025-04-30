@@ -7,6 +7,7 @@ public class ShowCourseDto
     public string? ImagePath { get; set; }
     public string? TeacherName { get; set; }
     public List<LessonInfo>? lessonInfo { get; set; }
+    public string? CategoryName { get; set; }
 }
 public class LessonInfo
 {

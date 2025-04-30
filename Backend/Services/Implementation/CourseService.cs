@@ -74,8 +74,9 @@ public class CourseService : ResponseHandler, ICourseService
     public async Task<Response<List<ShowAllCoursesDto>>> GetAllAsync()
     {
         var courses = await _unitOfWork.Repository<Course>()
-         .GetTableNoTracking()
-         .ToListAsync();
+        .GetTableNoTracking()
+        .Include(c => c.Category) // Include هنا
+        .ToListAsync();
 
         var result = _mapper.Map<List<ShowAllCoursesDto>>(courses);
         return Success(result);
@@ -83,9 +84,10 @@ public class CourseService : ResponseHandler, ICourseService
 
     public async Task<Response<ShowCourseDto>> GetCourseByIdAsync(int id)
     {
-        var course = _unitOfWork.Repository<Course>()
-         .GetTableNoTracking()
-         .FirstOrDefault(c => c.Id == id);
+        var course = await _unitOfWork.Repository<Course>()
+        .GetTableNoTracking()
+        .Include(c => c.Category) // Include هنا
+        .FirstOrDefaultAsync(c => c.Id == id);
 
         if (course == null)
             return NotFound<ShowCourseDto>("Course not found");
