@@ -5,9 +5,14 @@ import { useFormik } from 'formik';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup'
-
+import { registerAdmin } from '@/Redux/features/registerAdmin/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 function AdminReg() {
+
+    const dispatch= useDispatch()
+    const {loading, error}= useSelector((state)=>state.authAdmin || {})
+
 
     const navigate= useNavigate()
     const handleGoBack=()=>{
@@ -15,28 +20,39 @@ function AdminReg() {
     }
 
     const handleReg = async(formsData) =>{
-        try{
-         console.log('Registered',formsData);
-         navigate('/auth/login')
- 
- 
-        }catch(error){
-         console.log('error',error);
-         
+        const action= await dispatch(registerAdmin(formsData))
+
+        if(registerAdmin.fulfilled.match(action)){
+            console.log('Registered');
+            navigate('/auth/login')
+            
+        }else{
+            console.log("Registration failed:", error);
         }
             
      }
+
+    let validationSchema=Yup.object(
+        {
+            name:Yup.string().required('name is required').min(3,'min length is 3'). max(10,'max lenght is 10'),
+            email:Yup.string().required('email is required').email('invalid email'),
+            password:Yup.string().required('password is required').matches(/^.{6,}$/),
+            confirmPassword:Yup.string().required('rePassword is required').oneOf([Yup.ref('password')],'password not match')
+        }
+    )
 
     let formik= useFormik({
         initialValues:{
             name:'',
             email:'',
             password:'',
-            rePassword:''
+            confirmPassword:''
         },
+        validationSchema:validationSchema,
         onSubmit:handleReg,
         
     })
+
 
     return <>
 
@@ -62,7 +78,7 @@ function AdminReg() {
                                 </div>
 
                                 <div className=" mb-3">
-                                    <input type="password" className='border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease' value={formik.values.rePassword} name="rePassword" onChange={formik.handleChange} onBlur={formik.handleBlur} id="rePassword" placeholder="rePassword" required/>
+                                    <input type="password" className='border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease' value={formik.values.confirmPassword} name="confirmPassword" onChange={formik.handleChange} onBlur={formik.handleBlur} id="confirmPassword" placeholder="confirmPassword" required/>
                                 </div>
 
                                     <div className=" flex justify-center my-3">
