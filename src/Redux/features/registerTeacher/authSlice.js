@@ -7,7 +7,7 @@ export const registerTeacher= createAsyncThunk(
        try{
         console.log(formsData);
         
-        const response = await axios.post('http://e-learn-v1.runasp.net/api/Auth/register/teacher', formsData)
+        const response = await axios.post(`http://e-learn-v1.runasp.net/api/Auth/register/teacher`, formsData)
         return response.data
        }catch(error){
         if (error.response && error.response.data) {

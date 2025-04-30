@@ -70,7 +70,7 @@ function Dashboard() {
                     <p className='text-xl text-gray-400 hover:underline transition-all duration-300 ease'><Link>View All</Link></p>
                 </div>
                 
-                <div className='grid md:grid-cols-3 sm:grid-cols-1 gap-3 '>
+                <div className='grid md:grid-cols-4 sm:grid-cols-1 gap-3 '>
 
                     <div className='rounded-2xl p-4 text-xl shadow shadow-gray-400'>
                         <img src={img1} alt="Programming course" width={'100%'} height={'100px'}/>
@@ -83,6 +83,12 @@ function Dashboard() {
                         <h3 className='font-bold text-2xl'>Data Science Fundamentals</h3>
                         <p className='text-gray-500'>4/12 Lessons</p>
                         <progress className={styles.progress} value='35' max='100'/>
+                    </div>
+                    <div className='rounded-2xl p-4 text-xl shadow shadow-gray-400'>
+                        <img src={img3} alt="Programming course" width={'100%'} height={'100px'}/>
+                        <h3 className='font-bold text-2xl'>Graphic Design Basics</h3>
+                        <p className='text-gray-500'>8/10 Lessons</p>
+                        <progress className={styles.progress} value='85' max='100'/>
                     </div>
                     <div className='rounded-2xl p-4 text-xl shadow shadow-gray-400'>
                         <img src={img3} alt="Programming course" width={'100%'} height={'100px'}/>
