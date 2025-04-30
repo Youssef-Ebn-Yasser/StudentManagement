@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-
+using Backend.Helper;
 namespace Backend.Services.Implementation;
 
 public class AuthenticationService : IAuthenticationService
@@ -151,13 +151,9 @@ public class AuthenticationService : IAuthenticationService
             return _responseHandler.BadRequest<TokenDto>("User already exists");
         }
 
-        var user = new User
-        {
-            Email = model.Email,
-            UserName = model.Email,
-            SecurityStamp = Guid.NewGuid().ToString(),
-            Name = model.Name
-        };
+        var user = UserCreate.CreateUser(
+            Enum.Parse<UserType>(role, true),
+            model);
 
         var result = await _userManager.CreateAsync(user, model.Password);
 
@@ -180,8 +176,8 @@ public class AuthenticationService : IAuthenticationService
         var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(confirmationToken));
 
-        var callbackUrl = $"{_baseUrl}/confirm-email?userId={user.Id}&token={encodedToken}";
-
+        var callbackUrl = $"{_baseUrl}/Auth/confirm-email?userId={user.Id}&token={encodedToken}";
+         Console.WriteLine(callbackUrl);
         if (user.Email != null)
         {
             await _emailSender.SendEmailAsync(
@@ -198,9 +194,9 @@ public class AuthenticationService : IAuthenticationService
         return _responseHandler.Success(token);
     }
 
-    public async Task<Response<string>> ConfirmEmailAsync(string userId, string token)
+    public async Task<Response<string>> ConfirmEmailAsync(int userId, string token)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user == null)
         {
             return _responseHandler.BadRequest<string>("User not found");
