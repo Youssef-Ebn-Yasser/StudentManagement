@@ -1,8 +1,9 @@
 using Backend.DTOs.AuthDTOs;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 
 namespace Backend.Controllers;
 
+[EnableCors("_cors")]
 [Route("api/[controller]")]
 [ApiController]
 public class AuthController : AppControllerBase
@@ -28,6 +29,7 @@ public class AuthController : AppControllerBase
         return NewResult(result);
     }
 
+
     [HttpPost("register/teacher")]
     public async Task<IActionResult> RegisterTeacher([FromBody] RegisterDto model)
     {
@@ -42,7 +44,7 @@ public class AuthController : AppControllerBase
         var result = await _authService.ConfirmEmailAsync(userId, token);
         return NewResult(result);
     }
-  
+
 
     [HttpPost("register/admin")]
     public async Task<IActionResult> RegisterAdmin([FromBody] RegisterDto model)
@@ -71,9 +73,9 @@ public class AuthController : AppControllerBase
     }
 
 
-    
+
     [HttpGet("GetJWTToken")]
-    
+
     public async Task<IActionResult> GetJWTToken([FromQuery] string userId)
     {
         var result = await _authService.GetJWTToken(userId);
