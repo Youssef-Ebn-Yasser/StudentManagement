@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { courseService } from '../../services/courseService';
-import "./CearteCourse.css";
+import "./CreateCourse.css";
 
 const AddMaterial = () => {
   const [courses, setCourses] = useState([]);

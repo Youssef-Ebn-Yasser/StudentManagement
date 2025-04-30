@@ -1,5 +1,5 @@
 import React from 'react';
-import "./CearteCourse.css";
+import "./CreateCourse.css";
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
   return (

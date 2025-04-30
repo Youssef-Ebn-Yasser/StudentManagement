@@ -4,7 +4,7 @@ import AddLesson from './AddLesson';
 import AddMaterial from './AddMaterial';
 import AddAssignment from './AddAssignment';
 import Sidebar from './Sidebar';
-import "./CearteCourse.css";
+import "./CreateCourse.css";
 
 const CreateCourse = () => {
   const [activeTab, setActiveTab] = useState('courses');
