@@ -30,7 +30,7 @@ builder.Services.AddCors(Options =>
        {
            policy.AllowAnyHeader();
            policy.AllowAnyMethod();
-           policy.WithOrigins("http://localhost:5175");
+           policy.WithOrigins("http://localhost:5175", "http://localhost:5173", "http://localhost:5174");
        });
 });
 #endregion

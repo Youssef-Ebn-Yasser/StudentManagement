@@ -1,5 +1,3 @@
-using Backend.BaseResponse;
-using Backend.Constraints;
 using Backend.DTOs.AuthDTOs;
 using Backend.Settings;
 using Microsoft.AspNetCore.WebUtilities;
@@ -7,7 +5,6 @@ using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using Backend.Helper;
 namespace Backend.Services.Implementation;
 
 public class AuthenticationService : IAuthenticationService
@@ -113,12 +110,12 @@ public class AuthenticationService : IAuthenticationService
 
         // Get user and generate new tokens
         var user = await _userManager.FindByIdAsync(storedToken.UserId.ToString());
-        
+
         if (user == null)
         {
             return _responseHandler.BadRequest<TokenDto>("User not found");
         }
-        
+
         var jwtToken = await GenerateJwtToken(user);
         var newRefreshToken = await GenerateRefreshToken(user);
 
@@ -176,20 +173,25 @@ public class AuthenticationService : IAuthenticationService
         var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(confirmationToken));
 
-        var callbackUrl = $"{_baseUrl}/Auth/confirm-email?userId={user.Id}&token={encodedToken}";
-         Console.WriteLine(callbackUrl);
-        if (user.Email != null)
-        {
-            await _emailSender.SendEmailAsync(
-                user.Email,
-                "Confirm your email",
-                $"Please confirm your account by <a href='{callbackUrl}'>clicking here</a>.");
-        }
+        //var callbackUrl = $"{_baseUrl}/Auth/confirm-email?userId={user.Id}&token={encodedToken}";
+        // Console.WriteLine(callbackUrl);
+        //if (user.Email != null)
+        //{
+        //    await _emailSender.SendEmailAsync(
+        //        user.Email,
+        //        "Confirm your email",
+        //        $"Please confirm your account by <a href='{callbackUrl}'>clicking here</a>.");
+        //}
 
-        // Generate token
-        var token = await GenerateJwtToken(user);
-        var refreshToken = await GenerateRefreshToken(user);
-        token.RefreshToken = refreshToken.Token;
+        //// Generate token
+        //var token = await GenerateJwtToken(user);
+        //var refreshToken = await GenerateRefreshToken(user);
+        //token.RefreshToken = refreshToken.Token;
+
+
+        var token = new TokenDto();
+        token.Token = encodedToken;
+        token.RefreshToken = user.Id.ToString();
 
         return _responseHandler.Success(token);
     }
@@ -322,7 +324,7 @@ public class AuthenticationService : IAuthenticationService
         {
             return _responseHandler.BadRequest<UserDto>("Invalid refresh token");
         }
-        
+
         // Check if token is used or revoked
         if (storedToken.IsUsed || storedToken.IsRevoked)
         {

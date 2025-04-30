@@ -6,7 +6,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
-        
+
 
     }
 
@@ -21,6 +21,8 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
     public DbSet<Payment> Payments { get; set; }
     public DbSet<StudentCourse> studentCourses { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<Category> Categories { get; set; }
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
