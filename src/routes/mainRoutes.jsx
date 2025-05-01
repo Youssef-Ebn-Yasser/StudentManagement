@@ -30,15 +30,36 @@ const routesConfig = [
 const mainRoutes = [
   {
     path: '',
-    element: <Layout />, 
-    children: routesConfig.map(({ path, element, isProtected, accessRole }) => (
-      isProtected
-        ? { path, element: <ProtectedRoutes 
-            accessRole={accessRole}
-            isAuth={isAuth}>{element}</ProtectedRoutes> }
-        : { path, element }
-    )),
-  },
-]
+    element: <Layout />,
+    children: [
+      // Public routes
+      ...routesConfig
+        .filter(route => !route.isProtected)
+        .map(({ path, element }) => ({ path, element })),
+
+      // Protected wrapper
+      {
+        element: <ProtectedRoutes isAuth={!!localStorage.getItem('JWTToken')} accessRole="all" />,
+        children: routesConfig
+          .filter(route => route.isProtected)
+          .map(({ path, element }) => ({ path, element }))
+      }
+    ]
+  }
+];
+
+// const mainRoutes = [
+//   {
+//     path: '',
+//     element: <Layout />, 
+//     children: routesConfig.map(({ path, element, isProtected, accessRole }) => (
+//       isProtected
+//         ? { path, element: <ProtectedRoutes 
+//             accessRole={accessRole}
+//             isAuth={!!localStorage.getItem('JWTToken')}>{element}</ProtectedRoutes> }
+//         : { path, element }
+//     )),
+//   },
+// ]
 
 export default mainRoutes;

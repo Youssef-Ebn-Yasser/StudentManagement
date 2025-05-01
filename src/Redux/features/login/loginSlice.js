@@ -23,10 +23,19 @@ export const login= createAsyncThunk(
     }
 )
 
+export const isTokenExpired = () => {
+    const expiration = localStorage.getItem('expirationDate');
+    if (!expiration) return true;
+  
+    const now = new Date().getTime();
+    const expirationTime = new Date(expiration).getTime();
+  
+    return now > expirationTime; // true means expired
+  };
 
 const getTokenFromLocalStorage = () => {
     try {
-        return localStorage.getItem('userToken');
+        return localStorage.getItem('JWTToken');
     } catch (e) {
         console.error("Could not access localStorage", e);
         return null;
@@ -39,6 +48,8 @@ const authSlice = createSlice({
     name:'login',
     initialState:{
         userToken: getTokenFromLocalStorage(),
+        refreshToken:'',
+        expirationDate:'',
         loading:false,
         error:null
     },
@@ -54,6 +65,11 @@ const authSlice = createSlice({
             state.loading=false;
             state.userToken= action.payload.token
             localStorage.setItem('userToken', action.payload.token);
+            state.refreshToken=action.payload.refreshToken
+            state.expirationDate=action.payload.expiration
+            localStorage.setItem('JWTToken', action.payload.token);
+            localStorage.setItem('refreshToken', action.payload.refreshToken);
+            localStorage.setItem('expirationDate', action.payload.expiration);
         })
         builder.addCase(registerStudent.rejected,(state,action)=>{
             state.loading=false;
