@@ -1,4 +1,6 @@
-﻿namespace Backend.Services.Implementation;
+﻿using Backend.Wrapper;
+
+namespace Backend.Services.Implementation;
 
 public class CourseService : ResponseHandler, ICourseService
 {
@@ -9,7 +11,7 @@ public class CourseService : ResponseHandler, ICourseService
     #endregion
 
     #region   Counstructor
-    public CourseService(IUnitOfWork unitOfWork, IMapper mapper,IFileService fileService)
+    public CourseService(IUnitOfWork unitOfWork, IMapper mapper, IFileService fileService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
@@ -20,6 +22,61 @@ public class CourseService : ResponseHandler, ICourseService
     #endregion
 
     #region   Handle Methods
+
+    public async Task<Response<List<ShowAllCoursesDto>>> GetAllAsync()
+    {
+        var courses = await _unitOfWork.Repository<Course>()
+        .GetTableNoTracking()
+        .Include(c => c.Category) // Include هنا
+        .ToListAsync();
+
+        var result = _mapper.Map<List<ShowAllCoursesDto>>(courses);
+        return Success(result);
+    }
+
+    public async Task<Response<ShowCourseDto>> GetCourseByIdAsync(int id)
+    {
+        var course = await _unitOfWork.Repository<Course>()
+        .GetTableNoTracking()
+        .Include(c => c.Category) // Include هنا
+        .FirstOrDefaultAsync(c => c.Id == id);
+
+        if (course == null)
+            return NotFound<ShowCourseDto>("Course not found");
+
+        var result = _mapper.Map<ShowCourseDto>(course);
+        return Success(result);
+    }
+
+    private IQueryable<Course> GetCourseQuerable()
+    {
+        var result = _unitOfWork.Repository<Course>().GetTableNoTracking();
+
+        return result;
+    }
+    public async Task<Response<PaginateResult<HomeCourses>>> GetPaginatedCourse(int pageNumber, int pageSize, enOrderBy? orderBy = null)
+    {
+        var querable = GetCourseQuerable();
+
+        switch (orderBy)
+        {
+            case enOrderBy.Price:
+                querable = querable.OrderBy(c => c.Price);
+                break;
+            case enOrderBy.CreatedAt:
+                querable = querable.OrderBy(x => x.CreatedAt);
+                break;
+            case enOrderBy.noOrder:
+            default:
+                querable = querable.OrderBy(x => x.Id);
+                break;
+        }
+
+        var result = await _mapper.ProjectTo<HomeCourses>(querable)
+                                                        .ToPaginatedListAsync(pageNumber, pageSize);
+        return Success(result);
+    }
+
     public async Task<Response<string>> CreateAsync(CreateCourseDto createCourseDto)
     {
         if (createCourseDto == null)
@@ -51,49 +108,6 @@ public class CourseService : ResponseHandler, ICourseService
         _unitOfWork.Complete();
 
         return Created<string>("Course created successfully");
-    }
-
-    public async Task<Response<string>> DeleteAsync(int id)
-    {
-        var course = await _unitOfWork.Repository<Course>().GetByIdAsync(id);
-        if (course == null)
-            return NotFound<string>("Course not found");
-
-        if (!string.IsNullOrWhiteSpace(course.ImagePath))
-        {
-            var deleteResult = await _fileService.DeleteImageByUrlAsync(course.ImagePath);
-            if (!deleteResult.Success)
-                return BadRequest<string>($"Failed to delete image: {deleteResult.Message}");
-        }
-
-        _unitOfWork.Repository<Course>().Delete(course);
-        _unitOfWork.Complete();
-
-        return Success("Course deleted successfully");
-    }
-    public async Task<Response<List<ShowAllCoursesDto>>> GetAllAsync()
-    {
-        var courses = await _unitOfWork.Repository<Course>()
-        .GetTableNoTracking()
-        .Include(c => c.Category) // Include هنا
-        .ToListAsync();
-
-        var result = _mapper.Map<List<ShowAllCoursesDto>>(courses);
-        return Success(result);
-    }
-
-    public async Task<Response<ShowCourseDto>> GetCourseByIdAsync(int id)
-    {
-        var course = await _unitOfWork.Repository<Course>()
-        .GetTableNoTracking()
-        .Include(c => c.Category) // Include هنا
-        .FirstOrDefaultAsync(c => c.Id == id);
-
-        if (course == null)
-            return NotFound<ShowCourseDto>("Course not found");
-
-        var result = _mapper.Map<ShowCourseDto>(course);
-        return Success(result);
     }
 
     public async Task<Response<string>> UpdateAsync(UpdateCourseDto createCourseDto)
@@ -133,6 +147,25 @@ public class CourseService : ResponseHandler, ICourseService
 
         _unitOfWork.Repository<Course>().Update(course);
         return Success("Course updated successfully");
+    }
+
+    public async Task<Response<string>> DeleteAsync(int id)
+    {
+        var course = await _unitOfWork.Repository<Course>().GetByIdAsync(id);
+        if (course == null)
+            return NotFound<string>("Course not found");
+
+        if (!string.IsNullOrWhiteSpace(course.ImagePath))
+        {
+            var deleteResult = await _fileService.DeleteImageByUrlAsync(course.ImagePath);
+            if (!deleteResult.Success)
+                return BadRequest<string>($"Failed to delete image: {deleteResult.Message}");
+        }
+
+        _unitOfWork.Repository<Course>().Delete(course);
+        _unitOfWork.Complete();
+
+        return Success("Course deleted successfully");
     }
     #endregion
 }

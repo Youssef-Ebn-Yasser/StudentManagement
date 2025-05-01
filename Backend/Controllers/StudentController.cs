@@ -1,6 +1,4 @@
 ﻿using Backend.DTOs.StudentDOs;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
 {
@@ -10,7 +8,7 @@ namespace Backend.Controllers
     {
         private readonly IStudentService _studentService;
 
-        public StudentController(IStudentService studentService) 
+        public StudentController(IStudentService studentService)
         {
             _studentService = studentService;
         }
@@ -44,7 +42,12 @@ namespace Backend.Controllers
             var result = await _studentService.GetAllInCourseByCourseNameAsync(courseName);
             return NewResult(result);
         }
-
+        [HttpGet("GetPaginatedCourses/{pageNumber}/{pageSize}")]
+        public async Task<IActionResult> GetAllInCourseByCourseName(int pageNumber, int pageSize)
+        {
+            var result = await _studentService.GetPaginatedListOfStudentAsync(pageNumber, pageSize);
+            return NewResult(result);
+        }
         // Create New Student
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromBody] CreateStudentDto createStudentDto)

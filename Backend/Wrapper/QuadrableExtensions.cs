@@ -10,8 +10,10 @@ public static class QuadrableExtensions
         pageNumber = pageNumber == 0 ? 1 : pageNumber;
         pageSize = pageSize == 0 ? 10 : pageSize;
         int count = await source.AsNoTracking().CountAsync();
+
         if (count == 0)
             return PaginateResult<T>.Success(new List<T>(), count, pageNumber, pageSize);
+
         pageNumber = pageNumber <= 0 ? 1 : pageNumber;
         var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
