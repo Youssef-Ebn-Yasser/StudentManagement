@@ -9,6 +9,7 @@ import CoursesDetails from './../component/CoursesDetails/CoursesDetails';
 import TeacherProfile from '@/component/TeacherProfile/TeacherProfile';
 import CreateCourse from '@/component/TeacherProfile/CreateCourse';
 import TeacherCourses from '@/component/TeacherProfile/TeacherCourses';
+import AccountSettings from '@/component/TeacherProfile/settingsPage/AccountSettings';
 
 const isAuth = true; // Replace with actual authentication logic
 
@@ -20,8 +21,9 @@ const routesConfig = [
   { path: 'course/:id', element: <CoursesDetails />, isProtected: false, accessRole: 'all' },
   { path: 'dashboard', element: <Dashboard />, isProtected: false , accessRole: 'all' },
   { path: 'teacher/profile', element: <TeacherProfile />, isProtected: false , accessRole: 'all' },
-  { path: 'teacher/profile/createcourse', element: <CreateCourse />, isProtected: false , accessRole: 'all' },
+  { path: 'teacher/createcourse', element: <CreateCourse />, isProtected: false , accessRole: 'all' },
   { path: 'teacher/courses', element: <TeacherCourses />, isProtected: false , accessRole: 'all' },
+  { path: 'teacher/settings', element: <AccountSettings />, isProtected: false , accessRole: 'all' },
 ];
 
 

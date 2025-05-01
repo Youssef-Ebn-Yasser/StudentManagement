@@ -126,7 +126,7 @@ const TeacherCourses = () => {
             </span>
           </div>
           <Link 
-            to="/teacher/profile/createcourse" 
+            to="/teacher/createcourse" 
             className="bg-[#6C63FF] hover:bg-[#5952ff] text-white px-10 py-4 rounded-md text-center text-xl font-semibold ml-auto"
           >
             Create New Course

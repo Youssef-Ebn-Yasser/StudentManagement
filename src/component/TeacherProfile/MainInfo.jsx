@@ -58,8 +58,8 @@ const MainInfo = () => {
   });
   return (
     <aside className="sticky top-0 bg-white md:mx-8 lg:mx-4 mb-8 p-6 shadow-md rounded-md -mt-40">
-      <div className="w-24 h-24 rounded-md overflow-hidden mx-auto mb-5">
-        <img src='../../../public/download.jpeg' alt="shafiqhammad" className="w-full rounded-full border p-1 border-solid border-black" />
+      <div className="w-64 h-64 rounded-md overflow-hidden mx-auto mb-5">
+        <img src='../../../public/teacher-photo.avif' alt="shafiqhammad" className=" h-full rounded-full border p-1 border-solid border-black" />
       </div>
       <div className="text-center">
         <h3 className="text-2xl text-gray-800 font-bold mb-1">{instrutorInfo.instructorName}</h3>
