@@ -24,6 +24,8 @@ public static class ClassesDependencies
         services.AddTransient<ILessonService, LessonService>();
         services.AddTransient<ITeacherService, TeacherService>();
         services.AddTransient<ICategoryService, CategoryService>();
+        services.AddTransient<IAuthGoogleService, AuthGoogleService>();
+
 
 
 

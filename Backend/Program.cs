@@ -1,4 +1,6 @@
 using Backend.Settings;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,27 @@ builder.Services.AddConnectionDependency(builder.Configuration)
 builder.Services.AddHttpClient();
 
 
+#region Payment tsripe
+
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+
+#endregion
+
+#region   Google Authentication
+builder.Services.AddAuthentication().AddCookie().AddGoogle(options =>
+{
+    var clientID = builder.Configuration["Authorization:google:clientId"];
+    var clientSecret = builder.Configuration["Authorization:google:clientSecret"];
+
+    if (clientID is null || clientSecret is null)
+        throw new ArgumentException("Google config are missing");
+
+    options.ClientId = clientID;
+    options.ClientSecret = clientSecret;
+    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+});
+#endregion
 
 
 #region   CORS

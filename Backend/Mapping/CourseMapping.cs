@@ -29,7 +29,6 @@
             // Course → CoursesProfile (assuming CoursesProfile is defined elsewhere)
             CreateMap<Course, CoursesProfile>();
             CreateMap<Course, HomeCourses>();
-
         }
     }
 }
