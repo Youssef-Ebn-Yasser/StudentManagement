@@ -34,7 +34,7 @@ const AccountSettings = () => {
         <div className="mb-16">
           <h1 className="text-2xl font-bold text-gray-800 mb-6">Account Settings</h1>
           
-          <div className="space-y-6">
+          <form className="space-y-6">
             <div className="bg-white rounded-md">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-6">
@@ -153,7 +153,7 @@ const AccountSettings = () => {
               <NotificationsSection onSave={handleSaveChanges} />
               <ChangePasswordSection onSave={handleSaveChanges} />
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </div>
