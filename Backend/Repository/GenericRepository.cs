@@ -1,5 +1,6 @@
 ﻿using Backend.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace Backend.Repository;
 
@@ -68,5 +69,14 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         _dbContext.Set<T>().UpdateRange(entity);
     }
+
+    public async Task<IReadOnlyList<T>> GetAllAsync()
+    {
+      return await _dbContext.Set<T>().ToListAsync();
+    }
+
+
+
+
     #endregion
 }

@@ -1,4 +1,8 @@
-﻿namespace Backend.Services.Implementation;
+﻿using Backend.Wrapper;
+using Microsoft.AspNetCore.Http.HttpResults;
+using static Backend.Services.Interfaces.ITeacherService;
+
+namespace Backend.Services.Implementation;
 
 public class TeacherService : ResponseHandler, ITeacherService
 {
@@ -20,36 +24,34 @@ public class TeacherService : ResponseHandler, ITeacherService
     #endregion
 
     #region   Handle Methods
-    public async Task<Response<List<ShowAllTeacherDto>>> GetAllAsync()
+
+    
+    public async Task<PaginateResult<ShowAllTeacherDto>> GetAllPaginatedAsync( int pageNumber, int pageSize, enTeacherOrderBy? orderBy = null)
     {
-        var teachers = await _unitOfWork.Repository<Teacher>()
-                                                    .GetTableNoTracking()
-                                                    .Include(t => t.Courses)
-                                                    .Where(t => t.IsDeleted == false)
-                                                    .ToListAsync();
+        var query = _unitOfWork.Repository<Teacher>()
+                               .GetTableNoTracking()
+                               .Where(t => !t.IsDeleted);
 
-        if (teachers == null)
-            return NotFound<List<ShowAllTeacherDto>>($"there is no teachers");
+        if (orderBy == enTeacherOrderBy.Name)
+            query = query.OrderBy(t => t.Name);
+        else if (orderBy == enTeacherOrderBy.CreatedAt)
+            query = query.OrderBy(t => t.CreatedAt);
+        else
+            query = query.OrderBy(t => t.Id);
 
-        var result = _mapper.Map<List<ShowAllTeacherDto>>(teachers);
-
-        return Success(result);
+        return await _mapper.ProjectTo<ShowAllTeacherDto>(query)
+                            .ToPaginatedListAsync(pageNumber, pageSize);
     }
-    public async Task<Response<List<ShowAllTeacherWithDetailsDto>>> GetAllDeletedAsync()
-    {
-        var teachers = await _unitOfWork.Repository<Teacher>()
-                                                    .GetTableNoTracking()
-                                                    .Include(t => t.Courses)
-                                                    .Where(t => t.IsDeleted == true)
-                                                    .ToListAsync();
+    public async Task<PaginateResult<ShowAllTeacherWithDetailsDto>> GetAllDeletedPaginatedAsync(
+    int pageNumber, int pageSize)
+{
+    var query = _unitOfWork.Repository<Teacher>()
+                           .GetTableNoTracking()
+                           .Where(t => t.IsDeleted);
 
-        if (teachers == null)
-            return NotFound<List<ShowAllTeacherWithDetailsDto>>($"there is no teachers");
-
-        var result = _mapper.Map<List<ShowAllTeacherWithDetailsDto>>(teachers);
-
-        return Success(result);
-    }
+    return await _mapper.ProjectTo<ShowAllTeacherWithDetailsDto>(query)
+                        .ToPaginatedListAsync(pageNumber, pageSize);
+}
     public async Task<Response<TeacherProfileDto>> GetByIdAsync(int id)
     {
         var teacher = await _unitOfWork.Repository<Teacher>()
