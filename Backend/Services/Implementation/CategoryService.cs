@@ -47,14 +47,15 @@ namespace Backend.Services.Implementation
             return Success("Category deleted successfully");
         }
 
-        //public async Task<Response<List<CategoryDto>>> GetAllAsync()
-        //{
-        //    var categories = await _unitOfWork.Repository<Category>()
-        //   .FindAsync(c => !c.IsDeleted);
+        public async Task<Response<List<CategoryDto>>> GetAllAsync()
+        {
+            var allCategories = await _unitOfWork.Repository<Category>().GetAllAsync();
 
-        //    var mapped = _mapper.Map<List<CategoryDto>>(categories);
-        //    return Success(mapped);
-        //}
+            var filtered = allCategories.Where(c => !c.IsDeleted).ToList();
+
+            var mapped = _mapper.Map<List<CategoryDto>>(filtered);
+            return Success(mapped);
+        }
 
         public async Task<Response<CategoryDto>> GetByIdAsync(int id)
         {
