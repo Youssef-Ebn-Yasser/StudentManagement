@@ -12,6 +12,8 @@ namespace Backend.Controllers
         {
             _studentService = studentService;
         }
+
+
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll()
         {
@@ -48,6 +50,29 @@ namespace Backend.Controllers
             var result = await _studentService.GetPaginatedListOfStudentAsync(pageNumber, pageSize);
             return NewResult(result);
         }
+
+        [HttpGet("GetAllEnrolledStudentCourses")]
+        public async Task<IActionResult> GetAllEnrolledStudentCourses(int studentId)
+        {
+            var result = await _studentService.GetAllEnrolledStudentCourses(studentId);
+            return NewResult(result);
+        }
+
+        [HttpPost("IsEnrolled")]
+        public async Task<IActionResult> IsEnrolledInCourse(StudentEnrollDto studentEnrollDto)
+        {
+            var result = await _studentService.IsEnrolledInCourse(studentEnrollDto);
+            return NewResult(result);
+        }
+
+        [HttpPost("EnrollToCourse")]
+        public async Task<IActionResult> EnrollToCourse(StudentEnrollDto studentEnrollDto)
+        {
+            var result = await _studentService.EnrollToCourse(studentEnrollDto);
+            return NewResult(result);
+        }
+
+
         // Create New Student
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromBody] CreateStudentDto createStudentDto)

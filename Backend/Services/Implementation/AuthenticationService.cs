@@ -284,10 +284,12 @@ public class AuthenticationService : IAuthenticationService
             signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
         );
 
+        var refreshToken = await GenerateRefreshToken(user);
         return new TokenDto
         {
             Token = new JwtSecurityTokenHandler().WriteToken(token),
-            Expiration = token.ValidTo
+            Expiration = token.ValidTo,
+            RefreshToken = refreshToken.Token
         };
     }
 

@@ -9,16 +9,25 @@ namespace Backend.Controllers;
 public class AuthController : AppControllerBase
 {
     private readonly IAuthenticationService _authService;
+    private readonly IAuthGoogleService _authGoogleService;
 
-    public AuthController(IAuthenticationService authService)
+    public AuthController(IAuthenticationService authService, IAuthGoogleService authGoogleService)
     {
         _authService = authService;
+        _authGoogleService = authGoogleService;
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto model)
     {
         var result = await _authService.LoginAsync(model);
+        return NewResult(result);
+    }
+
+    [HttpPost("Googlelogin")]
+    public async Task<IActionResult> Googlelogin([FromBody] GoogleLoginDto googleLogin)
+    {
+        var result = await _authGoogleService.AuthenticationWithGoogle(googleLogin.IdToken);
         return NewResult(result);
     }
 
