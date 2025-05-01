@@ -4,6 +4,7 @@ import './TeacherProfile.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faVideo, faCheck, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
 import { faSellcast } from '@fortawesome/free-brands-svg-icons';
+import Sidebar from "./Sidebar";
 
 function TeacherProfile() {
   const [batchs, setBatchs]= useState([
@@ -30,6 +31,7 @@ function TeacherProfile() {
   ]);
     return (
         <div className=" min-h-screen relative bg-gray-50 pb-10">
+          <Sidebar />
             <div className="h-60 w-full">
               <img
                 src='../../../public/csscode.jpg'
