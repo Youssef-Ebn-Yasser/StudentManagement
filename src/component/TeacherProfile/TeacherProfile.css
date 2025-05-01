@@ -1,8 +1,30 @@
-.teacherprofile-content{
-    width: 90%;
-    margin: 5vh auto 0 ;
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  min-width: 100vw;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  box-sizing: border-box;
 }
-.box{
-    filter: drop-shadow(rgba(0, 0, 0, 0.167) 1px 1px 4px);
 
+.main-content {
+  flex: 1;
+  height: 100vh;
+  overflow-y: auto;
+  background: #f9f9f9;
+  padding: 0;
+  box-sizing: border-box;
+  margin-left: 3.5rem;
+}
+
+.teacherprofile-content {
+  width: 90%;
+  margin: 5vh auto 0;
+}
+
+.box {
+  filter: drop-shadow(rgba(0, 0, 0, 0.167) 1px 1px 4px);
 }

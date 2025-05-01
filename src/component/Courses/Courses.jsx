@@ -1,7 +1,9 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import styles from './Courses.module.css';
 import Loader from '../Loader/Loader';
+
 function Courses() {
   const [courses, setCourses] = useState([]);
 
@@ -57,7 +59,7 @@ function Courses() {
                   <h3 className="mt-0 mb-2 text-lg font-semibold text-black line-clamp-2">
                     {course.description}
                   </h3>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center mb-4">
                     <div className="flex items-center">
                       <i className="fas fa-star text-yellow-500 text-sm"></i>
                       <span className="ml-1 text-sm text-black">4.5</span>
@@ -65,6 +67,12 @@ function Courses() {
                     </div>
                     <span className="text-xl font-bold text-black">${course.price}</span>
                   </div>
+                  <Link
+                    to={`/course/${course.id}`}
+                    className="w-full bg-[#6C63FF] text-white hover:bg-[#5952ff] px-4 py-2 rounded-md font-semibold text-center block transition duration-300"
+                  >
+                    View Details
+                  </Link>
                 </div>
               </div>
             )) : (

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { courseService } from '../../services/courseService';
+import Loader from '../Loader/Loader';
 import "./CreateCourse.css";
 
 const AddLesson = () => {
@@ -260,93 +261,95 @@ const AddLesson = () => {
         </div>
       )}
 
-      {isLoading && (
-        <div className="loading-overlay">
-          <div className="loading-spinner"></div>
+      {isLoading ? (
+        <div className="flex items-center justify-center h-[calc(100vh-300px)]">
+          <div className="scale-[2.5]">
+            <Loader />
+          </div>
         </div>
-      )}
-
-      <h2>Add New Lesson</h2>
-      <div className="form-group">
-        <label className="required-field">Select Course</label>
-        <select 
-          name="courseId" 
-          required 
-          className="category-select"
-          value={editingCourseId || ''}
-          onChange={(e) => setEditingCourseId(e.target.value)}
-        >
-          <option value="">Choose a course</option>
-          {courses.map(course => (
-            <option key={course.id} value={course.id}>
-              {course.title}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {editingCourseId && (
+      ) : (
         <>
-          {editingLesson ? (
+          <h2>Add New Lesson</h2>
+          <div className="form-group">
+            <label className="required-field">Select Course</label>
+            <select 
+              name="courseId" 
+              required 
+              className="category-select"
+              value={editingCourseId || ''}
+              onChange={(e) => setEditingCourseId(e.target.value)}
+            >
+              <option value="">Choose a course</option>
+              {courses.map(course => (
+                <option key={course.id} value={course.id}>
+                  {course.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {editingCourseId && (
             <>
-              <h2>Edit Lesson</h2>
-              <LessonForm
-                lesson={editingLesson}
-                onSubmit={handleUpdateLesson}
-                onCancel={handleCancelEdit}
-                submitText="Update Lesson"
-              />
-            </>
-          ) : (
-            <>
-              <LessonForm
-                onSubmit={handleCreateLesson}
-                submitText="Create Lesson"
-              />
+              {editingLesson ? (
+                <>
+                  <h2>Edit Lesson</h2>
+                  <LessonForm
+                    lesson={editingLesson}
+                    onSubmit={handleUpdateLesson}
+                    onCancel={handleCancelEdit}
+                    submitText="Update Lesson"
+                  />
+                </>
+              ) : (
+                <>
+                  <LessonForm
+                    onSubmit={handleCreateLesson}
+                    submitText="Create Lesson"
+                  />
+                </>
+              )}
+
+              <div className="items-list">
+                <h3>Course Lessons</h3>
+                {lessons.length > 0 ? (
+                  lessons.map(lesson => (
+                    <div key={lesson.id} className="lesson-card">
+                      <div className="card-header">
+                        <h5>{lesson.title}</h5>
+                        <span className="lesson-type">{lesson.type}</span>
+                      </div>
+                      <p>{lesson.description}</p>
+                      <div className="lesson-content">
+                        {lesson.content}
+                      </div>
+                      <div className="card-stats">
+                        <span>Duration: {lesson.duration} minutes</span>
+                        <span>Order: {lesson.order}</span>
+                      </div>
+                      <div className="card-actions">
+                        <button
+                          className="edit-btn"
+                          onClick={() => handleEditLesson(lesson)}
+                          title="Edit Lesson"
+                        >
+                          ✎
+                        </button>
+                        <button
+                          className="delete-btn"
+                          onClick={() => handleDeleteLesson(lesson.id)}
+                          title="Delete Lesson"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p>No lessons available for this course.</p>
+                )}
+              </div>
             </>
           )}
-
-          <div className="items-list">
-            <h3>Course Lessons</h3>
-            {isLoading ? (
-              <div className="loading">Loading lessons...</div>
-            ) : lessons.length > 0 ? (
-              lessons.map(lesson => (
-                <div key={lesson.id} className="lesson-card">
-                  <div className="card-header">
-                    <h5>{lesson.title}</h5>
-                    <span className="lesson-type">{lesson.type}</span>
-                  </div>
-                  <p>{lesson.description}</p>
-                  <div className="lesson-content">
-                    {lesson.content}
-                  </div>
-                  <div className="card-stats">
-                    <span>Duration: {lesson.duration} minutes</span>
-                    <span>Order: {lesson.order}</span>
-                  </div>
-                  <div className="card-actions">
-                    <button
-                      className="edit-btn"
-                      onClick={() => handleEditLesson(lesson)}
-                      title="Edit Lesson"
-                    >
-                      ✎
-                    </button>
-                    <button
-                      className="delete-btn"
-                      onClick={() => handleDeleteLesson(lesson.id)}
-                      title="Delete Lesson"
-                    >
-                      ×
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p>No lessons available for this course.</p>
-            )}
-          </div>
         </>
       )}
     </div>

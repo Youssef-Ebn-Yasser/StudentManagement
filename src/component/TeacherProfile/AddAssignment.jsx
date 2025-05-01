@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { courseService } from '../../services/courseService';
+import Loader from '../Loader/Loader';
 import "./CreateCourse.css";
 
 const AddAssignment = () => {
@@ -214,25 +215,15 @@ const AddAssignment = () => {
         </div>
       )}
 
-      {isLoading && (
-        <div className="loading-overlay">
-          <div className="loading-spinner"></div>
+      {isLoading ? (
+        <div className="flex items-center justify-center h-[calc(100vh-300px)]">
+          <div className="scale-[2.5]">
+            <Loader />
+          </div>
         </div>
-      )}
-
-      {editingAssignment ? (
-        <>
-          <h2>Edit Assignment</h2>
-          <AssignmentForm
-            assignment={editingAssignment}
-            onSubmit={handleUpdateAssignment}
-            onCancel={handleCancelEdit}
-            submitText="Update Assignment"
-          />
-        </>
       ) : (
         <>
-          <h2>Create New Assignment</h2>
+          <h2>Add New Assignment</h2>
           <div className="form-group">
             <label className="required-field">Select Course</label>
             <select 
@@ -240,12 +231,7 @@ const AddAssignment = () => {
               required 
               className="category-select"
               value={editingCourseId || ''}
-              onChange={(e) => {
-                setEditingCourseId(e.target.value);
-                if (e.target.value) {
-                  getCourseAssignments(e.target.value).then(assignments => setAssignments(assignments));
-                }
-              }}
+              onChange={(e) => setEditingCourseId(e.target.value)}
             >
               <option value="">Choose a course</option>
               {courses.map(course => (
@@ -255,37 +241,46 @@ const AddAssignment = () => {
               ))}
             </select>
           </div>
+
           {editingCourseId && (
             <>
-              <AssignmentForm
-                onSubmit={handleCreateAssignment}
-                submitText="Create Assignment"
-              />
+              {editingAssignment ? (
+                <>
+                  <h2>Edit Assignment</h2>
+                  <AssignmentForm
+                    assignment={editingAssignment}
+                    onSubmit={handleUpdateAssignment}
+                    onCancel={handleCancelEdit}
+                    submitText="Update Assignment"
+                  />
+                </>
+              ) : (
+                <>
+                  <AssignmentForm
+                    onSubmit={handleCreateAssignment}
+                    submitText="Create Assignment"
+                  />
+                </>
+              )}
+
               <div className="items-list">
                 <h3>Course Assignments</h3>
-                {isLoading ? (
-                  <div className="loading">Loading assignments...</div>
-                ) : assignments.length > 0 ? (
+                {assignments.length > 0 ? (
                   assignments.map(assignment => (
                     <div key={assignment.id} className="assignment-card">
                       <div className="card-header">
                         <h5>{assignment.title}</h5>
-                        <span className="assignment-deadline">
-                          Due: {new Date(assignment.dueDate).toLocaleDateString()}
-                        </span>
+                        <span className="assignment-type">{assignment.type}</span>
                       </div>
                       <p>{assignment.description}</p>
-                      <div className="assignment-details">
+                      <div className="card-stats">
+                        <span>Due Date: {new Date(assignment.dueDate).toLocaleDateString()}</span>
                         <span>Points: {assignment.points}</span>
-                        <span>Instructions: {assignment.instructions}</span>
                       </div>
                       <div className="card-actions">
                         <button
                           className="edit-btn"
-                          onClick={() => {
-                            setEditingAssignment(assignment);
-                            setEditingAssignmentId(assignment.id);
-                          }}
+                          onClick={() => handleEditAssignment(assignment)}
                           title="Edit Assignment"
                         >
                           ✎

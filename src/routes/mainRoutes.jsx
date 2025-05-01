@@ -5,11 +5,11 @@ import Layout from '../component/Layout/Layout';
 import Teachers from './../component/Teachers/Teachers';
 import About from './../component/About/About';
 import Courses from './../component/Courses/Courses';
-import CoursesDetails from './../component/CoursesDetails/CoursesDetails';
 import TeacherProfile from '@/component/TeacherProfile/TeacherProfile';
 import CreateCourse from '@/component/TeacherProfile/CreateCourse';
 import TeacherCourses from '@/component/TeacherProfile/TeacherCourses';
 import AccountSettings from '@/component/TeacherProfile/settingsPage/AccountSettings';
+import TeacherCourseDetails from '@/component/TeacherProfile/TeacherCourseDetails';
 
 const isAuth = true; // Replace with actual authentication logic
 
@@ -18,11 +18,11 @@ const routesConfig = [
   { path: 'courses', element: <Courses />, isProtected: false, accessRole: 'all' },
   { path: 'teachers', element: <Teachers />, isProtected: false, accessRole: 'all' },
   { path: 'about', element: <About />, isProtected: false, accessRole: 'all' },
-  { path: 'course/:id', element: <CoursesDetails />, isProtected: false, accessRole: 'all' },
   { path: 'dashboard', element: <Dashboard />, isProtected: false , accessRole: 'all' },
   { path: 'teacher/profile', element: <TeacherProfile />, isProtected: false , accessRole: 'all' },
   { path: 'teacher/createcourse', element: <CreateCourse />, isProtected: false , accessRole: 'all' },
   { path: 'teacher/courses', element: <TeacherCourses />, isProtected: false , accessRole: 'all' },
+  { path: 'teacher/course/:id', element: <TeacherCourseDetails />, isProtected: false , accessRole: 'all' },
   { path: 'teacher/settings', element: <AccountSettings />, isProtected: false , accessRole: 'all' },
 ];
 

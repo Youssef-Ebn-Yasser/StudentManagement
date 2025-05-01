@@ -3,7 +3,7 @@ import { courseService } from '../../services/courseService';
 import AddLesson from './AddLesson';
 import AddMaterial from './AddMaterial';
 import AddAssignment from './AddAssignment';
-import Sidebar from './Sidebar';
+import Loader from '../Loader/Loader';
 import "./CreateCourse.css";
 
 const CreateCourse = () => {
@@ -293,136 +293,113 @@ const CreateCourse = () => {
     );
   };
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'courses':
-        return (
-          <div className="form-container">
-            {editingCourse ? (
-              <>
-                <h2>Edit Course</h2>
-                <CourseForm
-                  course={editingCourse}
-                  onSubmit={handleUpdateCourse}
-                  onCancel={handleCancelEdit}
-                  submitText="Update Course"
-                />
-              </>
-            ) : (
-              <>
-                <h2>Create New Course</h2>
-                <CourseForm
-                  onSubmit={handleCreateCourse}
-                  submitText="Create Course"
-                />
-                <div className="items-list">
-                  <h3>Created Courses</h3>
-                  {Object.entries(getCoursesByCategory()).map(([category, categoryCourses]) => (
-                    categoryCourses.length > 0 && (
-                      <div key={category} className="category-section">
-                        <h4 className="category-title" style={{ color: getCategoryColor(category) }}>
-                          {category}
-                        </h4>
-                        <div className="category-courses">
-                          {categoryCourses.map(course => (
-                            <div key={course.id} className="course-card">
-                              <div className="card-header">
-                                <h4>{course.title}</h4>
-                                <div className="card-actions">
-                                  <button
-                                    className="edit-btn"
-                                    onClick={() => handleEditCourse(course)}
-                                    title="Edit Course"
-                                  >
-                                    ✎
-                                  </button>
-                                  <button
-                                    className="delete-btn"
-                                    onClick={() => handleDeleteCourse(course.id)}
-                                    title="Delete Course"
-                                  >
-                                    ×
-                                  </button>
-                                </div>
-                              </div>
+  return (
+    <div className="min-h-screen bg-gray-50 p-8">
+      {isLoading ? (
+        <div className="flex items-center justify-center h-[calc(100vh-300px)]">
+          <div className="scale-[2.5]">
+            <Loader />
+          </div>
+        </div>
+      ) : error ? (
+        <div className="flex items-center justify-center h-[calc(100vh-300px)] text-red-600 text-2xl">
+          {error}
+        </div>
+      ) : (
+        <div className="w-full min-h-screen bg-white p-8">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Create New Course</h1>
+          </div>
 
-                              {course.thumbnail && (
-                                <div className="course-image">
-                                  <img src={course.thumbnail} alt={course.title} />
-                                </div>
-                              )}
+          {editingCourse ? (
+            <CourseForm
+              course={editingCourse}
+              onSubmit={handleUpdateCourse}
+              onCancel={handleCancelEdit}
+              submitText="Update Course"
+            />
+          ) : (
+            <CourseForm
+              onSubmit={handleCreateCourse}
+              submitText="Create Course"
+            />
+          )}
 
-                              <span 
-                                className="category-badge"
-                                style={{ 
-                                  backgroundColor: getCategoryColor(course.category),
-                                  color: 'white'
-                                }}
-                              >
-                                {course.category}
-                              </span>
+          <div className="mt-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Courses</h2>
+            {Object.entries(getCoursesByCategory()).map(([category, categoryCourses]) => (
+              categoryCourses.length > 0 && (
+                <div key={category} className="category-section">
+                  <h4 className="category-title" style={{ color: getCategoryColor(category) }}>
+                    {category}
+                  </h4>
+                  <div className="category-courses">
+                    {categoryCourses.map(course => (
+                      <div key={course.id} className="course-card">
+                        <div className="card-header">
+                          <h4>{course.title}</h4>
+                          <div className="card-actions">
+                            <button
+                              className="edit-btn"
+                              onClick={() => handleEditCourse(course)}
+                              title="Edit Course"
+                            >
+                              ✎
+                            </button>
+                            <button
+                              className="delete-btn"
+                              onClick={() => handleDeleteCourse(course.id)}
+                              title="Delete Course"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        </div>
 
-                              <p>{course.description}</p>
+                        {course.thumbnail && (
+                          <div className="course-image">
+                            <img src={course.thumbnail} alt={course.title} />
+                          </div>
+                        )}
 
-                              <div className="course-details">
-                                <div className="course-price">
-                                  ${course.price.toFixed(2)}
-                                </div>
-                                <div className="course-duration">
-                                  {course.duration} hours
-                                </div>
-                                <div className="course-level">
-                                  {course.level}
-                                </div>
-                              </div>
-                          
-                              <div className="card-stats">
-                                <span>{course.lessons?.length || 0} lessons</span>
-                                <span>{course.materials?.length || 0} materials</span>
-                                <span>{course.assignments?.length || 0} assignments</span>
-                              </div>
-                            </div>
-                          ))}
+                        <span 
+                          className="category-badge"
+                          style={{ 
+                            backgroundColor: getCategoryColor(course.category),
+                            color: 'white'
+                          }}
+                        >
+                          {course.category}
+                        </span>
+
+                        <p>{course.description}</p>
+
+                        <div className="course-details">
+                          <div className="course-price">
+                            ${course.price.toFixed(2)}
+                          </div>
+                          <div className="course-duration">
+                            {course.duration} hours
+                          </div>
+                          <div className="course-level">
+                            {course.level}
+                          </div>
+                        </div>
+                    
+                        <div className="card-stats">
+                          <span>{course.lessons?.length || 0} lessons</span>
+                          <span>{course.materials?.length || 0} materials</span>
+                          <span>{course.assignments?.length || 0} assignments</span>
                         </div>
                       </div>
-                    )
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </>
-            )}
+              )
+            ))}
           </div>
-        );
-      case 'lessons':
-        return <AddLesson />;
-      case 'materials':
-        return <AddMaterial />;
-      case 'assignments':
-        return <AddAssignment />;
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div className="app-container">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-
-      <main className="main-content">
-        {error && (
-          <div className="error-message" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', zIndex: 2000, background: '#fee2e2', color: '#b91c1c', padding: '16px', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-            <p style={{ margin: 0 }}>{error}</p>
-            <button onClick={() => setError(null)} style={{ marginLeft: 16, background: '#b91c1c', color: 'white', border: 'none', borderRadius: 4, padding: '4px 12px', cursor: 'pointer' }}>Dismiss</button>
-          </div>
-        )}
-
-        {isLoading && (
-          <div className="loading-overlay">
-            <div className="loading-spinner"></div>
-          </div>
-        )}
-
-        {renderContent()}
-      </main>
+        </div>
+      )}
     </div>
   );
 };

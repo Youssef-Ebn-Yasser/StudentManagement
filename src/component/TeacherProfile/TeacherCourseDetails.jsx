@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { courseService } from '../../services/courseService';
-import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook, FaClipboardList, FaTrash } from 'react-icons/fa';
+import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook, FaClipboardList, FaTrash, FaEdit } from 'react-icons/fa';
+import Loader from '../Loader/Loader';
 
-const CoursesDetails = () => {
+const TeacherCourseDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
@@ -11,63 +12,67 @@ const CoursesDetails = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
 
-  // Fixed course details
+  // Fixed courses data
   const fixedCourses = {
     1: {
       id: 1,
       title: "Complete Web Development Course",
       category: "Programming",
-      description: "Learn web development from scratch to advanced. This comprehensive course covers HTML, CSS, JavaScript, React, Node.js, and more. Perfect for beginners and intermediate developers looking to expand their skills.",
+      description: "Learn web development from scratch to advanced. This comprehensive course covers HTML, CSS, JavaScript, React, Node.js, and more. Perfect for beginners and intermediate developers looking to enhance their skills.",
       imagePath: "https://img-c.udemycdn.com/course/750x422/1430746_2f43_10.jpg",
       price: 49.99,
       rating: 4.8,
-      duration: 42,
-      level: "All Levels",
+      duration: 45,
+      level: "Intermediate",
       students: Array(125).fill(null),
       lessons: [
         {
           id: 1,
           title: "Introduction to Web Development",
-          description: "Overview of web development basics and course structure",
-          duration: 45,
-          type: "video"
+          description: "Learn the basics of web development and set up your development environment.",
+          duration: 60
         },
         {
           id: 2,
-          title: "HTML Fundamentals",
-          description: "Learn the building blocks of web pages",
-          duration: 60,
-          type: "video"
+          title: "HTML5 Fundamentals",
+          description: "Master HTML5 and create structured, semantic web pages.",
+          duration: 90
         },
         {
           id: 3,
-          title: "CSS Styling",
-          description: "Master website styling and responsive design",
-          duration: 90,
-          type: "video"
+          title: "CSS3 Styling",
+          description: "Learn modern CSS3 techniques for beautiful web designs.",
+          duration: 120
         }
       ],
       materials: [
         {
           id: 1,
-          title: "Course Slides",
-          description: "Comprehensive slides for all lectures",
-          type: "pdf"
+          title: "Web Development Cheat Sheet",
+          description: "A comprehensive reference guide for web development concepts.",
+          type: "PDF"
         },
         {
           id: 2,
-          title: "Source Code",
-          description: "Complete project source code",
-          type: "zip"
+          title: "Code Examples",
+          description: "Practical code examples for each lesson.",
+          type: "ZIP"
         }
       ],
       assignments: [
         {
           id: 1,
-          title: "Portfolio Project",
-          description: "Build your personal portfolio website",
-          dueDate: "2024-04-01",
+          title: "Build a Portfolio Website",
+          description: "Create a responsive portfolio website using HTML, CSS, and JavaScript.",
+          dueDate: "2024-04-15",
           points: 100
+        },
+        {
+          id: 2,
+          title: "E-commerce Project",
+          description: "Develop a simple e-commerce website with product listing and cart functionality.",
+          dueDate: "2024-04-30",
+          points: 150
         }
       ]
     },
@@ -75,57 +80,42 @@ const CoursesDetails = () => {
       id: 2,
       title: "UI/UX Design Masterclass",
       category: "Design",
-      description: "Master the art of user interface and user experience design. Learn design principles, wireframing, prototyping, and user research. Create beautiful and functional designs using industry-standard tools.",
+      description: "Master the art of user interface and user experience design. Learn to create beautiful, functional, and user-friendly designs that engage and delight users.",
       imagePath: "https://img-c.udemycdn.com/course/750x422/1650610_2673_5.jpg",
       price: 39.99,
       rating: 4.9,
       duration: 35,
-      level: "Intermediate",
+      level: "Advanced",
       students: Array(98).fill(null),
       lessons: [
         {
           id: 1,
           title: "Design Principles",
-          description: "Understanding core design principles and theory",
-          duration: 60,
-          type: "video"
+          description: "Learn fundamental design principles and how to apply them.",
+          duration: 75
         },
         {
           id: 2,
-          title: "Wireframing Basics",
-          description: "Create effective wireframes for your designs",
-          duration: 75,
-          type: "video"
-        },
-        {
-          id: 3,
-          title: "Prototyping in Figma",
-          description: "Build interactive prototypes",
-          duration: 90,
-          type: "video"
+          title: "User Research",
+          description: "Master the art of user research and persona creation.",
+          duration: 90
         }
       ],
       materials: [
         {
           id: 1,
-          title: "Design Assets",
-          description: "UI kit and design resources",
-          type: "zip"
-        },
-        {
-          id: 2,
-          title: "Case Studies",
-          description: "Real-world design case studies",
-          type: "pdf"
+          title: "Design Templates",
+          description: "Professional UI/UX design templates and resources.",
+          type: "Figma"
         }
       ],
       assignments: [
         {
           id: 1,
           title: "Mobile App Design",
-          description: "Design a complete mobile application",
-          dueDate: "2024-04-15",
-          points: 100
+          description: "Design a complete mobile app interface with user flows.",
+          dueDate: "2024-04-20",
+          points: 120
         }
       ]
     },
@@ -133,56 +123,41 @@ const CoursesDetails = () => {
       id: 3,
       title: "Digital Marketing Essentials",
       category: "Marketing",
-      description: "Learn digital marketing strategies and techniques. Master social media marketing, SEO, content marketing, and paid advertising. Start growing your online presence today.",
+      description: "Learn digital marketing strategies and techniques to grow your business online. Covering SEO, social media marketing, content marketing, and more.",
       imagePath: "https://img-c.udemycdn.com/course/750x422/903744_8eb2.jpg",
       price: 44.99,
       rating: 4.7,
-      duration: 38,
+      duration: 40,
       level: "Beginner",
       students: Array(156).fill(null),
       lessons: [
         {
           id: 1,
-          title: "Digital Marketing Overview",
-          description: "Introduction to digital marketing channels",
-          duration: 45,
-          type: "video"
+          title: "SEO Fundamentals",
+          description: "Learn the basics of search engine optimization.",
+          duration: 60
         },
         {
           id: 2,
-          title: "Social Media Strategy",
-          description: "Create effective social media campaigns",
-          duration: 60,
-          type: "video"
-        },
-        {
-          id: 3,
-          title: "SEO Fundamentals",
-          description: "Learn search engine optimization basics",
-          duration: 75,
-          type: "video"
+          title: "Social Media Marketing",
+          description: "Master social media marketing strategies.",
+          duration: 90
         }
       ],
       materials: [
         {
           id: 1,
           title: "Marketing Templates",
-          description: "Ready-to-use marketing templates",
-          type: "pdf"
-        },
-        {
-          id: 2,
-          title: "Analytics Guide",
-          description: "Guide to marketing analytics",
-          type: "pdf"
+          description: "Ready-to-use marketing templates and guides.",
+          type: "PDF"
         }
       ],
       assignments: [
         {
           id: 1,
           title: "Marketing Campaign",
-          description: "Plan and execute a digital marketing campaign",
-          dueDate: "2024-04-30",
+          description: "Create and execute a complete digital marketing campaign.",
+          dueDate: "2024-04-25",
           points: 100
         }
       ]
@@ -193,14 +168,17 @@ const CoursesDetails = () => {
     const fetchCourseDetails = async () => {
       try {
         setLoading(true);
-        // Check if it's one of our fixed courses
-        if (fixedCourses[id]) {
-          setCourse(fixedCourses[id]);
-        } else {
-          // Fallback to API call for other courses
-          const response = await courseService.getCourseDetails(id);
-          setCourse(response?.data || response);
+        // Try to get course from fixed data first
+        const fixedCourse = fixedCourses[id];
+        if (fixedCourse) {
+          setCourse(fixedCourse);
+          setLoading(false);
+          return;
         }
+
+        // If not in fixed data, try API
+        const response = await courseService.getCourseDetails(id);
+        setCourse(response?.data || response);
       } catch (err) {
         setError(err.message || 'Failed to load course details');
         console.error('Error fetching course details:', err);
@@ -216,11 +194,11 @@ const CoursesDetails = () => {
     if (window.confirm('Are you sure you want to delete this course? This action cannot be undone.')) {
       try {
         setLoading(true);
-        setError(null); // Clear any previous errors
+        setError(null);
         const response = await courseService.deleteCourse(id);
         
         if (response && response.succeeded) {
-          navigate('/courses', { 
+          navigate('/teacher/courses', { 
             state: { message: 'Course deleted successfully' }
           });
         } else {
@@ -239,10 +217,16 @@ const CoursesDetails = () => {
     }
   };
 
+  const handleEdit = () => {
+    navigate(`/teacher/course/edit/${id}`);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6C63FF]"></div>
+        <div className="scale-[2.5]">
+          <Loader />
+        </div>
       </div>
     );
   }
@@ -252,7 +236,7 @@ const CoursesDetails = () => {
       <div className="min-h-screen flex flex-col items-center justify-center">
         <div className="text-red-600 mb-4">{error}</div>
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/teacher/courses')}
           className="text-[#6C63FF] hover:text-[#5952ff] font-semibold"
         >
           ← Go Back
@@ -266,7 +250,7 @@ const CoursesDetails = () => {
       <div className="min-h-screen flex flex-col items-center justify-center">
         <div className="text-gray-600 mb-4">Course not found</div>
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/teacher/courses')}
           className="text-[#6C63FF] hover:text-[#5952ff] font-semibold"
         >
           ← Go Back
@@ -277,28 +261,39 @@ const CoursesDetails = () => {
 
   return (
     <div className="min-h-screen w-screen bg-white">
-      {/* Back Button and Delete Button */}
-      <div className="border-b px-8 flex justify-between items-center">
-        <button
-          onClick={() => navigate(-1)}
-          className="text-[#6C63FF] hover:text-[#5952ff] font-semibold flex items-center text-xl py-4"
-        >
-          <span className="mr-2">←</span> Back to Courses
-        </button>
-        <button
-          onClick={handleDelete}
-          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition duration-300"
-        >
-          <FaTrash /> Delete Course
-        </button>
+      {/* Course Header */}
+      <div className="border-b px-8 py-6">
+        <div className="flex justify-between items-center">
+          <button
+            onClick={() => navigate('/teacher/courses')}
+            className="text-[#6C63FF] hover:text-[#5952ff] font-semibold flex items-center text-xl"
+          >
+            <span className="mr-2">←</span> Go Back 
+          </button>
+          <div className="flex gap-4">
+            <button
+              onClick={handleEdit}
+              className="bg-[#6C63FF] hover:bg-[#5952ff] text-white px-4 py-2 rounded-md flex items-center gap-2 transition duration-300"
+            >
+              <FaEdit /> Edit Course
+            </button>
+            <button
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition duration-300"
+            >
+              <FaTrash /> Delete Course
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Course Info */}
       <div className="border-b py-6 px-8">
+        <h1 className="text-3xl font-bold mb-4">{course.title}</h1>
         <div className="flex flex-wrap items-center gap-12">
           <div className="flex items-center">
             <FaStar className="text-[#ffc107] text-2xl mr-3" />
-            <span className="text-xl">{course.rating}</span>
+            <span className="text-xl">{course.rating || 0}</span>
           </div>
           <div className="flex items-center">
             <FaUsers className="text-gray-400 text-2xl mr-3" />
@@ -306,7 +301,7 @@ const CoursesDetails = () => {
           </div>
           <div className="flex items-center">
             <FaClock className="text-gray-400 text-2xl mr-3" />
-            <span className="text-xl">{course.duration} hours</span>
+            <span className="text-xl">{course.duration || 0} hours</span>
           </div>
           <div className="flex items-center">
             <FaGraduationCap className="text-gray-400 text-2xl mr-3" />
@@ -366,7 +361,10 @@ const CoursesDetails = () => {
         {activeTab === 'overview' && (
           <div>
             <h2 className="text-3xl font-bold mb-6">Course Overview</h2>
-            <p className="text-gray-600 text-xl mb-10 leading-relaxed">{course.description}</p>
+            <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-100 mb-8">
+              <h3 className="text-2xl font-semibold mb-4">Description</h3>
+              <p className="text-gray-600 text-lg leading-relaxed">{course.description}</p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-100">
                 <div className="flex items-center gap-4 mb-4">
@@ -479,4 +477,4 @@ const CoursesDetails = () => {
   );
 };
 
-export default CoursesDetails;
+export default TeacherCourseDetails; 

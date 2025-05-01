@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { courseService } from '../../services/courseService';
+import Loader from '../Loader/Loader';
 import "./CreateCourse.css";
 
 const AddMaterial = () => {
@@ -218,38 +219,23 @@ const AddMaterial = () => {
         </div>
       )}
 
-      {isLoading && (
-        <div className="loading-overlay">
-          <div className="loading-spinner"></div>
+      {isLoading ? (
+        <div className="flex items-center justify-center h-[calc(100vh-300px)]">
+          <div className="scale-[2.5]">
+            <Loader />
+          </div>
         </div>
-      )}
-
-      {editingMaterial ? (
-        <>
-          <h2>Edit Material</h2>
-          <MaterialForm
-            material={editingMaterial}
-            onSubmit={handleUpdateMaterial}
-            onCancel={handleCancelEdit}
-            submitText="Update Material"
-          />
-        </>
       ) : (
         <>
-          <h2>Upload Material</h2>
+          <h2>Add New Material</h2>
           <div className="form-group">
             <label className="required-field">Select Course</label>
-            <select
-              name="courseId"
-              required
+            <select 
+              name="courseId" 
+              required 
               className="category-select"
               value={editingCourseId || ''}
-              onChange={(e) => {
-                setEditingCourseId(e.target.value);
-                if (e.target.value) {
-                  getCourseMaterials(e.target.value).then(materials => setMaterials(materials));
-                }
-              }}
+              onChange={(e) => setEditingCourseId(e.target.value)}
             >
               <option value="">Choose a course</option>
               {courses.map(course => (
@@ -259,17 +245,31 @@ const AddMaterial = () => {
               ))}
             </select>
           </div>
+
           {editingCourseId && (
             <>
-              <MaterialForm
-                onSubmit={handleUploadMaterial}
-                submitText="Upload Material"
-              />
+              {editingMaterial ? (
+                <>
+                  <h2>Edit Material</h2>
+                  <MaterialForm
+                    material={editingMaterial}
+                    onSubmit={handleUpdateMaterial}
+                    onCancel={handleCancelEdit}
+                    submitText="Update Material"
+                  />
+                </>
+              ) : (
+                <>
+                  <MaterialForm
+                    onSubmit={handleUploadMaterial}
+                    submitText="Create Material"
+                  />
+                </>
+              )}
+
               <div className="items-list">
                 <h3>Course Materials</h3>
-                {isLoading ? (
-                  <div className="loading">Loading materials...</div>
-                ) : materials.length > 0 ? (
+                {materials.length > 0 ? (
                   materials.map(material => (
                     <div key={material.id} className="material-card">
                       <div className="card-header">
@@ -277,18 +277,6 @@ const AddMaterial = () => {
                         <span className="material-type">{material.type}</span>
                       </div>
                       <p>{material.description}</p>
-                      {material.file && (
-                        <div className="material-file">
-                          <a 
-                            href={material.file} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="view-content-btn"
-                          >
-                            View Content
-                          </a>
-                        </div>
-                      )}
                       <div className="card-actions">
                         <button
                           className="edit-btn"
