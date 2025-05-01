@@ -57,21 +57,23 @@ const authSlice = createSlice({
     reducers:{},
 
     extraReducers:(builder)=>{
-        builder.addCase(registerStudent.pending,(state)=>{
+        builder.addCase(login.pending,(state)=>{
             state.loading=true;
             state.error=null
         })
-        builder.addCase(registerStudent.fulfilled,(state,action)=>{
+        builder.addCase(login.fulfilled,(state,action)=>{
             state.loading=false;
             state.userToken= action.payload.token
-            localStorage.setItem('userToken', action.payload.token);
+            localStorage.setItem('userToken', action.payload.data.token);
+
             state.refreshToken=action.payload.refreshToken
             state.expirationDate=action.payload.expiration
+
             localStorage.setItem('JWTToken', action.payload.token);
             localStorage.setItem('refreshToken', action.payload.refreshToken);
             localStorage.setItem('expirationDate', action.payload.expiration);
         })
-        builder.addCase(registerStudent.rejected,(state,action)=>{
+        builder.addCase(login.rejected,(state,action)=>{
             state.loading=false;
             state.error=action.payload
         })

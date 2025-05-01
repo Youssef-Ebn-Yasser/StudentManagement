@@ -69,3 +69,5 @@ const expirationSlice= createSlice({
     }
     
 })
+
+export default expirationSlice.reducer;
