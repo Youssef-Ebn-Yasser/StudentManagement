@@ -1,4 +1,5 @@
 ﻿using Backend.DTOs.StudentDOs;
+using Backend.Wrapper;
 
 namespace Backend.Services.Implementation;
 
@@ -64,6 +65,16 @@ public class StudentService : ResponseHandler, IStudentService
         return Success(mappedStudent);
     }
 
+    public async Task<Response<PaginateResult<ShowStudentDto>>> GetPaginatedListOfStudentAsync(int pageNumber, int pageSize)
+    {
+        var student = _unitOfWork.Repository<Student>()
+                                                 .GetTableNoTracking();
+
+
+        var mapper = await _mapper.ProjectTo<ShowStudentDto>(student)
+                                                          .ToPaginatedListAsync(pageNumber, pageSize);
+        return Success(mapper);
+    }
     public async Task<Response<string>> CreateAsync(CreateStudentDto createStudent)
     {
         var isNameExist = await _isNameExist(createStudent.Name);

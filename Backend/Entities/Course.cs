@@ -7,6 +7,8 @@ public class Course : BaseEntity
     public bool? IsDeleted { get; set; }
     public DateTime? CreatedAt { get; set; } = DateTime.Now;
     public string? ImagePath { get; set; }
+    [Required]
+    public string? Level { get; set; }
     public List<Lesson>? lessons { get; set; }
     [ForeignKey("TecherId")]
     public Teacher? Teacher { get; set; }

@@ -15,7 +15,7 @@
             // Course → ShowAllCoursesDto
             CreateMap<Course, ShowAllCoursesDto>()
                 .ForMember(dest => dest.Price, opt => opt.MapFrom(src => (int?)src.Price))
-                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.CategoryName)); 
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.CategoryName));
 
             // Course → ShowCourseDto
             CreateMap<Course, ShowCourseDto>()
@@ -28,6 +28,8 @@
 
             // Course → CoursesProfile (assuming CoursesProfile is defined elsewhere)
             CreateMap<Course, CoursesProfile>();
+            CreateMap<Course, HomeCourses>();
+
         }
     }
 }

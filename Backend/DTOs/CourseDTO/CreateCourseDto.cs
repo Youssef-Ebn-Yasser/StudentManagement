@@ -7,5 +7,6 @@ public class CreateCourseDto
     public double? Price { get; set; }
     public int? TeacherId { get; set; }
     public int? CategoryId { get; set; }
+    public string? Level { get; set; }
     public IFormFile? Image { get; set; }
 }
