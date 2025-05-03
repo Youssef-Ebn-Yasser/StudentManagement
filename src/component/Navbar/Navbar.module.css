@@ -11,7 +11,7 @@
 
 /* Hover state */
 .navlink:hover {
-  color: var(--color-primary); /* Change color on hover */
+  color: #4850E4; /* Change color on hover */
 }
 
 /* Hover bottom border with animation */
@@ -22,7 +22,7 @@
   left: 0;
   width: 100%; /* Full width */
   height: 2px; /* Border thickness */
-  background-color: var(--color-primary); /* Primary color */
+  background-color: #4850E4; /* Primary color */
   transform: scaleY(0); /* Initially hidden (collapsed vertically) */
   transform-origin: bottom; /* Animate from the bottom upwards */
   transition: transform 0.4s ease-in-out; /* Smooth transition for the animation */
@@ -35,7 +35,7 @@
 
 /* Active state */
 .navlink.active {
-  color: var(--color-primary); /* Primary color for active link */
+  color: #4850E4; /* Primary color for active link */
   font-weight: 700; /* Bold font for active link */
 }
 
@@ -47,7 +47,7 @@
   left: 0;
   width: 100%; /* Full width */
   height: 2px; /* Border thickness */
-  background-color: var(--color-primary); /* Primary color */
+  background-color: #4850E4; /* Primary color */
   transform: scaleY(1); /* Fully visible */
   -webkit-transform: scaleY(1);
   -moz-transform: scaleY(1);

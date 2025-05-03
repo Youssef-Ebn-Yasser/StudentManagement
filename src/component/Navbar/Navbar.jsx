@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import Button from './Button';
 import styles from './Navbar.module.css'; // Import the CSS module
 import img from '../../assets/avatar.png'; // Import the logo image
+import SearchBar from './SearchBar';
 
 function Navbar() {
     const [isNotificationVisible, setIsNotificationVisible] = useState(false); // State for notification dropdown
     const [isMenuOpen, setIsMenuOpen] = useState(false); // State for the toggle menu
+    const navigate = useNavigate();
 
     const toggleNotification = () => {
         setIsNotificationVisible(!isNotificationVisible);
@@ -14,6 +16,10 @@ function Navbar() {
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
+    };
+
+    const handleSearch = (query) => {
+        navigate(`/courses?q=${encodeURIComponent(query)}`);
     };
 
     return (
@@ -74,14 +80,7 @@ function Navbar() {
                 {/* Search, Bell, and Cart Icons (Large Screens) */}
                 <div className={`hidden lg:flex items-center gap-4 ml-auto ${styles.icons}`}>
                     <div className="relative">
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className={`w-[260px] h-[36px] pl-[34px] pr-[12px] text-sm font-normal bg-neutral-200 rounded-md border-0 outline-none hover:bg-white hover:text-neutral-400 focus:bg-white focus:text-neutral-400 transition-all duration-300 ease-in-out ${styles.searchInput}`}
-                        />
-                        <span>
-                            <i className={`fa-solid fa-magnifying-glass absolute top-[10px] left-[12px] text-neutral-900 ${styles.searchIcon}`}></i>
-                        </span>
+                     <SearchBar onSearch={handleSearch} />
                     </div>
                     <div className="relative">
                         <div
@@ -122,7 +121,7 @@ function Navbar() {
                         )}
                     </div>
                     <Link to={"/profile"}>
-                    <div className={`w-[30px] h-[30px] text-neutral-700 text-3xl ${styles.cartIcon}`}>
+                    <div className={`w-[30px] h-[30px] text-neutral-700 text-3xl  ${styles.cartIcon}`}>
                         <img src={img} alt="user picture" />
                     </div>
                     </Link>

@@ -8,17 +8,17 @@ import img from '../../assets/sliderpic.jpg';
 import styles from './Home.module.css';
 
 function Home() {
-  useEffect(() => {
-    // Reset body display to block
-    document.body.style.display = 'block';
-    document.body.style.backgroundColor = 'white';
+  // useEffect(() => {
+  //   // Reset body display to block
+  //   document.body.style.display = 'block';
+  //   document.body.style.backgroundColor = 'white';
 
-    // Cleanup function to reset styles when the component unmounts
-    return () => {
-      document.body.style.display = '';
-      document.body.style.backgroundColor = '';
-    };
-  }, []);
+  //   // Cleanup function to reset styles when the component unmounts
+  //   return () => {
+  //     document.body.style.display = '';
+  //     document.body.style.backgroundColor = '';
+  //   };
+  // }, []);
 
   // Slider state
   const [currentSlide, setCurrentSlide] = useState(0);

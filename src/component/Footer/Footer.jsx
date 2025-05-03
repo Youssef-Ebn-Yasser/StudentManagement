@@ -8,7 +8,7 @@ const Footer = () => {
                     {/* E-Learning Logo Section */}
                     <div className="col-span-1 md:col-span-2">
                         <div className="flex items-center mb-4">
-                            <span className="text-lg md:text-xl font-bold text-gray-800">E-Learning</span>
+                            <span className="text-lg md:text-xl ms-7 font-bold text-gray-800">E-Learning</span>
                         </div>
                     </div>
 
@@ -48,7 +48,7 @@ const Footer = () => {
                         </p>
                         <div className="flex flex-col md:flex-row items-center">
                             <div className="relative flex-grow w-full md:w-auto mb-4 md:mb-0">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <div className="absolute inset-y-0 left-0 pl-3 mt-1 flex items-center pointer-events-none">
                                     <i className="fa-regular fa-envelope h-5 w-5 text-gray-400"></i>
                                 </div>
                                 <input
@@ -59,7 +59,7 @@ const Footer = () => {
                             </div>
                             <button
                                 type="button"
-                                className="w-full md:w-auto inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                className="w-full ms-4 md:w-auto inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             >
                                 Subscribe
                             </button>
