@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import img from '@/assets/studentReg.png'
 import { useNavigate } from 'react-router-dom';
@@ -18,23 +18,34 @@ function Login() {
     }
 
     const dispatch= useDispatch()
-    const auth = useSelector((state) => state.login);
-    const loading = auth?.loading;
-    const error = auth?.error;
+    const loginState  = useSelector((state) => state.login);
+    const loading = loginState?.loading;
+    const error = loginState?.error;
 
 
-    const handleLgin = async(formsData) =>{
-        const action= await dispatch(login(formsData))
+    const handleLgin = async (formsData) => {
+        console.log('Sending data to login API:', formsData);
+        const action = await dispatch(login(formsData));
+    
+        if (login.fulfilled.match(action)) {
 
-        if(login.fulfilled.match(action)){
+            const token = action.payload.data.token;
+            const refreshToken = action.payload.data.refreshToken;
+            const expirationDate= action.payload.data.expiration;
+      
+            localStorage.setItem('JWTToken', token);
+            localStorage.setItem('refreshToken', refreshToken);
+            localStorage.setItem('expirationDate', expirationDate);
+
+
             console.log('Login success');
-            navigate('/')
+            console.log(action.payload);
+            navigate('/');
             
-        }else{
-            console.log("Login failed:", error);
+        } else {
+            console.log("Login failed:", action.payload);  // <-- Log the actual error from API
         }
-            
-     }
+    }
 
     let validationSchema=Yup.object(
         {
@@ -68,10 +79,16 @@ function Login() {
 
                             <div className=" mb-3">
                                     <input type="email" className='border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease' value={formik.values.email} name="email" onChange={formik.handleChange} onBlur={formik.handleBlur} id="email" placeholder="name@example.com" required/>
+                                    {formik.touched.email && formik.errors.email ?(
+                                        <div className='text-red-500'>{formik.errors.email}</div>
+                                    ):''}
                                 </div>
 
                                 <div className=" mb-3">
                                     <input type="password" className='border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease' value={formik.values.password} name="password" onChange={formik.handleChange} onBlur={formik.handleBlur} id="password" placeholder="Password" required/>
+                                    {formik.touched.password && formik.errors.password ?(
+                                        <div className='text-red-500'>{formik.errors.password}</div>
+                                    ):''}
                                     <button className='text-gray-400 hover:cursor-pointer hover:underline transition-all duration-300 ease'>
                                         <Link to={'/auth/forgetpassword'}>
                                         Forget my password?
@@ -88,7 +105,7 @@ function Login() {
                                 </div>
 
                                 <div className="">
-                                    <p className="m-0 text-secondary text-center">Not Register Yet?  <Link to={'/auth/register'}  class="text-blue-600 hover:underline transition-all duration-300 ease">Sign up</Link></p>
+                                    <p className="m-0 text-secondary text-center">Not Register Yet?  <Link to={'/auth/register'}  className="text-blue-600 hover:underline transition-all duration-300 ease">Sign up</Link></p>
                                 </div>
                     </div>
                     </form>

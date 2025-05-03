@@ -4,8 +4,16 @@ import Button from './Button';
 import styles from './Navbar.module.css'; // Import the CSS module
 import img from '../../assets/avatar.png'; // Import the logo image
 import SearchBar from './SearchBar';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '@/Redux/features/login/loginSlice';
+
 
 function Navbar() {
+
+    let dispatch =useDispatch()
+
+    let {userToken} = useSelector((state)=>state.login)
+
     const [isNotificationVisible, setIsNotificationVisible] = useState(false); // State for notification dropdown
     const [isMenuOpen, setIsMenuOpen] = useState(false); // State for the toggle menu
     const navigate = useNavigate();

@@ -1,13 +1,15 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import styles from './Courses.module.css';
 import Loader from '../Loader/Loader';
-import { Link, useLocation } from 'react-router-dom';
 
 function Courses() {
   const [courses, setCourses] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCourses, setFilteredCourses] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
 
   useEffect(() => {
@@ -19,41 +21,73 @@ function Courses() {
 
   async function getCourses() {
     try {
+      setLoading(true);
+      setError(null);
       let { data } = await axios.get('http://e-learn-v1.runasp.net/Course/GetAll');
       console.log(data.data);
       setCourses(data.data);
       setFilteredCourses(data.data);
     } catch (error) {
       console.error('Error fetching courses:', error);
+      setError('Failed to load courses. Please try again later.');
+    } finally {
+      setLoading(false);
     }
   }
+
+  const filterCourses = (courses, query) => {
+    if (!query.trim()) {
+      return courses;
+    }
+
+    const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0);
+    
+    return courses.filter(course => {
+      const courseTitle = course.title.toLowerCase();
+      const courseCategory = course.category?.toLowerCase() || '';
+      const courseLevel = course.level?.toLowerCase() || '';
+      
+      return searchTerms.some(term => 
+        courseTitle.includes(term) ||
+        courseCategory.includes(term) ||
+        courseLevel.includes(term)
+      );
+    });
+  };
 
   useEffect(() => {
     getCourses();
   }, []);
 
   useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setFilteredCourses(courses);
-    } else {
-      const query = searchQuery.toLowerCase();
-      const searchTerms = query.split(' ').filter(term => term.length > 0);
-      
-      const filtered = courses.filter(course => {
-        const courseTitle = course.title.toLowerCase();
-        const courseCategory = course.category?.toLowerCase() || '';
-        const courseLevel = course.level?.toLowerCase() || '';
-        
-        return searchTerms.some(term => 
-          courseTitle.includes(term) ||
-          courseCategory.includes(term) ||
-          courseLevel.includes(term)
-        );
-      });
-      
-      setFilteredCourses(filtered);
-    }
+    setFilteredCourses(filterCourses(courses, searchQuery));
   }, [searchQuery, courses]);
+
+  if (loading && !error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="scale-[3]">
+          <Loader />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 text-xl mb-4">{error}</p>
+          <button 
+            onClick={getCourses}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -67,10 +101,10 @@ function Courses() {
             </p>
           )}
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8'>
-            {filteredCourses.length > 0 ? filteredCourses.map((course, index) => (
-              <Link to={`/course/${index}`} >
+            {filteredCourses.length > 0 ? filteredCourses.map((course) => (
+              <Link to={`/course/${course.id}`}>
                 <div
-                  key={index}
+                  key={course.id}
                   className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card} h-[330px] flex flex-col`} 
                 >
                   <div className="relative overflow-hidden">
@@ -111,7 +145,7 @@ function Courses() {
                     <p className="text-gray-500">Try searching with different keywords or check your spelling</p>
                   </div>
                 ) : (
-                  <div className="scale-[2.5]">
+                  <div className="scale-[3]">
                     <Loader />
                   </div>
                 )}

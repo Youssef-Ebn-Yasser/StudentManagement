@@ -3,7 +3,6 @@ import ProfilePhotoUpload from "./ProfilePhotoUpload";
 import SocialProfileSection from "./SocialProfileSection";
 import NotificationsSection from "./NotificationsSection";
 import ChangePasswordSection from "./ChangePasswordSection";
-import  Sidebar  from "../Sidebar";
 
 const AccountSettings = () => {
   const [formData, setFormData] = useState({
@@ -28,9 +27,8 @@ const AccountSettings = () => {
   };
 
   return (
-    <div className="bg-white min-h-screen">
-      <Sidebar />
-      <div className="max-w-7xl mx-auto px-4 py-8 ms-15">
+    <div className="bg-white min-h-screen p-8">
+      <div className="max-w-7xl mx-auto">
         <div className="mb-16">
           <h1 className="text-2xl font-bold text-gray-800 mb-6">Account Settings</h1>
           

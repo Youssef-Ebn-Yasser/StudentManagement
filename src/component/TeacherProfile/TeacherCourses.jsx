@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { courseService } from '../../services/courseService';
 import { Link } from 'react-router-dom';
 import { FaStar, FaUsers } from 'react-icons/fa';
+import Loader from '../Loader/Loader';
 
 const TeacherCourses = () => {
   const [courses, setCourses] = useState([
@@ -168,7 +169,9 @@ const TeacherCourses = () => {
 
         {loading ? (
           <div className="flex items-center justify-center h-[calc(100vh-300px)]">
-            <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-[#6C63FF]"></div>
+            <div className="scale-[2.5]">
+              <Loader />
+            </div>
           </div>
         ) : error ? (
           <div className="flex items-center justify-center h-[calc(100vh-300px)] text-red-600 text-2xl">
@@ -183,33 +186,28 @@ const TeacherCourses = () => {
                   alt={course?.title || 'Course'}
                   className="w-full h-64 object-cover rounded-t-xl"
                 />
-                <div className="p-8 flex flex-col flex-grow">
-                  <div className="text-base font-semibold text-[#6C63FF] uppercase mb-4">
-                    {course?.category || 'UNCATEGORIZED'}
+                <div className="p-6 flex-grow">
+                  <h3 className="text-xl font-semibold mb-2">{course?.title || 'Untitled Course'}</h3>
+                  <p className="text-gray-600 mb-4 line-clamp-2">{course?.description || 'No description available'}</p>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center">
+                        <FaStar className="text-[#ffc107] mr-1" />
+                        <span>{course?.rating || 0}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <FaUsers className="text-gray-400 mr-1" />
+                        <span>{course?.students?.length || 0}</span>
+                      </div>
+                    </div>
+                    <span className="text-[#6C63FF] font-semibold">${course?.price || 0}</span>
                   </div>
-                  <h3 className="text-2xl font-semibold text-[#1e2022] mb-6 line-clamp-2 flex-grow">
-                    {course?.title || 'Untitled Course'}
-                  </h3>
-                  <div className="flex items-center mb-6">
-                    <FaStar className="text-[#ffc107] text-2xl mr-3" />
-                    <span className="text-lg text-gray-600 mr-8">{course?.rating || 4.5}</span>
-                    <FaUsers className="text-gray-400 text-2xl mr-3" />
-                    <span className="text-lg text-gray-600">
-                      {course?.students?.length || 0} students
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center mt-6 pt-6 border-t border-gray-100">
-                    <span className="text-3xl font-bold text-[#6C63FF]">
-                      ${course?.price || 0}
-                    </span>
-                    <Link
-                      to={`/course/${course?.id}`}
-                      className="bg-[#6C63FF] text-white hover:bg-[#5952ff] px-6 py-3 rounded-md font-semibold text-lg flex items-center gap-2 transition duration-300"
-                    >
-                      View Details 
-                      <span className="text-xl">→</span>
-                    </Link>
-                  </div>
+                  <Link 
+                    to={`/teacher/course/${course?.id}`}
+                    className="block w-full bg-[#6C63FF] hover:bg-[#5952ff] text-white text-center py-3 rounded-md transition duration-300"
+                  >
+                    View Details
+                  </Link>
                 </div>
               </div>
             ))}
