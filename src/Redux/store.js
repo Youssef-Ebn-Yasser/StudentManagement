@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import authSlice from './auth/authSlice';
 import confirmEmailReducer from "./features/confirmEmail/confirmSlice";
 import loginReducer from "./features/login/loginSlice";
+import userDetailsReducer from './features/GetUserDetails/userDetailsSlice';
 
 let store = configureStore({
     reducer: {
@@ -12,6 +13,7 @@ let store = configureStore({
         login:loginReducer,
         // expiration:expiredReducer,
         auth: authSlice,
+        userDetails: userDetailsReducer,
     },
 })
 export default store

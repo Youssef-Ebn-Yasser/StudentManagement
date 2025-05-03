@@ -1,8 +1,16 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import img2 from '../../assets/study.png'
 import CategorySlider from '../CategorySlider/CategorySlider';
+import axios from 'axios';
 
 export default function About() {
+
+  async function getAllStudent() {
+    let response = await axios.get('http://e-learn-v1.runasp.net/api/Teacher/Teacher/GetAll')
+    console.log(response);
+  }
+  
+
   return (
     <>
       <div className='p-4 flex flex-col gap-20'>

@@ -29,6 +29,9 @@ const authSlice = createSlice({
             state.isLogedin = false
             localStorage.removeItem('refreshToken')
             localStorage.removeItem('expirationDate')
+            localStorage.removeItem('token')
+            localStorage.removeItem('userId')
+            localStorage.removeItem('userToken')
         },
     },
     extraReducers: (builder) => {

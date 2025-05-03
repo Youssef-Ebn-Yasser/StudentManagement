@@ -26,6 +26,7 @@ const routesConfig = [
   { path: 'teacher/course/:id', element: <TeacherCourseDetails />, isProtected: false , accessRole: 'all' },
   { path: 'courses/course/:id', element: <CoursesDetails />, isProtected: false , accessRole: 'all' },
   { path: 'teacher/settings', element: <AccountSettings />, isProtected: false , accessRole: 'all' },
+
 ];
 
 
