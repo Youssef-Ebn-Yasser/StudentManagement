@@ -18,6 +18,7 @@ const useLogin = () => {
 
     const handleLgin = async (formsData) => {
         dispatch(loginUser(formsData))
+        .unwrap()
             .then(() => {
                 setAuthToken()
                 navigate('/')

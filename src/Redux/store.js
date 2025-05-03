@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import authSlice from './auth/authSlice';
 import confirmEmailReducer from "./features/confirmEmail/confirmSlice";
 import loginReducer from "./features/login/loginSlice";
-import userDetailsReducer from './features/GetUserDetails/userDetailsSlice';
+import userDetailsReducer from './features/getUserDetails/userDetailsSlice';
 
 let store = configureStore({
     reducer: {
