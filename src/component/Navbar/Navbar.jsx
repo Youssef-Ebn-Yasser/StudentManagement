@@ -9,9 +9,9 @@ import { login } from '@/Redux/features/login/loginSlice';
 
 function Navbar() {
 
-    let dispatch =useDispatch()
+    // let dispatch =useDispatch()
 
-    let {userToken} = useSelector((state)=>state.login)
+    // let {userToken} = useSelector((state)=>state.login)
 
     const [isNotificationVisible, setIsNotificationVisible] = useState(false); // State for notification dropdown
     const [isMenuOpen, setIsMenuOpen] = useState(false); // State for the toggle menu
