@@ -9,7 +9,7 @@ public class Course : BaseEntity
     public string? ImagePath { get; set; }
     [Required]
     public string? Level { get; set; }
-    public string? Hours { get; set; }
+    //public string? Hours { get; set; }
     public List<Lesson>? lessons { get; set; }
     [ForeignKey("TecherId")]
     public Teacher? Teacher { get; set; }

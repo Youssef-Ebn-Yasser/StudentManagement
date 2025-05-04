@@ -24,6 +24,14 @@ public class CourseController : AppControllerBase
         var result = await _courseService.GetAllAsync();
         return NewResult(result);
     }
+
+    [HttpGet("Course/GetAllByCategory")]
+    public async Task<IActionResult> GetAllByCategory()
+    {
+        var result = await _courseService.GetAllByCategoryAsync();
+        return NewResult(result);
+    }
+
     [HttpGet("HomeCourses/GetPaginated")]
     public async Task<IActionResult> GetPaginated([FromQuery] int pageNumber, [FromQuery] int PageSize, [FromQuery] enOrderBy enOrderBy)
     {
