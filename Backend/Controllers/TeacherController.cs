@@ -17,6 +17,13 @@ public class TeacherController : AppControllerBase
         return NewResult(result);
     }
 
+    [HttpGet("Teacher/All")]
+    public async Task<IActionResult> GetAll()
+    {
+        var result = await _teacherService.GetAllAsync();
+        return NewResult(result);
+
+    }
     [HttpGet("Teacher/ByName/{name}")]
     public async Task<IActionResult> GetTeacherByName(string name)
     {
