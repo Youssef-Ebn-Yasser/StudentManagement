@@ -81,6 +81,17 @@ public class TeacherService : ResponseHandler, ITeacherService
         return Success(newTeacher);
     }
 
+    public async Task<Response<List<ShowAllTeacherDto>>> GetAllAsync()
+    {
+        var teachers = await _unitOfWork.Repository<Teacher>()
+                                              .GetTableNoTracking()
+                                              .Where(t => !t.IsDeleted)
+                                              .ToListAsync();
+        if (teachers == null)
+            return NotFound<List<ShowAllTeacherDto>>($"there is no teacher");
+        var newTeachers = _mapper.Map<List<ShowAllTeacherDto>>(teachers);
+        return Success(newTeachers);
+    }
 
     public async Task<Response<string>> CreateAsync(CreateTeacherDto createTeacherDto)
     {
