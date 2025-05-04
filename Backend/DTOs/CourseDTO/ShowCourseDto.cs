@@ -9,6 +9,7 @@ public class ShowCourseDto
     public string? ImagePath { get; set; }
     public string? TeacherName { get; set; }
     public int LessonCount { get; set; }
+    //public string? Hours { get; set; } 
     public List<LessonInfo>? LessonInfo { get; set; }
     public List<CommentInfo>? CommentInfo { get; set; }
 

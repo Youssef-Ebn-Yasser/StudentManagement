@@ -1,4 +1,5 @@
-﻿using Backend.Wrapper;
+﻿using Backend.DTOs.CategoryDTOOS;
+using Backend.Wrapper;
 
 namespace Backend.Services.Implementation;
 
@@ -31,6 +32,28 @@ public class CourseService : ResponseHandler, ICourseService
         .ToListAsync();
 
         var result = _mapper.Map<List<ShowAllCoursesDto>>(courses);
+        return Success(result);
+    }
+
+    public async Task<Response<List<ShowCoursesByCategory>>> GetAllByCategoryAsync()
+    {
+        var categories = await _unitOfWork.Repository<Category>()
+        .GetTableNoTracking()
+        .ToListAsync();
+
+        var courses = await _unitOfWork.Repository<Course>()
+        .GetTableNoTracking()
+        .Include(c => c.Category)
+        .ToListAsync();
+
+        var coursesByCategory = categories.Select(category => new ShowCoursesByCategory
+        {
+            Category = _mapper.Map<CategoryDto>(category),
+            Courses = _mapper.Map<List<ShowCourseDto>>(courses.Where(c => c.CategoryId == category.Id).ToList())
+        }).ToList();
+
+
+        var result = _mapper.Map<List<ShowCoursesByCategory>>(coursesByCategory);
         return Success(result);
     }
 
