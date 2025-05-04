@@ -11,8 +11,8 @@ import { login, logout } from '@/Redux/features/login/loginSlice';
 
 function Navbar() {
     const dispatch = useDispatch();
-    const userToken = useSelector((state) => state.login.userToken) || localStorage.getItem('JWTToken');
-    const userRole = useSelector((state) => state.auth.role) || localStorage.getItem('userRole');
+    const userToken = useSelector((state) => state.login.userToken);
+    const userRole = useSelector((state) => state.login.userRole);
     const [isNotificationVisible, setIsNotificationVisible] = useState(false); // State for notification dropdown
     const [isMenuOpen, setIsMenuOpen] = useState(false); // State for the toggle menu
     const navigate = useNavigate();

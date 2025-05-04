@@ -48,6 +48,7 @@ const authSlice = createSlice({
     name:'login',
     initialState:{
         userToken: getTokenFromLocalStorage(),
+        userRole: localStorage.getItem('userRole') || null,
         refreshToken:'',
         expirationDate:'',
         loading:false,
@@ -57,6 +58,7 @@ const authSlice = createSlice({
     reducers:{
         logout: (state) => {
             state.userToken = null;
+            state.userRole = null;
             state.refreshToken = '';
             state.expirationDate = '';
             state.loading = false;
@@ -86,10 +88,12 @@ const authSlice = createSlice({
             localStorage.setItem('refreshToken', action.payload.refreshToken);
             localStorage.setItem('expirationDate', action.payload.expiration);
 
-            // Set userRole in localStorage if present in response
+            // Set userRole in Redux and localStorage
             if (action.payload.data.role) {
+              state.userRole = action.payload.data.role;
               localStorage.setItem('userRole', action.payload.data.role);
             } else if (action.payload.data.roles && action.payload.data.roles.length > 0) {
+              state.userRole = action.payload.data.roles[0];
               localStorage.setItem('userRole', action.payload.data.roles[0]);
             }
         })
