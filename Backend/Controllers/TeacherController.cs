@@ -25,22 +25,6 @@ public class TeacherController : AppControllerBase
         return NewResult(result);
     }
 
-    [HttpGet("Teacher/GetAll")]
-    public async Task<IActionResult> GetAll()
-    {
-        var result = await _teacherService.GetAllAsync();
-
-        return NewResult(result);
-    }
-
-    [HttpGet("Teacher/GetAllDeleted")]
-    public async Task<IActionResult> GetAllDeleted()
-    {
-        var result = await _teacherService.GetAllDeletedAsync();
-
-        return NewResult(result);
-    }
-
     [HttpPost("Teacher/Create")]
     public async Task<IActionResult> Create(CreateTeacherDto createTeacherDto)
     {
