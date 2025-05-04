@@ -5,15 +5,14 @@ import styles from './Navbar.module.css'; // Import the CSS module
 import img from '../../assets/avatar.png'; // Import the logo image
 import SearchBar from './SearchBar';
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '@/Redux/features/login/loginSlice';
+import { login, logout } from '@/Redux/features/login/loginSlice';
+// import { useAuth } from '@/contexts/AuthContext';
 
 
 function Navbar() {
-
-    // let dispatch =useDispatch()
-
-    // let {userToken} = useSelector((state)=>state.login)
-
+    const dispatch = useDispatch();
+    const userToken = useSelector((state) => state.login.userToken) || localStorage.getItem('JWTToken');
+    const userRole = useSelector((state) => state.auth.role) || localStorage.getItem('userRole');
     const [isNotificationVisible, setIsNotificationVisible] = useState(false); // State for notification dropdown
     const [isMenuOpen, setIsMenuOpen] = useState(false); // State for the toggle menu
     const navigate = useNavigate();
@@ -42,108 +41,65 @@ function Navbar() {
                 {/* Navbar Links (Large Screens) */}
                 <div className={`hidden lg:flex items-center gap-6 ml-[150px] ${styles.navLinks}`}>
                     <ul className="flex items-center gap-4">
-                        <li>
-                            <NavLink
-                                to="/"
-                                className={({ isActive }) =>
-                                    isActive ? `${styles.navlink} ${styles.active}` : styles.navlink
-                                }
-                            >
-                                Home
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink
-                                to="/courses"
-                                className={({ isActive }) =>
-                                    isActive ? `${styles.navlink} ${styles.active}` : styles.navlink
-                                }
-                            >
-                                Courses
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink
-                                to="/dashboard"
-                                className={({ isActive }) =>
-                                    isActive ? `${styles.navlink} ${styles.active}` : styles.navlink
-                                }
-                            >
-                                Dashboard
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink
-                                to="/about"
-                                className={({ isActive }) =>
-                                    isActive ? `${styles.navlink} ${styles.active}` : styles.navlink
-                                }
-                            >
-                                About
-                            </NavLink>
-                        </li>
+                        {userToken && userRole === 'Student' && (
+                          <>
+                            <li><NavLink to="/" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Home</NavLink></li>
+                            <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
+                            <li><NavLink to="/dashboard" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Dashboard</NavLink></li>
+                            <li><NavLink to="/about" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>About</NavLink></li>
+                          </>
+                        )}
+                        {userToken && userRole === 'Teacher' && (
+                          <>
+                            <li><NavLink to="/" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Home</NavLink></li>
+                            <li><NavLink to="/teacher/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>My Courses</NavLink></li>
+                            <li><NavLink to="/dashboard" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Dashboard</NavLink></li>
+                            <li><NavLink to="/about" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>About</NavLink></li>
+                          </>
+                        )}
+                        {(!userToken || (!['Student', 'Teacher'].includes(userRole))) && (
+                          <>
+                            <li><NavLink to="/" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Home</NavLink></li>
+                            <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
+                            <li><NavLink to="/dashboard" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Dashboard</NavLink></li>
+                            <li><NavLink to="/about" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>About</NavLink></li>
+                          </>
+                        )}
                     </ul>
                 </div>
 
-                {/* Search, Bell, and Cart Icons (Large Screens) */}
+                {/* Search, Bell, and Profile Icons (Large Screens) */}
                 <div className={`hidden lg:flex items-center gap-4 ml-auto ${styles.icons}`}>
+                  <div className="relative">
+                    <SearchBar onSearch={handleSearch} />
+                  </div>
+                  {userToken && (userRole === 'Student' || userRole === 'Teacher') && (
                     <div className="relative">
-                     <SearchBar onSearch={handleSearch} />
-                    </div>
-                    <div className="relative">
-                        <div
-                            className={`w-[24px] h-[24px] text-neutral-700 cursor-pointer ${styles.bellIcon}`}
-                            onClick={toggleNotification}
-                        >
-                            <i className="fa-solid fa-bell"></i>
+                      <div className={`w-[24px] h-[24px] text-neutral-700 cursor-pointer ${styles.bellIcon}`} onClick={toggleNotification}>
+                        <i className="fa-solid fa-bell"></i>
+                      </div>
+                      {/* Notification Dropdown */}
+                      {isNotificationVisible && (
+                        <div className={`absolute right-0 mt-2 w-[200px] bg-white shadow-lg rounded-md p-4 ${styles.notificationDropdown}`}>
+                          <p className="text-sm text-neutral-700">No new notifications</p>
                         </div>
-                        {/* Notification Dropdown */}
-                        {isNotificationVisible && (
-                            <div className={`absolute right-0 mt-2 w-[200px] bg-white shadow-lg rounded-md p-4 ${styles.notificationDropdown}`}>
-                                <p className="text-sm text-neutral-700">No new notifications</p>
-                            </div>
-                        )}
+                      )}
                     </div>
-                    <Link to={"/teacher/profile"}>
+                  )}
+                  <Link to={userToken && userRole === 'Teacher' ? "/teacher/profile" : "/profile"}>
                     <div className={`w-[20px] h-[25px] text-neutral-700 text-3xl ${styles.cartIcon}`}>
-                    <img src={img} alt="user picture" />
+                      <img src={img} alt="user picture" />
                     </div>
-                    </Link>
-
+                  </Link>
                 </div>
 
-                {/* Hamburger Menu Button, Bell, and Cart Icons (Small Screens) */}
-                <div className={`ml-auto lg:hidden flex items-center gap-4 ${styles.smallScreenIcons}`}>
-                    <div className="relative">
-                        <div
-                            className={`w-[24px] h-[24px] text-neutral-700 cursor-pointer ${styles.bellIcon}`}
-                            onClick={toggleNotification}
-                        >
-                            <i className="fa-solid fa-bell"></i>
-                        </div>
-                        {/* Notification Dropdown */}
-                        {isNotificationVisible && (
-                            <div className={`absolute right-0 mt-2 w-[200px] bg-white shadow-lg rounded-md p-4 ${styles.notificationDropdown}`}>
-                                <p className="text-sm text-neutral-700">No new notifications</p>
-                            </div>
-                        )}
-                    </div>
-                    <Link to={"/profile"}>
-                    <div className={`w-[30px] h-[30px] text-neutral-700 text-3xl  ${styles.cartIcon}`}>
-                        <img src={img} alt="user picture" />
-                    </div>
-                    </Link>
-                    <button
-                        onClick={toggleMenu}
-                        className={`text-black focus:outline-none ${styles.menuButton}`}
-                    >
-                        <i className="fa-solid fa-bars text-xl"></i>
-                    </button>
-                </div>
-
-                {/* Button (Large Screens) */}
+                {/* Auth Button (Large Screens) */}
                 <div className={`hidden lg:block ml-4 ${styles.button}`}>
-                    <Button />
+                  {(userToken && (userRole === 'Student' || userRole === 'Teacher')) ? (
+                    <button onClick={() => dispatch(logout())} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Logout</button>
+                  ) : (
+                    <Link to="/auth/login"><Button /></Link>
+                  )}
                 </div>
             </div>
 
@@ -154,61 +110,44 @@ function Navbar() {
                 } ${styles.dropdownMenu}`}
             >
                 <ul className="flex flex-col gap-4 items-center">
-                    <li>
-                        <NavLink
-                            to="/"
-                            className={({ isActive }) =>
-                                isActive ? `${styles.navlink} ${styles.active}` : styles.navlink
-                            }
-                        >
-                            Home
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink
-                            to="/courses"
-                            className={({ isActive }) =>
-                                isActive ? `${styles.navlink} ${styles.active}` : styles.navlink
-                            }
-                        >
-                            Courses
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink
-                            to="/dashboard"
-                            className={({ isActive }) =>
-                                isActive ? `${styles.navlink} ${styles.active}` : styles.navlink
-                            }
-                        >
-                            Dashboard
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink
-                            to="/about"
-                            className={({ isActive }) =>
-                                isActive ? `${styles.navlink} ${styles.active}` : styles.navlink
-                            }
-                        >
-                            About
-                        </NavLink>
-                    </li>
+                  {userToken && userRole === 'Student' && (
+                    <>
+                      <li><NavLink to="/" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Home</NavLink></li>
+                      <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
+                      <li><NavLink to="/dashboard" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Dashboard</NavLink></li>
+                      <li><NavLink to="/about" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>About</NavLink></li>
+                    </>
+                  )}
                 </ul>
-                <div className={`mt-4 flex items-center gap-4 ps-8 ${styles.searchAndButton}`}>
-                    <div className={`relative w-full max-w-[300px] ${styles.searchInputWrapper}`}>
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className={`w-full h-[36px] pl-[34px] pr-[12px] text-sm font-normal bg-neutral-200 rounded-md border-0 outline-none hover:bg-white hover:text-neutral-400 focus:bg-white focus:text-neutral-400 transition-all duration-300 ease-in-out ${styles.searchInput}`}
-                        />
-                        <span>
-                            <i className={`fa-solid fa-magnifying-glass absolute top-[10px] left-[12px] text-neutral-900 ${styles.searchIcon}`}></i>
-                        </span>
-                    </div>
-                    <Link to={"/auth/login"}> <Button /></Link>
-                    
-                </div>
+                {userToken && userRole === 'Student' && (
+                  <div className={`mt-4 flex items-center gap-4 ps-8 ${styles.searchAndButton}`}>
+                      <div className={`relative w-full max-w-[300px] ${styles.searchInputWrapper}`}>
+                          <input type="text" placeholder="Search..." className={`w-full h-[36px] pl-[34px] pr-[12px] text-sm font-normal bg-neutral-200 rounded-md border-0 outline-none hover:bg-white hover:text-neutral-400 focus:bg-white focus:text-neutral-400 transition-all duration-300 ease-in-out ${styles.searchInput}`}/>
+                          <span><i className={`fa-solid fa-magnifying-glass absolute top-[10px] left-[12px] text-neutral-900 ${styles.searchIcon}`}></i></span>
+                      </div>
+                      <div className="relative">
+                          <div className={`w-[24px] h-[24px] text-neutral-700 cursor-pointer ${styles.bellIcon}`} onClick={toggleNotification}>
+                              <i className="fa-solid fa-bell"></i>
+                          </div>
+                          {isNotificationVisible && (
+                              <div className={`absolute right-0 mt-2 w-[200px] bg-white shadow-lg rounded-md p-4 ${styles.notificationDropdown}`}>
+                                  <p className="text-sm text-neutral-700">No new notifications</p>
+                              </div>
+                          )}
+                      </div>
+                      <Link to="/profile">
+                          <div className={`w-[30px] h-[30px] text-neutral-700 text-3xl  ${styles.cartIcon}`}>
+                              <img src={img} alt="user picture" />
+                          </div>
+                      </Link>
+                      <button onClick={() => dispatch(logout())} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Logout</button>
+                  </div>
+                )}
+                {(!userToken || userRole !== 'Student') && (
+                  <div className={`mt-4 flex items-center gap-4 ps-8 ${styles.searchAndButton}`}>
+                    <Link to="/auth/login"><Button /></Link>
+                  </div>
+                )}
             </div>
         </div>
     );

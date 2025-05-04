@@ -102,9 +102,11 @@ function Courses() {
           )}
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8'>
             {filteredCourses.length > 0 ? filteredCourses.map((course) => (
-              <Link to={`/course/${course.id}`}>
+              <Link 
+                key={course.id}
+                to={`/courses/course/${course.id}`}
+              >
                 <div
-                  key={course.id}
                   className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card} h-[330px] flex flex-col`} 
                 >
                   <div className="relative overflow-hidden">

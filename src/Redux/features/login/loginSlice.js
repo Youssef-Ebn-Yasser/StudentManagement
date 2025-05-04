@@ -54,7 +54,20 @@ const authSlice = createSlice({
         error:null
     },
 
-    reducers:{},
+    reducers:{
+        logout: (state) => {
+            state.userToken = null;
+            state.refreshToken = '';
+            state.expirationDate = '';
+            state.loading = false;
+            state.error = null;
+            localStorage.removeItem('JWTToken');
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('expirationDate');
+            localStorage.removeItem('userRole');
+        },
+    },
 
     extraReducers:(builder)=>{
         builder.addCase(login.pending,(state)=>{
@@ -72,6 +85,13 @@ const authSlice = createSlice({
             localStorage.setItem('JWTToken', action.payload.token);
             localStorage.setItem('refreshToken', action.payload.refreshToken);
             localStorage.setItem('expirationDate', action.payload.expiration);
+
+            // Set userRole in localStorage if present in response
+            if (action.payload.data.role) {
+              localStorage.setItem('userRole', action.payload.data.role);
+            } else if (action.payload.data.roles && action.payload.data.roles.length > 0) {
+              localStorage.setItem('userRole', action.payload.data.roles[0]);
+            }
         })
         builder.addCase(login.rejected,(state,action)=>{
             state.loading=false;
@@ -80,4 +100,5 @@ const authSlice = createSlice({
     }
 })
 
+export const { logout } = authSlice.actions;
 export default authSlice.reducer;
