@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
+import { logout } from '@/Redux/auth/authSlice';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
+import img from '../../assets/avatar.png'; // Import the logo image
 import Button from './Button';
 import styles from './Navbar.module.css'; // Import the CSS module
-import img from '../../assets/avatar.png'; // Import the logo image
 import SearchBar from './SearchBar';
-import { useDispatch, useSelector } from 'react-redux';
-import { login, logout } from '@/Redux/features/login/loginSlice';
 // import { useAuth } from '@/contexts/AuthContext';
 
 
 function Navbar() {
     const dispatch = useDispatch();
-    const userToken = useSelector((state) => state.login.userToken);
-    const userRole = useSelector((state) => state.login.userRole);
+    const authStore = useSelector((state) => state.auth || {});
+    const userRole = authStore.role;
+    const isLoggedIn = authStore.isLogedin;
     const [isNotificationVisible, setIsNotificationVisible] = useState(false); // State for notification dropdown
     const [isMenuOpen, setIsMenuOpen] = useState(false); // State for the toggle menu
     const navigate = useNavigate();
@@ -41,7 +42,7 @@ function Navbar() {
                 {/* Navbar Links (Large Screens) */}
                 <div className={`hidden lg:flex items-center gap-6 ml-[150px] ${styles.navLinks}`}>
                     <ul className="flex items-center gap-4">
-                        {userToken && userRole === 'Student' && (
+                        {isLoggedIn && userRole === 'Student' && (
                           <>
                             <li><NavLink to="/" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Home</NavLink></li>
                             <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
@@ -49,7 +50,7 @@ function Navbar() {
                             <li><NavLink to="/about" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>About</NavLink></li>
                           </>
                         )}
-                        {userToken && userRole === 'Teacher' && (
+                        {isLoggedIn && userRole === 'Teacher' && (
                           <>
                             <li><NavLink to="/" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Home</NavLink></li>
                             <li><NavLink to="/teacher/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>My Courses</NavLink></li>
@@ -57,7 +58,7 @@ function Navbar() {
                             <li><NavLink to="/about" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>About</NavLink></li>
                           </>
                         )}
-                        {(!userToken || (!['Student', 'Teacher'].includes(userRole))) && (
+                        {(!isLoggedIn || (!['Student', 'Teacher'].includes(userRole))) && (
                           <>
                             <li><NavLink to="/" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Home</NavLink></li>
                             <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
@@ -73,7 +74,7 @@ function Navbar() {
                   <div className="relative">
                     <SearchBar onSearch={handleSearch} />
                   </div>
-                  {userToken && (userRole === 'Student' || userRole === 'Teacher') && (
+                  {isLoggedIn && (userRole === 'Student' || userRole === 'Teacher') && (
                     <div className="relative">
                       <div className={`w-[24px] h-[24px] text-neutral-700 cursor-pointer ${styles.bellIcon}`} onClick={toggleNotification}>
                         <i className="fa-solid fa-bell"></i>
@@ -86,7 +87,7 @@ function Navbar() {
                       )}
                     </div>
                   )}
-                  <Link to={userToken && userRole === 'Teacher' ? "/teacher/profile" : "/profile"}>
+                  <Link to={isLoggedIn && userRole === 'Teacher' ? "/teacher/profile" : "/profile"}>
                     <div className={`w-[20px] h-[25px] text-neutral-700 text-3xl ${styles.cartIcon}`}>
                       <img src={img} alt="user picture" />
                     </div>
@@ -95,7 +96,7 @@ function Navbar() {
 
                 {/* Auth Button (Large Screens) */}
                 <div className={`hidden lg:block ml-4 ${styles.button}`}>
-                  {(userToken && (userRole === 'Student' || userRole === 'Teacher')) ? (
+                  {(isLoggedIn && (userRole === 'Student' || userRole === 'Teacher')) ? (
                     <button onClick={() => dispatch(logout())} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Logout</button>
                   ) : (
                     <Link to="/auth/login"><Button /></Link>
@@ -110,7 +111,7 @@ function Navbar() {
                 } ${styles.dropdownMenu}`}
             >
                 <ul className="flex flex-col gap-4 items-center">
-                  {userToken && userRole === 'Student' && (
+                  {isLoggedIn && userRole === 'Student' && (
                     <>
                       <li><NavLink to="/" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Home</NavLink></li>
                       <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
@@ -119,7 +120,7 @@ function Navbar() {
                     </>
                   )}
                 </ul>
-                {userToken && userRole === 'Student' && (
+                {isLoggedIn && userRole === 'Student' && (
                   <div className={`mt-4 flex items-center gap-4 ps-8 ${styles.searchAndButton}`}>
                       <div className={`relative w-full max-w-[300px] ${styles.searchInputWrapper}`}>
                           <input type="text" placeholder="Search..." className={`w-full h-[36px] pl-[34px] pr-[12px] text-sm font-normal bg-neutral-200 rounded-md border-0 outline-none hover:bg-white hover:text-neutral-400 focus:bg-white focus:text-neutral-400 transition-all duration-300 ease-in-out ${styles.searchInput}`}/>
@@ -143,7 +144,7 @@ function Navbar() {
                       <button onClick={() => dispatch(logout())} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Logout</button>
                   </div>
                 )}
-                {(!userToken || userRole !== 'Student') && (
+                {(!isLoggedIn || userRole !== 'Student') && (
                   <div className={`mt-4 flex items-center gap-4 ps-8 ${styles.searchAndButton}`}>
                     <Link to="/auth/login"><Button /></Link>
                   </div>
