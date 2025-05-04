@@ -28,8 +28,7 @@ export const confirmBuilder = (builder) => {
         })
         .addCase(confirmUserEmail.fulfilled, (state, action) => {
             state.loading = false;
-            state.user = action.payload.user;
-            state.token = action.payload.token;
+           
         })
         .addCase(confirmUserEmail.rejected, (state, action) => {
             state.loading = false;

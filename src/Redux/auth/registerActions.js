@@ -1,87 +1,50 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import
-    {
-        registerAdmin,
-        registerStudent,
-        registerTeacher
-    } from '@/services/auth';
+import { createAsyncThunk } from '@reduxjs/toolkit'
+import {
+    registerAdmin,
+    registerStudent,
+    registerTeacher,
+} from '@/services/auth'
 
+const registerFunc = (userType) => {
+    switch (userType) {
+        case 'admin':
+            return registerAdmin
+        case 'student':
+            return registerStudent
+        case 'teacher':
+            return registerTeacher
+        default:
+            throw new Error('Invalid user type')
+    }
+}
 
-export const registerAdminUser = createAsyncThunk('auth/registerAdmin', async (data, { rejectWithValue }) => {
-  try {
-    const response = await registerAdmin(data);
-    return response.data;
-  } catch (error) {
-    return rejectWithValue(error.response.data);
-  }
-});
-
-
-export const registerStudentUser = createAsyncThunk('auth/registerStudent', async (data, { rejectWithValue }) => {
-  try {
-    const response = await registerStudent(data);
-    return response.data;
-  } catch (error) {
-    return rejectWithValue(error.response.data);
-  }
-});
-
-export const registerTeacherUser = createAsyncThunk('auth/registerTeacher', async (data, { rejectWithValue }) => {
-  try {
-    const response = await registerTeacher(data);
-    return response.data;
-  } catch (error) {
-    return rejectWithValue(error.response.data);
-  }
-});
-
-
+export const registerUser = createAsyncThunk(
+    'auth/register',
+    async (data, userType, { rejectWithValue }) => {
+        try {
+          console.log('data', data, userType)
+            const register = registerFunc(userType)
+            const response = await register(data)
+            return response.data
+        } catch (error) {
+            return rejectWithValue(error.response.data)
+        }
+    }
+)
 
 export const registerBuilder = (builder) => {
-     builder
-          .addCase(registerAdminUser.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-          })
-          .addCase(registerAdminUser.fulfilled, (state, action) => {
-            state.loading = false;
-            state.user = action.payload.user;
-            state.token = action.payload.token;
-          })
-          .addCase(registerAdminUser.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload;
-          });
-
-           builder
-                .addCase(registerStudentUser.pending, (state) => {
-                  state.loading = true;
-                  state.error = null;
-                })
-                .addCase(registerStudentUser.fulfilled, (state, action) => {
-                  state.loading = false;
-                  state.user = action.payload.user;
-                  state.token = action.payload.token;
-                })
-                .addCase(registerStudentUser.rejected, (state, action) => {
-                  state.loading = false;
-                  state.error = action.payload;
-                });
-          
-              builder
-                .addCase(registerTeacherUser.pending, (state) => {
-                  state.loading = true;
-                  state.error = null;
-                })
-                .addCase(registerTeacherUser.fulfilled, (state, action) => {
-                  state.loading = false;
-                  state.user = action.payload.user;
-                  state.token = action.payload.token;
-                })
-                .addCase(registerTeacherUser.rejected, (state, action) => {
-                  state.loading = false;
-                  state.error = action.payload;
-                });
-
-                
-            }
+    builder
+        .addCase(registerUser.pending, (state) => {
+            state.loading = true
+            state.error = null
+        })
+        .addCase(registerUser.fulfilled, (state, action) => {
+            state.loading = false
+            // state.user = action.payload.user
+            // state.token = action.payload.token
+        })
+        .addCase(registerUser.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
+        })
+}
