@@ -96,5 +96,13 @@ namespace Backend.Controllers
             var result = await _studentService.DeleteAsync(id);
             return NewResult(result);
         }
+
+        // Delete Student from Course
+        [HttpDelete("DeleteStudentFromCourse")]
+        public async Task<IActionResult> DeleteStudentFromCourse([FromBody] DeleteStudentFromCourseDto deleteStudentFromCourseDto)
+        {
+            var result = await _studentService.DeleteStudentFromCourseAsync(deleteStudentFromCourseDto);
+            return NewResult(result);
+        }
     }
 }

@@ -7,5 +7,6 @@ public class StudentCourseProfile : Profile
     public StudentCourseProfile()
     {
         CreateMap<StudentEnrollDto, StudentCourse>();
+
     }
 }
