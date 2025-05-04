@@ -65,8 +65,6 @@ public class AuthenticationService : IAuthenticationService
 
         jwtToken.RefreshToken = refreshToken.Token;
 
-
-
         return _responseHandler.Success(jwtToken);
     }
 

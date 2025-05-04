@@ -100,15 +100,15 @@ public class StudentService : ResponseHandler, IStudentService
     public async Task<Response<string>> EnrollToCourse(StudentEnrollDto studentEnrollDto)
     {
         // check this student is exist 
-        if (await _isStudentExistById(studentEnrollDto.StudentId))
+        if (!await _isStudentExistById(studentEnrollDto.StudentId))
             return BadRequest<string>($"this Student with this id : {studentEnrollDto.StudentId} not exist");
         // this course is exist
-        if (await _isCourseExistById(studentEnrollDto.CourseId))
+        if (!await _isCourseExistById(studentEnrollDto.CourseId))
             return BadRequest<string>($"this Course with this id : {studentEnrollDto.CourseId} not exist");
 
         // check if in payment table  
-        var isPaid = await IsEnrolledInCourse(studentEnrollDto);
-        if (!isPaid.Succeeded) return BadRequest<string>("Student Should Pay First");
+        //var isPaid = await IsEnrolledInCourse(studentEnrollDto);
+        // if (!isPaid.Succeeded) return BadRequest<string>("Student Should Pay First");
 
         var mapper = _mapper.Map<StudentCourse>(studentEnrollDto);
 

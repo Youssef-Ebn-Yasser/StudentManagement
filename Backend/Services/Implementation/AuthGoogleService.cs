@@ -40,7 +40,7 @@ public class AuthGoogleService : ResponseHandler, IAuthGoogleService
             var result = await _authenticationService.GetJWTToken(user.Id.ToString());
             return result;
         }
-        catch (Exception e)
+        catch
         {
             return BadRequest<TokenDto>("Google Authentication Faild");
 
