@@ -1,4 +1,5 @@
 import axiosInstance from './axiosInstance';
+import axios from 'axios';
 
 export const courseService = {
   // Create a new course
@@ -181,5 +182,22 @@ export const courseService = {
     } catch (error) {
       throw error;
     }
+  }
+};
+
+const BASE_URL = 'http://e-learn-v1.runasp.net';
+
+export const getPaginatedCourses = async (page = 1, pageSize = 4) => {
+  try {
+    const response = await axios.get(`http://e-learn-v1.runasp.net/HomeCourses/GetPaginated`, {
+      params: {
+        page,
+        pageSize
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching courses:', error);
+    throw error;
   }
 }; 
