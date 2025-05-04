@@ -37,12 +37,15 @@ public class CourseService : ResponseHandler, ICourseService
     public async Task<Response<ShowCourseDto>> GetCourseByIdAsync(int id)
     {
         var course = await _unitOfWork.Repository<Course>()
-                                             .GetTableNoTracking()
-                                             .Include(c => c.Category)
-                                             .Include(c => c.StudentCourses)
-                                             .ThenInclude(c => c.Student)
-                                             .ThenInclude(s => s.Comments)
-                                             .FirstOrDefaultAsync(c => c.Id == id);
+            .GetTableNoTracking()
+            .Include(c => c.Category)
+            .Include(c => c.Teacher)
+            .Include(c => c.lessons)
+            .Include(c => c.StudentCourses)
+                .ThenInclude(sc => sc.Student)
+                    .ThenInclude(s => s.Comments)
+                        .ThenInclude(c => c.Lesson)
+            .FirstOrDefaultAsync(c => c.Id == id);
 
         if (course == null)
             return NotFound<ShowCourseDto>("Course not found");

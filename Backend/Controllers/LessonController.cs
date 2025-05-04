@@ -12,11 +12,17 @@ namespace Backend.Controllers
         {
             _lessonService = lessonService;
         }
+        [HttpGet("Get/All/Lessons")]
+        public async Task<IActionResult> GetLessonDetails()
+        {
+            var result = await _lessonService.GetAll();
+            return NewResult(result);
+        }
 
         [HttpGet("GetLessonDetails/{lessonId}")]
-        public async Task<IActionResult> GetLessonDetails(int lessonId)
+        public async Task<IActionResult> GetLessonDetails(int lessonId, int courseId)
         {
-            var result = await _lessonService.GetLessonAsync(lessonId);
+            var result = await _lessonService.GetLessonAsync(lessonId, courseId);
             return NewResult(result);
         }
 
