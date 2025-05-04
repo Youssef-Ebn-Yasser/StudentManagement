@@ -29,6 +29,68 @@
             // Course → CoursesProfile (assuming CoursesProfile is defined elsewhere)
             CreateMap<Course, CoursesProfile>();
             CreateMap<Course, HomeCourses>();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            // Course → ShowCourseDto
+            CreateMap<Course, ShowCourseDto>()
+                .ForMember(dest => dest.TeacherName,
+                           opt => opt.MapFrom(src => src.Teacher != null ? src.Teacher.Name : null))
+                .ForMember(dest => dest.LessonCount,
+                           opt => opt.MapFrom(src => src.lessons != null ? src.lessons.Count : 0))
+                .ForMember(dest => dest.LessonInfo,
+                           opt => opt.MapFrom(src => src.lessons))
+                .ForMember(dest => dest.CommentInfo,
+                           opt => opt.MapFrom(src =>
+                               src.StudentCourses
+                                  .SelectMany(sc => sc.Student.Comments
+                                      .Where(c => c.Lesson.CourseId == src.Id))
+                                  .ToList()))
+                .ForMember(dest => dest.CategoryName,
+                           opt => opt.MapFrom(src => src.Category != null ? src.Category.CategoryName : null));
+
+            // Lesson → LessonInfo
+            CreateMap<Lesson, LessonInfo>();
+
+            // Comment → CommentInfo
+            CreateMap<Comment, CommentInfo>()
+                .ForMember(dest => dest.StudentName,
+                           opt => opt.MapFrom(src => src.Student != null ? src.Student.Name : "Unknown"));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         }
     }
 }
