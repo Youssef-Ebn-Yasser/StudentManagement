@@ -4,27 +4,19 @@ import Button from './Button';
 import styles from './Navbar.module.css'; // Import the CSS module
 import img from '../../assets/avatar.png'; // Import the logo image
 import SearchBar from './SearchBar';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { login } from '@/Redux/features/login/loginSlice';
-import { logout } from '@/Redux/auth/authSlice';
+
 
 function Navbar() {
 
-    let navigate= useNavigate()
-    let dispatch =useDispatch()
-    const [loggedOut, setLoggedOut]= useState(false)
+    // let dispatch =useDispatch()
 
-    function handleLogOut(){
-        dispatch(logout())
-        setLoggedOut(true)
-        navigate('/auth/login')
-
-    }
-   
     // let {userToken} = useSelector((state)=>state.login)
 
     const [isNotificationVisible, setIsNotificationVisible] = useState(false); // State for notification dropdown
     const [isMenuOpen, setIsMenuOpen] = useState(false); // State for the toggle menu
+    const navigate = useNavigate();
 
     const toggleNotification = () => {
         setIsNotificationVisible(!isNotificationVisible);
@@ -136,7 +128,7 @@ function Navbar() {
                             </div>
                         )}
                     </div>
-                    <Link to={"/teacher/profile"}>
+                    <Link to={"/profile"}>
                     <div className={`w-[30px] h-[30px] text-neutral-700 text-3xl  ${styles.cartIcon}`}>
                         <img src={img} alt="user picture" />
                     </div>
@@ -148,9 +140,7 @@ function Navbar() {
                         <i className="fa-solid fa-bars text-xl"></i>
                     </button>
                 </div>
-                <div>
-                    <button className='w-[30px] h-[30px] text-neutral-700 text-xl mb-1 ms-2 hover:text-red-500 hover:cursor-pointer' onClick={()=>{handleLogOut()}}><i className="fa-solid fa-right-from-bracket"></i></button>
-                </div>
+
                 {/* Button (Large Screens) */}
                 <div className={`hidden lg:block ml-4 ${styles.button}`}>
                     <Button />
@@ -215,9 +205,6 @@ function Navbar() {
                         <span>
                             <i className={`fa-solid fa-magnifying-glass absolute top-[10px] left-[12px] text-neutral-900 ${styles.searchIcon}`}></i>
                         </span>
-                    </div>
-                    <div>
-                        <button className='w-[30px] h-[30px] text-neutral-700 text-xl mb-1 ms-2 hover:text-red-500 hover:cursor-pointer' onClick={()=>{handleLogOut()}}><i className="fa-solid fa-right-from-bracket"></i></button>
                     </div>
                     <Link to={"/auth/login"}> <Button /></Link>
                     

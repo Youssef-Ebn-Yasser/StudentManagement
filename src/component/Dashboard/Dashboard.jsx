@@ -30,7 +30,7 @@ import {
 function Dashboard() {
 
     let dispatch= useDispatch()
-    let {userData,loading,erro}= useSelector((state)=>state.userDetails)
+    let {userData,loading,error}= useSelector((state)=>state.userDetails)
     console.log(userData);
     
   
