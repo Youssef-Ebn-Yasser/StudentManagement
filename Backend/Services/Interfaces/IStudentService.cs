@@ -18,6 +18,7 @@ public interface IStudentService
     public Task<Response<string>> CreateAsync(CreateStudentDto createStudent);
     public Task<Response<string>> UpdateAsync(UpdateStudentDto updateStudentDto);
     public Task<Response<string>> DeleteAsync(int id);
+    public Task<Response<string>> DeleteStudentFromCourseAsync(DeleteStudentFromCourseDto deleteStudent);
     // enroll to course
     // first should check in payment table
 }

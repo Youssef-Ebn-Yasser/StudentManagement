@@ -161,6 +161,28 @@ public class StudentService : ResponseHandler, IStudentService
         return result > 0 ? Success("Student Deleted Successfully") :
                             BadRequest<string>("can not delete this student error happen when try deleting");
     }
+    public async Task<Response<String>> DeleteStudentFromCourseAsync(DeleteStudentFromCourseDto deleteStudent)
+    {
+        var isNameExist = await _isNameExist(deleteStudent.StudentName);
+        if (!isNameExist) return NotFound<string>($"Student with this name = {deleteStudent.StudentName} not exist");
+
+        var isCourseExist = await _isCourseExistByName(deleteStudent.CourseName);
+        if (!isCourseExist) return NotFound<string>($"Course with this name = {deleteStudent.CourseName} not exist");
+        var student = await _unitOfWork.Repository<Student>()
+                                              .GetTableAsTracking()
+                                              .FirstOrDefaultAsync(s => s.Name == deleteStudent.StudentName);
+        var course = await _unitOfWork.Repository<Course>()
+                                                .GetTableAsTracking()
+                                                .FirstOrDefaultAsync(c => c.Title == deleteStudent.CourseName);
+        var studentCourse = await _unitOfWork.Repository<StudentCourse>()
+                                              .GetTableAsTracking()
+                                              .FirstOrDefaultAsync(sc => sc.StudentId == student.Id && sc.CourseId == course.Id);
+        if (studentCourse == null) return NotFound<string>($"Student with this name = {deleteStudent.StudentName} not exist in this course");
+        _unitOfWork.Repository<StudentCourse>().Delete(studentCourse);
+        var result = _unitOfWork.Complete();
+        return result > 0 ? Success("Student Deleted From Course Successfully") :
+                            BadRequest<string>("can not delete this student from course error happen when try deleting");
+    }
     public Task<Response<string>> UpdateAsync(UpdateStudentDto updateStudentDto)
     {
         throw new NotImplementedException();
@@ -192,6 +214,8 @@ public class StudentService : ResponseHandler, IStudentService
     }
     private async Task<bool> _isCourseExistById(int id) =>
     await _unitOfWork.Repository<Course>().GetTableNoTracking().AnyAsync(s => s.Id == id);
+    private async Task<bool> _isCourseExistByName(string Name) =>
+   await _unitOfWork.Repository<Course>().GetTableNoTracking().AnyAsync(s => s.Title == Name);
     private async Task<bool> _isStudentExistById(int id) =>
     await _unitOfWork.Repository<Student>().GetTableNoTracking().AnyAsync(s => s.Id == id);
     #endregion
