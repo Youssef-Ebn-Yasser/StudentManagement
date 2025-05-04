@@ -171,6 +171,8 @@ public class AuthenticationService : IAuthenticationService
 
         // Generate email confirmation token and send email
         var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        await _userManager.ConfirmEmailAsync(user, confirmationToken);
+
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(confirmationToken));
 
         //var callbackUrl = $"{_baseUrl}/Auth/confirm-email?userId={user.Id}&token={encodedToken}";
