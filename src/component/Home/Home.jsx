@@ -1,36 +1,188 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import img1 from '../../assets/homepicstatic1.jpg';
-import img2 from '../../assets/homepicstatic2.jpg';
-import img3 from '../../assets/homepicstatic2.jpg';
-import img4 from '../../assets/homepicstatic1.jpg';
 import img from '../../assets/sliderpic.jpg';
 import styles from './Home.module.css';
 import { getPaginatedCourses } from '../../services/courseService';
+import Loader from '../Loader/Loader';
+
+const CourseCard = ({ course }) => (
+  <Link
+    to={`/courses/course/${course.id}`}
+    className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card}`}
+    aria-label={`View course: ${course.title}`}
+  >
+    <div className="relative overflow-hidden">
+      <img
+        src={course.imagePath || img}
+        alt={course.title}
+        className="block w-full h-40 object-cover transition-transform duration-300 group-hover:scale-110"
+        onError={(e) => {
+          e.target.src = img;
+        }}
+      />
+    </div>
+    <div className="p-3">
+      <div className="flex justify-between items-center mb-1">
+        <span className="text-gray-500 text-sm">{course.level || 'All Levels'}</span>
+      </div>
+      <h3 className="mt-0 mb-1 text-lg font-semibold text-black line-clamp-2">
+        {course.title}
+      </h3>
+      <p className="text-gray-600 text-sm mb-2 line-clamp-2">{course.description}</p>
+      <div className="flex justify-between items-center">
+        <div className="flex items-center">
+          <i className="fas fa-star text-yellow-500 text-sm" aria-hidden="true"></i>
+          <span className="ml-1 text-sm text-black">4.5</span>
+          <span className="text-gray-500 text-sm ps-1">(1253)</span>
+        </div>
+        <span className="text-xl font-bold text-black">${course.price}</span>
+      </div>
+    </div>
+  </Link>
+);
+
+const Pagination = ({ currentPage, totalPages, onPageChange, hasNextPage, hasPreviousPage }) => {
+  if (totalPages <= 1) return null;
+
+  // Show only 5 page numbers at a time
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
+
+  return (
+    <div className="flex items-center justify-center gap-2" role="navigation" aria-label="Pagination">
+      <button
+        className={`px-4 py-2 rounded-md ${
+          !hasPreviousPage
+            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            : 'bg-indigo-600 text-white hover:bg-indigo-700'
+        } transition-colors duration-200`}
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={!hasPreviousPage}
+        aria-label="Previous page"
+      >
+        Previous
+      </button>
+      <div className="flex items-center gap-2">
+        {getPageNumbers().map((pageNum) => (
+          <button
+            key={pageNum}
+            className={`w-10 h-10 rounded-md ${
+              currentPage === pageNum
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            } transition-colors duration-200`}
+            onClick={() => onPageChange(pageNum)}
+            aria-label={`Page ${pageNum}`}
+            aria-current={currentPage === pageNum ? 'page' : undefined}
+          >
+            {pageNum}
+          </button>
+        ))}
+      </div>
+      <button
+        className={`px-4 py-2 rounded-md ${
+          !hasNextPage
+            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            : 'bg-indigo-600 text-white hover:bg-indigo-700'
+        } transition-colors duration-200`}
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={!hasNextPage}
+        aria-label="Next page"
+      >
+        Next
+      </button>
+    </div>
+  );
+};
+
+// Custom hook for fetching courses
+const useCourseFetch = (initialPage = 1, enOrderBy = 0) => {
+  const [courses, setCourses] = useState([]);
+  const [page, setPage] = useState(initialPage);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [hasPreviousPage, setHasPreviousPage] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log('Fetching page:', page, 'with enOrderBy:', enOrderBy); // Debug log
+        const response = await getPaginatedCourses(page, enOrderBy);
+        
+        if (!isMounted) return;
+
+        if (response?.succeeded && response?.data?.data) {
+          console.log('Received data:', response.data.data); // Debug log
+          setCourses(response.data.data);
+          setTotalPages(response.data.totalPage);
+          setHasNextPage(response.data.hasNextPage);
+          setHasPreviousPage(response.data.hasPreviousPage);
+        } else {
+          setError('Failed to fetch courses. Please try again later.');
+        }
+      } catch (error) {
+        if (!isMounted) return;
+        console.error('Error fetching courses:', error);
+        setError(error.message || 'An unexpected error occurred');
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchCourses();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [page, enOrderBy]); // Added enOrderBy to dependencies
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      console.log('Changing to page:', newPage); // Debug log
+      setPage(newPage);
+    }
+  };
+
+  return {
+    courses,
+    page,
+    setPage: handlePageChange,
+    totalPages,
+    loading,
+    error,
+    hasNextPage,
+    hasPreviousPage
+  };
+};
 
 function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   
-  // Recommended Courses State
-  const [recommendedCourses, setRecommendedCourses] = useState([]);
-  const [recommendedPage, setRecommendedPage] = useState(1);
-  const [recommendedTotalPages, setRecommendedTotalPages] = useState(1);
-  const [recommendedLoading, setRecommendedLoading] = useState(true);
-  const [recommendedError, setRecommendedError] = useState(null);
-
-  // Popular Courses State
-  const [popularCourses, setPopularCourses] = useState([]);
-  const [popularPage, setPopularPage] = useState(1);
-  const [popularTotalPages, setPopularTotalPages] = useState(1);
-  const [popularLoading, setPopularLoading] = useState(true);
-  const [popularError, setPopularError] = useState(null);
-
-  // Trending Courses State
-  const [trendingCourses, setTrendingCourses] = useState([]);
-  const [trendingPage, setTrendingPage] = useState(1);
-  const [trendingTotalPages, setTrendingTotalPages] = useState(1);
-  const [trendingLoading, setTrendingLoading] = useState(true);
-  const [trendingError, setTrendingError] = useState(null);
+  // Use the custom hook for each course section with different enOrderBy values
+  const recommendedCourses = useCourseFetch(1, 0); // Recommended courses
+  const popularCourses = useCourseFetch(1, 2);    // Popular courses
+  const trendingCourses = useCourseFetch(1, 1);   // Trending courses
 
   const slides = [
     {
@@ -49,216 +201,27 @@ function Home() {
     },
   ];
 
-  // Fetch Recommended Courses
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchRecommendedCourses = async () => {
-      try {
-        setRecommendedLoading(true);
-        setRecommendedError(null);
-        const response = await getPaginatedCourses(recommendedPage);
-        
-        if (!isMounted) return;
-
-        if (response?.succeeded && response?.data?.data) {
-          setRecommendedCourses(response.data.data);
-          setRecommendedTotalPages(response.data.totalPage || 1);
-        } else {
-          setRecommendedError('Invalid response format from server');
-        }
-      } catch (error) {
-        if (!isMounted) return;
-        console.error('Error fetching recommended courses:', error);
-        setRecommendedError(error.message || 'An error occurred while fetching courses');
-      } finally {
-        if (isMounted) {
-          setRecommendedLoading(false);
-        }
-      }
-    };
-
-    fetchRecommendedCourses();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [recommendedPage]);
-
-  // Fetch Popular Courses
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchPopularCourses = async () => {
-      try {
-        setPopularLoading(true);
-        setPopularError(null);
-        const response = await getPaginatedCourses(popularPage);
-        
-        if (!isMounted) return;
-
-        if (response?.succeeded && response?.data?.data) {
-          setPopularCourses(response.data.data);
-          setPopularTotalPages(response.data.totalPage || 1);
-        } else {
-          setPopularError('Invalid response format from server');
-        }
-      } catch (error) {
-        if (!isMounted) return;
-        console.error('Error fetching popular courses:', error);
-        setPopularError(error.message || 'An error occurred while fetching courses');
-      } finally {
-        if (isMounted) {
-          setPopularLoading(false);
-        }
-      }
-    };
-
-    fetchPopularCourses();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [popularPage]);
-
-  // Fetch Trending Courses
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchTrendingCourses = async () => {
-      try {
-        setTrendingLoading(true);
-        setTrendingError(null);
-        const response = await getPaginatedCourses(trendingPage);
-        
-        if (!isMounted) return;
-
-        if (response?.succeeded && response?.data?.data) {
-          setTrendingCourses(response.data.data);
-          setTrendingTotalPages(response.data.totalPage || 1);
-        } else {
-          setTrendingError('Invalid response format from server');
-        }
-      } catch (error) {
-        if (!isMounted) return;
-        console.error('Error fetching trending courses:', error);
-        setTrendingError(error.message || 'An error occurred while fetching courses');
-      } finally {
-        if (isMounted) {
-          setTrendingLoading(false);
-        }
-      }
-    };
-
-    fetchTrendingCourses();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [trendingPage]);
-
   const goToSlide = (index) => {
     setCurrentSlide(index);
   };
 
-  const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-    if (totalPages <= 1) return null;
-
-    return (
-      <div className="flex items-center justify-center gap-2 mt-8">
-        <button
-          className={`px-4 py-2 rounded-md ${
-            currentPage === 1
-              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              : 'bg-indigo-600 text-white hover:bg-indigo-700'
-          } transition-colors duration-200`}
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-        <div className="flex items-center gap-2">
-          {[...Array(totalPages)].map((_, idx) => (
-            <button
-              key={idx}
-              className={`w-10 h-10 rounded-md ${
-                currentPage === idx + 1
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              } transition-colors duration-200`}
-              onClick={() => onPageChange(idx + 1)}
-            >
-              {idx + 1}
-            </button>
-          ))}
-        </div>
-        <button
-          className={`px-4 py-2 rounded-md ${
-            currentPage === totalPages
-              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              : 'bg-indigo-600 text-white hover:bg-indigo-700'
-          } transition-colors duration-200`}
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
-      </div>
-    );
-  };
-
-  const CourseCard = ({ course }) => (
-    <Link
-      key={course.id}
-      to={`/courses/course/${course.id}`}
-      className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card}`}
-    >
-      <div className="relative overflow-hidden">
-        <img
-          src={course.imagePath || img}
-          alt={course.title}
-          className="block w-full h-40 object-cover transition-transform duration-300 group-hover:scale-110"
-          onError={(e) => {
-            e.target.src = img;
-          }}
-        />
-      </div>
-      <div className="p-3">
-        <div className="flex justify-between items-center mb-1">
-          <span className="text-gray-500 text-sm">{course.level || 'All Levels'}</span>
-        </div>
-        <h3 className="mt-0 mb-1 text-lg font-semibold text-black line-clamp-2">
-          {course.title}
-        </h3>
-        <p className="text-gray-600 text-sm mb-2 line-clamp-2">{course.description}</p>
-        <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            <i className="fas fa-star text-yellow-500 text-sm"></i>
-            <span className="ml-1 text-sm text-black">4.5</span>
-            <span className="text-gray-500 text-sm ps-1">(1253)</span>
-          </div>
-          <span className="text-xl font-bold text-black">${course.price}</span>
-        </div>
-      </div>
-    </Link>
-  );
-
-  const CourseSection = ({ title, courses, loading, error, currentPage, totalPages, onPageChange }) => (
+  const CourseSection = ({ title, courses, loading, error, currentPage, totalPages, onPageChange, hasNextPage, hasPreviousPage }) => (
     <>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold text-black">{title}</h2>
         <Link
           to={`/courses`}
           className={`${styles.primary} me-5 group flex items-center mt-4`}
+          aria-label={`View all ${title.toLowerCase()}`}
         >
           View More
-          <i className="fa-solid fa-angle-right ml-2 transition-transform duration-300 group-hover:translate-x-1"></i>
+          <i className="fa-solid fa-angle-right ml-2 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true"></i>
         </Link>
       </div>
 
       {loading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+          <Loader />
         </div>
       ) : error ? (
         <div className="flex flex-col items-center justify-center h-64">
@@ -266,6 +229,7 @@ function Home() {
           <button
             onClick={() => onPageChange(1)}
             className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+            aria-label="Retry loading courses"
           >
             Retry
           </button>
@@ -276,16 +240,22 @@ function Home() {
         </div>
       ) : (
         <>
-          <div className="flex flex-wrap justify-center gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {courses.map((course) => (
               <CourseCard key={course.id} course={course} />
             ))}
           </div>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={onPageChange}
-          />
+          {totalPages > 1 && (
+            <div className="mt-8 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+                hasNextPage={hasNextPage}
+                hasPreviousPage={hasPreviousPage}
+              />
+            </div>
+          )}
         </>
       )}
     </>
@@ -300,21 +270,26 @@ function Home() {
         {/* Recommended Courses Section */}
         <CourseSection
           title="Recommended for you"
-          courses={recommendedCourses}
-          loading={recommendedLoading}
-          error={recommendedError}
-          currentPage={recommendedPage}
-          totalPages={recommendedTotalPages}
-          onPageChange={setRecommendedPage}
+          courses={recommendedCourses.courses}
+          loading={recommendedCourses.loading}
+          error={recommendedCourses.error}
+          currentPage={recommendedCourses.page}
+          totalPages={recommendedCourses.totalPages}
+          onPageChange={recommendedCourses.setPage}
+          hasNextPage={recommendedCourses.hasNextPage}
+          hasPreviousPage={recommendedCourses.hasPreviousPage}
         />
 
         <br />
         <br />
-                {/* Slider Section */}
-                <div className="mt-8 relative overflow-hidden">
+        
+        {/* Slider Section */}
+        <div className="mt-8 relative overflow-hidden">
           <div
             className="flex transition-transform duration-500"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+            role="region"
+            aria-label="Featured courses slider"
           >
             {slides.map((slide, index) => (
               <div
@@ -326,7 +301,10 @@ function Home() {
                     {slide.title}
                   </h2>
                   <p className="text-gray-600 mb-6">{slide.description}</p>
-                  <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-md">
+                  <button 
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-md"
+                    aria-label={slide.buttonText}
+                  >
                     {slide.buttonText}
                   </button>
                 </div>
@@ -341,7 +319,7 @@ function Home() {
             ))}
           </div>
 
-          <div className="flex justify-center mt-4 mb-4">
+          <div className="flex justify-center mt-4 mb-4" role="tablist">
             {slides.map((_, index) => (
               <button
                 key={index}
@@ -351,6 +329,9 @@ function Home() {
                     ? 'bg-indigo-600'
                     : 'bg-gray-300 hover:bg-gray-400'
                 }`}
+                role="tab"
+                aria-selected={currentSlide === index}
+                aria-label={`Slide ${index + 1}`}
               ></button>
             ))}
           </div>
@@ -359,12 +340,14 @@ function Home() {
         {/* Popular Courses Section */}
         <CourseSection
           title="Popular courses"
-          courses={popularCourses}
-          loading={popularLoading}
-          error={popularError}
-          currentPage={popularPage}
-          totalPages={popularTotalPages}
-          onPageChange={setPopularPage}
+          courses={popularCourses.courses}
+          loading={popularCourses.loading}
+          error={popularCourses.error}
+          currentPage={popularCourses.page}
+          totalPages={popularCourses.totalPages}
+          onPageChange={popularCourses.setPage}
+          hasNextPage={popularCourses.hasNextPage}
+          hasPreviousPage={popularCourses.hasPreviousPage}
         />
 
         <br />
@@ -373,18 +356,18 @@ function Home() {
         {/* Trending Courses Section */}
         <CourseSection
           title="Trending courses"
-          courses={trendingCourses}
-          loading={trendingLoading}
-          error={trendingError}
-          currentPage={trendingPage}
-          totalPages={trendingTotalPages}
-          onPageChange={setTrendingPage}
+          courses={trendingCourses.courses}
+          loading={trendingCourses.loading}
+          error={trendingCourses.error}
+          currentPage={trendingCourses.page}
+          totalPages={trendingCourses.totalPages}
+          onPageChange={trendingCourses.setPage}
+          hasNextPage={trendingCourses.hasNextPage}
+          hasPreviousPage={trendingCourses.hasPreviousPage}
         />
 
         <br />
         <br />
-
-
       </div>
     </>
   );
