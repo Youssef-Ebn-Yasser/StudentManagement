@@ -1,29 +1,189 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import img1 from '../../assets/homepicstatic1.jpg';
-import img2 from '../../assets/homepicstatic2.jpg';
-import img3 from '../../assets/homepicstatic2.jpg';
-import img4 from '../../assets/homepicstatic1.jpg';
 import img from '../../assets/sliderpic.jpg';
 import styles from './Home.module.css';
+import { getPaginatedCourses } from '../../services/courseService';
+import Loader from '../Loader/Loader';
+
+const CourseCard = ({ course }) => (
+  <Link
+    to={`/courses/course/${course.id}`}
+    className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card}`}
+    aria-label={`View course: ${course.title}`}
+  >
+    <div className="relative overflow-hidden">
+      <img
+        src={course.imagePath || img}
+        alt={course.title}
+        className="block w-full h-40 object-cover transition-transform duration-300 group-hover:scale-110"
+        onError={(e) => {
+          e.target.src = img;
+        }}
+      />
+    </div>
+    <div className="p-3">
+      <div className="flex justify-between items-center mb-1">
+        <span className="text-gray-500 text-sm">{course.level || 'All Levels'}</span>
+      </div>
+      <h3 className="mt-0 mb-1 text-lg font-semibold text-black line-clamp-2">
+        {course.title}
+      </h3>
+      <p className="text-gray-600 text-sm mb-2 line-clamp-2">{course.description}</p>
+      <div className="flex justify-between items-center">
+        <div className="flex items-center">
+          <i className="fas fa-star text-yellow-500 text-sm" aria-hidden="true"></i>
+          <span className="ml-1 text-sm text-black">4.5</span>
+          <span className="text-gray-500 text-sm ps-1">(1253)</span>
+        </div>
+        <span className="text-xl font-bold text-black">${course.price}</span>
+      </div>
+    </div>
+  </Link>
+);
+
+const Pagination = ({ currentPage, totalPages, onPageChange, hasNextPage, hasPreviousPage }) => {
+  if (totalPages <= 1) return null;
+
+  // Show only 5 page numbers at a time
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
+
+  return (
+    <div className="flex items-center justify-center gap-2" role="navigation" aria-label="Pagination">
+      <button
+        className={`px-4 py-2 rounded-md ${
+          !hasPreviousPage
+            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            : 'bg-indigo-600 text-white hover:bg-indigo-700'
+        } transition-colors duration-200`}
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={!hasPreviousPage}
+        aria-label="Previous page"
+      >
+        Previous
+      </button>
+      <div className="flex items-center gap-2">
+        {getPageNumbers().map((pageNum) => (
+          <button
+            key={pageNum}
+            className={`w-10 h-10 rounded-md ${
+              currentPage === pageNum
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            } transition-colors duration-200`}
+            onClick={() => onPageChange(pageNum)}
+            aria-label={`Page ${pageNum}`}
+            aria-current={currentPage === pageNum ? 'page' : undefined}
+          >
+            {pageNum}
+          </button>
+        ))}
+      </div>
+      <button
+        className={`px-4 py-2 rounded-md ${
+          !hasNextPage
+            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            : 'bg-indigo-600 text-white hover:bg-indigo-700'
+        } transition-colors duration-200`}
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={!hasNextPage}
+        aria-label="Next page"
+      >
+        Next
+      </button>
+    </div>
+  );
+};
+
+// Custom hook for fetching courses
+const useCourseFetch = (initialPage = 1, enOrderBy = 0) => {
+  const [courses, setCourses] = useState([]);
+  const [page, setPage] = useState(initialPage);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [hasPreviousPage, setHasPreviousPage] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log('Fetching page:', page, 'with enOrderBy:', enOrderBy); // Debug log
+        const response = await getPaginatedCourses(page, enOrderBy);
+        
+        if (!isMounted) return;
+
+        if (response?.succeeded && response?.data?.data) {
+          console.log('Received data:', response.data.data); // Debug log
+          setCourses(response.data.data);
+          setTotalPages(response.data.totalPage);
+          setHasNextPage(response.data.hasNextPage);
+          setHasPreviousPage(response.data.hasPreviousPage);
+        } else {
+          setError('Failed to fetch courses. Please try again later.');
+        }
+      } catch (error) {
+        if (!isMounted) return;
+        console.error('Error fetching courses:', error);
+        setError(error.message || 'An unexpected error occurred');
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchCourses();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [page, enOrderBy]); // Added enOrderBy to dependencies
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      console.log('Changing to page:', newPage); // Debug log
+      setPage(newPage);
+    }
+  };
+
+  return {
+    courses,
+    page,
+    setPage: handlePageChange,
+    totalPages,
+    loading,
+    error,
+    hasNextPage,
+    hasPreviousPage
+  };
+};
 
 function Home() {
-  // useEffect(() => {
-  //   // Reset body display to block
-  //   document.body.style.display = 'block';
-  //   document.body.style.backgroundColor = 'white';
-
-  //   // Cleanup function to reset styles when the component unmounts
-  //   return () => {
-  //     document.body.style.display = '';
-  //     document.body.style.backgroundColor = '';
-  //   };
-  // }, []);
-
-  // Slider state
   const [currentSlide, setCurrentSlide] = useState(0);
+  
+  // Use the custom hook for each course section with different enOrderBy values
+  const recommendedCourses = useCourseFetch(1, 0); // Recommended courses
+  const popularCourses = useCourseFetch(1, 2);    // Popular courses
+  const trendingCourses = useCourseFetch(1, 1);   // Trending courses
 
-  // Slider data
   const slides = [
     {
       title: 'Digital Illustrations',
@@ -41,181 +201,113 @@ function Home() {
     },
   ];
 
-  // Function to go to a specific slide
   const goToSlide = (index) => {
     setCurrentSlide(index);
   };
+
+  const CourseSection = ({ title, courses, loading, error, currentPage, totalPages, onPageChange, hasNextPage, hasPreviousPage }) => (
+    <>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-bold text-black">{title}</h2>
+        <Link
+          to={`/courses`}
+          className={`${styles.primary} me-5 group flex items-center mt-4`}
+          aria-label={`View all ${title.toLowerCase()}`}
+        >
+          View More
+          <i className="fa-solid fa-angle-right ml-2 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true"></i>
+        </Link>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <Loader />
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center h-64">
+          <p className="text-red-500 text-lg mb-4">{error}</p>
+          <button
+            onClick={() => onPageChange(1)}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+            aria-label="Retry loading courses"
+          >
+            Retry
+          </button>
+        </div>
+      ) : courses.length === 0 ? (
+        <div className="flex justify-center items-center h-64">
+          <p className="text-gray-500 text-lg">No courses available</p>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {courses.map((course) => (
+              <CourseCard key={course.id} course={course} />
+            ))}
+          </div>
+          {totalPages > 1 && (
+            <div className="mt-8 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+                hasNextPage={hasNextPage}
+                hasPreviousPage={hasPreviousPage}
+              />
+            </div>
+          )}
+        </>
+      )}
+    </>
+  );
 
   return (
     <>
       <div className="min-h-screen w-full max-w-[1300px] mx-auto px-4 bg-white mt-[75px]">
         <br />
         <br />
-        {/* Header recommended Section */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-black">Recommended for you</h2>
-          <Link
-            to={`/courses`}
-            className={`${styles.primary} me-5 group flex items-center mt-4`}
-          >
-            View More
-            <i
-              className="fa-solid fa-angle-right ml-2 transition-transform duration-300 group-hover:translate-x-1"
-            ></i>
-          </Link>
-        </div>
+        
+        {/* Recommended Courses Section */}
+        <CourseSection
+          title="Recommended for you"
+          courses={recommendedCourses.courses}
+          loading={recommendedCourses.loading}
+          error={recommendedCourses.error}
+          currentPage={recommendedCourses.page}
+          totalPages={recommendedCourses.totalPages}
+          onPageChange={recommendedCourses.setPage}
+          hasNextPage={recommendedCourses.hasNextPage}
+          hasPreviousPage={recommendedCourses.hasPreviousPage}
+        />
 
-        {/* Main recommended Content */}
-        <div className="flex flex-wrap justify-center gap-6">
-          {/* Card 1 */}
-          <Link
-            to={`/coursesDetails`}
-            className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card}`}
-          >
-            <div className="relative overflow-hidden">
-              <img
-                src={img1}
-                alt="Video Editing Clapperboard with Popcorn"
-                className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
-              />
-            </div>
-            <div className="p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-500 text-sm">Video</span>
-                <span className="bg-red-400 text-white py-1 px-2 rounded-xl text-xs">
-                  Beginner Level
-                </span>
-              </div>
-              <h3 className="mt-0 mb-2 text-lg font-semibold text-black">
-                Grow Your Video Editing Skills from Experts
-              </h3>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <i className="fas fa-star text-yellow-500 text-sm"></i>
-                  <span className="ml-1 text-sm text-black">4.5</span>
-                  <span className="text-gray-500 text-sm ps-1">(1253)</span>
-                </div>
-                <span className="text-xl font-bold text-black">$39</span>
-              </div>
-            </div>
-          </Link>
-
-          {/* Card 2 */}
-          <Link
-            to={`/coursesDetails`}
-            className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card}`}
-          >
-            <div className="relative overflow-hidden">
-              <img
-                src={img2}
-                alt="Video Editing Clapperboard with Popcorn"
-                className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
-              />
-            </div>
-            <div className="p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-500 text-sm">Photography</span>
-              </div>
-              <h3 className="mt-0 mb-2 text-lg font-semibold text-black">
-                Easy and Creative Food Art Ideas Decoration
-              </h3>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <i className="fas fa-star text-yellow-500 text-sm"></i>
-                  <span className="ml-1 text-sm text-black">4.5</span>
-                  <span className="text-gray-500 text-sm ps-1">(1233)</span>
-                </div>
-                <span className="text-xl font-bold text-black">$59</span>
-              </div>
-            </div>
-          </Link>
-
-          {/* Card 3 */}
-          <Link
-            to={`/coursesDetails`}
-            className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card}`}
-          >
-            <div className="relative overflow-hidden">
-              <img
-                src={img1}
-                alt="Video Editing Clapperboard with Popcorn"
-                className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
-              />
-            </div>
-            <div className="p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-500 text-sm">Lifestyle</span>
-              </div>
-              <h3 className="mt-0 mb-2 text-lg font-semibold text-black">
-                Create Your Own Sustainable Fashion Style
-              </h3>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <i className="fas fa-star text-yellow-500 text-sm"></i>
-                  <span className="ml-1 text-sm text-black">4.5</span>
-                  <span className="text-gray-500 text-sm ps-1">(123)</span>
-                </div>
-                <span className="text-xl font-bold text-black">$29</span>
-              </div>
-            </div>
-          </Link>
-
-          {/* Card 4 */}
-          <Link
-            to={`/coursesDetails`}
-            className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card}`}
-          >
-            <div className="relative overflow-hidden">
-              <img
-                src={img2}
-                alt="Video Editing Clapperboard with Popcorn"
-                className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
-              />
-            </div>
-            <div className="p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-500 text-sm">Marketing</span>
-                <span className="bg-[#e8618c] text-white py-1 px-2 rounded-xl text-xs">
-                  20% Off
-                </span>
-              </div>
-              <h3 className="mt-0 mb-2 text-lg font-semibold text-black">
-                Grow Your Skills Fashion Marketing
-              </h3>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <i className="fas fa-star text-yellow-500 text-sm"></i>
-                  <span className="ml-1 text-sm text-black">4.5</span>
-                  <span className="text-gray-500 text-sm ps-1">(123)</span>
-                </div>
-                <span className="text-xl font-bold text-black">$39</span>
-              </div>
-            </div>
-          </Link>
-        </div>
         <br />
+        <br />
+        
         {/* Slider Section */}
         <div className="mt-8 relative overflow-hidden">
           <div
             className="flex transition-transform duration-500"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+            role="region"
+            aria-label="Featured courses slider"
           >
             {slides.map((slide, index) => (
               <div
                 key={index}
                 className="flex flex-row items-center justify-between py-16 px-8 md:px-24 lg:px-32 min-w-full"
               >
-                {/* Text Section */}
                 <div className="w-2/5 flex-shrink-0">
                   <h2 className="text-3xl font-bold text-gray-800 mb-4">
                     {slide.title}
                   </h2>
                   <p className="text-gray-600 mb-6">{slide.description}</p>
-                  <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-md">
+                  <button 
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-md"
+                    aria-label={slide.buttonText}
+                  >
                     {slide.buttonText}
                   </button>
                 </div>
-                {/* Image Section */}
                 <div className="w-2/5 ml-8 rounded-lg overflow-hidden shadow-lg">
                   <img
                     src={slide.img}
@@ -227,8 +319,7 @@ function Home() {
             ))}
           </div>
 
-          {/* Dots for Navigation */}
-          <div className="flex justify-center mt-4 mb-4">
+          <div className="flex justify-center mt-4 mb-4" role="tablist">
             {slides.map((_, index) => (
               <button
                 key={index}
@@ -238,307 +329,45 @@ function Home() {
                     ? 'bg-indigo-600'
                     : 'bg-gray-300 hover:bg-gray-400'
                 }`}
+                role="tab"
+                aria-selected={currentSlide === index}
+                aria-label={`Slide ${index + 1}`}
               ></button>
             ))}
           </div>
         </div>
-        <br />
-        <br />
-        {/* Header popular Section */}
-        <div className="flex justify-between items-center mb-6 ">
-          <h2 className="text-3xl font-bold text-black">Popular courses</h2>
-          <Link
-            to={`/courses`}
-            className={`${styles.primary} me-5 group flex items-center mt-4`}
-          >
-            View More
-            <i
-              className="fa-solid fa-angle-right ml-2 transition-transform duration-300 group-hover:translate-x-1"
-            ></i>
-          </Link>
-        </div>
-        {/* Main popular Content  */}
-        <div className="flex flex-wrap justify-center gap-6">
-          {/* Card 1 */}
-          <Link
-            to={`/coursesDetails`}
-            className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card}`}
-          >
-            <div className="relative overflow-hidden">
-              <img
-                src={img1}
-                alt="Video Editing Clapperboard with Popcorn"
-                className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
-              />
-            </div>
-            <div className="p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-500 text-sm">Graphic Design</span>
-                <span className="bg-[#636ae8] text-white py-1 px-2 rounded-xl text-xs">
-                Best-seller
-                </span>
-              </div>
-              <h3 className="mt-0 mb-2 text-lg font-semibold text-black">
-              Digital Poster Design: Best Practices
-              </h3>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <i className="fas fa-star text-yellow-500 text-sm"></i>
-                  <span className="ml-1 text-sm text-black">4.5</span>
-                  <span className="text-gray-500 text-sm ps-1">(1253)</span>
-                </div>
-                <span className="text-xl font-bold text-black">$39</span>
-              </div>
-            </div>
-          </Link>
 
-          {/* Card 2 */}
-          <Link
-            to={`/coursesDetails`}
-            className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card}`}
-          >
-            <div className="relative overflow-hidden">
-              <img
-                src={img2}
-                alt="Video Editing Clapperboard with Popcorn"
-                className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
-              />
-            </div>
-            <div className="p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-500 text-sm">Graphic Design</span>
-                <span className="bg-[#636ae8] text-white py-1 px-2 rounded-xl text-xs">
-                Best-seller
-                </span>
-              </div>
-              <h3 className="mt-0 mb-2 text-lg font-semibold text-black">
-              Create Emotional & Trendy Typography
-              </h3>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <i className="fas fa-star text-yellow-500 text-sm"></i>
-                  <span className="ml-1 text-sm text-black">4.5</span>
-                  <span className="text-gray-500 text-sm ps-1">(1233)</span>
-                </div>
-                <span className="text-xl font-bold text-black">$59</span>
-              </div>
-            </div>
-          </Link>
+        {/* Popular Courses Section */}
+        <CourseSection
+          title="Popular courses"
+          courses={popularCourses.courses}
+          loading={popularCourses.loading}
+          error={popularCourses.error}
+          currentPage={popularCourses.page}
+          totalPages={popularCourses.totalPages}
+          onPageChange={popularCourses.setPage}
+          hasNextPage={popularCourses.hasNextPage}
+          hasPreviousPage={popularCourses.hasPreviousPage}
+        />
 
-          {/* Card 3 */}
-          <Link
-            to={`/coursesDetails`}
-            className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card}`}
-          >
-            <div className="relative overflow-hidden">
-              <img
-                src={img1}
-                alt="Video Editing Clapperboard with Popcorn"
-                className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
-              />
-            </div>
-            <div className="p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-500 text-sm">Graphic Design</span>
-              </div>
-              <h3 className="mt-0 mb-2 text-lg font-semibold text-black">
-              Create Vector Illustrations  for Beginner
-              </h3>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <i className="fas fa-star text-yellow-500 text-sm"></i>
-                  <span className="ml-1 text-sm text-black">4.5</span>
-                  <span className="text-gray-500 text-sm ps-1">(123)</span>
-                </div>
-                <span className="text-xl font-bold text-black">$29</span>
-              </div>
-            </div>
-          </Link>
-
-          {/* Card 4 */}
-          <Link
-            to={`/coursesDetails`}
-            className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card}`}
-          >
-            <div className="relative overflow-hidden">
-              <img
-                src={img2}
-                alt="Video Editing Clapperboard with Popcorn"
-                className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
-              />
-            </div>
-            <div className="p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-500 text-sm">Graphic Design</span>
-                <span className="bg-[#636ae8] text-white py-1 px-2 rounded-xl text-xs">
-                Best-seller
-                </span>
-              </div>
-              <h3 className="mt-0 mb-2 text-lg font-semibold text-black">
-              How to Design a Creative Book Cover
-              </h3>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <i className="fas fa-star text-yellow-500 text-sm"></i>
-                  <span className="ml-1 text-sm text-black">4.5</span>
-                  <span className="text-gray-500 text-sm ps-1">(123)</span>
-                </div>
-                <span className="text-xl font-bold text-black">$19</span>
-              </div>
-            </div>
-          </Link>
-        </div>
-        <br />
-        <br />
-        <br />
-        {/* Header trending Section */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-black">Trending courses</h2>
-          <Link
-            to={`/courses`}
-            className={`${styles.primary} me-5 group flex items-center mt-4`}
-          >
-            View More
-            <i
-              className="fa-solid fa-angle-right ml-2 transition-transform duration-300 group-hover:translate-x-1"
-            ></i>
-          </Link>
-        </div>
-        {/* Main trending Content */}
-        <div className="flex flex-wrap justify-center gap-6">
-          {/* Card 1 */}
-          <Link
-            to={`/coursesDetails`}
-            className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card}`}
-          >
-            <div className="relative overflow-hidden">
-              <img
-                src={img1}
-                alt="Video Editing Clapperboard with Popcorn"
-                className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
-              />
-            </div>
-            <div className="p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-500 text-sm">UI/UX Design</span>
-                <span className="bg-[#636ae8] text-white py-1 px-2 rounded-xl text-xs">
-                Best-seller
-                </span>
-              </div>
-              <h3 className="mt-0 mb-2 text-lg font-semibold text-black">
-              UI Design, a User-Centered Approach
-              </h3>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <i className="fas fa-star text-yellow-500 text-sm"></i>
-                  <span className="ml-1 text-sm text-black">4.5</span>
-                  <span className="text-gray-500 text-sm ps-1">(1253)</span>
-                </div>
-                <span className="text-xl font-bold text-black">$39</span>
-              </div>
-            </div>
-          </Link>
-
-          {/* Card 2 */}
-          <Link
-            to={`/coursesDetails`}
-            className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card}`}
-          >
-            <div className="relative overflow-hidden">
-              <img
-                src={img2}
-                alt="Video Editing Clapperboard with Popcorn"
-                className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
-              />
-            </div>
-            <div className="p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-500 text-sm">UI/UX Design</span>
-                <span className="bg-[#e8618c] text-white py-1 px-2 rounded-xl text-xs">
-                20% Off
-                </span>
-              </div>
-              <h3 className="mt-0 mb-2 text-lg font-semibold text-black">
-              Pick Awesome Color Palette for Your App
-              </h3>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <i className="fas fa-star text-yellow-500 text-sm"></i>
-                  <span className="ml-1 text-sm text-black">4.5</span>
-                  <span className="text-gray-500 text-sm ps-1">(1233)</span>
-                </div>
-                <span className="text-xl font-bold text-black">$59</span>
-              </div>
-            </div>
-          </Link>
-
-          {/* Card 3 */}
-          <Link
-            to={`/coursesDetails`}
-            className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card}`}
-          >
-            <div className="relative overflow-hidden">
-              <img
-                src={img1}
-                alt="Video Editing Clapperboard with Popcorn"
-                className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
-              />
-            </div>
-            <div className="p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-500 text-sm">UI/UX Design</span>
-              </div>
-              <h3 className="mt-0 mb-2 text-lg font-semibold text-black">
-              Principles of Great UI Design System
-              </h3>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <i className="fas fa-star text-yellow-500 text-sm"></i>
-                  <span className="ml-1 text-sm text-black">4.5</span>
-                  <span className="text-gray-500 text-sm ps-1">(123)</span>
-                </div>
-                <span className="text-xl font-bold text-black">$29</span>
-              </div>
-            </div>
-          </Link>
-
-          {/* Card 4 */}
-          <Link
-            to={`/coursesDetails`}
-            className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card}`}
-          >
-            <div className="relative overflow-hidden">
-              <img
-                src={img2}
-                alt="Video Editing Clapperboard with Popcorn"
-                className="block w-full h-auto transition-transform duration-300 group-hover:scale-110"
-              />
-            </div>
-            <div className="p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-500 text-sm">UI/UX Design</span>
-                <span className="bg-[#e8618c] text-white py-1 px-2 rounded-xl text-xs">
-                20% Off
-                </span>
-              </div>
-              <h3 className="mt-0 mb-2 text-lg font-semibold text-black">
-              Prototype Your First Mobile Application
-              </h3>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <i className="fas fa-star text-yellow-500 text-sm"></i>
-                  <span className="ml-1 text-sm text-black">4.5</span>
-                  <span className="text-gray-500 text-sm ps-1">(123)</span>
-                </div>
-                <span className="text-xl font-bold text-black">$19</span>
-              </div>
-            </div>
-          </Link>
-        </div>
-        <br />
         <br />
         <br />
 
+        {/* Trending Courses Section */}
+        <CourseSection
+          title="Trending courses"
+          courses={trendingCourses.courses}
+          loading={trendingCourses.loading}
+          error={trendingCourses.error}
+          currentPage={trendingCourses.page}
+          totalPages={trendingCourses.totalPages}
+          onPageChange={trendingCourses.setPage}
+          hasNextPage={trendingCourses.hasNextPage}
+          hasPreviousPage={trendingCourses.hasPreviousPage}
+        />
+
+        <br />
+        <br />
       </div>
     </>
   );

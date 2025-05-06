@@ -1,4 +1,6 @@
 import axiosInstance from './axiosInstance';
+import axios from 'axios';
+import { API_URL } from '../config';
 
 export const courseService = {
   // Create a new course
@@ -181,5 +183,39 @@ export const courseService = {
     } catch (error) {
       throw error;
     }
+  }
+};
+
+export const getPaginatedCourses = async (page = 1, enOrderBy = 0) => {
+  try {
+    // Ensure page is a number and at least 1
+    const pageNumber = Math.max(1, parseInt(page));
+    
+    const response = await axios.get(`${API_URL}/HomeCourses/GetPaginated`, {
+      params: {
+        pageNumber: pageNumber,
+        PageSize: 4,
+        enOrderBy: enOrderBy
+      }
+    });
+    
+    if (response.data.succeeded) {
+      return {
+        succeeded: true,
+        data: {
+          data: response.data.data.data,
+          totalPage: response.data.data.totalPage,
+          currentPage: response.data.data.currentPage,
+          totalCount: response.data.data.totalCount,
+          hasNextPage: response.data.data.hasNextPage,
+          hasPreviousPage: response.data.data.hasPreviousPage
+        }
+      };
+    } else {
+      throw new Error(response.data.message || 'Failed to fetch courses');
+    }
+  } catch (error) {
+    console.error('Error fetching paginated courses:', error);
+    throw error;
   }
 }; 
