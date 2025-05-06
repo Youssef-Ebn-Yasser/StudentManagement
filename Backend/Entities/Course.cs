@@ -18,4 +18,5 @@ public class Course : BaseEntity
     [ForeignKey("CategoryId")]
     public int CategoryId { get; set; }
     public Category? Category { get; set; }
+    public List<Message>? Messages { get; set; }
 }
