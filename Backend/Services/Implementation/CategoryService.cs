@@ -2,15 +2,15 @@
 
 namespace Backend.Services.Implementation
 {
-    public class CategoryService: ResponseHandler, ICategoryService
+    public class CategoryService : ResponseHandler, ICategoryService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public CategoryService(IUnitOfWork unitOfWork,IMapper mapper )
+        public CategoryService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
-           _mapper = mapper;
+            _mapper = mapper;
         }
         private async Task<bool> _isNameExist(string name)
         {
@@ -23,11 +23,11 @@ namespace Backend.Services.Implementation
 
         public async Task<Response<string>> CreateAsync(CreateCategoryDto dto)
         {
-            var IsExistCategory=await _isNameExist(dto.Name);
-            if (IsExistCategory) 
+            var IsExistCategory = await _isNameExist(dto.Name);
+            if (IsExistCategory)
                 return BadRequest<string>("Student Name is already exist");
-            
-                var category = _mapper.Map<Category>(dto);
+
+            var category = _mapper.Map<Category>(dto);
             await _unitOfWork.Repository<Category>().AddAsync(category);
             _unitOfWork.Complete();
             return Success("Category Created Successfully");
@@ -49,11 +49,13 @@ namespace Backend.Services.Implementation
 
         public async Task<Response<List<CategoryDto>>> GetAllAsync()
         {
-            var allCategories = await _unitOfWork.Repository<Category>().GetAllAsync();
+            var allCategories = await _unitOfWork.Repository<Category>()
+                                                              .GetTableNoTracking()
+                                                              .Where(c => !c.IsDeleted)
+                                                              .ToListAsync();
 
-            var filtered = allCategories.Where(c => !c.IsDeleted).ToList();
 
-            var mapped = _mapper.Map<List<CategoryDto>>(filtered);
+            var mapped = _mapper.Map<List<CategoryDto>>(allCategories);
             return Success(mapped);
         }
 

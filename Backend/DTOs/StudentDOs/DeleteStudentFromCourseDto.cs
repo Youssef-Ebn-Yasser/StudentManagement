@@ -1,8 +1,7 @@
-﻿namespace Backend.DTOs.StudentDOs
+﻿namespace Backend.DTOs.StudentDOs;
+
+public class DeleteStudentFromCourseDto
 {
-    public class DeleteStudentFromCourseDto
-    {
-        public string StudentName { get; set; }
-        public string CourseName { get; set; }
-    }
+    public string StudentName { get; set; }
+    public string CourseName { get; set; }
 }

@@ -64,7 +64,8 @@ namespace Backend.Services.Implementation
             if (lesson == null)
                 return NotFound<string>("Lesson Not Found");
 
-            _unitOfWork.Repository<Lesson>().Delete(lesson);
+            lesson.IsDeleted = true;
+            _unitOfWork.Repository<Lesson>().Update(lesson);
             _unitOfWork.Complete();
             return Success("Lesson Deleted Successfully");
         }
