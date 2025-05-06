@@ -99,7 +99,7 @@ public class StudentService : ResponseHandler, IStudentService
     public async Task<Response<string>> EnrollToCourse(StudentEnrollDto studentEnrollDto)
     {
         // check this student is exist 
-        if (!await _isStudentExistById(studentEnrollDto.StudentId))
+        if (!await _isExistById(studentEnrollDto.StudentId))
             return BadRequest<string>($"this Student with this id : {studentEnrollDto.StudentId} not exist");
         // this course is exist
         if (!await _isCourseExistById(studentEnrollDto.CourseId))
