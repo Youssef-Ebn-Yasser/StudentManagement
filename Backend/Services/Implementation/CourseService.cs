@@ -1,5 +1,5 @@
-﻿using Backend.DTOs.CategoryDTOOS;
-using Backend.Wrapper;
+﻿using Backend.Wrapper;
+
 
 namespace Backend.Services.Implementation;
 
@@ -28,33 +28,32 @@ public class CourseService : ResponseHandler, ICourseService
     {
         var courses = await _unitOfWork.Repository<Course>()
         .GetTableNoTracking()
-        .Include(c => c.Category) // Include هنا
+        .Include(c => c.Category)
         .ToListAsync();
 
         var result = _mapper.Map<List<ShowAllCoursesDto>>(courses);
         return Success(result);
     }
 
-    public async Task<Response<List<ShowCoursesByCategory>>> GetAllByCategoryAsync()
+    public async Task<Response<List<HomeCourses>>> GetAllByCategoryAsync(string categoryName)
     {
-        var categories = await _unitOfWork.Repository<Category>()
-        .GetTableNoTracking()
-        .ToListAsync();
-
         var courses = await _unitOfWork.Repository<Course>()
-        .GetTableNoTracking()
-        .Include(c => c.Category)
-        .ToListAsync();
+                                                      .GetTableNoTracking()
+                                                      .Include(c => c.Category)
+                                                      .Where(c => c.Category!.CategoryName == categoryName)
+                                                      .Select(c => new HomeCourses
+                                                      {
+                                                          Id = c.Id,
+                                                          Title = c.Title,
+                                                          Description = c.Description,
+                                                          Level = c.Level,
+                                                          Price = c.Price,
+                                                          ImagePath = c.ImagePath,
+                                                      })
+                                                      .ToListAsync();
 
-        var coursesByCategory = categories.Select(category => new ShowCoursesByCategory
-        {
-            Category = _mapper.Map<CategoryDto>(category),
-            Courses = _mapper.Map<List<ShowCourseDto>>(courses.Where(c => c.CategoryId == category.Id).ToList())
-        }).ToList();
 
-
-        var result = _mapper.Map<List<ShowCoursesByCategory>>(coursesByCategory);
-        return Success(result);
+        return Success(courses);
     }
 
     public async Task<Response<ShowCourseDto>> GetCourseByIdAsync(int id)

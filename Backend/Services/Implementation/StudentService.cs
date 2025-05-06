@@ -77,30 +77,29 @@ public class StudentService : ResponseHandler, IStudentService
     }
     public async Task<Response<List<ShowStudentCourseDto>>> GetAllEnrolledStudentCourses(int studentId)
     {
-        var studentCourse = await
+        var studentCourses = await
         _unitOfWork.Repository<StudentCourse>()
                    .GetTableAsTracking()
                    .Include(sc => sc.Course)
                    .Include(sc => sc.Student)
                    .Where(sc => sc.StudentId == studentId)
-                   .Select(_ => new
+                   .Select(_ => new ShowStudentCourseDto
                    {
-                       StudentId = _.Student.Id,
-                       CourseId = _.Course.Id,
-                       _.Course.Title,
-                       _.Course.Category,
-                       _.Course.Level
+                       Id = _.Course.Id,
+                       Title = _.Course.Title,
+                       Description = _.Course.Description,
+                       Level = _.Course.Level,
+                       CategoryName = _.Course.Category.CategoryName,
+                       ImagePath = _.Course.ImagePath,
                    })
                    .ToListAsync();
 
-        var result = _mapper.Map<List<ShowStudentCourseDto>>(studentCourse);
-
-        return Success(result);
+        return Success(studentCourses);
     }
     public async Task<Response<string>> EnrollToCourse(StudentEnrollDto studentEnrollDto)
     {
         // check this student is exist 
-        if (!await _isStudentExistById(studentEnrollDto.StudentId))
+        if (!await _isExistById(studentEnrollDto.StudentId))
             return BadRequest<string>($"this Student with this id : {studentEnrollDto.StudentId} not exist");
         // this course is exist
         if (!await _isCourseExistById(studentEnrollDto.CourseId))
@@ -109,6 +108,11 @@ public class StudentService : ResponseHandler, IStudentService
         // check if in payment table  
         //var isPaid = await IsEnrolledInCourse(studentEnrollDto);
         // if (!isPaid.Succeeded) return BadRequest<string>("Student Should Pay First");
+
+        var isEnroll = await IsEnrolledInCourse(studentEnrollDto);
+
+        if (isEnroll.Data)
+            return BadRequest<string>($"this student Already in this course");
 
         var mapper = _mapper.Map<StudentCourse>(studentEnrollDto);
 
@@ -120,11 +124,10 @@ public class StudentService : ResponseHandler, IStudentService
     }
     public async Task<Response<bool>> IsEnrolledInCourse(StudentEnrollDto studentEnrollDto)
     {
-        var isEnrolled = await _unitOfWork.Repository<Payment>()
+        var isEnrolled = await _unitOfWork.Repository<StudentCourse>()
                                               .GetTableNoTracking()
                                               .AnyAsync(p => p.StudentId == studentEnrollDto.StudentId &&
-                                                                      p.CourseId == studentEnrollDto.CourseId &&
-                                                                      p.Status == "Complete");
+                                                                      p.CourseId == studentEnrollDto.CourseId);
 
         return isEnrolled ? Success(true) : BadRequest<bool>("not in course");
     }
@@ -161,28 +164,34 @@ public class StudentService : ResponseHandler, IStudentService
         return result > 0 ? Success("Student Deleted Successfully") :
                             BadRequest<string>("can not delete this student error happen when try deleting");
     }
+
     public async Task<Response<String>> DeleteStudentFromCourseAsync(DeleteStudentFromCourseDto deleteStudent)
     {
-        var isNameExist = await _isNameExist(deleteStudent.StudentName);
-        if (!isNameExist) return NotFound<string>($"Student with this name = {deleteStudent.StudentName} not exist");
+        var StudentExist = await _studentExistById(deleteStudent.StudentName);
+        if (StudentExist == null) return NotFound<string>($"Student with this name = {deleteStudent.StudentName} not exist");
 
-        var isCourseExist = await _isCourseExistByName(deleteStudent.CourseName);
-        if (!isCourseExist) return NotFound<string>($"Course with this name = {deleteStudent.CourseName} not exist");
-        var student = await _unitOfWork.Repository<Student>()
-                                              .GetTableAsTracking()
-                                              .FirstOrDefaultAsync(s => s.Name == deleteStudent.StudentName);
-        var course = await _unitOfWork.Repository<Course>()
-                                                .GetTableAsTracking()
-                                                .FirstOrDefaultAsync(c => c.Title == deleteStudent.CourseName);
+        var CourseExist = await _courseExistByName(deleteStudent.CourseName);
+        if (CourseExist == null) return NotFound<string>($"Course with this name = {deleteStudent.CourseName} not exist");
+
+
+
         var studentCourse = await _unitOfWork.Repository<StudentCourse>()
-                                              .GetTableAsTracking()
-                                              .FirstOrDefaultAsync(sc => sc.StudentId == student.Id && sc.CourseId == course.Id);
-        if (studentCourse == null) return NotFound<string>($"Student with this name = {deleteStudent.StudentName} not exist in this course");
-        _unitOfWork.Repository<StudentCourse>().Delete(studentCourse);
+                                                        .GetTableAsTracking()
+                                                        .Where(sc => sc.StudentId == StudentExist.Id && sc.CourseId == CourseExist.Id)
+                                                        .FirstOrDefaultAsync();
+
+        if (studentCourse == null) return NotFound<string>($"Student with this name = {deleteStudent.StudentName} not enroll in this course");
+
+
+        studentCourse.IsDeleted = true;
+
+        _unitOfWork.Repository<StudentCourse>().Update(studentCourse);
         var result = _unitOfWork.Complete();
+
         return result > 0 ? Success("Student Deleted From Course Successfully") :
                             BadRequest<string>("can not delete this student from course error happen when try deleting");
     }
+
     public Task<Response<string>> UpdateAsync(UpdateStudentDto updateStudentDto)
     {
         throw new NotImplementedException();
@@ -214,9 +223,9 @@ public class StudentService : ResponseHandler, IStudentService
     }
     private async Task<bool> _isCourseExistById(int id) =>
     await _unitOfWork.Repository<Course>().GetTableNoTracking().AnyAsync(s => s.Id == id);
-    private async Task<bool> _isCourseExistByName(string Name) =>
-   await _unitOfWork.Repository<Course>().GetTableNoTracking().AnyAsync(s => s.Title == Name);
-    private async Task<bool> _isStudentExistById(int id) =>
-    await _unitOfWork.Repository<Student>().GetTableNoTracking().AnyAsync(s => s.Id == id);
+    private async Task<Course> _courseExistByName(string Name) =>
+   await _unitOfWork.Repository<Course>().GetTableNoTracking().FirstOrDefaultAsync(c => c.Title == Name);
+    private async Task<Student> _studentExistById(string name) =>
+    await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => s.Name == name);
     #endregion
 }

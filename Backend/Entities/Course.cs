@@ -9,13 +9,13 @@ public class Course : BaseEntity
     public string? ImagePath { get; set; }
     [Required]
     public string? Level { get; set; }
-    //public string? Hours { get; set; }
+    public string? Hours { get; set; }
     public List<Lesson>? lessons { get; set; }
     [ForeignKey("TecherId")]
     public Teacher? Teacher { get; set; }
     public int? TecherId { get; set; }
     public List<StudentCourse>? StudentCourses { get; set; }
     [ForeignKey("CategoryId")]
-    public int CategoryId { get; set; } // مفتاح أجنبي
+    public int CategoryId { get; set; }
     public Category? Category { get; set; }
 }

@@ -26,9 +26,9 @@ public class CourseController : AppControllerBase
     }
 
     [HttpGet("Course/GetAllByCategory")]
-    public async Task<IActionResult> GetAllByCategory()
+    public async Task<IActionResult> GetAllByCategory(string categoryName)
     {
-        var result = await _courseService.GetAllByCategoryAsync();
+        var result = await _courseService.GetAllByCategoryAsync(categoryName);
         return NewResult(result);
     }
 
