@@ -1,4 +1,5 @@
 using Backend.DTOs.AuthDTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 
 namespace Backend.Controllers;
@@ -39,6 +40,7 @@ public class AuthController : AppControllerBase
     }
 
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("register/teacher")]
     public async Task<IActionResult> RegisterTeacher([FromBody] RegisterDto model)
     {
@@ -55,6 +57,7 @@ public class AuthController : AppControllerBase
     }
 
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("register/admin")]
     public async Task<IActionResult> RegisterAdmin([FromBody] RegisterDto model)
     {
@@ -95,6 +98,20 @@ public class AuthController : AppControllerBase
     public async Task<IActionResult> GetRefreshToken([FromQuery] string refreshToken)
     {
         var result = await _authService.GetRefreshToken(refreshToken);
+        return NewResult(result);
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword(string email)
+    {
+        var result = await _authService.ForgotPasswordAsync(email);
+        return NewResult(result);
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto model)
+    {
+        var result = await _authService.ResetPasswordAsync(model.Email, model.Token, model.NewPassword);
         return NewResult(result);
     }
 }

@@ -171,24 +171,24 @@ public class AuthenticationService : IAuthenticationService
 
         // Generate email confirmation token and send email
         var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        await _userManager.ConfirmEmailAsync(user, confirmationToken);
+        // await _userManager.ConfirmEmailAsync(user, confirmationToken);
 
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(confirmationToken));
 
-        //var callbackUrl = $"{_baseUrl}/Auth/confirm-email?userId={user.Id}&token={encodedToken}";
-        // Console.WriteLine(callbackUrl);
-        //if (user.Email != null)
-        //{
-        //    await _emailSender.SendEmailAsync(
-        //        user.Email,
-        //        "Confirm your email",
-        //        $"Please confirm your account by <a href='{callbackUrl}'>clicking here</a>.");
-        //}
+        var callbackUrl = $"{_baseUrl}/Auth/confirm-email?userId={user.Id}&token={encodedToken}";
+        Console.WriteLine(callbackUrl);
+        if (user.Email != null)
+        {
+           await _emailSender.SendEmailAsync(
+               user.Email,
+               "Confirm your email",
+               $"Please confirm your account by <a href='{callbackUrl}'>clicking here</a>.");
+        }
 
-        //// Generate token
-        //var token = await GenerateJwtToken(user);
-        //var refreshToken = await GenerateRefreshToken(user);
-        //token.RefreshToken = refreshToken.Token;
+        // Generate token
+        // var token = await GenerateJwtToken(user);
+        // var refreshToken = await GenerateRefreshToken(user);
+        // token.RefreshToken = refreshToken.Token;
 
 
         var token = new TokenDto();
