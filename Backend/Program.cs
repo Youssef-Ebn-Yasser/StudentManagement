@@ -1,3 +1,4 @@
+using Backend.ChatHubs;
 using Backend.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Stripe;
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
@@ -82,6 +84,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
+
 app.MapControllers();
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();
