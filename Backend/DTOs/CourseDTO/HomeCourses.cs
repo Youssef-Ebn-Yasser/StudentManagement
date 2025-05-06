@@ -7,5 +7,6 @@ public class HomeCourses
     public string? Description { get; set; }
     public string? Level { get; set; }
     public double? Price { get; set; }
+    public string? Hours { get; set; }
     public string? ImagePath { get; set; }
 }
