@@ -77,7 +77,7 @@ public class StudentService : ResponseHandler, IStudentService
     }
     public async Task<Response<List<ShowStudentCourseDto>>> GetAllEnrolledStudentCourses(int studentId)
     {
-        var studentCourse = await
+        var studentCourses = await
         _unitOfWork.Repository<StudentCourse>()
                    .GetTableAsTracking()
                    .Include(sc => sc.Course)
@@ -85,17 +85,34 @@ public class StudentService : ResponseHandler, IStudentService
                    .Where(sc => sc.StudentId == studentId)
                    .Select(_ => new
                    {
-                       StudentId = _.Student.Id,
                        CourseId = _.Course.Id,
                        _.Course.Title,
-                       _.Course.Category,
-                       _.Course.Level
+                       _.Course.Description,
+                       _.Course.Level,
+                       _.Course.Category.CategoryName,
+                       _.Course.ImagePath,
+
                    })
                    .ToListAsync();
 
-        var result = _mapper.Map<List<ShowStudentCourseDto>>(studentCourse);
+        var response = new List<ShowStudentCourseDto>();
 
-        return Success(result);
+        foreach (var studentCourse in studentCourses)
+        {
+            var result = new ShowStudentCourseDto
+            {
+                Id = studentCourse.CourseId,
+                Title = studentCourse.Title,
+                Description = studentCourse.Description,
+                Level = studentCourse.Level,
+                CategoryName = studentCourse.CategoryName,
+                ImagePath = studentCourse.ImagePath,
+            };
+
+            response.Add(result);
+        }
+
+        return Success(response);
     }
     public async Task<Response<string>> EnrollToCourse(StudentEnrollDto studentEnrollDto)
     {
@@ -110,6 +127,11 @@ public class StudentService : ResponseHandler, IStudentService
         //var isPaid = await IsEnrolledInCourse(studentEnrollDto);
         // if (!isPaid.Succeeded) return BadRequest<string>("Student Should Pay First");
 
+        var isEnroll = await IsEnrolledInCourse(studentEnrollDto);
+
+        if (isEnroll.Data)
+            return BadRequest<string>($"this student Already in this course");
+
         var mapper = _mapper.Map<StudentCourse>(studentEnrollDto);
 
         await _unitOfWork.Repository<StudentCourse>().AddAsync(mapper);
@@ -120,11 +142,10 @@ public class StudentService : ResponseHandler, IStudentService
     }
     public async Task<Response<bool>> IsEnrolledInCourse(StudentEnrollDto studentEnrollDto)
     {
-        var isEnrolled = await _unitOfWork.Repository<Payment>()
+        var isEnrolled = await _unitOfWork.Repository<StudentCourse>()
                                               .GetTableNoTracking()
                                               .AnyAsync(p => p.StudentId == studentEnrollDto.StudentId &&
-                                                                      p.CourseId == studentEnrollDto.CourseId &&
-                                                                      p.Status == "Complete");
+                                                                      p.CourseId == studentEnrollDto.CourseId);
 
         return isEnrolled ? Success(true) : BadRequest<bool>("not in course");
     }
