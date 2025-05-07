@@ -1,46 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { courseService } from '../../services/courseService';
-import { Link } from 'react-router-dom';
 import { FaStar, FaUsers } from 'react-icons/fa';
 import Loader from '../Loader/Loader';
+import { useNavigate } from 'react-router-dom';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
-const TeacherCourses = () => {
-  const [courses, setCourses] = useState([
-    {
-      id: 1,
-      title: "Complete Web Development Course",
-      category: "Programming",
-      description: "Learn web development from scratch to advanced",
-      imagePath: "https://img-c.udemycdn.com/course/750x422/1430746_2f43_10.jpg",
-      price: 49.99,
-      rating: 4.8,
-      students: Array(125).fill(null),
-    },
-    {
-      id: 2,
-      title: "UI/UX Design Masterclass",
-      category: "Design",
-      description: "Master the art of user interface and user experience design",
-      imagePath: "https://img-c.udemycdn.com/course/750x422/1650610_2673_5.jpg",
-      price: 39.99,
-      rating: 4.9,
-      students: Array(98).fill(null),
-    },
-    {
-      id: 3,
-      title: "Digital Marketing Essentials",
-      category: "Marketing",
-      description: "Learn digital marketing strategies and techniques",
-      imagePath: "https://img-c.udemycdn.com/course/750x422/903744_8eb2.jpg",
-      price: 44.99,
-      rating: 4.7,
-      students: Array(156).fill(null),
-    }
-  ]);
+const TeacherCourses = ({ teacherId, setActiveTab }) => {
+  const navigate = useNavigate();
+  const [courses, setCourses] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Category');
   const [sortBy, setSortBy] = useState('Latest');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Categories for the dropdown
@@ -57,20 +29,20 @@ const TeacherCourses = () => {
   ];
 
   useEffect(() => {
-    // Commenting out the API call since we're using fixed courses
-    // fetchCourses();
-  }, []);
+    fetchCourses();
+  }, [teacherId]);
 
   const fetchCourses = async () => {
     try {
       setLoading(true);
       const response = await courseService.getAllCourses();
       const coursesData = response?.data || [];
+      // Show all courses without filtering by teacher ID
       setCourses(Array.isArray(coursesData) ? coursesData : []);
-      setLoading(false);
     } catch (err) {
       console.error('Error fetching courses:', err);
       setError('Failed to load courses');
+    } finally {
       setLoading(false);
     }
   };
@@ -89,14 +61,14 @@ const TeacherCourses = () => {
     return result.sort((a, b) => {
       switch (sortBy) {
         case 'Most Popular':
-          return b.students.length - a.students.length;
+          return b.studentsCount - a.studentsCount;
         case 'Price: Low to High':
           return a.price - b.price;
         case 'Price: High to Low':
           return b.price - a.price;
         case 'Latest':
         default:
-          return b.id - a.id; // Assuming newer courses have higher IDs
+          return new Date(b.createdAt) - new Date(a.createdAt);
       }
     });
   }, [courses, searchQuery, selectedCategory, sortBy]);
@@ -117,56 +89,55 @@ const TeacherCourses = () => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white">
-      <div className="w-full p-8 lg:p-12">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-          <div className="flex items-center gap-4">
-            <h1 className="text-4xl lg:text-5xl font-bold">My Courses</h1>
-            <span className="bg-[#6C63FF] text-white px-6 py-3 rounded-full text-lg">
-              {filteredAndSortedCourses.length} Courses
-            </span>
-          </div>
-          <Link 
-            to="/teacher/createcourse" 
-            className="bg-[#6C63FF] hover:bg-[#5952ff] text-white px-10 py-4 rounded-md text-center text-xl font-semibold ml-auto"
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="w-full min-h-screen bg-white p-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">My Courses</h1>
+          <button
+            onClick={() => setActiveTab('create-course')}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200"
           >
             Create New Course
-          </Link>
+          </button>
         </div>
 
-        <div className="flex flex-col lg:flex-row justify-between gap-6 mb-12">
-          <div className="w-full lg:w-auto">
+        {/* Search and Filter Section */}
+        <div className="mb-8 flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
             <input
               type="text"
-              placeholder="Search in your courses..."
-              className="px-8 py-5 text-xl border border-gray-200 rounded-md focus:outline-none focus:border-[#6C63FF] w-full lg:w-[500px]"
+              placeholder="Search courses..."
               value={searchQuery}
-              onChange={handleSearchChange}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
-          <div className="flex flex-col sm:flex-row gap-6 justify-end">
+          <div className="flex gap-4">
             <select
-              className="px-8 py-5 text-xl border border-gray-200 rounded-md focus:outline-none focus:border-[#6C63FF] w-full sm:w-72"
-              value={sortBy}
-              onChange={handleSortChange}
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="Latest">Latest</option>
-              <option value="Most Popular">Most Popular</option>
-              <option value="Price: Low to High">Price: Low to High</option>
-              <option value="Price: High to Low">Price: High to Low</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
             </select>
             <select
-              className="px-8 py-5 text-xl border border-gray-200 rounded-md focus:outline-none focus:border-[#6C63FF] w-full sm:w-72"
-              value={selectedCategory}
-              onChange={handleCategoryChange}
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
-              ))}
+              <option value="Latest">Latest</option>
+              <option value="Oldest">Oldest</option>
+              <option value="A-Z">A-Z</option>
+              <option value="Z-A">Z-A</option>
             </select>
           </div>
         </div>
 
+        {/* Courses Grid */}
         {loading ? (
           <div className="flex items-center justify-center h-[calc(100vh-300px)]">
             <div className="scale-[2.5]">
@@ -187,44 +158,43 @@ const TeacherCourses = () => {
                   className="w-full h-64 object-cover rounded-t-xl"
                 />
                 <div className="p-6 flex-grow">
-                  <h3 className="text-xl font-semibold mb-2">{course?.title || 'Untitled Course'}</h3>
-                  <p className="text-gray-600 mb-4 line-clamp-2">{course?.description || 'No description available'}</p>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center">
-                        <FaStar className="text-[#ffc107] mr-1" />
-                        <span>{course?.rating || 0}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <FaUsers className="text-gray-400 mr-1" />
-                        <span>{course?.students?.length || 0}</span>
-                      </div>
-                    </div>
-                    <span className="text-[#6C63FF] font-semibold">${course?.price || 0}</span>
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-semibold text-gray-900 line-clamp-2">
+                      {course?.title || 'Untitled Course'}
+                    </h3>
                   </div>
-                  <Link 
-                    to={`/teacher/course/${course?.id}`}
-                    className="block w-full bg-[#6C63FF] hover:bg-[#5952ff] text-white text-center py-3 rounded-md transition duration-300"
-                  >
-                    View Details
-                  </Link>
+                  <p className="text-gray-600 mb-4 line-clamp-3">
+                    {course?.description || 'No description available'}
+                  </p>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <FaStar className="text-yellow-400 mr-1" />
+                      <span className="text-gray-700">{course?.rating || 0}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <FaUsers className="text-gray-400 mr-1" />
+                      <span className="text-gray-700">{course?.students || 0} students</span>
+                    </div>
+                  </div>
+                  <div className="mt-auto">
+                    <button
+                      onClick={() => navigate(`/teacher/course/${course.id}`)}
+                      className="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200"
+                    >
+                      View Details
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-[calc(100vh-300px)]">
-            <p className="text-gray-600 text-2xl mb-8">No courses found matching your criteria</p>
-            <Link
-              to="/teacher/profile/createcourse"
-              className="bg-[#6C63FF] text-white hover:bg-[#5952ff] px-8 py-4 rounded-md font-semibold text-xl flex items-center gap-3"
-            >
-              Create your first course 
-              <span className="text-2xl">→</span>
-            </Link>
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">No courses found</p>
           </div>
         )}
       </div>
+      <ToastContainer />
     </div>
   );
 };

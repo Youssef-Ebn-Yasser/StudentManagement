@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authSlice from './auth/authSlice';
-import confirmEmailReducer from "./features/confirmEmail/confirmSlice";
-import loginReducer from "./features/login/loginSlice";
+import authSlice from '@/redux/auth/authSlice';
+import confirmEmailReducer from "@/redux/features/confirmEmail/confirmSlice";
+import loginReducer from "@/redux/features/login/loginSlice";
 // import userDetailsReducer from './features/getUserDetails/userDetailsSlice';
 
 let store = configureStore({

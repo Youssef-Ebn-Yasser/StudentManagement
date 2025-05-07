@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { courseService } from '../../services/courseService';
 import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook, FaClipboardList, FaTrash, FaEdit } from 'react-icons/fa';
 import Loader from '../Loader/Loader';
+import { toast } from 'react-toastify';
 
 const TeacherCourseDetails = () => {
   const { id } = useParams();
@@ -11,6 +12,10 @@ const TeacherCourseDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Debug log for id param
+  console.log('Course ID from params:', id);
 
   // Fixed courses data
   const fixedCourses = {
@@ -43,20 +48,21 @@ const TeacherCourseDetails = () => {
   };
 
   useEffect(() => {
+    console.log('useEffect running, id:', id);
     const fetchCourseDetails = async () => {
       try {
         setLoading(true);
-        // Check if it's one of our fixed courses
-        if (fixedCourses[id]) {
-          setCourse(fixedCourses[id]);
+        const response = await courseService.getCourseDetails(id);
+        console.log('Response from getCourseDetails:', response);
+        if (response.succeeded) {
+          setCourse(response.data);
         } else {
-          // Fallback to API call for other courses
-          const response = await courseService.getCourseDetails(id);
-          setCourse(response?.data || response);
+          throw new Error(response.messages?.[0] || 'Failed to load course details');
         }
-      } catch (err) {
-        setError(err.message || 'Failed to load course details');
-        console.error('Error fetching course details:', err);
+      } catch (error) {
+        console.error('Error fetching course details:', error);
+        setError(error.message || 'Failed to load course details');
+        toast.error(error.message || 'Failed to load course details');
       } finally {
         setLoading(false);
       }
@@ -65,10 +71,66 @@ const TeacherCourseDetails = () => {
     fetchCourseDetails();
   }, [id]);
 
+  const handleDeleteCourse = async () => {
+    if (window.confirm('Are you sure you want to delete this course? This action cannot be undone.')) {
+      try {
+        setIsDeleting(true);
+        console.log('Starting course deletion for ID:', id);
+        const response = await courseService.deleteCourse(id);
+        console.log('Delete response:', response);
+        
+        if (response?.succeeded) {
+          toast.success('Course deleted successfully');
+          navigate('/teacher/courses'); // Navigate back to courses list
+        } else {
+          throw new Error(response?.message || 'Failed to delete course');
+        }
+      } catch (err) {
+        console.error('Error deleting course:', {
+          error: err,
+          response: err.response,
+          message: err.message
+        });
+        
+        let errorMessage = 'Failed to delete course';
+        if (err.response?.data?.message) {
+          errorMessage = err.response.data.message;
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+        
+        toast.error(errorMessage);
+      } finally {
+        setIsDeleting(false);
+      }
+    }
+  };
+
+  const handleDeleteLesson = async (lessonId) => {
+    if (window.confirm('Are you sure you want to delete this lesson?')) {
+      try {
+        const response = await courseService.deleteLesson(lessonId);
+        if (response.succeeded) {
+          // Refresh course details to update lessons list
+          const updatedCourse = await courseService.getCourseDetails(id);
+          setCourse(updatedCourse.data);
+          toast.success('Lesson deleted successfully');
+        } else {
+          throw new Error(response.messages?.[0] || 'Failed to delete lesson');
+        }
+      } catch (error) {
+        console.error('Error deleting lesson:', error);
+        toast.error(error.message || 'Failed to delete lesson');
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader />
+        <div className="scale-[2.5]">
+          <Loader />
+        </div>
       </div>
     );
   }
@@ -130,11 +192,24 @@ const TeacherCourseDetails = () => {
                     Edit Course
                   </button>
                   <button
-                    onClick={() => {/* Handle delete */}}
-                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                    onClick={handleDeleteCourse}
+                    disabled={isDeleting}
+                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <FaTrash className="inline-block mr-2" />
-                    Delete Course
+                    {isDeleting ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Deleting...
+                      </>
+                    ) : (
+                      <>
+                        <FaTrash className="inline-block mr-2" />
+                        Delete Course
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
@@ -146,7 +221,7 @@ const TeacherCourseDetails = () => {
                 </div>
                 <div className="flex items-center">
                   <FaUsers className="text-blue-500 mr-2" />
-                  <span>{course.students.length} students</span>
+                  <span>{course.students?.length || 0} students</span>
                 </div>
                 <div className="flex items-center">
                   <FaClock className="text-green-500 mr-2" />
@@ -229,34 +304,50 @@ const TeacherCourseDetails = () => {
                 </button>
               </div>
               <div className="space-y-4">
-                {course.lessons.map((lesson) => (
-                  <div key={lesson.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h3 className="font-semibold">{lesson.title}</h3>
-                        <p className="text-gray-600">{lesson.description}</p>
-                        <div className="flex items-center mt-2">
-                          <FaClock className="text-gray-400 mr-2" />
-                          <span className="text-sm text-gray-500">{lesson.duration} minutes</span>
+                {course.lessons && course.lessons.length > 0 ? (
+                  course.lessons.map((lesson) => (
+                    <div key={lesson.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h3 className="font-semibold">{lesson.title}</h3>
+                          <p className="text-gray-600">{lesson.description}</p>
+                          <div className="flex items-center mt-2">
+                            <FaClock className="text-gray-400 mr-2" />
+                            <span className="text-sm text-gray-500">
+                              {lesson.duration || 0} minutes
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => navigate(`/teacher/course/${course.id}/lesson/${lesson.id}/edit`)}
+                            className="text-blue-500 hover:text-blue-600"
+                            title="Edit Lesson"
+                          >
+                            <FaEdit />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteLesson(lesson.id)}
+                            className="text-red-500 hover:text-red-600"
+                            title="Delete Lesson"
+                          >
+                            <FaTrash />
+                          </button>
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => navigate(`/teacher/course/${course.id}/lesson/${lesson.id}/edit`)}
-                          className="text-blue-500 hover:text-blue-600"
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          onClick={() => {/* Handle delete */}}
-                          className="text-red-500 hover:text-red-600"
-                        >
-                          <FaTrash />
-                        </button>
-                      </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">No lessons available yet</p>
+                    <button
+                      onClick={() => navigate(`/teacher/course/${course.id}/lesson/new`)}
+                      className="mt-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                    >
+                      Add Your First Lesson
+                    </button>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           )}

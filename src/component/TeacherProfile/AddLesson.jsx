@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { courseService } from '../../services/courseService';
+import { useParams, useNavigate } from 'react-router-dom';
 import Loader from '../Loader/Loader';
 import "./CreateCourse.css";
 
 const AddLesson = () => {
+  const { courseId } = useParams();
+  const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [lessons, setLessons] = useState([]);
   const [editingLesson, setEditingLesson] = useState(null);
   const [editingLessonId, setEditingLessonId] = useState(null);
-  const [editingCourseId, setEditingCourseId] = useState(null);
+  const [editingCourseId, setEditingCourseId] = useState(courseId);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -59,11 +62,8 @@ const AddLesson = () => {
       const lessonData = {
         title: formData.get('title'),
         description: formData.get('description'),
-        type: formData.get('type'),
-        content: formData.get('content'),
-        duration: parseInt(formData.get('duration')),
-        order: parseInt(formData.get('order')),
-        courseId: editingCourseId
+        courseId: editingCourseId,
+        teacherId: 36
       };
 
       const response = await courseService.addLesson(lessonData);
@@ -71,6 +71,8 @@ const AddLesson = () => {
         const updatedCourse = await courseService.getCourseDetails(editingCourseId);
         setLessons(updatedCourse.data?.lessons || []);
         e.target.reset();
+        // Navigate back to course details after successful creation
+        navigate(`/teacher/course/${editingCourseId}`);
       } else {
         throw new Error(response.messages?.[0] || 'Failed to create lesson');
       }
@@ -92,15 +94,14 @@ const AddLesson = () => {
       setIsLoading(true);
       const formData = new FormData(e.target);
       const lessonData = {
+        id: editingLessonId,
         title: formData.get('title'),
         description: formData.get('description'),
-        type: formData.get('type'),
-        content: formData.get('content'),
-        duration: parseInt(formData.get('duration')),
-        order: parseInt(formData.get('order')),
+        courseId: editingCourseId,
+        teacherId: 36
       };
 
-      const updatedLesson = await courseService.updateLesson(editingCourseId, editingLessonId, lessonData);
+      const updatedLesson = await courseService.updateLesson(lessonData);
       setLessons(lessons.map(lesson =>
         lesson.id === editingLessonId ? updatedLesson : lesson
       ));
@@ -117,7 +118,7 @@ const AddLesson = () => {
     if (window.confirm('Are you sure you want to delete this lesson?')) {
       try {
         setIsLoading(true);
-        await courseService.deleteLesson(editingCourseId, lessonId);
+        await courseService.deleteLesson(lessonId, { teacherId: 36 });
         setLessons(lessons.filter(lesson => lesson.id !== lessonId));
       } catch (error) {
         setError(error.message || 'Failed to delete lesson');
@@ -142,12 +143,6 @@ const AddLesson = () => {
       
       if (!formData.get('title')) validationErrors.title = 'Title is required';
       if (!formData.get('description')) validationErrors.description = 'Description is required';
-      if (!formData.get('type')) validationErrors.type = 'Type is required';
-      if (!formData.get('content')) validationErrors.content = 'Content is required';
-      if (!formData.get('duration')) validationErrors.duration = 'Duration is required';
-      if (isNaN(parseInt(formData.get('duration')))) validationErrors.duration = 'Duration must be a number';
-      if (!formData.get('order')) validationErrors.order = 'Order is required';
-      if (isNaN(parseInt(formData.get('order')))) validationErrors.order = 'Order must be a number';
       
       if (Object.keys(validationErrors).length > 0) {
         setErrors(validationErrors);
@@ -170,63 +165,6 @@ const AddLesson = () => {
             className={errors.title ? 'error' : ''}
           />
           {errors.title && <span className="error-message">{errors.title}</span>}
-        </div>
-
-        <div className="form-group">
-          <label className="required-field">Type</label>
-          <select 
-            name="type" 
-            required 
-            className={`category-select ${errors.type ? 'error' : ''}`}
-            defaultValue={lesson?.type}
-          >
-            <option value="">Select type</option>
-            {Object.entries(lessonTypes).map(([key, value]) => (
-              <option key={key} value={value}>{value}</option>
-            ))}
-          </select>
-          {errors.type && <span className="error-message">{errors.type}</span>}
-        </div>
-
-        <div className="form-group">
-          <label className="required-field">Content</label>
-          <textarea
-            name="content"
-            required
-            defaultValue={lesson?.content}
-            placeholder="Enter lesson content"
-            rows="4"
-            className={errors.content ? 'error' : ''}
-          />
-          {errors.content && <span className="error-message">{errors.content}</span>}
-        </div>
-
-        <div className="form-group">
-          <label className="required-field">Duration (minutes)</label>
-          <input
-            type="number"
-            name="duration"
-            required
-            min="1"
-            defaultValue={lesson?.duration}
-            placeholder="Enter lesson duration"
-            className={errors.duration ? 'error' : ''}
-          />
-          {errors.duration && <span className="error-message">{errors.duration}</span>}
-        </div>
-
-        <div className="form-group">
-          <label className="required-field">Order</label>
-          <input
-            type="number"
-            name="order"
-            required
-            min="1"
-            defaultValue={lesson?.order}
-            placeholder="Enter lesson order"
-            className={errors.order ? 'error' : ''}
-          />
-          {errors.order && <span className="error-message">{errors.order}</span>}
         </div>
 
         <div className="form-group">
@@ -270,23 +208,25 @@ const AddLesson = () => {
       ) : (
         <>
           <h2>Add New Lesson</h2>
-          <div className="form-group">
-            <label className="required-field">Select Course</label>
-            <select 
-              name="courseId" 
-              required 
-              className="category-select"
-              value={editingCourseId || ''}
-              onChange={(e) => setEditingCourseId(e.target.value)}
-            >
-              <option value="">Choose a course</option>
-              {courses.map(course => (
-                <option key={course.id} value={course.id}>
-                  {course.title}
-                </option>
-              ))}
-            </select>
-          </div>
+          {!courseId && (
+            <div className="form-group">
+              <label className="required-field">Select Course</label>
+              <select 
+                name="courseId" 
+                required 
+                className="category-select"
+                value={editingCourseId || ''}
+                onChange={(e) => setEditingCourseId(e.target.value)}
+              >
+                <option value="">Choose a course</option>
+                {courses.map(course => (
+                  <option key={course.id} value={course.id}>
+                    {course.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {editingCourseId && (
             <>
