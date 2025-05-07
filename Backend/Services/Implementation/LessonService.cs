@@ -16,7 +16,7 @@ namespace Backend.Services.Implementation
         public async Task<Response<List<ShowLessonDetailsPage>>> GetAll()
         {
 
-            var lesson = await _unitOfWork.Repository<Lesson>().GetTableNoTracking().ToListAsync();
+            var lesson = await _unitOfWork.Repository<Lesson>().GetTableNoTracking().Where(s => s.IsDeleted == false).ToListAsync();
             if (lesson == null)
                 return NotFound<List<ShowLessonDetailsPage>>("Lesson Not Found");
 
@@ -29,6 +29,7 @@ namespace Backend.Services.Implementation
 
             var lesson = await _unitOfWork.Repository<Lesson>()
                 .GetTableNoTracking()
+                .Where(s => s.IsDeleted == false)
                 .FirstOrDefaultAsync(l => l.Id == lessonId && l.CourseId == courseId);
 
             if (lesson == null)
