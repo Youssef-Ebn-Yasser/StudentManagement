@@ -34,7 +34,7 @@ public class StudentService : ResponseHandler, IStudentService
     {
         var students = await _unitOfWork.Repository<Student>()
                                                     .GetTableNoTracking()
-                                                    .Where(s => s.StudentCourses.Any(sc => sc.Course.Title.ToLower().Contains(courseName.ToLower())))
+                                                    .Where(s => s.StudentCourses.Any(sc => sc.Course.Title.ToLower().Contains(courseName.ToLower())) && s.IsDeleted == false)
                                                     .Include(s => s.StudentCourses)
                                                     .ThenInclude(sc => sc.Course)
                                                     .ToListAsync();
@@ -45,7 +45,7 @@ public class StudentService : ResponseHandler, IStudentService
 
     public async Task<Response<ShowStudentDto>> GetByIdAsync(int id)
     {
-        var student = await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => s.Id == id);
+        var student = await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => s.Id == id && s.IsDeleted == false);
         if (student == null)
             return NotFound<ShowStudentDto>("Student Not Found");
 
@@ -68,7 +68,9 @@ public class StudentService : ResponseHandler, IStudentService
     public async Task<Response<PaginateResult<ShowStudentDto>>> GetPaginatedListOfStudentAsync(int pageNumber, int pageSize)
     {
         var student = _unitOfWork.Repository<Student>()
-                                                 .GetTableNoTracking();
+                                                 .GetTableNoTracking()
+                                                    .Where(s => !s.IsDeleted)
+                                                 ;
 
 
         var mapper = await _mapper.ProjectTo<ShowStudentDto>(student)
@@ -80,6 +82,7 @@ public class StudentService : ResponseHandler, IStudentService
         var studentCourses = await
         _unitOfWork.Repository<StudentCourse>()
                    .GetTableAsTracking()
+                   .Where(s => s.IsDeleted == false)
                    .Include(sc => sc.Course)
                    .Include(sc => sc.Student)
                    .Where(sc => sc.StudentId == studentId)
@@ -127,7 +130,8 @@ public class StudentService : ResponseHandler, IStudentService
         var isEnrolled = await _unitOfWork.Repository<StudentCourse>()
                                               .GetTableNoTracking()
                                               .AnyAsync(p => p.StudentId == studentEnrollDto.StudentId &&
-                                                                      p.CourseId == studentEnrollDto.CourseId);
+                                                                      p.CourseId == studentEnrollDto.CourseId &&
+                                                                      p.IsDeleted == false);
 
         return isEnrolled ? Success(true) : BadRequest<bool>("not in course");
     }
