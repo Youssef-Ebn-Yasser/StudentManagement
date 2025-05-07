@@ -49,7 +49,7 @@ public class TeacherController : AppControllerBase
     }
 
     [HttpDelete("Teacher/Delete")]
-    public async Task<IActionResult> GetAll(int id)
+    public async Task<IActionResult> DeleteAll(int id)
     {
         var result = await _teacherService.DeleteAsync(id);
 
