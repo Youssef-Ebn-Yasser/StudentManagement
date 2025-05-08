@@ -69,10 +69,10 @@ public class StudentAssignmentService : ResponseHandler, IStudentAssignmentServi
             return NotFound<AssignmentStudentDto>("Lesson not found.");
 
         var assignment = await _unitOfWork.Repository<StudentAssignment>()
-            .GetTableNoTracking()
-            .Include(x => x.Student)
-            .Include(x => x.Lesson)
-            .FirstOrDefaultAsync(sa => sa.LessonId == lessonId);
+                                                     .GetTableNoTracking()
+                                                     .Include(x => x.Student)
+                                                     .Include(x => x.Lesson)
+                                                     .FirstOrDefaultAsync(sa => sa.LessonId == lessonId);
 
         if (assignment == null)
             return NotFound<AssignmentStudentDto>("Assignment not found.");
@@ -81,6 +81,27 @@ public class StudentAssignmentService : ResponseHandler, IStudentAssignmentServi
         return Success(result);
     }
 
+    public async Task<Response<List<AssignmentOfLessonDto>>> GetAllAssignmentOfCourse(String CourseName, string StudentName)
+    {
+        var course = await _unitOfWork.Repository<Course>()
+                                      .GetTableNoTracking()
+                                      .FirstOrDefaultAsync(x => x.Title == CourseName);
+        if (course == null)
+            return NotFound<List<AssignmentOfLessonDto>>("Course not found.");
+        var student = await _unitOfWork.Repository<Student>()
+                                       .GetTableNoTracking()
+                                       .Include(s => s.StudentCourses)
+                                       .FirstOrDefaultAsync(x => x.Name == StudentName && x.StudentCourses.Any(c=> c.CourseId == course.Id));
+        if (student == null)
+            return NotFound<List<AssignmentOfLessonDto>>("Student not found.");
+        var result = await _unitOfWork.Repository<StudentAssignment>()
+                                      .GetTableNoTracking()
+                                      .Include(x => x.Lesson)
+                                      .Where(sa => sa.StudentId == student.Id && sa.Lesson.CourseId == course.Id)
+                                      .ToListAsync();
+        var mapper = _mapper.Map<List<AssignmentOfLessonDto>>(result);
+        return Success(mapper);
+    }
     public class StudentAssignmentCourseDto
     {
         public string Path { get; set; }
