@@ -11,8 +11,6 @@ import TeacherCourses from '@/component/TeacherProfile/TeacherCourses'
 import AccountSettings from '@/component/TeacherProfile/settingsPage/AccountSettings'
 import TeacherCourseDetails from '@/component/TeacherProfile/TeacherCourseDetails'
 import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
-import AddLesson from '@/component/TeacherProfile/AddLesson'
-import EditCourse from '@/component/TeacherProfile/EditCourse'
 
 const isAuth = true // Replace with actual authentication logic
 
@@ -81,12 +79,6 @@ const routesConfig = [
     {
         path: 'teacher/settings',
         element: <AccountSettings />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/course/edit/:id',
-        element: <EditCourse />,
         isProtected: false,
         accessRole: 'all',
     },
