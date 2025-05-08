@@ -33,7 +33,7 @@ public class TeacherController : AppControllerBase
     }
 
     [HttpPost("Teacher/Create")]
-    public async Task<IActionResult> Create(CreateTeacherDto createTeacherDto)
+    public async Task<IActionResult> Create([FromBody]CreateTeacherDto createTeacherDto)
     {
         var result = await _teacherService.CreateAsync(createTeacherDto);
 
@@ -41,7 +41,7 @@ public class TeacherController : AppControllerBase
     }
 
     [HttpPut("Teacher/Update")]
-    public async Task<IActionResult> Update(UpdateTeacherDto updateTeacherDto)
+    public async Task<IActionResult> Update([FromBody]UpdateTeacherDto updateTeacherDto)
     {
         var result = await _teacherService.UpdateAsync(updateTeacherDto);
 
