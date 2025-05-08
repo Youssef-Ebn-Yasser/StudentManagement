@@ -104,11 +104,24 @@ function Courses() {
   }
 
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <div className="w-64 bg-white shadow-lg p-6">
-        <h2 className="text-xl font-bold mb-4">Categories</h2>
-        <div className="space-y-2">
+    <div className="flex flex-col lg:flex-row min-h-screen">
+      {/* Sidebar - Hidden on mobile, shown as dropdown */}
+      <div className="lg:w-64 bg-white shadow-lg p-4 lg:p-6">
+        <div className="lg:hidden mb-4">
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="w-full p-2 border rounded-lg bg-white"
+          >
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+        </div>
+        <h2 className="text-xl font-bold mb-4 hidden lg:block">Categories</h2>
+        <div className="space-y-2 hidden lg:block">
           {categories.map((category) => (
             <button
               key={category}
@@ -126,62 +139,62 @@ function Courses() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
-        <h1 className="text-2xl font-bold text-center mb-4">Courses</h1>
-        <p className="text-center mb-8">Explore our wide range of courses</p>
+      <div className="flex-1 p-4 lg:p-6">
+        <h1 className="text-xl lg:text-2xl font-bold text-center mb-2 lg:mb-4">Courses</h1>
+        <p className="text-sm lg:text-base text-center mb-4 lg:mb-8">Explore our wide range of courses</p>
         {searchQuery && (
-          <p className="text-center mb-4 text-gray-600">
+          <p className="text-center mb-4 text-gray-600 text-sm lg:text-base">
             Showing results for: "{searchQuery}"
           </p>
         )}
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8'>
           {filteredCourses.length > 0 ? filteredCourses.map((course) => (
             <Link 
               key={course.id}
               to={`/courses/course/${course.id}`}
             >
               <div
-                className={`w-full border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card} h-[330px] flex flex-col`} 
+                className={`w-full border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card} h-[300px] lg:h-[330px] flex flex-col`} 
               >
                 <div className="relative overflow-hidden">
                   <img
                     src={course.imagePath}
                     alt={course.title}
-                    className="block w-full h-[180px] object-cover transition-transform duration-300 group-hover:scale-110"
+                    className="block w-full h-[140px] lg:h-[180px] object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                 </div>
-                <div className='p-4 flex-1 flex flex-col'>
+                <div className='p-3 lg:p-4 flex-1 flex flex-col'>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-500 text-sm">{course.title}</span>
+                    <span className="text-gray-500 text-xs lg:text-sm truncate max-w-[60%]">{course.title}</span>
                     {course.level && (
-                      <span className="bg-red-400 text-white py-1 px-2 rounded-xl text-xs">
-                        {course.level} level
+                      <span className="bg-red-400 text-white py-0.5 px-2 rounded-xl text-xs">
+                        {course.level}
                       </span>
                     )}
                   </div>
-                  <h3 className="mt-0 mb-2 text-lg font-semibold text-black line-clamp-2 flex-1">
+                  <h3 className="mt-0 mb-2 text-sm lg:text-lg font-semibold text-black line-clamp-2 flex-1">
                     {course.description}
                   </h3>
                   <div className="flex justify-between items-center mt-auto">
                     <div className="flex items-center">
-                      <i className="fas fa-star text-yellow-500 text-sm"></i>
-                      <span className="ml-1 text-sm text-black">4.5</span>
-                      <span className="text-gray-500 text-sm ps-1">(1253)</span>
+                      <i className="fas fa-star text-yellow-500 text-xs lg:text-sm"></i>
+                      <span className="ml-1 text-xs lg:text-sm text-black">4.5</span>
+                      <span className="text-gray-500 text-xs lg:text-sm ps-1">(1253)</span>
                     </div>
-                    <span className="text-xl font-bold text-black">${course.price}</span>
+                    <span className="text-base lg:text-xl font-bold text-black">${course.price}</span>
                   </div>
                 </div>
               </div>
             </Link>
           )) : (
-            <div className="col-span-full flex flex-col items-center justify-center min-h-[60vh]">
+            <div className="col-span-full flex flex-col items-center justify-center min-h-[50vh] lg:min-h-[60vh]">
               {searchQuery ? (
-                <div className="text-center">
-                  <p className="text-xl text-gray-600 mb-4">No courses found matching "{searchQuery}"</p>
-                  <p className="text-gray-500">Try searching with different keywords or check your spelling</p>
+                <div className="text-center px-4">
+                  <p className="text-lg lg:text-xl text-gray-600 mb-2 lg:mb-4">No courses found matching "{searchQuery}"</p>
+                  <p className="text-sm lg:text-base text-gray-500">Try searching with different keywords or check your spelling</p>
                 </div>
               ) : (
-                <div className="scale-[3]">
+                <div className="scale-[2] lg:scale-[3]">
                   <Loader />
                 </div>
               )}

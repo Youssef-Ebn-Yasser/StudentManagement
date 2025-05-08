@@ -8,34 +8,34 @@ import Loader from '../Loader/Loader';
 const CourseCard = ({ course }) => (
   <Link
     to={`/courses/course/${course.id}`}
-    className={`w-72 border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card}`}
+    className={`w-[280px] sm:w-[300px] md:w-[320px] border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group ${styles.card}`}
     aria-label={`View course: ${course.title}`}
   >
     <div className="relative overflow-hidden">
       <img
         src={course.imagePath || img}
         alt={course.title}
-        className="block w-full h-40 object-cover transition-transform duration-300 group-hover:scale-110"
+        className="block w-full h-32 sm:h-36 md:h-40 object-cover transition-transform duration-300 group-hover:scale-110"
         onError={(e) => {
           e.target.src = img;
         }}
       />
     </div>
-    <div className="p-3">
+    <div className="p-2 sm:p-3">
       <div className="flex justify-between items-center mb-1">
-        <span className="text-gray-500 text-sm">{course.level || 'All Levels'}</span>
+        <span className="text-gray-500 text-xs sm:text-sm">{course.level || 'All Levels'}</span>
       </div>
-      <h3 className="mt-0 mb-1 text-lg font-semibold text-black line-clamp-2">
+      <h3 className="mt-0 mb-1 text-base sm:text-lg font-semibold text-black line-clamp-2">
         {course.title}
       </h3>
-      <p className="text-gray-600 text-sm mb-2 line-clamp-2">{course.description}</p>
+      <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-2">{course.description}</p>
       <div className="flex justify-between items-center">
         <div className="flex items-center">
-          <i className="fas fa-star text-yellow-500 text-sm" aria-hidden="true"></i>
-          <span className="ml-1 text-sm text-black">4.5</span>
-          <span className="text-gray-500 text-sm ps-1">(1253)</span>
+          <i className="fas fa-star text-yellow-500 text-xs sm:text-sm" aria-hidden="true"></i>
+          <span className="ml-1 text-xs sm:text-sm text-black">4.5</span>
+          <span className="text-gray-500 text-xs sm:text-sm ps-1">(1253)</span>
         </div>
-        <span className="text-xl font-bold text-black">${course.price}</span>
+        <span className="text-lg sm:text-xl font-bold text-black">${course.price}</span>
       </div>
     </div>
   </Link>
@@ -207,11 +207,11 @@ function Home() {
 
   const CourseSection = ({ title, courses, loading, error, currentPage, totalPages, onPageChange, hasNextPage, hasPreviousPage }) => (
     <>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-black">{title}</h2>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 px-2 sm:px-0">
+        <h2 className="text-2xl sm:text-3xl font-bold text-black mb-2 sm:mb-0">{title}</h2>
         <Link
           to={`/courses`}
-          className={`${styles.primary} me-5 group flex items-center mt-4`}
+          className={`${styles.primary} group flex items-center`}
           aria-label={`View all ${title.toLowerCase()}`}
         >
           View More
@@ -220,33 +220,33 @@ function Home() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center h-64">
+        <div className="flex justify-center items-center h-48 sm:h-64">
           <Loader />
         </div>
       ) : error ? (
-        <div className="flex flex-col items-center justify-center h-64">
-          <p className="text-red-500 text-lg mb-4">{error}</p>
+        <div className="flex flex-col items-center justify-center h-48 sm:h-64">
+          <p className="text-red-500 text-base sm:text-lg mb-4">{error}</p>
           <button
             onClick={() => onPageChange(1)}
-            className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+            className="bg-indigo-600 text-white px-3 sm:px-4 py-2 rounded-md hover:bg-indigo-700"
             aria-label="Retry loading courses"
           >
             Retry
           </button>
         </div>
       ) : courses.length === 0 ? (
-        <div className="flex justify-center items-center h-64">
-          <p className="text-gray-500 text-lg">No courses available</p>
+        <div className="flex justify-center items-center h-48 sm:h-64">
+          <p className="text-gray-500 text-base sm:text-lg">No courses available</p>
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-12 xl:gap-16 px-2 sm:px-0 justify-items-center">
             {courses.map((course) => (
               <CourseCard key={course.id} course={course} />
             ))}
           </div>
           {totalPages > 1 && (
-            <div className="mt-8 flex justify-center">
+            <div className="mt-6 sm:mt-8 flex justify-center">
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -263,111 +263,105 @@ function Home() {
 
   return (
     <>
-      <div className="min-h-screen w-full max-w-[1300px] mx-auto px-4 bg-white mt-[75px]">
-        <br />
-        <br />
-        
-        {/* Recommended Courses Section */}
-        <CourseSection
-          title="Recommended for you"
-          courses={recommendedCourses.courses}
-          loading={recommendedCourses.loading}
-          error={recommendedCourses.error}
-          currentPage={recommendedCourses.page}
-          totalPages={recommendedCourses.totalPages}
-          onPageChange={recommendedCourses.setPage}
-          hasNextPage={recommendedCourses.hasNextPage}
-          hasPreviousPage={recommendedCourses.hasPreviousPage}
-        />
+      <div className="min-h-screen w-full max-w-[1300px] mx-auto px-2 sm:px-4 bg-white mt-[56px] sm:mt-[75px]">
+        <div className="py-4 sm:py-8">
+          {/* Recommended Courses Section */}
+          <CourseSection
+            title="Recommended for you"
+            courses={recommendedCourses.courses}
+            loading={recommendedCourses.loading}
+            error={recommendedCourses.error}
+            currentPage={recommendedCourses.page}
+            totalPages={recommendedCourses.totalPages}
+            onPageChange={recommendedCourses.setPage}
+            hasNextPage={recommendedCourses.hasNextPage}
+            hasPreviousPage={recommendedCourses.hasPreviousPage}
+          />
 
-        <br />
-        <br />
-        
-        {/* Slider Section */}
-        <div className="mt-8 relative overflow-hidden">
-          <div
-            className="flex transition-transform duration-500"
-            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-            role="region"
-            aria-label="Featured courses slider"
-          >
-            {slides.map((slide, index) => (
+          <div className="py-6 sm:py-8">
+            {/* Slider Section */}
+            <div className="mt-4 sm:mt-8 relative overflow-hidden">
               <div
-                key={index}
-                className="flex flex-row items-center justify-between py-16 px-8 md:px-24 lg:px-32 min-w-full"
+                className="flex transition-transform duration-500"
+                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                role="region"
+                aria-label="Featured courses slider"
               >
-                <div className="w-2/5 flex-shrink-0">
-                  <h2 className="text-3xl font-bold text-gray-800 mb-4">
-                    {slide.title}
-                  </h2>
-                  <p className="text-gray-600 mb-6">{slide.description}</p>
-                  <button 
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-md"
-                    aria-label={slide.buttonText}
+                {slides.map((slide, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col sm:flex-row items-center justify-between py-8 sm:py-16 px-4 sm:px-8 md:px-16 lg:px-24 min-w-full"
                   >
-                    {slide.buttonText}
-                  </button>
-                </div>
-                <div className="w-2/5 ml-8 rounded-lg overflow-hidden shadow-lg">
-                  <img
-                    src={slide.img}
-                    alt={slide.title}
-                    className="w-full h-auto object-cover"
-                  />
-                </div>
+                    <div className="w-full sm:w-2/5 flex-shrink-0 mb-6 sm:mb-0">
+                      <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">
+                        {slide.title}
+                      </h2>
+                      <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">{slide.description}</p>
+                      <button 
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 sm:py-3 px-4 sm:px-6 rounded-md text-sm sm:text-base"
+                        aria-label={slide.buttonText}
+                      >
+                        {slide.buttonText}
+                      </button>
+                    </div>
+                    <div className="w-full sm:w-2/5 sm:ml-8 rounded-lg overflow-hidden shadow-lg">
+                      <img
+                        src={slide.img}
+                        alt={slide.title}
+                        className="w-full h-auto object-cover"
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+
+              <div className="flex justify-center mt-4 mb-4" role="tablist">
+                {slides.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToSlide(index)}
+                    className={`w-2 h-2 sm:w-3 sm:h-3 mx-1 sm:mx-2 rounded-full ${
+                      currentSlide === index
+                        ? 'bg-indigo-600'
+                        : 'bg-gray-300 hover:bg-gray-400'
+                    }`}
+                    role="tab"
+                    aria-selected={currentSlide === index}
+                    aria-label={`Slide ${index + 1}`}
+                  ></button>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <div className="flex justify-center mt-4 mb-4" role="tablist">
-            {slides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`w-3 h-3 mx-2 rounded-full ${
-                  currentSlide === index
-                    ? 'bg-indigo-600'
-                    : 'bg-gray-300 hover:bg-gray-400'
-                }`}
-                role="tab"
-                aria-selected={currentSlide === index}
-                aria-label={`Slide ${index + 1}`}
-              ></button>
-            ))}
+          {/* Popular Courses Section */}
+          <CourseSection
+            title="Popular courses"
+            courses={popularCourses.courses}
+            loading={popularCourses.loading}
+            error={popularCourses.error}
+            currentPage={popularCourses.page}
+            totalPages={popularCourses.totalPages}
+            onPageChange={popularCourses.setPage}
+            hasNextPage={popularCourses.hasNextPage}
+            hasPreviousPage={popularCourses.hasPreviousPage}
+          />
+
+          <div className="py-6 sm:py-8">
+            {/* Trending Courses Section */}
+            <CourseSection
+              title="Trending courses"
+              courses={trendingCourses.courses}
+              loading={trendingCourses.loading}
+              error={trendingCourses.error}
+              currentPage={trendingCourses.page}
+              totalPages={trendingCourses.totalPages}
+              onPageChange={trendingCourses.setPage}
+              hasNextPage={trendingCourses.hasNextPage}
+              hasPreviousPage={trendingCourses.hasPreviousPage}
+            />
           </div>
         </div>
-
-        {/* Popular Courses Section */}
-        <CourseSection
-          title="Popular courses"
-          courses={popularCourses.courses}
-          loading={popularCourses.loading}
-          error={popularCourses.error}
-          currentPage={popularCourses.page}
-          totalPages={popularCourses.totalPages}
-          onPageChange={popularCourses.setPage}
-          hasNextPage={popularCourses.hasNextPage}
-          hasPreviousPage={popularCourses.hasPreviousPage}
-        />
-
-        <br />
-        <br />
-
-        {/* Trending Courses Section */}
-        <CourseSection
-          title="Trending courses"
-          courses={trendingCourses.courses}
-          loading={trendingCourses.loading}
-          error={trendingCourses.error}
-          currentPage={trendingCourses.page}
-          totalPages={trendingCourses.totalPages}
-          onPageChange={trendingCourses.setPage}
-          hasNextPage={trendingCourses.hasNextPage}
-          hasPreviousPage={trendingCourses.hasPreviousPage}
-        />
-
-        <br />
-        <br />
       </div>
     </>
   );
