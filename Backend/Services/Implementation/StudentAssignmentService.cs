@@ -1,4 +1,5 @@
 ﻿using Backend.DTOs.AssignmentDTO;
+using Backend.Entities;
 
 namespace Backend.Services.Implementation;
 
@@ -60,6 +61,24 @@ public class StudentAssignmentService : ResponseHandler, IStudentAssignmentServi
 
         var mapper = _mapper.Map<List<StudentAssignmentCourseDto>>(result);
         return Success(mapper);
+    }
+    public async Task<Response<AssignmentStudentDto>> GetStudentAssignmentForLessonId(int lessonId)
+    {
+        var lesson = await _unitOfWork.Repository<Lesson>().GetByIdAsync(lessonId);
+        if (lesson == null)
+            return NotFound<AssignmentStudentDto>("Lesson not found.");
+
+        var assignment = await _unitOfWork.Repository<StudentAssignment>()
+            .GetTableNoTracking()
+            .Include(x => x.Student)
+            .Include(x => x.Lesson)
+            .FirstOrDefaultAsync(sa => sa.LessonId == lessonId);
+
+        if (assignment == null)
+            return NotFound<AssignmentStudentDto>("Assignment not found.");
+
+        var result = _mapper.Map<AssignmentStudentDto>(assignment);
+        return Success(result);
     }
 
     public class StudentAssignmentCourseDto
