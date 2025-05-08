@@ -11,6 +11,9 @@ import TeacherCourses from '@/component/TeacherProfile/TeacherCourses'
 import AccountSettings from '@/component/TeacherProfile/settingsPage/AccountSettings'
 import TeacherCourseDetails from '@/component/TeacherProfile/TeacherCourseDetails'
 import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
+import StudentDashboard from '@/component/StudentDashboard/StudentDashboard'
+import StudentProfile from '@/component/StudentProfile/StudentProfile'
+import EditProfile from '@/component/StudentProfile/EditProfile'
 
 const isAuth = true // Replace with actual authentication logic
 
@@ -37,6 +40,18 @@ const routesConfig = [
     {
         path: 'dashboard',
         element: <Dashboard />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'studentdashboard',
+        element: <StudentDashboard />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'studentprofile',
+        element: <StudentProfile />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -73,6 +88,12 @@ const routesConfig = [
     {
         path: 'teacher/settings',
         element: <AccountSettings />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'studentprofile/edit-profile',
+        element: <EditProfile />,
         isProtected: false,
         accessRole: 'all',
     },
