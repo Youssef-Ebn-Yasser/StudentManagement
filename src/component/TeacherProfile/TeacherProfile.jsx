@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MainInfo from "./MainInfo";
 import './TeacherProfile.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -9,33 +9,61 @@ import TeacherCourses from "./TeacherCourses";
 import CreateCourse from "./CreateCourse";
 import AddLesson from "./AddLesson";
 import AddMaterial from "./AddMaterial";
-import AddAssignment from "./AddAssignment";
 import AccountSettings from "./settingsPage/AccountSettings";
+import { courseService } from '../../services/courseService';
+import Loader from '../Loader/Loader';
 
 function TeacherProfile() {
   const [activeTab, setActiveTab] = useState('profile');
-  const [batchs, setBatchs]= useState([
+  const [teacherData, setTeacherData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchTeacherData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await courseService.getTeacherStats(5);
+        setTeacherData(response.data);
+      } catch (error) {
+        setError(error.message || 'Failed to load teacher data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTeacherData();
+  }, []);
+
+  const stats = [
     {
-    name: 'Enrolled Courses',
-    number: 957,
-    iconType: faVideo,
+      name: 'Enrolled Courses',
+      number: teacherData?.enrolledCourses || 0,
+      iconType: faVideo,
     },
     {
-    name: 'Active Courses',
-    number: 19,
-    iconType: faCheck,
+      name: 'Active Courses',
+      number: teacherData?.activeCourses || 0,
+      iconType: faCheck,
     },
     {
-    name: 'Students',
-    number: 957,
-    iconType: faGraduationCap,
+      name: 'Students',
+      number: teacherData?.students || 0,
+      iconType: faGraduationCap,
     },
     {
-    name: 'Course Sold',
-    number: 7435,
-    iconType: faSellcast,
+      name: 'Course Sold',
+      number: teacherData?.courseSold || 0,
+      iconType: faSellcast,
     },
-  ]);
+  ];
+
+  const handleProfileUpdate = (updatedData) => {
+    setTeacherData(prev => ({
+      ...prev,
+      ...updatedData
+    }));
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -44,7 +72,7 @@ function TeacherProfile() {
           <>
             <div className="h-60 w-full">
               <img
-                src='../../../public/csscode.jpg'
+                src={teacherData?.coverImage || '../../../public/csscode.jpg'}
                 alt="cover"
                 className="w-full h-full object-cover object-center"
               />
@@ -53,17 +81,17 @@ function TeacherProfile() {
               <div className="container px-4">
                 <div className="flex flex-wrap px-4 gap-5">
                   <div className="w-full mt-10">
-                    <MainInfo />
+                    <MainInfo teacherId={5} teacherData={teacherData} />
                   </div>
                   <div className="w-full">
                     <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-                      {batchs.map((batch) => (
-                        <div key={batch.name} className="box grid grid-flow-col grid-rows-3 gap-4 bg-[#EBEBFF] flex rounded-md hover:bg-[#e9e9f5]">
+                      {stats.map((stat) => (
+                        <div key={stat.name} className="box grid grid-flow-col grid-rows-3 gap-4 bg-[#EBEBFF] flex rounded-md hover:bg-[#e9e9f5]">
                           <div className="row-span-3 flex">
-                            <FontAwesomeIcon icon={batch.iconType} className="text-[#564FFD] text-3xl w-24 self-center" />
+                            <FontAwesomeIcon icon={stat.iconType} className="text-[#564FFD] text-3xl w-24 self-center" />
                           </div>
-                          <div className="col-span-2 self-center pt-2 text-black text-2xl">{batch.number}</div>
-                          <div className="col-span-2 row-span-2 self-center text-[#4E5566] text-2xl">{batch.name}</div>
+                          <div className="col-span-2 self-center pt-2 text-black text-2xl">{stat.number}</div>
+                          <div className="col-span-2 row-span-2 self-center text-[#4E5566] text-2xl">{stat.name}</div>
                         </div>
                       ))}
                     </div>
@@ -74,21 +102,33 @@ function TeacherProfile() {
           </>
         );
       case 'courses':
-        return <TeacherCourses />;
+        return <TeacherCourses teacherId={5} setActiveTab={setActiveTab} />;
       case 'create-course':
-        return <CreateCourse />;
+        return <CreateCourse teacherId={5} />;
       case 'lessons':
-        return <AddLesson />;
+        return <AddLesson teacherId={5} />;
       case 'materials':
-        return <AddMaterial />;
-      case 'assignments':
-        return <AddAssignment />;
+        return <AddMaterial teacherId={5} />;
       case 'settings':
-        return <AccountSettings />;
+        return <AccountSettings teacherData={{...teacherData, id: 5}} onUpdate={handleProfileUpdate} />;
       default:
         return null;
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="scale-[2.5]">
+          <Loader />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="flex items-center justify-center h-screen text-red-600">{error}</div>;
+  }
 
   return (
     <div className="app-container">

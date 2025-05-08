@@ -14,6 +14,8 @@ import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
 import StudentDashboard from '@/component/StudentDashboard/StudentDashboard'
 import StudentProfile from '@/component/StudentProfile/StudentProfile'
 import EditProfile from '@/component/StudentProfile/EditProfile'
+import AddLesson from '@/component/TeacherProfile/AddLesson'
+import EditCourse from '@/component/TeacherProfile/EditCourse'
 
 const isAuth = true // Replace with actual authentication logic
 
@@ -80,6 +82,12 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
+        path: 'teacher/course/:courseId/lesson/new',
+        element: <AddLesson />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
         path: 'courses/course/:id',
         element: <CoursesDetails />,
         isProtected: false,
@@ -94,6 +102,12 @@ const routesConfig = [
     {
         path: 'studentprofile/edit-profile',
         element: <EditProfile />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'teacher/course/edit/:id',
+        element: <EditCourse />,
         isProtected: false,
         accessRole: 'all',
     },

@@ -5,27 +5,24 @@ import "./CreateCourse.css";
 
 const AddMaterial = () => {
   const [courses, setCourses] = useState([]);
+  const [lessons, setLessons] = useState([]);
   const [materials, setMaterials] = useState([]);
-  const [editingMaterial, setEditingMaterial] = useState(null);
-  const [editingMaterialId, setEditingMaterialId] = useState(null);
-  const [editingCourseId, setEditingCourseId] = useState(null);
+  const [selectedCourse, setSelectedCourse] = useState('');
+  const [selectedLesson, setSelectedLesson] = useState('');
+  const [selectedMaterialType, setSelectedMaterialType] = useState('1'); // Default to Normal type
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
-
-  const materialTypes = {
-    FILE: 'file',
-    VIDEO: 'video',
-    URL: 'url'
-  };
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         setIsLoading(true);
         const response = await courseService.getAllCourses();
+        console.log('Courses response:', response);
         setCourses(response?.data || []);
       } catch (error) {
+        console.error('Error fetching courses:', error);
         setError(error.message || 'Failed to load courses');
       } finally {
         setIsLoading(false);
@@ -34,70 +31,137 @@ const AddMaterial = () => {
     fetchCourses();
   }, []);
 
-  const getCourseMaterials = async (courseId) => {
-    try {
-      const courseDetails = await courseService.getCourseDetails(courseId);
-      return courseDetails.materials || [];
-    } catch (error) {
-      setError(error.message || 'Failed to load materials');
-      return [];
-    }
-  };
+  useEffect(() => {
+    const fetchLessons = async () => {
+      if (!selectedCourse) {
+        setLessons([]);
+        return;
+      }
+      try {
+        setIsLoading(true);
+        console.log('Fetching lessons for course:', selectedCourse);
+        const courseLessons = await courseService.getCourseLessons(selectedCourse);
+        console.log('Lessons response:', courseLessons);
+        // Ensure we have an array of lessons
+        if (Array.isArray(courseLessons)) {
+          setLessons(courseLessons);
+        } else if (courseLessons?.data) {
+          setLessons(Array.isArray(courseLessons.data) ? courseLessons.data : []);
+        } else {
+          setLessons([]);
+        }
+      } catch (error) {
+        console.error('Error fetching lessons:', error);
+        setError(error.message || 'Failed to load lessons');
+        setLessons([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchLessons();
+  }, [selectedCourse]);
+
+  useEffect(() => {
+    const fetchMaterials = async () => {
+      if (!selectedLesson) {
+        setMaterials([]);
+        return;
+      }
+      try {
+        setIsLoading(true);
+        console.log('Fetching materials for lesson:', selectedLesson);
+        const materialsData = await courseService.getLessonMaterials(selectedLesson);
+        console.log('Materials response:', materialsData);
+        setMaterials(materialsData || []);
+      } catch (error) {
+        console.error('Error fetching materials:', error);
+        setError(error.message || 'Failed to load materials');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchMaterials();
+  }, [selectedLesson]);
 
   const handleUploadMaterial = async (e) => {
     e.preventDefault();
-    try {
-      setIsLoading(true);
-      const formData = new FormData(e.target);
-      const materialData = {
-        title: formData.get('title'),
-        description: formData.get('description'),
-        type: formData.get('type'),
-        file: formData.get('file'),
-      };
-
-      const newMaterial = await courseService.uploadMaterial(editingCourseId, materialData);
-      setMaterials([...materials, newMaterial]);
-      e.target.reset();
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    } catch (error) {
-      setError(error.message || 'Failed to upload material');
-    } finally {
-      setIsLoading(false);
+    if (!selectedLesson) {
+      setError('Please select a lesson first');
+      return;
     }
-  };
 
-  const handleEditMaterial = (material) => {
-    setEditingMaterial(material);
-    setEditingMaterialId(material.id);
-  };
-
-  const handleUpdateMaterial = async (e) => {
-    e.preventDefault();
     try {
       setIsLoading(true);
+      setError(null);
+
       const formData = new FormData(e.target);
+      const file = formData.get('file');
+      
+      if (!file || file.size === 0) {
+        setError('Please select a file to upload');
+        return;
+      }
+
+      // Validate file type
+      const allowedTypes = [
+        'application/pdf',  // PDF
+        'application/msword',  // DOC
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',  // DOCX
+        'text/plain',  // TXT
+        'video/mp4',  // MP4
+        'video/quicktime',  // MOV
+        'video/x-msvideo',  // AVI
+        'application/vnd.ms-powerpoint',  // PPT
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation'  // PPTX
+      ];
+
+      if (!allowedTypes.includes(file.type)) {
+        console.log('File type:', file.type);
+        setError('Invalid file type. Please upload a PDF, DOC, DOCX, TXT, PPT, PPTX, or video file (MP4, MOV, AVI).');
+        return;
+      }
+
+      // Validate file size (max 50MB)
+      const maxSize = 50 * 1024 * 1024; // 50MB in bytes
+      if (file.size > maxSize) {
+        setError('File is too large. Maximum size is 50MB.');
+        return;
+      }
+
+      // Create material data object with exact property names expected by backend
       const materialData = {
-        title: formData.get('title'),
-        description: formData.get('description'),
-        type: formData.get('type'),
-        file: formData.get('file'),
+        Title: formData.get('title'),
+        Content: formData.get('Content'),
+        LessonId: parseInt(selectedLesson),
+        Data: file,
+        Type: parseInt(selectedMaterialType)
       };
 
-      const updatedMaterial = await courseService.updateMaterial(editingCourseId, editingMaterialId, materialData);
-      setMaterials(materials.map(material =>
-        material.id === editingMaterialId ? updatedMaterial : material
-      ));
-      setEditingMaterial(null);
-      setEditingMaterialId(null);
+      console.log('Uploading material:', {
+        Title: materialData.Title,
+        Content: materialData.Content,
+        LessonId: materialData.LessonId,
+        Type: materialData.Type,
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size
+      });
+
+      await courseService.uploadLessonMaterial(selectedLesson, materialData);
+      
+      // Refresh materials list
+      const updatedMaterials = await courseService.getLessonMaterials(selectedLesson);
+      setMaterials(updatedMaterials || []);
+      
+      // Reset form
       e.target.reset();
+      setSelectedMaterialType('1'); // Reset to Normal type
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
     } catch (error) {
-      setError(error.message || 'Failed to update material');
+      console.error('Error uploading material:', error);
+      setError(error.message || 'Failed to upload material');
     } finally {
       setIsLoading(false);
     }
@@ -107,9 +171,10 @@ const AddMaterial = () => {
     if (window.confirm('Are you sure you want to delete this material?')) {
       try {
         setIsLoading(true);
-        await courseService.deleteMaterial(editingCourseId, materialId);
+        await courseService.deleteMaterial(materialId);
         setMaterials(materials.filter(material => material.id !== materialId));
       } catch (error) {
+        console.error('Error deleting material:', error);
         setError(error.message || 'Failed to delete material');
       } finally {
         setIsLoading(false);
@@ -117,98 +182,15 @@ const AddMaterial = () => {
     }
   };
 
-  const handleCancelEdit = () => {
-    setEditingMaterial(null);
-    setEditingMaterialId(null);
-  };
-
-  const MaterialForm = ({ material, onSubmit, onCancel, submitText }) => {
-    const [errors, setErrors] = useState({});
-
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const validationErrors = {};
-      
-      if (!formData.get('title')) validationErrors.title = 'Title is required';
-      if (!formData.get('description')) validationErrors.description = 'Description is required';
-      if (!formData.get('type')) validationErrors.type = 'Type is required';
-      if (!formData.get('file') && formData.get('type') !== 'url') validationErrors.file = 'File is required';
-      
-      if (Object.keys(validationErrors).length > 0) {
-        setErrors(validationErrors);
-        return;
-      }
-
-      onSubmit(e);
-    };
-
+  if (isLoading) {
     return (
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label className="required-field">Title</label>
-          <input
-            type="text"
-            name="title"
-            required
-            defaultValue={material?.title}
-            placeholder="Enter material title"
-            className={errors.title ? 'error' : ''}
-          />
-          {errors.title && <span className="error-message">{errors.title}</span>}
+      <div className="flex items-center justify-center h-[calc(100vh-300px)]">
+        <div className="scale-[2.5]">
+          <Loader />
         </div>
-
-        <div className="form-group">
-          <label className="required-field">Type</label>
-          <select 
-            name="type" 
-            required 
-            className={`category-select ${errors.type ? 'error' : ''}`}
-            defaultValue={material?.type}
-          >
-            <option value="">Select type</option>
-            {Object.entries(materialTypes).map(([key, value]) => (
-              <option key={key} value={value}>{value}</option>
-            ))}
-          </select>
-          {errors.type && <span className="error-message">{errors.type}</span>}
-        </div>
-
-        <div className="form-group file-input">
-          <label className="required-field">File</label>
-          <input
-            type="file"
-            name="file"
-            ref={fileInputRef}
-            accept=".pdf,.doc,.docx,.txt,video/*"
-            className={errors.file ? 'error' : ''}
-          />
-          {errors.file && <span className="error-message">{errors.file}</span>}
-          <p className="help-text">Supported formats: PDF, DOC, DOCX, TXT, and video files</p>
-        </div>
-
-        <div className="form-group">
-          <label className="required-field">Description</label>
-          <textarea
-            name="description"
-            required
-            defaultValue={material?.description}
-            placeholder="Enter material description"
-            rows="3"
-            className={errors.description ? 'error' : ''}
-          />
-          {errors.description && <span className="error-message">{errors.description}</span>}
-        </div>
-
-        <div className="form-actions">
-          {onCancel && (
-            <button type="button" className="cancel-button" onClick={onCancel}>Cancel</button>
-          )}
-          <button type="submit" className="save-button">{submitText}</button>
-        </div>
-      </form>
+      </div>
     );
-  };
+  }
 
   return (
     <div className="form-container">
@@ -219,88 +201,152 @@ const AddMaterial = () => {
         </div>
       )}
 
-      {isLoading ? (
-        <div className="flex items-center justify-center h-[calc(100vh-300px)]">
-          <div className="scale-[2.5]">
-            <Loader />
-          </div>
-        </div>
-      ) : (
-        <>
-          <h2>Add New Material</h2>
-          <div className="form-group">
-            <label className="required-field">Select Course</label>
-            <select 
-              name="courseId" 
-              required 
-              className="category-select"
-              value={editingCourseId || ''}
-              onChange={(e) => setEditingCourseId(e.target.value)}
-            >
-              <option value="">Choose a course</option>
-              {courses.map(course => (
-                <option key={course.id} value={course.id}>
-                  {course.title}
-                </option>
-              ))}
-            </select>
-          </div>
+      <h2>Upload Course Material</h2>
+      
+      <div className="form-group">
+        <label className="required-field">Select Course</label>
+        <select 
+          value={selectedCourse}
+          onChange={(e) => {
+            console.log('Selected course:', e.target.value);
+            setSelectedCourse(e.target.value);
+            setSelectedLesson('');
+          }}
+          className="category-select"
+          required
+        >
+          <option value="">Choose a course</option>
+          {courses.map(course => (
+            <option key={course.id} value={course.id}>
+              {course.title}
+            </option>
+          ))}
+        </select>
+      </div>
 
-          {editingCourseId && (
-            <>
-              {editingMaterial ? (
-                <>
-                  <h2>Edit Material</h2>
-                  <MaterialForm
-                    material={editingMaterial}
-                    onSubmit={handleUpdateMaterial}
-                    onCancel={handleCancelEdit}
-                    submitText="Update Material"
-                  />
-                </>
-              ) : (
-                <>
-                  <MaterialForm
-                    onSubmit={handleUploadMaterial}
-                    submitText="Create Material"
-                  />
-                </>
-              )}
-
-              <div className="items-list">
-                <h3>Course Materials</h3>
-                {materials.length > 0 ? (
-                  materials.map(material => (
-                    <div key={material.id} className="material-card">
-                      <div className="card-header">
-                        <h5>{material.title}</h5>
-                        <span className="material-type">{material.type}</span>
-                      </div>
-                      <p>{material.description}</p>
-                      <div className="card-actions">
-                        <button
-                          className="edit-btn"
-                          onClick={() => handleEditMaterial(material)}
-                          title="Edit Material"
-                        >
-                          ✎
-                        </button>
-                        <button
-                          className="delete-btn"
-                          onClick={() => handleDeleteMaterial(material.id)}
-                          title="Delete Material"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p>No materials available for this course.</p>
-                )}
-              </div>
-            </>
+      {selectedCourse && (
+        <div className="form-group">
+          <label className="required-field">Select Lesson</label>
+          <select 
+            value={selectedLesson}
+            onChange={(e) => {
+              console.log('Selected lesson:', e.target.value);
+              setSelectedLesson(e.target.value);
+            }}
+            className="category-select"
+            required
+          >
+            <option value="">Choose a lesson</option>
+            {lessons.map(lesson => (
+              <option key={lesson.id} value={lesson.id}>
+                {lesson.title?.toString() || 'Untitled Lesson'}
+              </option>
+            ))}
+          </select>
+          {lessons.length === 0 && (
+            <p className="text-red-500 mt-2">No lessons available for this course.</p>
           )}
+        </div>
+      )}
+
+      {selectedLesson && (
+        <>
+          <form onSubmit={handleUploadMaterial} className="space-y-4">
+            <div className="form-group">
+              <label className="required-field">Material Title</label>
+              <input
+                type="text"
+                name="title"
+                required
+                className="form-input"
+                placeholder="Enter material title"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="required-field">Description</label>
+              <textarea
+                name="Content"
+                required
+                className="form-input"
+                rows="3"
+                placeholder="Enter material description"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="required-field">Material Type</label>
+              <select
+                name="materialType"
+                value={selectedMaterialType}
+                onChange={(e) => setSelectedMaterialType(e.target.value)}
+                className="form-input"
+                required
+              >
+                <option value="1">Normal Material</option>
+                <option value="2">Assignment</option>
+              </select>
+              <p className="help-text">Choose whether this is a regular material or an assignment</p>
+            </div>
+
+            <div className="form-group">
+              <label className="required-field">Material File</label>
+              <input
+                type="file"
+                name="file"
+                ref={fileInputRef}
+                required
+                className="form-input"
+                accept=".pdf,.doc,.docx,.txt,video/*"
+              />
+              <p className="help-text">Supported formats: PDF, DOC, DOCX, TXT, and video files</p>
+            </div>
+
+            <button
+              type="submit"
+              className="save-button"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Uploading...' : 'Upload Material'}
+            </button>
+          </form>
+
+          <div className="materials-section">
+            <h3>Course Materials</h3>
+            {materials.length > 0 ? (
+              <div className="materials-list">
+                {materials.map(material => (
+                  <div key={material.id} className="material-item">
+                    <div className="card-header">
+                      <h5>{material.title}</h5>
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDeleteMaterial(material.id)}
+                        title="Delete Material"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <p>{material.Content}</p>
+                    {material.filePath && (
+                      <div className="material-content">
+                        <a
+                          href={material.filePath}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="view-file-btn"
+                        >
+                          View Material
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>No materials available for this lesson.</p>
+            )}
+          </div>
         </>
       )}
     </div>

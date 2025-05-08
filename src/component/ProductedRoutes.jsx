@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Navigate, Outlet, useNavigate } from 'react-router-dom';
 import NoAccess from './NoAccess/NoAccess';
 import { useDispatch } from 'react-redux';
-import { expiredToken } from '@/Redux/features/expiredToken/expiredToken';
+import { expiredToken } from '@/redux/features/expiredToken/expiredToken';
 
 
 const userRole = localStorage.getItem('userRole');

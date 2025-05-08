@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { courseService } from '../../services/courseService';
 import AddLesson from './AddLesson';
 import AddMaterial from './AddMaterial';
-import AddAssignment from './AddAssignment';
 import Loader from '../Loader/Loader';
 import "./CreateCourse.css";
 
@@ -79,24 +78,40 @@ const CreateCourse = () => {
     e.preventDefault();
     try {
       setIsLoading(true);
+      setError(null);
       const formData = new FormData(e.target);
-      if (formData.get('thumbnail') && formData.get('thumbnail').size > 0) {
-        await courseService.createCourse(formData, true);
-      } else {
-        const courseData = {
-          title: formData.get('title'),
-          description: formData.get('description'),
-          category: formData.get('category'),
-          price: parseFloat(formData.get('price')),
-          duration: parseInt(formData.get('duration')),
-          level: formData.get('level'),
-        };
-        await courseService.createCourse(courseData, false);
-      }
-      const coursesData = await courseService.getAllCourses();
-      setCourses(coursesData);
+      
+      // Create course data object with required fields
+      const courseData = {
+        title: formData.get('title')?.trim(),
+        description: formData.get('description')?.trim(),
+        price: parseFloat(formData.get('price')),
+        teacherId: 36,
+        level: formData.get('level'),
+        image: formData.get('thumbnail')
+      };
+
+      // Log the data being sent
+      console.log('Sending course data:', courseData);
+
+      const response = await courseService.createCourse(courseData);
+      console.log('Course created successfully:', response);
+      
+      // Refresh the course list
+      const coursesResponse = await courseService.getAllCourses();
+      setCourses(coursesResponse.data || []);
+      
+      // Reset the form
+      e.target.reset();
+      
+      // Show success message or handle success state
+      alert('Course created successfully!');
     } catch (error) {
-      setError(error.message || 'Failed to create course');
+      console.error('Error creating course:', error);
+      if (error.response?.data) {
+        console.error('Error details:', error.response.data);
+      }
+      setError(error.response?.data?.message || error.message || 'Failed to create course');
     } finally {
       setIsLoading(false);
     }
@@ -164,12 +179,9 @@ const CreateCourse = () => {
       
       if (!formData.get('title')) validationErrors.title = 'Title is required';
       if (!formData.get('description')) validationErrors.description = 'Description is required';
-      if (!formData.get('category')) validationErrors.category = 'Category is required';
       if (!formData.get('price')) validationErrors.price = 'Price is required';
       if (isNaN(parseFloat(formData.get('price')))) validationErrors.price = 'Price must be a number';
-      if (!formData.get('duration')) validationErrors.duration = 'Duration is required';
-      if (isNaN(parseInt(formData.get('duration')))) validationErrors.duration = 'Duration must be a number';
-      if (!formData.get('level')) validationErrors.level = 'Level is required';
+      if (parseFloat(formData.get('price')) <= 0) validationErrors.price = 'Price must be greater than 0';
       
       if (Object.keys(validationErrors).length > 0) {
         setErrors(validationErrors);
@@ -210,22 +222,6 @@ const CreateCourse = () => {
         </div>
 
         <div className="form-group">
-          <label className="required-field">Category</label>
-          <select 
-            name="category" 
-            required 
-            className={`category-select ${errors.category ? 'error' : ''}`}
-            defaultValue={course?.category}
-          >
-            <option value="">Select a category</option>
-            {Object.entries(courseCategories).map(([key, value]) => (
-              <option key={key} value={value}>{value}</option>
-            ))}
-          </select>
-          {errors.category && <span className="error-message">{errors.category}</span>}
-        </div>
-
-        <div className="form-group">
           <label className="required-field">Description</label>
           <textarea
             name="description"
@@ -244,43 +240,13 @@ const CreateCourse = () => {
             type="number"
             name="price"
             required
-            min="0"
+            min="0.01"
             step="0.01"
             defaultValue={course?.price}
             placeholder="Enter course price"
             className={errors.price ? 'error' : ''}
           />
           {errors.price && <span className="error-message">{errors.price}</span>}
-        </div>
-
-        <div className="form-group">
-          <label className="required-field">Duration (hours)</label>
-          <input
-            type="number"
-            name="duration"
-            required
-            min="1"
-            defaultValue={course?.duration}
-            placeholder="Enter course duration"
-            className={errors.duration ? 'error' : ''}
-          />
-          {errors.duration && <span className="error-message">{errors.duration}</span>}
-        </div>
-
-        <div className="form-group">
-          <label className="required-field">Level</label>
-          <select 
-            name="level" 
-            required 
-            className={`category-select ${errors.level ? 'error' : ''}`}
-            defaultValue={course?.level}
-          >
-            <option value="">Select level</option>
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
-          </select>
-          {errors.level && <span className="error-message">{errors.level}</span>}
         </div>
 
         <div className="form-actions">
@@ -293,113 +259,126 @@ const CreateCourse = () => {
     );
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-300px)]">
+        <div className="scale-[2.5]">
+          <Loader />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-300px)]">
+        <div className="text-center">
+          <p className="text-red-500 text-xl mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
-      {isLoading ? (
-        <div className="flex items-center justify-center h-[calc(100vh-300px)]">
-          <div className="scale-[2.5]">
-            <Loader />
-          </div>
+      <div className="w-full min-h-screen bg-white p-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Create New Course</h1>
         </div>
-      ) : error ? (
-        <div className="flex items-center justify-center h-[calc(100vh-300px)] text-red-600 text-2xl">
-          {error}
-        </div>
-      ) : (
-        <div className="w-full min-h-screen bg-white p-8">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Create New Course</h1>
-          </div>
 
-          {editingCourse ? (
-            <CourseForm
-              course={editingCourse}
-              onSubmit={handleUpdateCourse}
-              onCancel={handleCancelEdit}
-              submitText="Update Course"
-            />
-          ) : (
-            <CourseForm
-              onSubmit={handleCreateCourse}
-              submitText="Create Course"
-            />
-          )}
+        {editingCourse ? (
+          <CourseForm
+            course={editingCourse}
+            onSubmit={handleUpdateCourse}
+            onCancel={handleCancelEdit}
+            submitText="Update Course"
+          />
+        ) : (
+          <CourseForm
+            onSubmit={handleCreateCourse}
+            submitText="Create Course"
+          />
+        )}
 
-          <div className="mt-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Courses</h2>
-            {Object.entries(getCoursesByCategory()).map(([category, categoryCourses]) => (
-              categoryCourses.length > 0 && (
-                <div key={category} className="category-section">
-                  <h4 className="category-title" style={{ color: getCategoryColor(category) }}>
-                    {category}
-                  </h4>
-                  <div className="category-courses">
-                    {categoryCourses.map(course => (
-                      <div key={course.id} className="course-card">
-                        <div className="card-header">
-                          <h4>{course.title}</h4>
-                          <div className="card-actions">
-                            <button
-                              className="edit-btn"
-                              onClick={() => handleEditCourse(course)}
-                              title="Edit Course"
-                            >
-                              ✎
-                            </button>
-                            <button
-                              className="delete-btn"
-                              onClick={() => handleDeleteCourse(course.id)}
-                              title="Delete Course"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        </div>
-
-                        {course.thumbnail && (
-                          <div className="course-image">
-                            <img src={course.thumbnail} alt={course.title} />
-                          </div>
-                        )}
-
-                        <span 
-                          className="category-badge"
-                          style={{ 
-                            backgroundColor: getCategoryColor(course.category),
-                            color: 'white'
-                          }}
-                        >
-                          {course.category}
-                        </span>
-
-                        <p>{course.description}</p>
-
-                        <div className="course-details">
-                          <div className="course-price">
-                            ${course.price.toFixed(2)}
-                          </div>
-                          <div className="course-duration">
-                            {course.duration} hours
-                          </div>
-                          <div className="course-level">
-                            {course.level}
-                          </div>
-                        </div>
-                    
-                        <div className="card-stats">
-                          <span>{course.lessons?.length || 0} lessons</span>
-                          <span>{course.materials?.length || 0} materials</span>
-                          <span>{course.assignments?.length || 0} assignments</span>
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Courses</h2>
+          {Object.entries(getCoursesByCategory()).map(([category, categoryCourses]) => (
+            categoryCourses.length > 0 && (
+              <div key={category} className="category-section">
+                <h4 className="category-title" style={{ color: getCategoryColor(category) }}>
+                  {category}
+                </h4>
+                <div className="category-courses">
+                  {categoryCourses.map(course => (
+                    <div key={course.id} className="course-card">
+                      <div className="card-header">
+                        <h4>{course.title}</h4>
+                        <div className="card-actions">
+                          <button
+                            className="edit-btn"
+                            onClick={() => handleEditCourse(course)}
+                            title="Edit Course"
+                          >
+                            ✎
+                          </button>
+                          <button
+                            className="delete-btn"
+                            onClick={() => handleDeleteCourse(course.id)}
+                            title="Delete Course"
+                          >
+                            ×
+                          </button>
                         </div>
                       </div>
-                    ))}
-                  </div>
+
+                      {course.thumbnail && (
+                        <div className="course-image">
+                          <img src={course.thumbnail} alt={course.title} />
+                        </div>
+                      )}
+
+                      <span 
+                        className="category-badge"
+                        style={{ 
+                          backgroundColor: getCategoryColor(course.category),
+                          color: 'white'
+                        }}
+                      >
+                        {course.category}
+                      </span>
+
+                      <p>{course.description}</p>
+
+                      <div className="course-details">
+                        <div className="course-price">
+                          ${course.price.toFixed(2)}
+                        </div>
+                        <div className="course-duration">
+                          {course.duration} hours
+                        </div>
+                        <div className="course-level">
+                          {course.level}
+                        </div>
+                      </div>
+                  
+                      <div className="card-stats">
+                        <span>{course.lessons?.length || 0} lessons</span>
+                        <span>{course.materials?.length || 0} materials</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              )
-            ))}
-          </div>
+              </div>
+            )
+          ))}
         </div>
-      )}
+      </div>
     </div>
   );
 };
