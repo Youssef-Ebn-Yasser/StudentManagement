@@ -12,6 +12,10 @@ public class StudentAssignmentProfile : Profile
             .ForMember(dest => dest.Path, opt => opt.MapFrom(src => src.Path))
             .ForMember(dest => dest.LessonName, opt => opt.MapFrom(src => src.Lesson.Title))
             .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Name));
+        CreateMap<StudentAssignment, AssignmentOfLessonDto>()
+            .ForMember(dest => dest.Path, opt => opt.MapFrom(src => src.Path))
+            .ForMember(dest => dest.LessonName, opt => opt.MapFrom(src => src.Lesson.Title));
+            
 
     }
 }

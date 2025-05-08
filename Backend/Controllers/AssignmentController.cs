@@ -24,9 +24,15 @@ public class AssignmentController(IStudentAssignmentService _studentAssignmentSe
 
     }
     [HttpGet("GetStudentAssignmentForLessonId")]
-    public async Task<IActionResult> GetStudentAssignmentForLesson(int LessonId)
+    public async Task<IActionResult> GetStudentAssignmentForLesson(int lessonId)
     {
-        var result = await _studentAssignmentService.GetStudentAssignmentForLessonId(LessonId);
+        var result = await _studentAssignmentService.GetStudentAssignmentForLessonId(lessonId);
+        return NewResult(result);
+    }
+    [HttpGet("GetAllAssignmentOfCourse")]
+    public async Task<IActionResult> GetAllAssignmentOfCourse(string courseName, string studentName)
+    {
+        var result = await _studentAssignmentService.GetAllAssignmentOfCourse(courseName, studentName);
         return NewResult(result);
     }
 }
