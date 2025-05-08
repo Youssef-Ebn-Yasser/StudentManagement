@@ -196,5 +196,24 @@ public class CourseService : ResponseHandler, ICourseService
 
         return Success("Course deleted successfully");
     }
+    public async Task<Response<List<ShowCourseInfoByCategoryDto>>> GetCourseInfoByCategoryAsync(string category)
+    {
+        var courses = await _unitOfWork.Repository<Course>()
+            .GetTableNoTracking()
+            .Where(c => c.Category!.CategoryName == category && c.IsDeleted == false)
+            .Select(c => new ShowCourseInfoByCategoryDto
+            {
+                Description = c.Description,
+                Price = c.Price,
+                CreatedAt = c.CreatedAt,
+                ImagePath = c.ImagePath,
+                Level = c.Level,
+                Hours = c.Hours
+            })
+            .ToListAsync();
+        return Success(courses);
+    }
+
+
     #endregion
 }

@@ -60,4 +60,11 @@ public class CourseController : AppControllerBase
         var result = await _courseService.DeleteAsync(id);
         return NewResult(result);
     }
+
+    [HttpGet("Course/GetCourseInfoByCategory")]
+    public async Task<IActionResult> GetCourseInfoByCategory(string category)
+    {
+        var result = await _courseService.GetCourseInfoByCategoryAsync(category);
+        return NewResult(result);
+    }
 }
