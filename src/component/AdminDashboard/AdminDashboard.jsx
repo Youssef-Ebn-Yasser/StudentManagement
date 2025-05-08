@@ -38,22 +38,31 @@ function AdminDashboard() {
         <div className='grid grid-cols-1 gap-2 p-5'>
         <h1 className='text-3xl font-medium text-black text-center italic'>Admin Dashboard</h1>
             <main className='hover:shadow-2xl transition-all duration-300 ease rounded-2xl shadow p-3 mb-3'>
-                <h2 className='text-2xl font-medium text-black text-center pb-3  '>OverView</h2>
+                <h2 className='text-2xl font-medium text-black text-center pb-3 '>OverView</h2>
                 <div className='grid lg:grid-cols-3 md-grid-cols-1 sm:grid-cols-1 gap-3 text-center'>
-                    <a href="#students"><div className='shadow shadow-gray-500 rounded-2xl p-2 cursor-pointer hover:shadow-violet-300 transition-all duration-300 ease'>
-                        <h3 className='text-xl'> Students</h3>
-                        <p>{!loading?(<>{students.length}</>):<Loader/>}<img className='w-7 inline m-2' src={stuImg} alt="stuImg" /></p>
+                    <a href="#students"><div className='shadow-lg p-0 shadow-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:shadow-violet-300 transition-all duration-300 ease'>
+                        <div className='pt-10 text-2xl'>
+                            <h3> Students</h3>
+                            <p>{!loading?(<>{students.length}</>):<Loader/>}<img className='w-7 inline m-2' src={stuImg} alt="stuImg" /></p>
+                        </div>
+                        <svg className='p-0' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#6366F1" fill-opacity="1" d="M0,192L80,170.7C160,149,320,107,480,122.7C640,139,800,213,960,240C1120,267,1280,245,1360,234.7L1440,224L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path></svg>
                     </div>
                     </a>
-                    <a href="#teachers"><div className='shadow shadow-gray-500 rounded-2xl p-2 cursor-pointer hover:shadow-violet-300 transition-all duration-300 ease'>
-                        <h3 className='text-xl'> Teachers</h3>
-                        <p>{!loading?(<>{teachers.length}</>):<Loader/>}<img className='w-7 inline m-2' src={teaImg} alt="stuImg" /></p>
+                    <a href="#teachers"><div className='shadow-lg rounded-2xl overflow-hidden cursor-pointer hover:shadow-violet-300 transition-all duration-300 ease'>
+                        <div className='pt-10 text-2xl'>
+                            <h3 > Teachers</h3>
+                            <p>{!loading?(<>{teachers.length}</>):<Loader/>}<img className='w-7 inline m-2' src={teaImg} alt="stuImg" /></p>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#6366F1" fill-opacity="1" d="M0,192L80,170.7C160,149,320,107,480,122.7C640,139,800,213,960,240C1120,267,1280,245,1360,234.7L1440,224L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path></svg>
                     </div>
                     </a>
                     
-                    <a href="#courses"><div className='shadow shadow-gray-500 rounded-2xl p-2 cursor-pointer hover:shadow-violet-300 transition-all duration-300 ease'>
+                    <a href="#courses"><div className='shadow-lg rounded-2xl cursor-pointer overflow-hidden hover:shadow-violet-300 transition-all duration-300 ease'>
+                    <div className='pt-10 text-2xl'>
                         <h3 className='text-xl'> Courses</h3>
                         <p>{!loading?(<>{courses.length}</>):<Loader/>}<img className='w-7 inline m-2' src={courseImg} alt="stuImg" /></p>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#6366F1" fill-opacity="1" d="M0,192L80,170.7C160,149,320,107,480,122.7C640,139,800,213,960,240C1120,267,1280,245,1360,234.7L1440,224L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path></svg>
                     </div>
                     </a>
 
