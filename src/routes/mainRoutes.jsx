@@ -11,6 +11,14 @@ import TeacherCourses from '@/component/TeacherProfile/TeacherCourses'
 import AccountSettings from '@/component/TeacherProfile/settingsPage/AccountSettings'
 import TeacherCourseDetails from '@/component/TeacherProfile/TeacherCourseDetails'
 import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
+import AdminProfile from '@/component/AdminProfile/AdminProfile'
+import AddTeacher from '@/component/AdminProfile/AddTeacher'
+import AddGategory from '@/component/AdminProfile/AddGategory'
+import AddCourse from '@/component/AdminProfile/AddCourse'
+import Students from '@/component/AdminProfile/Students'
+import Lessons from '@/component/AdminProfile/Lessons'
+import AdminDashboard from '@/component/AdminDashboard/AdminDashboard'
+
 
 const isAuth = true // Replace with actual authentication logic
 
@@ -73,6 +81,48 @@ const routesConfig = [
     {
         path: 'teacher/settings',
         element: <AccountSettings />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'admin/profile',
+        element: <AdminProfile />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'admin/addteacher',
+        element: <AddTeacher />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'admin/addgategory',
+        element: <AddGategory/>,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'admin/addcourse',
+        element: <AddCourse/>,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'admin/students',
+        element: <Students/>,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'admin/lessons',
+        element: <Lessons/>,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'admin/dashboard',
+        element: <AdminDashboard/>,
         isProtected: false,
         accessRole: 'all',
     },
