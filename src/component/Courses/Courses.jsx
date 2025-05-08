@@ -167,8 +167,8 @@ function Courses() {
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-gray-500 text-xs lg:text-sm truncate max-w-[60%]">{course.title}</span>
                     {course.level && (
-                      <span className="bg-red-400 text-white py-0.5 px-2 rounded-xl text-xs">
-                        {course.level}
+                      <span className="bg-red-400 text-white py-1 px-2 rounded-xl text-xs">
+                        {course.level} Level
                       </span>
                     )}
                   </div>
