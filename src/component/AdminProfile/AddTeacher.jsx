@@ -17,9 +17,25 @@ function AddTeacher() {
     const [imagePreview, setImagePreview]= useState(img)
     const [addedTeacher, setAddedTeacher]= useState([])
     const {teachers,loading}= useSelector((state)=>state.allTeachers)
+    let [searchItem, setSearchItem]=useState('')
+    const [searchType, setSearchType] = useState('name');
+    
+    const filteredstudent = teachers && teachers.length > 0
+      ? teachers.filter ((item)=>{
+        const value = searchItem.toLowerCase()
+        if(searchType === 'name'){
+            return item.name?.toLowerCase().includes(value);
+        }else if (searchType === 'id'){
+            return item.id?.toString().includes(value);
+        }else if (searchType === 'email'){
+            return item.email?.toLowerCase().includes(value);
+        }
+        return false
+      }):[];
+
 
     async function handleRemoveTeacher(id) {
-        axios.delete(`https://e-learn-v1.runasp.net/api/Teacher/Teacher/Delete/${id}`)
+        axios.delete(`https://e-learn-v1.runasp.net/api/Teacher/Teacher/Delete?id=${id}`)
         .then((response)=>{
             console.log(response);
             console.log("Teacher deleted");
@@ -36,9 +52,7 @@ function AddTeacher() {
     async function handleAddTeacher(formsData){
         console.log('Added',formsData);
         
-        axios.post('https://e-learn-v1.runasp.net/api/Teacher/Teacher/Create', {},
-            {params:formsData
-            }
+        axios.post('https://e-learn-v1.runasp.net/api/Teacher/Teacher/Create', formsData
         ).then((response)=>{
             console.log(response);
             setAddedTeacher(response.data.data)
@@ -102,7 +116,6 @@ function AddTeacher() {
                     <label htmlFor="specialization">Specialization <span className='text-red-500'>*</span></label>
                     <select 
                         name="specialization" 
-                        required 
                         value={formik.values.specialization} 
                         onChange={formik.handleChange} 
                         onBlur={formik.handleBlur}
@@ -151,6 +164,63 @@ function AddTeacher() {
 
             <div className='p-2'>
                 <h1 className='font-medium text-2xl'><img src={teaImg} alt="stuImg" className='w-7 inline m-2' />Our Teachers</h1>
+
+                {/* /////////Search Section/////////////////////// */}
+
+
+                <div className=" p-4 ">
+                                <input className='border-1 rounded-3xl border-gray-200 p-2 hover:shadow-lg hover:shadow-gray-400 w-[50%] transition-all duration-300 ease ms-3'
+                                type="text" placeholder={`Search teachers by ${searchType}`} onChange={(e)=>setSearchItem(e.target.value)}/>
+                                <select
+                                    className="p-1"
+                                    value={searchType}
+                                    onChange={(e) => setSearchType(e.target.value)}
+                                >
+                                    <option value="name">Name</option>
+                                    <option value="id">ID</option>
+                                    <option value="email">Email</option>
+                                </select>
+                            </div>
+
+                            {searchItem && (
+                        <div className="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 gap-5 p-5 text-center mx-auto hover:cursor-pointer transition-all duration-300 ease">
+                            {!loading ? (
+                            <>
+                                <h1 className=" text-2xl col-span-full">
+                                <i className="fa-solid fa-magnifying-glass px-2 text-red-500 text-lg"></i>
+                                Search Results
+                                </h1>
+
+                                {filteredstudent.length > 0 ? (
+                                filteredstudent.map((teacher, index) => (
+                                    <div key={teacher.id} className="relative shadow rounded p-2 bg-white hover:shadow-xl hover:shadow-violet-200 ">
+                                        <img src={teacher.imagePath ||teacherImg} alt={teacher.name} className="w-full h-48 object-fill rounded " />
+                                        <h2 className="text-lg font-semibold mt-2">teacher Name : {teacher.name}</h2>
+                                        <p className="text-lg text-red-500 font-semibold mt-2">Id : {teacher.id}</p>
+                                    
+                                        <p className="text-gray-500 hover:text-blue-500 hover:underline transition-all duration-300 ease">
+                                            <a href={`mailto:${teacher.email}`} 
+                                            target='_blank' rel="noreferrer">{teacher.email}</a>
+                                        </p>
+                                        
+                                        <div className='text-red-500 absolute top-5 right-7 bg-white rounded-full p-2 hover:cursor-pointer hover:shadow-2xl hover:shadow-gray-500'>
+                                            <button  onClick={()=>{handleRemoveTeacher(teacher.id)}}>
+                                                <i className="fa-solid fa-lock hover:cursor-pointer"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                        ))
+                                        ) : (
+                                        <p className="text-gray-500 text-center col-span-full">No matching Teachers found.</p>
+                                        )}
+                                    </>
+                                    ) : (
+                                    <p className="text-center col-span-full text-gray-500">Loading Teachers...</p>
+                                    )}
+                                </div>
+                                )}
+                {/* /////////Search Section/////////////////////// */}
+
                     <div className='grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 gap-5 p-5 text-center mx-auto hover:cursor-pointer transition-all duration-300 ease'>
                         {!loading?
                         (<>
@@ -168,7 +238,7 @@ function AddTeacher() {
                                     
                                     <div className='text-red-500 absolute top-5 right-7 bg-white rounded-full p-2 hover:cursor-pointer hover:shadow-2xl hover:shadow-gray-500'>
                                         <button  onClick={()=>{handleRemoveTeacher(teacher.id)}}>
-                                            <i className="fa-solid fa-trash-can hover:cursor-pointer"></i>
+                                            <i className="fa-solid fa-lock hover:cursor-pointer"></i>
                                         </button>
                                     </div>
                                 </div>

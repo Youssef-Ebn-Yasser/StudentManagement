@@ -23,11 +23,9 @@ function AddCourse() {
     async function handleAddCourse(formsData){
         console.log('Added',formsData);
         
-        axios.post('https://e-learn-v1.runasp.net/api/Teacher/Teacher/Create', {},
-            {params:formsData
-            }
-        ).then((response)=>{
-            console.log(response);
+        axios.post('https://e-learn-v1.runasp.net/api/Teacher/Teacher/Create', formsData)
+            .then((response)=>{
+            console.log(response.data);
             alert("Course added successfully!");
             toast.success('Course Added')
             dispatch(allCourses());
@@ -58,13 +56,14 @@ function AddCourse() {
 
     let formik = useFormik({
         initialValues:{
-            title:'',
-            description:'',
-            price:'',
-            teacherId:'',
-            categoryId:'',
-            level:'',
-            image:null
+            Title:'',
+            Description:'',
+            Price:'',
+            TeacherId:'',
+            CategoryId:'',
+            Level:'',
+            Hours:'',
+            Image:null
         },
         onSubmit:handleAddCourse
     })
@@ -78,60 +77,67 @@ function AddCourse() {
             <h2 className='font-medium text-2xl p-2'><img src={addImg} alt="stuImg" className='w-7 inline m-2' />Add Course</h2>
             <form className='mx-auto p-2 w-[50%]' onSubmit={formik.handleSubmit}>
                 <div>
-                    <label htmlFor="title" className='block'>Course Title <span className='text-red-500'>*</span></label>
-                    <input type="text" name="title" id="title" value={formik.values.title} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                    <label htmlFor="Title" className='block'>Course Title <span className='text-red-500'>*</span></label>
+                    <input type="text" name="Title" id="Title" value={formik.values.Title} onChange={formik.handleChange} onBlur={formik.handleBlur}
                     placeholder='Enter Course Title'
                     className="block border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
                 </div>
                 <div>
-                    <label htmlFor="description">Course Description </label>
-                    <input type="text" name="description" id="description" value={formik.values.description} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                    <label htmlFor="Description">Course Description </label>
+                    <input type="text" name="Description" id="Description" value={formik.values.Description} onChange={formik.handleChange} onBlur={formik.handleBlur}
                     placeholder='Enter Course Description'
                     className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
                 </div>
                 <div>
-                    <label htmlFor="price">Course Price <span className='text-red-500'>*</span></label>
-                    <input type="number" name="price" id="price" value={formik.values.price} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                    <label htmlFor="Price">Course Price <span className='text-red-500'>*</span></label>
+                    <input type="number" name="Price" id="Price" value={formik.values.Price} onChange={formik.handleChange} onBlur={formik.handleBlur}
                     placeholder='Enter Course Price'
                     className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
                 </div>
                 <div>
-                    <label htmlFor="teacherId">TeacherId <span className='text-red-500'>*</span></label>
-                    <input type="text" name="teacherId" id="teacherId" value={formik.values.teacherId} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                    <label htmlFor="Hours">Course Hours <span className='text-red-500'>*</span></label>
+                    <input type="number" name="Hours" id="Hours" value={formik.values.Hours} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                    placeholder='Enter Course Hours'
+                    className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
+                </div>
+                <div>
+                    <label htmlFor="TeacherId">TeacherId <span className='text-red-500'>*</span></label>
+                    <input type="text" name="TeacherId" id="TeacherId" value={formik.values.TeacherId} onChange={formik.handleChange} onBlur={formik.handleBlur}
                     placeholder='Enter TeacherId'
                     className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
                 </div>
                 <div>
-                    <label htmlFor="categoryId">CategoryId <span className='text-red-500'>*</span></label>
-                    <input type="text" name="categoryId" id="categoryId" value={formik.values.categoryId} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                    <label htmlFor="CategoryId">CategoryId <span className='text-red-500'>*</span></label>
+                    <input type="text" name="CategoryId" id="CategoryId" value={formik.values.CategoryId} onChange={formik.handleChange} onBlur={formik.handleBlur}
                     placeholder='Enter CategoryId'
                     className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
                 </div>
                 <div>
-                    <label htmlFor="level">Level</label>
+                    <label htmlFor="Level">Level</label>
                     <select 
-                        name="level" 
+                        id='Level'
+                        name="Level" 
                         required 
-                        value={formik.values.level} 
+                        value={formik.values.Level} 
                         onChange={formik.handleChange} 
                         onBlur={formik.handleBlur}
                         className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease">
-                        <option value="">Select level</option>
+                        <option value="">Select Level</option>
                         <option value="beginner">Beginner</option>
                         <option value="intermediate">Intermediate</option>
                         <option value="advanced">Advanced</option>
                     </select>
                 </div>
                 <div>
-                    <label htmlFor="image">Image</label>
-                    <input type="file" name="image" id="image" accept='image/*' onBlur={formik.handleBlur}
+                    <label htmlFor="Image">Image</label>
+                    <input type="file" name="Image" id="Image" accept='Image/*' onBlur={formik.handleBlur}
                     onChange={(e)=>{
                         const file=e.currentTarget.files[0];
                         if(file){
-                            formik.setFieldValue('image',file)
+                            formik.setFieldValue('Image',file)
                             setImagePreview(URL.createObjectURL(file))
                         }else{
-                            formik.setFieldValue('image',null)
+                            formik.setFieldValue('Image',null)
                             setImagePreview(img)
                         }
                     }}
@@ -163,7 +169,7 @@ function AddCourse() {
                                     <p className="text-violet-600 font-bold mt-1">{course.price} USD</p>
                                     <div className='text-red-500 absolute top-5 right-7 bg-white rounded-full p-2 hover:cursor-pointer hover:shadow-2xl hover:shadow-gray-500'>
                                         <button  onClick={()=>{handleRemoveCourse(course.id)}}>
-                                            <i className="fa-solid fa-trash-can hover:cursor-pointer"></i>
+                                            <i className="fa-solid fa-lock hover:cursor-pointer"></i>
                                         </button>
                                     </div>
                                 </div>

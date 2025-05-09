@@ -38,22 +38,33 @@ function AdminDashboard() {
         <div className='grid grid-cols-1 gap-2 p-5'>
         <h1 className='text-3xl font-medium text-black text-center italic'>Admin Dashboard</h1>
             <main className='hover:shadow-2xl transition-all duration-300 ease rounded-2xl shadow p-3 mb-3'>
-                <h2 className='text-2xl font-medium text-black text-center pb-3  '>OverView</h2>
+                <h2 className='text-2xl font-medium text-black text-center pb-3 '>OverView</h2>
                 <div className='grid lg:grid-cols-3 md-grid-cols-1 sm:grid-cols-1 gap-3 text-center'>
-                    <a href="#students"><div className='shadow shadow-gray-500 rounded-2xl p-2 cursor-pointer hover:shadow-violet-300 transition-all duration-300 ease'>
-                        <h3 className='text-xl'> Students</h3>
-                        <p>{!loading?(<>{students.length}</>):<Loader/>}<img className='w-7 inline m-2' src={stuImg} alt="stuImg" /></p>
+                    <a href="#students"><div className='shadow-lg rounded-2xl overflow-hidden cursor-pointer hover:shadow-violet-300 transition-all duration-300 ease'>
+                        <div className='pt-10'>
+                            <h3 className='text-xl'> Students</h3>
+                            <p>{!loading?(<>{students.length}</>):<Loader/>}<img className='w-7 inline mx-2' src={stuImg} alt="stuImg" /></p>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#6366F1" fill-opacity="1" d="M0,224L40,229.3C80,235,160,245,240,229.3C320,213,400,171,480,149.3C560,128,640,128,720,144C800,160,880,192,960,208C1040,224,1120,224,1200,224C1280,224,1360,224,1400,224L1440,224L1440,320L1400,320C1360,320,1280,320,1200,320C1120,320,1040,320,960,320C880,320,800,320,720,320C640,320,560,320,480,320C400,320,320,320,240,320C160,320,80,320,40,320L0,320Z"></path></svg>
                     </div>
                     </a>
-                    <a href="#teachers"><div className='shadow shadow-gray-500 rounded-2xl p-2 cursor-pointer hover:shadow-violet-300 transition-all duration-300 ease'>
-                        <h3 className='text-xl'> Teachers</h3>
-                        <p>{!loading?(<>{teachers.length}</>):<Loader/>}<img className='w-7 inline m-2' src={teaImg} alt="stuImg" /></p>
+                    <a href="#teachers"><div className='shadow-lg rounded-2xl overflow-hidden cursor-pointer hover:shadow-violet-300 transition-all duration-300 ease'>
+                        <div className='pt-10'>
+                            <h3 className='text-xl'> Teachers</h3>
+                            <p>{!loading?(<>{teachers.length}</>):<Loader/>}<img className='w-7 inline mx-2' src={teaImg} alt="stuImg" /></p>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#6366F1" fill-opacity="1" d="M0,224L40,229.3C80,235,160,245,240,229.3C320,213,400,171,480,149.3C560,128,640,128,720,144C800,160,880,192,960,208C1040,224,1120,224,1200,224C1280,224,1360,224,1400,224L1440,224L1440,320L1400,320C1360,320,1280,320,1200,320C1120,320,1040,320,960,320C880,320,800,320,720,320C640,320,560,320,480,320C400,320,320,320,240,320C160,320,80,320,40,320L0,320Z"></path></svg>
+
                     </div>
                     </a>
                     
-                    <a href="#courses"><div className='shadow shadow-gray-500 rounded-2xl p-2 cursor-pointer hover:shadow-violet-300 transition-all duration-300 ease'>
-                        <h3 className='text-xl'> Courses</h3>
-                        <p>{!loading?(<>{courses.length}</>):<Loader/>}<img className='w-7 inline m-2' src={courseImg} alt="stuImg" /></p>
+                    <a href="#courses"><div className='shadow-lg rounded-2xl overflow-hidden cursor-pointer hover:shadow-violet-300 transition-all duration-300 ease'>
+                        <div className='pt-10'>
+                            <h3 className='text-xl'> Courses</h3>
+                            <p>{!loading?(<>{courses.length}</>):<Loader/>}<img className='w-7 inline mx-2' src={courseImg} alt="stuImg" /></p>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#6366F1" fill-opacity="1" d="M0,224L40,229.3C80,235,160,245,240,229.3C320,213,400,171,480,149.3C560,128,640,128,720,144C800,160,880,192,960,208C1040,224,1120,224,1200,224C1280,224,1360,224,1400,224L1440,224L1440,320L1400,320C1360,320,1280,320,1200,320C1120,320,1040,320,960,320C880,320,800,320,720,320C640,320,560,320,480,320C400,320,320,320,240,320C160,320,80,320,40,320L0,320Z"></path></svg>
+
                     </div>
                     </a>
 

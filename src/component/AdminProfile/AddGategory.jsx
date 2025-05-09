@@ -15,7 +15,7 @@ function AddGategory() {
     let {gategory, loading}= useSelector((state)=>state.allGategory)
 
     async function handleRemoveGategory(id) {
-        axios.delete(`https://e-learn-v1.runasp.net/api/Category/ Delete${id}`)
+        axios.delete(`https://e-learn-v1.runasp.net/api/Category/Delete${id}`)
         .then((response)=>{
             console.log("Lesson deleted");
             console.log("Clicked delete for ID:", lessons.id);
@@ -91,13 +91,13 @@ function AddGategory() {
                                                                    
                                     <div className='text-black-500 hover:text-red-500 absolute bottom-2 right-7 bg-gray-300 rounded-full px-3 py-2 hover:cursor-pointer hover:shadow-2xl hover:shadow-gray-500'>
                                         <button  onClick={()=>{handleRemoveGategory(gategory.id)}}>
-                                            <i className="fa-solid fa-trash-can hover:cursor-pointer"></i>
+                                            <i className="fa-solid fa-lock hover:cursor-pointer"></i>
                                         </button>
                                     </div>
                                 </div>
                                 ))
                             ) : (   
-                                <p className='text-red-600'>No lessons available.</p>
+                                <p className='text-red-600'>No Gategory available.</p>
                             )}</>
                         ):<Loader/>}
                           

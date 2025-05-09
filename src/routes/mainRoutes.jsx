@@ -21,7 +21,6 @@ import AddTeacher from '@/component/AdminProfile/AddTeacher'
 import AddGategory from '@/component/AdminProfile/AddGategory'
 import AddCourse from '@/component/AdminProfile/AddCourse'
 import Students from '@/component/AdminProfile/Students'
-import Lessons from '@/component/AdminProfile/Lessons'
 import AdminDashboard from '@/component/AdminDashboard/AdminDashboard'
 
 const isAuth = true // Replace with actual authentication logic
@@ -145,12 +144,6 @@ const routesConfig = [
     {
         path: 'admin/students',
         element: <Students/>,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'admin/lessons',
-        element: <Lessons/>,
         isProtected: false,
         accessRole: 'all',
     },
