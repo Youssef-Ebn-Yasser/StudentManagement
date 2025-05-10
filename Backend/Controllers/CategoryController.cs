@@ -36,14 +36,14 @@ public class CategoryController : ControllerBase
     }
 
     [HttpDelete(" Delete {id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete([FromBody] int id)
     {
         var result = await _categoryService.DeleteAsync(id);
         return Ok(result);
     }
 
     [HttpPost("Create")]
-    public async Task<IActionResult> Create(CreateCategoryDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateCategoryDto dto)
     {
         var result = await _categoryService.CreateAsync(dto);
         return Ok(result);

@@ -55,9 +55,16 @@ public class CourseController : AppControllerBase
     }
 
     [HttpDelete("Course/Delete/{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete([FromQuery]int id)
     {
         var result = await _courseService.DeleteAsync(id);
+        return NewResult(result);
+    }
+
+    [HttpGet("Course/GetCourseInfoByCategory")]
+    public async Task<IActionResult> GetCourseInfoByCategory(string category)
+    {
+        var result = await _courseService.GetCourseInfoByCategoryAsync(category);
         return NewResult(result);
     }
 }

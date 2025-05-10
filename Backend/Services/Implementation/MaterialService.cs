@@ -17,7 +17,7 @@ namespace Backend.Services.Implementation
         {
             var materials = await _unitOfWork.Repository<Material>()
                 .GetTableNoTracking()
-                .Where(m => m.LessonId == lessonId)
+                .Where(m => m.LessonId == lessonId && m.IsDeleted == false)
                 .ToListAsync();
 
             var mappedMaterials = _mapper.Map<List<ShowMaterialDto>>(materials);

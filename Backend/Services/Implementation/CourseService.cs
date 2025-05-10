@@ -40,7 +40,7 @@ public class CourseService : ResponseHandler, ICourseService
         var courses = await _unitOfWork.Repository<Course>()
                                                       .GetTableNoTracking()
                                                       .Include(c => c.Category)
-                                                      .Where(c => c.Category!.CategoryName == categoryName)
+                                                      .Where(c => c.Category!.CategoryName == categoryName && c.IsDeleted == false)
                                                       .Select(c => new HomeCourses
                                                       {
                                                           Id = c.Id,
@@ -60,6 +60,7 @@ public class CourseService : ResponseHandler, ICourseService
     {
         var course = await _unitOfWork.Repository<Course>()
             .GetTableNoTracking()
+            .Where(c => c.IsDeleted == false)
             .Include(c => c.Category)
             .Include(c => c.Teacher)
             .Include(c => c.lessons)
@@ -78,7 +79,7 @@ public class CourseService : ResponseHandler, ICourseService
 
     private IQueryable<Course> GetCourseQuerable()
     {
-        var result = _unitOfWork.Repository<Course>().GetTableNoTracking();
+        var result = _unitOfWork.Repository<Course>().GetTableNoTracking().Where(c => c.IsDeleted == false);
 
         return result;
     }
@@ -195,5 +196,24 @@ public class CourseService : ResponseHandler, ICourseService
 
         return Success("Course deleted successfully");
     }
+    public async Task<Response<List<ShowCourseInfoByCategoryDto>>> GetCourseInfoByCategoryAsync(string category)
+    {
+        var courses = await _unitOfWork.Repository<Course>()
+            .GetTableNoTracking()
+            .Where(c => c.Category!.CategoryName == category && c.IsDeleted == false)
+            .Select(c => new ShowCourseInfoByCategoryDto
+            {
+                Description = c.Description,
+                Price = c.Price,
+                CreatedAt = c.CreatedAt,
+                ImagePath = c.ImagePath,
+                Level = c.Level,
+                Hours = c.Hours
+            })
+            .ToListAsync();
+        return Success(courses);
+    }
+
+
     #endregion
 }
