@@ -1,3 +1,4 @@
+using Backend.ChatHubs;
 using Backend.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Stripe;
@@ -7,36 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Student Management API", Version = "v1" });
-
-    // Add Bearer token authentication
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Enter 'Bearer' [space] and then your token in the text input below.\n\nExample: 'Bearer abc123'"
-    });
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
-        }
-    });
-});
+builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
@@ -102,6 +75,9 @@ app.UseCors(CORS);
 app.UseAuthentication();
 app.UseAuthorization();
 
+
+
 app.MapControllers();
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();

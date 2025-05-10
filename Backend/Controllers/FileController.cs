@@ -14,7 +14,7 @@ public class FileController : ControllerBase
 
     //Endpoint 1: Upload file
     [HttpPost("upload/file")]
-    public async Task<IActionResult> UploadFile(IFormFile file)
+    public async Task<IActionResult> UploadFile([FromBody] IFormFile file)
     {
         if (file == null || file.Length == 0)
             return BadRequest("No file uploaded");
