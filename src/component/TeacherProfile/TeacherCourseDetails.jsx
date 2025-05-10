@@ -129,7 +129,7 @@ const TeacherCourseDetails = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="scale-[2.5]">
-          <Loader />
+        <Loader />
         </div>
       </div>
     );
@@ -206,8 +206,8 @@ const TeacherCourseDetails = () => {
                       </>
                     ) : (
                       <>
-                        <FaTrash className="inline-block mr-2" />
-                        Delete Course
+                    <FaTrash className="inline-block mr-2" />
+                    Delete Course
                       </>
                     )}
                   </button>
@@ -306,36 +306,36 @@ const TeacherCourseDetails = () => {
               <div className="space-y-4">
                 {course.lessons && course.lessons.length > 0 ? (
                   course.lessons.map((lesson) => (
-                    <div key={lesson.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <h3 className="font-semibold">{lesson.title}</h3>
-                          <p className="text-gray-600">{lesson.description}</p>
-                          <div className="flex items-center mt-2">
-                            <FaClock className="text-gray-400 mr-2" />
+                  <div key={lesson.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h3 className="font-semibold">{lesson.title}</h3>
+                        <p className="text-gray-600">{lesson.description}</p>
+                        <div className="flex items-center mt-2">
+                          <FaClock className="text-gray-400 mr-2" />
                             <span className="text-sm text-gray-500">
                               {lesson.duration || 0} minutes
                             </span>
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => navigate(`/teacher/course/${course.id}/lesson/${lesson.id}/edit`)}
-                            className="text-blue-500 hover:text-blue-600"
-                            title="Edit Lesson"
-                          >
-                            <FaEdit />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteLesson(lesson.id)}
-                            className="text-red-500 hover:text-red-600"
-                            title="Delete Lesson"
-                          >
-                            <FaTrash />
-                          </button>
                         </div>
                       </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => navigate(`/teacher/course/${course.id}/lesson/${lesson.id}/edit`)}
+                          className="text-blue-500 hover:text-blue-600"
+                            title="Edit Lesson"
+                        >
+                          <FaEdit />
+                        </button>
+                        <button
+                            onClick={() => handleDeleteLesson(lesson.id)}
+                          className="text-red-500 hover:text-red-600"
+                            title="Delete Lesson"
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
                     </div>
+                  </div>
                   ))
                 ) : (
                   <div className="text-center py-8">

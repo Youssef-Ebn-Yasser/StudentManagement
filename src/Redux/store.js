@@ -9,6 +9,7 @@ import allCoursesReducer from './features/allCourses/allCourses'
 import allLessonsReducer from './features/allLessons/allLessons'
 import allGategoryReducer from './features/allGategory/allGategory'
 import authSlice from './auth/authSlice';
+import teacherStatsReducer from './features/teacherStats/teacherStats';
 
 let store = configureStore({
     reducer: {
@@ -24,7 +25,8 @@ let store = configureStore({
         allTeachers:allTeacherReducer,
         allCourses:allCoursesReducer,
         allLessons:allLessonsReducer,
-        allGategory:allGategoryReducer
+        allGategory:allGategoryReducer,
+        teacherStats: teacherStatsReducer,
     },
 })
 export default store

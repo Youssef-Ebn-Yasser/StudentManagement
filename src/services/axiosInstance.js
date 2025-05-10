@@ -33,13 +33,13 @@ axiosInstance.interceptors.request.use(
 // Add a response interceptor to handle errors
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error) => {
+    (error) => {
     if (error.message === 'Network Error') {
       console.error('Network Error:', error);
       // You can add custom handling for network errors here
-    }
+        }
     return Promise.reject(error);
-  }
+    }
 );
 
 export default axiosInstance

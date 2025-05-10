@@ -93,7 +93,7 @@ const TeacherCourses = ({ teacherId, setActiveTab }) => {
       <div className="w-full min-h-screen bg-white p-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">My Courses</h1>
-          <button
+          <button 
             onClick={() => setActiveTab('create-course')}
             className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200"
           >
@@ -167,22 +167,22 @@ const TeacherCourses = ({ teacherId, setActiveTab }) => {
                     {course?.description || 'No description available'}
                   </p>
                   <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center">
+                      <div className="flex items-center">
                       <FaStar className="text-yellow-400 mr-1" />
                       <span className="text-gray-700">{course?.rating || 0}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <FaUsers className="text-gray-400 mr-1" />
+                      </div>
+                      <div className="flex items-center">
+                        <FaUsers className="text-gray-400 mr-1" />
                       <span className="text-gray-700">{course?.students || 0} students</span>
                     </div>
                   </div>
                   <div className="mt-auto">
-                    <button
+                  <button 
                       onClick={() => navigate(`/teacher/course/${course.id}`)}
                       className="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200"
-                    >
-                      View Details
-                    </button>
+                  >
+                    View Details
+                  </button>
                   </div>
                 </div>
               </div>
