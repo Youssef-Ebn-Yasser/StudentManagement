@@ -300,63 +300,59 @@ export const courseService = {
     }
   },
 
-  // Upload material for a lesson
-  uploadLessonMaterial: async (lessonId, materialData) => {
+  uploadLessonMaterial: async (materialData) => {
     try {
+      // Validate required fields
+      if (!materialData.title?.trim()) throw new Error('Title is required');
+      if (!materialData.content?.trim()) throw new Error('Content is required');
+      if (!materialData.lessonId) throw new Error('LessonId is required');
+      if (!materialData.file) throw new Error('File is required');
+      if (materialData.content.trim().length > 500) throw new Error('Content cannot exceed 500 characters');
+
+      // Create FormData object
       const formData = new FormData();
-      
-      // Add the file directly
-      formData.append('Data', materialData.Data);
-      
-      // Add other material properties
-      formData.append('Title', materialData.Title);
-      formData.append('Content', materialData.Content || '');
-      formData.append('LessonId', lessonId);
-      formData.append('Type', materialData.Type);
+      formData.append('Title', materialData.title.trim());
+      formData.append('Content', materialData.content.trim());
+      formData.append('LessonId', materialData.lessonId);
+      formData.append('File', materialData.file, materialData.file.name);
+      formData.append('Type', materialData.isAssignment ? 2 : 1);
 
-      console.log('Uploading material with data:', {
-        Title: materialData.Title,
-        Content: materialData.Content,
-        LessonId: lessonId,
-        Type: materialData.Type,
-        fileName: materialData.Data.name,
-        fileType: materialData.Data.type
+      console.log('Sending request with FormData:', {
+        Title: materialData.title.trim(),
+        Content: materialData.content.trim(),
+        LessonId: materialData.lessonId,
+        Type: materialData.isAssignment ? 2 : 1,
+        hasFile: !!materialData.file,
+        fileName: materialData.file.name,
+        fileType: materialData.file.type
       });
 
-      const response = await axiosInstance.post('/api/Material/CreateMaterial/CreateMaterial', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
+      const { data } = await axiosInstance.post(
+        '/api/Material/CreateMaterial/CreateMaterial',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data; boundary=' + formData._boundary
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            console.log(`Upload progress: ${percentCompleted}%`);
+          }
         }
-      });
+      );
 
-      console.log('Upload response:', response);
-      return response.data;
-    } catch (error) {
-      console.error('Error uploading material:', error);
-      
-      if (error.response) {
-        console.error('Error response:', error.response);
-        console.error('Error data:', error.response.data);
-        
-        switch (error.response.status) {
-          case 415:
-            throw new Error('Invalid file format. Please make sure you are uploading a supported file type (PDF, DOC, DOCX, TXT, or video).');
-          case 400:
-            throw new Error(`Invalid data: ${error.response.data?.message || 'Please check that all required fields are filled correctly.'}`);
-          case 401:
-            throw new Error('You are not authorized to upload materials. Please log in again.');
-          case 404:
-            throw new Error('Lesson not found. Please select a valid lesson.');
-          case 413:
-            throw new Error('File is too large. Please upload a smaller file.');
-          default:
-            throw new Error(`Upload failed: ${error.response.data?.message || 'Unknown error occurred'}`);
-        }
-      } else if (error.request) {
-        throw new Error('No response from server. Please check your internet connection.');
+      return data;
+    } catch (err) {
+      if (err.response) {
+        console.error('Upload failed:',
+          '\nStatus:', err.response.status,
+          '\nMessage:', err.response.data?.message || 'Unknown error',
+          '\nValidation Errors:', err.response.data?.errors || 'No validation errors'
+        );
       } else {
-        throw new Error(`Upload failed: ${error.message}`);
+        console.error('Upload failed:', err.message);
       }
+      throw err;
     }
   },
 
