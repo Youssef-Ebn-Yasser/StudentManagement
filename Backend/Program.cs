@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using Microsoft.Azure.CognitiveServices.Vision.Face;
+using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR();

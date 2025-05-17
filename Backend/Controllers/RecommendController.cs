@@ -16,10 +16,10 @@ namespace Backend.Controllers
         };
 
         [HttpGet("{userId}")]
-        public ActionResult<Course[]> Get(int userId)
+        public ActionResult<Course[]> Get()
         {
             var userPref = "Programming";  // Hard-coded for now
-            var recs = Courses.Where(c => c.Title == userPref).ToArray();
+            var recs = Courses.Where(c => c.Description == userPref).ToArray();
             return Ok(recs);
         }
     }

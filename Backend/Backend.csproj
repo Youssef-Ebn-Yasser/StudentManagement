@@ -10,9 +10,9 @@
 
   <ItemGroup>
 
-    <PackageReference Include="Emgu.CV" Version="4.10.0.5680" />
+    <PackageReference Include="Azure.Identity" Version="1.7.0" />
 
-    <PackageReference Include="MailKit" Version="4.11.0" />
+    <PackageReference Include="Emgu.CV" Version="4.10.0.5680" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
@@ -21,7 +21,7 @@
 
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="9.0.4" />
 
-    <PackageReference Include="Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="7.0.1" />
 
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
