@@ -24,10 +24,10 @@ export default function StudentProfile() {
         setLoading(true);
         
         // Fetch student details
-        const studentResponse = await axios.get(`https://e-learn-v1.runasp.net/api/Student/GetById/GetById/55`);
+        const studentResponse = await axios.get(`https://e-learn-v1.runasp.net/api/Student/GetById/GetById/85`);
         
         // Fetch enrolled courses
-        const coursesResponse = await axios.get(`https://e-learn-v1.runasp.net/api/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses?studentId=55`);
+        const coursesResponse = await axios.get(`https://e-learn-v1.runasp.net/api/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses?studentId=85`);
 
         if (studentResponse.data.succeeded && coursesResponse.data.succeeded) {
           setStudentData({
