@@ -12,6 +12,7 @@ import AddMaterial from "./AddMaterial";
 import AccountSettings from "./settingsPage/AccountSettings";
 import { courseService } from '../../services/courseService';
 import Loader from '../Loader/Loader';
+import TeacherDashboard from '../TeacherDashboard/TeacherDashboard';
 
 function TeacherProfile() {
   const [activeTab, setActiveTab] = useState('profile');
@@ -23,7 +24,7 @@ function TeacherProfile() {
     const fetchTeacherData = async () => {
       try {
         setIsLoading(true);
-        const response = await courseService.getTeacherStats(5);
+        const response = await courseService.getTeacherStats(20);
         setTeacherData(response.data);
       } catch (error) {
         setError(error.message || 'Failed to load teacher data');
@@ -67,6 +68,8 @@ function TeacherProfile() {
 
   const renderContent = () => {
     switch (activeTab) {
+      case 'dashboard':
+        return <TeacherDashboard />;
       case 'profile':
         return (
           <>
@@ -102,15 +105,15 @@ function TeacherProfile() {
           </>
         );
       case 'courses':
-        return <TeacherCourses teacherId={5} setActiveTab={setActiveTab} />;
+        return <TeacherCourses teacherId={20} setActiveTab={setActiveTab} />;
       case 'create-course':
-        return <CreateCourse teacherId={5} />;
+        return <CreateCourse teacherId={20} />;
       case 'lessons':
-        return <AddLesson teacherId={5} />;
+        return <AddLesson teacherId={20} />;
       case 'materials':
-        return <AddMaterial teacherId={5} />;
+        return <AddMaterial teacherId={20} />;
       case 'settings':
-        return <AccountSettings teacherData={{...teacherData, id: 5}} onUpdate={handleProfileUpdate} />;
+        return <AccountSettings teacherData={{...teacherData, id: 20}} onUpdate={handleProfileUpdate} />;
       default:
         return null;
     }

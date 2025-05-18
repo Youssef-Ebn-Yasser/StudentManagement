@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { logout } from '../../redux/auth/authSlice';
+=======
+import { logout } from '../../Redux/auth/authSlice';
+>>>>>>> bd29697d762f5c0fbf91703556485a55bb4b28ca
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
