@@ -13,9 +13,6 @@ public class CourseConstraints : IEntityTypeConfiguration<Course>
                .IsRequired()
                .HasMaxLength(10);
 
-        builder.Property(c => c.IsDeleted)
-                .IsRequired();
-
         builder.Property(c => c.CreatedAt)
                .IsRequired();
 
