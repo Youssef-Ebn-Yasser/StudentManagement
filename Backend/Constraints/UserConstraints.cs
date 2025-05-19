@@ -17,12 +17,13 @@ public class UserConstraints : IEntityTypeConfiguration<User>
                .IsRequired()
                .HasMaxLength(50);
 
-
-        builder.Property(u => u.Password)
-               .IsRequired();
-
         builder.Property(t => t.IsDeleted)
                .HasDefaultValue(false);
+
+        builder.Property(t => t.CreatedAt)
+               .HasDefaultValueSql("GETDATE()");
+
+        
 
     }
 }
