@@ -28,7 +28,7 @@ public class CategoryController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPut(" Update {id}")]
+    [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoryDto dto)
     {
         var result = await _categoryService.UpdateAsync(id, dto);
