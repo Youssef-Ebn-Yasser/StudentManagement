@@ -6,6 +6,19 @@ namespace Backend.Constraints
         public void Configure(EntityTypeBuilder<Student> builder)
         {
 
+            builder.Property(s=> s.PhoneNumber)
+                   .HasMaxLength(11)
+                   .IsRequired();
+
+            builder.Property(s => s.GithubLink)
+                     .IsRequired(false);
+
+            builder.Property(s => s.LinkedInLink)
+                        .IsRequired(false);
+
+            builder.Property(s => s.TelegramLink)
+                        .IsRequired(false);
+
             builder.HasMany(s => s.StudentCourses)
                    .WithOne(sc => sc.Student)
                    .HasForeignKey(sc => sc.StudentId)

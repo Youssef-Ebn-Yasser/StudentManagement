@@ -2,8 +2,9 @@
 {
     public class UpdateCategoryDto
     {
+        [Required]
         public string Name { get; set; }
 
-        public bool IsDeleted { get; set; }
+        public bool IsDeleted { get; set; } = false;
     }
 }
