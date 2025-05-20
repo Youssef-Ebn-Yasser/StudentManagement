@@ -7,16 +7,18 @@ namespace Backend.Constraints
         {
 
             builder.Property(t => t.Age)
-                   .IsRequired()
                    .HasAnnotation("MinimumAge", 20);
 
             builder.Property(t => t.AdditionalInfo)
                    .HasMaxLength(500);
 
-
             builder.Property(t => t.Specialization)
                    .IsRequired()
                    .HasMaxLength(100);
+
+            builder.Property(t => t.Phone)
+                   .HasMaxLength(11)
+                   .IsRequired(false);
 
         }
     }
