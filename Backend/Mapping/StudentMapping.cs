@@ -2,12 +2,12 @@
 
 namespace Backend.Mapping
 {
-    public class StudentMapping:Profile
+    public class StudentMapping : Profile
     {
         public StudentMapping()
         {
             CreateMap<CreateStudentDto, Student>();
-            CreateMap<UpdateStudentDto, Student>();
+            CreateMap<UpdateStudentDto, Student>().ReverseMap();
             CreateMap<Student, ShowStudentDto>();
 
             CreateMap<Student, ShowStudentWithCoursesDto>()
@@ -19,4 +19,3 @@ namespace Backend.Mapping
     }
 
 }
- 
