@@ -17,6 +17,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly IEmailSender _emailSender;
     private readonly string _baseUrl;
     private readonly ResponseHandler _responseHandler;
+    private readonly IUnitOfWork _unitOfWork;
 
     public AuthenticationService(
         UserManager<User> userManager,
@@ -26,7 +27,8 @@ public class AuthenticationService : IAuthenticationService
         Context.ApplicationDbContext context,
         IEmailSender emailSender,
         IConfiguration configuration,
-        ResponseHandler responseHandler)
+        ResponseHandler responseHandler,
+        IUnitOfWork unitOfWork)
     {
         _userManager = userManager;
         _roleManager = roleManager;
@@ -36,12 +38,13 @@ public class AuthenticationService : IAuthenticationService
         _emailSender = emailSender;
         _baseUrl = configuration["ApplicationSettings:BaseUrl"] ?? "https://localhost:7099";
         _responseHandler = responseHandler;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Response<TokenDto>> LoginAsync(LoginDto model)
     {
-        var user = await _userManager.FindByEmailAsync(model.Email);
-
+        //var user = await _userManager.FindByEmailAsync(model.Email);
+        var user = await _unitOfWork.Repository<User>().GetTableNoTracking().FirstOrDefaultAsync(u => u.Email == model.Email);
         if (user == null)
         {
             return _responseHandler.BadRequest<TokenDto>("Invalid credentials");
@@ -55,16 +58,16 @@ public class AuthenticationService : IAuthenticationService
         }
 
         // Check if email is confirmed
-        if (!await _userManager.IsEmailConfirmedAsync(user))
-        {
-            return _responseHandler.BadRequest<TokenDto>("Email not confirmed");
-        }
+        //if (!await _userManager.IsEmailConfirmedAsync(user))
+        //{
+        //    return _responseHandler.BadRequest<TokenDto>("Email not confirmed");
+        //}
 
         var jwtToken = await GenerateJwtToken(user);
         var refreshToken = await GenerateRefreshToken(user);
 
         jwtToken.RefreshToken = refreshToken.Token;
-
+        jwtToken.UserId = user.Id;
         return _responseHandler.Success(jwtToken);
     }
 
@@ -141,9 +144,10 @@ public class AuthenticationService : IAuthenticationService
 
     private async Task<Response<TokenDto>> RegisterUserAsync(RegisterDto model, string role)
     {
-        var userExists = await _userManager.FindByEmailAsync(model.Email);
+        //var userExists = await _userManager.FindByEmailAsync(model.Email);
 
-        if (userExists != null)
+        var userExists = await _unitOfWork.Repository<User>().GetTableNoTracking().FirstOrDefaultAsync(u => u.Email == model.Email);
+        if (userExists != null && userExists.UserType == role)
         {
             return _responseHandler.BadRequest<TokenDto>("User already exists");
         }
@@ -179,10 +183,10 @@ public class AuthenticationService : IAuthenticationService
         Console.WriteLine(callbackUrl);
         if (user.Email != null)
         {
-           await _emailSender.SendEmailAsync(
-               user.Email,
-               "Confirm your email",
-               $"Please confirm your account by <a href='{callbackUrl}'>clicking here</a>.");
+            await _emailSender.SendEmailAsync(
+                user.Email,
+                "Confirm your email",
+                $"Please confirm your account by <a href='{callbackUrl}'>clicking here</a>.");
         }
 
         // Generate token
@@ -192,8 +196,11 @@ public class AuthenticationService : IAuthenticationService
 
 
         var token = new TokenDto();
+
         token.Token = encodedToken;
-        token.RefreshToken = user.Id.ToString();
+        var refreshToken = await GenerateRefreshToken(user);
+        token.RefreshToken = refreshToken.Token;
+        token.UserId = user.Id;
 
         return _responseHandler.Success(token);
     }

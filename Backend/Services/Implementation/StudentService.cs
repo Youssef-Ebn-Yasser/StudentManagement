@@ -171,7 +171,7 @@ public class StudentService : ResponseHandler, IStudentService
 
     public async Task<Response<String>> DeleteStudentFromCourseAsync(DeleteStudentFromCourseDto deleteStudent)
     {
-        var StudentExist = await _studentExistById(deleteStudent.StudentName);
+        var StudentExist = await _studentExistByName(deleteStudent.StudentName);
         if (StudentExist == null) return NotFound<string>($"Student with this name = {deleteStudent.StudentName} not exist");
 
         var CourseExist = await _courseExistByName(deleteStudent.CourseName);
@@ -196,9 +196,20 @@ public class StudentService : ResponseHandler, IStudentService
                             BadRequest<string>("can not delete this student from course error happen when try deleting");
     }
 
-    public Task<Response<string>> UpdateAsync(UpdateStudentDto updateStudentDto)
+    public async Task<Response<string>> UpdateAsync(UpdateStudentDto updateStudentDto)
     {
-        throw new NotImplementedException();
+        // check this student is exist 
+        var student = await _studentExistById(updateStudentDto.Id);
+        if (student == null)
+            return BadRequest<string>($"this Student with this id : {updateStudentDto.Id} not exist");
+
+        _mapper.Map(student, updateStudentDto);
+
+        _unitOfWork.Repository<Student>().Update(student);
+        var result = _unitOfWork.Complete();
+
+        return result > 0 ? Success("Student Updated Successfully") :
+                            BadRequest<string>("can not Updated this student error happen when trying");
     }
 
     private async Task<bool> _isNameExist(string name)
@@ -229,7 +240,9 @@ public class StudentService : ResponseHandler, IStudentService
     await _unitOfWork.Repository<Course>().GetTableNoTracking().AnyAsync(s => s.Id == id);
     private async Task<Course> _courseExistByName(string Name) =>
    await _unitOfWork.Repository<Course>().GetTableNoTracking().FirstOrDefaultAsync(c => c.Title == Name);
-    private async Task<Student> _studentExistById(string name) =>
+    private async Task<Student> _studentExistByName(string name) =>
     await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => s.Name == name);
+    private async Task<Student> _studentExistById(int id) =>
+await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => s.Id == id);
     #endregion
 }

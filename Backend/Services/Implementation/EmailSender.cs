@@ -28,6 +28,7 @@ public class EmailSender : IEmailSender
                 Sender = MailboxAddress.Parse(_emailSettings.Email),
                 Subject = subject
             };
+
             email.From.Add(new MailboxAddress(_emailSettings.DisplayName, _emailSettings.Email));
             email.To.Add(MailboxAddress.Parse(mailTo));
 
@@ -40,7 +41,7 @@ public class EmailSender : IEmailSender
 
             await smtp.AuthenticateAsync(_emailSettings.Email, _emailSettings.Password);
 
-            await smtp.SendAsync(email);
+            var result = await smtp.SendAsync(email);
 
             await smtp.DisconnectAsync(true);
 

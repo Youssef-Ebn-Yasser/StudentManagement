@@ -1,112 +1,169 @@
 ﻿using Newtonsoft.Json;
 using Stripe;
 using Stripe.Checkout;
-
+using Backend.Settings;
+using Microsoft.Extensions.Options;
 
 namespace Backend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PaymentsController(IUnitOfWork _unitOfWork) : ControllerBase
+public class PaymentsController : ControllerBase
 {
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly StripeSettings _stripeSettings;
 
+    public PaymentsController(IUnitOfWork unitOfWork, IOptions<StripeSettings> stripeSettings)
+    {
+        _unitOfWork = unitOfWork;
+        _stripeSettings = stripeSettings?.Value ?? throw new ArgumentNullException(nameof(stripeSettings));
+        
+        // Set the API key
+        if (string.IsNullOrEmpty(_stripeSettings.SecretKey))
+            throw new InvalidOperationException("Stripe SecretKey is not configured");
+            
+        StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
+    }
 
     [HttpPost("create-payment-intent")]
     public async Task<ActionResult> CreatePaymentIntent([FromBody] PaymentIntentCreateRequest request)
     {
-
-        StripeConfiguration.ApiKey = "sk_test_51RJpFnB0P8973q3AzgMnEJMwwftSTNwmgWtXKm9i6a1Gvc6yWW1dgzI6E05YkCJNaGEIcMTlPLaZ4FgKZozeKQzM00yzQxpeH1";
-
-        var options = new Stripe.Checkout.SessionCreateOptions
+        try
         {
-            SuccessUrl = "http://127.0.0.1:5500/index.html",
-            CancelUrl = "http://127.0.0.1:5500/faild.html",
-
-            LineItems = new List<SessionLineItemOptions>
+            var options = new SessionCreateOptions
             {
-              new Stripe.Checkout.SessionLineItemOptions
-              {
-                  PriceData = new SessionLineItemPriceDataOptions
-                  {
-                      UnitAmount = (long?)request.Amount,
-                      Currency = "usd",
-                      ProductData = new SessionLineItemPriceDataProductDataOptions
-                      {
-                          Name = "Pay Course",
-                      },
-                  },
-                  Quantity = 1,
-              },
-            },
+                SuccessUrl = "http://127.0.0.1:5500/index.html",
+                CancelUrl = "http://127.0.0.1:5500/faild.html",
+                LineItems = new List<SessionLineItemOptions>
+                {
+                    new SessionLineItemOptions
+                    {
+                        PriceData = new SessionLineItemPriceDataOptions
+                        {
+                            UnitAmount = (long)(request.Amount * 100), // Convert to cents
+                            Currency = request.Currency.ToLower(),
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = "Pay Course",
+                            },
+                        },
+                        Quantity = 1,
+                    },
+                },
+                Mode = "payment",
+                Metadata = new Dictionary<string, string>
+                {
+                    { "amount", request.Amount.ToString() },
+                    { "paymentDate", request.PaymentDate.ToString("o") },
+                    { "currency", request.Currency },
+                    { "studentId", request.StudentId?.ToString() ?? "" },
+                    { "courseId", request.CourseId?.ToString() ?? "" }
+                }
+            };
 
-            Mode = "payment",
-            Metadata = new Dictionary<string, string>
-            {
-                { "amount", request.Amount.ToString() },
-                { "paymentDate", request.PaymentDate.ToString("o") }, // ISO 8601 format
-                { "currency", request.Currency },
-                { "studentId", request.StudentId?.ToString() ?? "" },
-                { "courseId", request.CourseId?.ToString() ?? "" }
-            }
-        };
-        var service = new Stripe.Checkout.SessionService();
-        Stripe.Checkout.Session session = service.Create(options);
+            var service = new SessionService();
+            var session = await service.CreateAsync(options);
 
-        return Ok(new { url = session.Url });
-
+            return Ok(new { url = session.Url });
+        }
+        catch (StripeException ex)
+        {
+            return StatusCode(500, new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "An unexpected error occurred" });
+        }
     }
 
     [HttpPost("webhook")]
     public async Task<IActionResult> StripeWebhook()
     {
-        // Read the request body
-        var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
-        if (string.IsNullOrEmpty(json))
+        if (string.IsNullOrEmpty(_stripeSettings.WebhookSecret))
         {
-            return BadRequest("Empty request body.");
+            return StatusCode(500, new { error = "Stripe webhook secret is not configured" });
         }
 
-        // Get the Stripe-Signature header
+        var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
         var stripeSignature = Request.Headers["Stripe-Signature"];
+
         if (string.IsNullOrEmpty(stripeSignature))
         {
-            return BadRequest("Missing Stripe-Signature header.");
+            return BadRequest(new { error = "Missing Stripe-Signature header" });
         }
 
         try
         {
-            // Your secret key from the Stripe Dashboard
-            string webhookSecret = "whsec_SLg9RylDCXwrnh095nEjExd6N25j5tMt"; // Replace with your actual webhook secret
-            // Construct the Stripe event
             var stripeEvent = EventUtility.ConstructEvent(
                 json,
                 stripeSignature,
-                webhookSecret
+                _stripeSettings.WebhookSecret
             );
 
             if (stripeEvent.Type == EventTypes.CheckoutSessionCompleted)
             {
                 var session = stripeEvent.Data.Object as Session;
+                
+                if (session == null)
+                {
+                    return BadRequest(new { error = "Invalid session data" });
+                }
 
-                // Handle the successful payment
-                string customerEmail = session.CustomerDetails.Email;
-                string paymentIntentId = session.PaymentIntentId;
+                // Extract metadata from the session
+                if (!session.Metadata.ContainsKey("amount") || 
+                    !session.Metadata.ContainsKey("paymentDate") || 
+                    !session.Metadata.ContainsKey("currency") || 
+                    !session.Metadata.ContainsKey("studentId") || 
+                    !session.Metadata.ContainsKey("courseId"))
+                {
+                    return BadRequest(new { error = "Missing required metadata in session" });
+                }
 
-                // Process the payment and save to DB here...
+                var amount = double.Parse(session.Metadata["amount"]);
+                var paymentDate = DateTime.Parse(session.Metadata["paymentDate"]);
+                var currency = session.Metadata["currency"];
+                var studentId = int.Parse(session.Metadata["studentId"]);
+                var courseId = int.Parse(session.Metadata["courseId"]);
 
-                return Ok();
+                // Create payment record
+                var payment = new Payment
+                {
+                    Amount = amount,
+                    Status = "Completed",
+                    PaymentDate = paymentDate,
+                    CompleteDate = DateTime.UtcNow,
+                    Currency = currency,
+                    StudentId = studentId,
+                    CourseId = courseId
+                };
+
+                // Save payment to database
+                await _unitOfWork.Repository<Payment>().AddAsync(payment);
+                var result = _unitOfWork.Complete();
+
+                if (result > 0)
+                {
+                    return Ok(new { message = "Payment processed successfully" });
+                }
+                else
+                {
+                    return StatusCode(500, new { error = "Failed to save payment to database" });
+                }
             }
 
-            return Ok();
+            return Ok(new { message = "Webhook received" });
         }
-        catch (StripeException e)
+        catch (StripeException ex)
         {
-            return BadRequest($"⚠️ Stripe webhook error: {e.Message}");
+            return BadRequest(new { error = $"Stripe webhook error: {ex.Message}" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = $"An unexpected error occurred: {ex.Message}" });
         }
     }
-
-
 }
+
 public class PaymentIntentCreateRequest
 {
     [Required] public double Amount { get; set; }

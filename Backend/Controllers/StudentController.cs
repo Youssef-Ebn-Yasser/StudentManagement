@@ -73,23 +73,22 @@ namespace Backend.Controllers
         }
 
 
-        // Create New Student
         [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] CreateStudentDto createStudentDto)
+        public async Task<IActionResult> Create(CreateStudentDto createStudentDto)
         {
             var result = await _studentService.CreateAsync(createStudentDto);
             return NewResult(result);
         }
 
-        // Update Student
+
         [HttpPut("Update")]
-        public async Task<IActionResult> Update([FromBody] UpdateStudentDto updateStudentDto)
+        public async Task<IActionResult> Update(UpdateStudentDto updateStudentDto)
         {
             var result = await _studentService.UpdateAsync(updateStudentDto);
             return NewResult(result);
         }
 
-        // Delete Student
+
         [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
