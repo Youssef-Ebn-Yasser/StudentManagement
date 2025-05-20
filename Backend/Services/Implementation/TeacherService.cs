@@ -121,8 +121,6 @@ public class TeacherService : ResponseHandler, ITeacherService
         var nameExist = await _isTeacherNameExistBeforeAsync(updateTeacherDto.Name, updateTeacherDto.Id);
         if (nameExist) return BadRequest<string>($"this teacher name is not valid is already exist");
 
-        var emailExist = await _isTeacherEmailExistBeforeAsync(updateTeacherDto.Email, updateTeacherDto.Id);
-        if (emailExist) return BadRequest<string>($"this teacher Email is not valid is already exist");
 
         var teacher = await _unitOfWork.Repository<Teacher>()
                                               .GetTableAsTracking()
