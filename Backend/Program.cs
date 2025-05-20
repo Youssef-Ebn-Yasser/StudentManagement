@@ -2,7 +2,6 @@ using Backend.ChatHubs;
 using Backend.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Stripe;
-using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,6 +56,7 @@ builder.Services.AddCors(Options =>
        });
 });
 #endregion
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 var app = builder.Build();
 
