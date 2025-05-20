@@ -16,7 +16,7 @@ public class AssignmentController(IStudentAssignmentService _studentAssignmentSe
     }
 
     [HttpPost("upload/assignment")]
-    public async Task<IActionResult> UploadAssignment([FromBody]UploadAssignmentDto dto)
+    public async Task<IActionResult> UploadAssignment([FromForm]UploadAssignmentDto dto)
     {
         var result = await _studentAssignmentService.UploadAssignment(dto);
 
