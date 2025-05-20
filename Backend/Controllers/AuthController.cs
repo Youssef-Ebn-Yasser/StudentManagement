@@ -1,5 +1,4 @@
 using Backend.DTOs.AuthDTOs;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 
 namespace Backend.Controllers;
@@ -40,7 +39,7 @@ public class AuthController : AppControllerBase
     }
 
 
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     [HttpPost("register/teacher")]
     public async Task<IActionResult> RegisterTeacher([FromBody] RegisterDto model)
     {
@@ -57,7 +56,7 @@ public class AuthController : AppControllerBase
     }
 
 
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     [HttpPost("register/admin")]
     public async Task<IActionResult> RegisterAdmin([FromBody] RegisterDto model)
     {
@@ -86,13 +85,13 @@ public class AuthController : AppControllerBase
 
 
 
-    [HttpGet("GetJWTToken")]
+    //[HttpGet("GetJWTToken")]
 
-    public async Task<IActionResult> GetJWTToken([FromQuery] string userId)
-    {
-        var result = await _authService.GetJWTToken(userId);
-        return NewResult(result);
-    }
+    //public async Task<IActionResult> GetJWTToken([FromQuery] string userId)
+    //{
+    //    var result = await _authService.GetJWTToken(userId);
+    //    return NewResult(result);
+    //}
 
     [HttpGet("GetRefreshToken")]
     public async Task<IActionResult> GetRefreshToken([FromQuery] string refreshToken)
