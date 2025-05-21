@@ -4,6 +4,8 @@ import AddLesson from './AddLesson';
 import AddMaterial from './AddMaterial';
 import Loader from '../Loader/Loader';
 import "./CreateCourse.css";
+import axiosInstance from '../../services/axiosInstance';
+import { useNavigate } from 'react-router-dom';
 
 const CreateCourse = () => {
   const [activeTab, setActiveTab] = useState('courses');
@@ -12,6 +14,9 @@ const CreateCourse = () => {
   const [editingCourseId, setEditingCourseId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+  const navigate = useNavigate();
 
   const courseCategories = {
     PROGRAMMING: 'Programming',
@@ -43,6 +48,32 @@ const CreateCourse = () => {
     };
     fetchInitialData();
   }, []);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      setIsLoadingCategories(true);
+      const response = await axiosInstance.get('/api/Category/GetAll');
+      console.log('Categories API Response:', response);
+      
+      if (response.data && response.data.data) {
+        setCategories(response.data.data);
+      } else if (response.data && Array.isArray(response.data)) {
+        setCategories(response.data);
+      } else {
+        console.error('Unexpected categories data structure:', response.data);
+        setCategories([]);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      setError('Failed to load categories');
+    } finally {
+      setIsLoadingCategories(false);
+    }
+  };
 
   const getCategoryColor = (category) => {
     const colors = {
@@ -86,8 +117,10 @@ const CreateCourse = () => {
         title: formData.get('title')?.trim(),
         description: formData.get('description')?.trim(),
         price: parseFloat(formData.get('price')),
-        teacherId: 36,
+        teacherId: 36, // This should be dynamically set based on the logged-in teacher
+        categoryId: parseInt(formData.get('categoryId')),
         level: formData.get('level'),
+        hours: formData.get('hours'),
         image: formData.get('thumbnail')
       };
 
@@ -97,15 +130,27 @@ const CreateCourse = () => {
       const response = await courseService.createCourse(courseData);
       console.log('Course created successfully:', response);
       
-      // Refresh the course list
-      const coursesResponse = await courseService.getAllCourses();
-      setCourses(coursesResponse.data || []);
-      
       // Reset the form
       e.target.reset();
       
-      // Show success message or handle success state
-      alert('Course created successfully!');
+      // Show enhanced success message
+      const categoryName = categories.find(cat => cat.id === courseData.categoryId)?.name || 'N/A';
+      const successMessage = `
+        🎉 Course Created Successfully!
+        
+        Title: ${courseData.title}
+        Category: ${categoryName}
+        Level: ${courseData.level}
+        Duration: ${courseData.hours}
+        
+        You can now add lessons and materials to your course.
+      `;
+      
+      alert(successMessage);
+      
+      // Navigate to courses page
+      navigate('/teacher/courses');
+      
     } catch (error) {
       console.error('Error creating course:', error);
       if (error.response?.data) {
@@ -151,13 +196,34 @@ const CreateCourse = () => {
   };
 
   const handleDeleteCourse = async (courseId) => {
-    if (window.confirm('Are you sure you want to delete this course? This will also delete all associated materials and assignments.')) {
+    const courseToDelete = courses.find(course => course.id === courseId);
+    
+    if (window.confirm(`
+      Are you sure you want to delete this course?
+      
+      Course Details:
+      Title: ${courseToDelete?.title}
+      Category: ${courseToDelete?.category}
+      Level: ${courseToDelete?.level}
+      
+      ⚠️ Warning: This action cannot be undone. All associated lessons, materials, and assignments will be permanently deleted.
+    `)) {
       try {
         setIsLoading(true);
         await courseService.deleteCourse(courseId);
+        
+        // Show success message
+        alert(`
+          ✅ Course Deleted Successfully!
+          
+          The course and all its associated content have been removed.
+        `);
+        
+        // Update the courses list
         setCourses(courses.filter(course => course.id !== courseId));
       } catch (error) {
-        setError(error.message || 'Failed to delete course');
+        console.error('Error deleting course:', error);
+        setError(error.response?.data?.message || error.message || 'Failed to delete course');
       } finally {
         setIsLoading(false);
       }
@@ -182,6 +248,9 @@ const CreateCourse = () => {
       if (!formData.get('price')) validationErrors.price = 'Price is required';
       if (isNaN(parseFloat(formData.get('price')))) validationErrors.price = 'Price must be a number';
       if (parseFloat(formData.get('price')) <= 0) validationErrors.price = 'Price must be greater than 0';
+      if (!formData.get('categoryId')) validationErrors.categoryId = 'Category is required';
+      if (!formData.get('level')) validationErrors.level = 'Level is required';
+      if (!formData.get('hours')) validationErrors.hours = 'Hours is required';
       
       if (Object.keys(validationErrors).length > 0) {
         setErrors(validationErrors);
@@ -192,7 +261,7 @@ const CreateCourse = () => {
     };
 
     return (
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="form-group">
           <label className="required-field">Title</label>
           <input
@@ -249,11 +318,114 @@ const CreateCourse = () => {
           {errors.price && <span className="error-message">{errors.price}</span>}
         </div>
 
-        <div className="form-actions">
-          {onCancel && (
-            <button type="button" className="cancel-button" onClick={onCancel}>Cancel</button>
+        <div className="form-group">
+          <label className="required-field block text-sm font-medium text-gray-700 mb-2">Category</label>
+          <div className="relative">
+            <select
+              name="categoryId"
+              required
+              defaultValue={course?.categoryId}
+              className={`
+                w-full px-4 py-2.5 rounded-lg border
+                ${errors.categoryId ? 'border-red-500' : 'border-gray-300'}
+                ${isLoadingCategories ? 'opacity-50 bg-gray-50' : 'bg-white'}
+                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                transition-all duration-200 ease-in-out
+                appearance-none cursor-pointer
+                hover:border-blue-400
+              `}
+              disabled={isLoadingCategories}
+            >
+              <option value="" className="text-gray-500">Select a category</option>
+              {categories && categories.length > 0 ? (
+                categories.map((category) => (
+                  <option 
+                    key={category.id} 
+                    value={category.id}
+                    className="py-2 px-4 hover:bg-blue-50"
+                  >
+                    {category.name}
+                  </option>
+                ))
+              ) : (
+                <option value="" disabled className="text-gray-500">No categories available</option>
+              )}
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+          {isLoadingCategories && (
+            <div className="mt-2 flex items-center text-sm text-gray-500">
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+              Loading categories...
+            </div>
           )}
-          <button type="submit" className="save-button">{submitText}</button>
+          {!isLoadingCategories && categories.length === 0 && (
+            <div className="mt-2 text-sm text-red-500 flex items-center">
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              No categories available
+            </div>
+          )}
+          {errors.categoryId && (
+            <div className="mt-2 text-sm text-red-500 flex items-center">
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {errors.categoryId}
+            </div>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label className="required-field">Level</label>
+          <input
+            type="text"
+            name="level"
+            required
+            defaultValue={course?.level}
+            placeholder="Enter course level (e.g., 'Beginner', 'Intermediate', 'Advanced')"
+            className={errors.level ? 'error' : ''}
+          />
+          {errors.level && <span className="error-message">{errors.level}</span>}
+        </div>
+
+        <div className="form-group">
+          <label className="required-field">Hours</label>
+          <input
+            type="text"
+            name="hours"
+            required
+            defaultValue={course?.hours}
+            placeholder="Enter course duration (e.g., '2 hours', '1.5 hours')"
+            className={errors.hours ? 'error' : ''}
+          />
+          {errors.hours && <span className="error-message">{errors.hours}</span>}
+        </div>
+
+        <div className="flex justify-end space-x-4">
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-4 py-2 text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
+            >
+              Cancel
+            </button>
+          )}
+          <button
+            type="submit"
+            className="px-4 py-2 text-white bg-gradient-to-r from-[var(--primary-dark)] to-[var(--primary-color)] rounded hover:opacity-90 transition-all duration-200 ease-in-out shadow-md hover:shadow-lg"
+          >
+            {submitText}
+          </button>
         </div>
       </form>
     );

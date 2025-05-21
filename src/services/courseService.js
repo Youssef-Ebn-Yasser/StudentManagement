@@ -14,8 +14,9 @@ export const courseService = {
       formData.append('Description', courseData.description?.trim() || '');
       formData.append('Price', courseData.price);
       formData.append('TeacherId', courseData.teacherId);
-      formData.append('CategoryId', 2); // Set default category ID to 2
-      formData.append('Level', courseData.level || 'Intermediate'); // Set default level to Intermediate
+      formData.append('CategoryId', courseData.categoryId);
+      formData.append('Level', courseData.level);
+      formData.append('Hours', courseData.hours);
       
       // Add image if provided
       if (courseData.image) {
@@ -32,6 +33,15 @@ export const courseService = {
       if (!courseData.teacherId || courseData.teacherId <= 0) {
         throw new Error('Valid teacher ID is required');
       }
+      if (!courseData.categoryId || courseData.categoryId <= 0) {
+        throw new Error('Valid category ID is required');
+      }
+      if (!courseData.level?.trim()) {
+        throw new Error('Course level is required');
+      }
+      if (!courseData.hours?.trim()) {
+        throw new Error('Course hours is required');
+      }
 
       // Log the form data for debugging
       console.log('Course form data:', {
@@ -39,19 +49,51 @@ export const courseService = {
         Description: courseData.description,
         Price: courseData.price,
         TeacherId: courseData.teacherId,
-        CategoryId: 2,
-        Level: courseData.level || 'Intermediate',
+        CategoryId: courseData.categoryId,
+        Level: courseData.level,
+        Hours: courseData.hours,
         HasImage: !!courseData.image
       });
 
-      const response = await axiosInstance.post('/Course/Create', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      return response.data;
+      // Add retry logic for the request
+      const maxRetries = 3;
+      let retryCount = 0;
+      let lastError = null;
+
+      while (retryCount < maxRetries) {
+        try {
+          const response = await axiosInstance.post('/Course/Create', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+            timeout: 30000, // 30 seconds timeout
+            onUploadProgress: (progressEvent) => {
+              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              console.log(`Upload progress: ${percentCompleted}%`);
+            }
+          });
+          return response.data;
+        } catch (error) {
+          lastError = error;
+          if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+            retryCount++;
+            if (retryCount < maxRetries) {
+              console.log(`Retry attempt ${retryCount} of ${maxRetries}`);
+              // Wait for 2 seconds before retrying
+              await new Promise(resolve => setTimeout(resolve, 2000));
+              continue;
+            }
+          }
+          throw error;
+        }
+      }
+
+      throw lastError;
     } catch (error) {
       console.error('Course creation error:', error.response?.data || error.message);
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        throw new Error('Request timed out. Please try again. The server might be busy or your internet connection is slow.');
+      }
       throw error;
     }
   },
@@ -100,8 +142,7 @@ export const courseService = {
   // Delete a course
   deleteCourse: async (courseId) => {
     try {
-      // Use /api prefix for Vite proxy
-      const response = await axiosInstance.delete(`/api/Course/Delete/${courseId}`);
+      const response = await axiosInstance.delete(`/Course/Delete/${courseId}?id=${courseId}`);
       return response.data;
     } catch (error) {
       console.error('Error deleting course:', error.response?.data || error.message);
@@ -202,7 +243,11 @@ export const courseService = {
   // Create material
   createMaterial: async (materialData) => {
     try {
-      const response = await axiosInstance.post('/api/Material/CreateMaterial/CreateMaterial', materialData);
+      const response = await axiosInstance.post('/api/Material/CreateMaterial/CreateMaterial', materialData, {
+        headers: {
+          'Content-Type': 'application/problem+json; charset=utf-8'
+        }
+      });
       return response.data;
     } catch (error) {
       throw error;

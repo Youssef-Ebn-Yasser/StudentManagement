@@ -113,12 +113,17 @@ const TeacherCourseDetails = () => {
       try {
         const response = await courseService.deleteLesson(lessonId);
         if (response.succeeded) {
-          setLessons((prevLessons) => prevLessons.filter(lesson => lesson.id !== lessonId));
+          setLessons(prevLessons => prevLessons.filter(lesson => lesson.id !== lessonId));
+          setCourse(prevCourse => ({
+            ...prevCourse,
+            lessonInfo: prevCourse.lessonInfo.filter(lesson => lesson.id !== lessonId)
+          }));
           toast.success('Lesson deleted successfully');
         } else {
           throw new Error(response.messages?.[0] || 'Failed to delete lesson');
         }
       } catch (error) {
+        console.error('Error deleting lesson:', error);
         toast.error(error.message || 'Failed to delete lesson');
       }
     }
@@ -169,6 +174,19 @@ const TeacherCourseDetails = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Back Button */}
+        <div className="mb-6">
+          <button
+            onClick={() => navigate('/teacher/courses')}
+            className="flex items-center text-gray-600 hover:text-gray-900 transition-colors duration-200"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Courses
+          </button>
+        </div>
+
         {/* Course Header */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-6">
@@ -205,8 +223,8 @@ const TeacherCourseDetails = () => {
                       </>
                     ) : (
                       <>
-                    <FaTrash className="inline-block mr-2" />
-                    Delete Course
+                        <FaTrash className="inline-block mr-2" />
+                        Delete Course
                       </>
                     )}
                   </button>
@@ -217,8 +235,8 @@ const TeacherCourseDetails = () => {
               {/* Course Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                 <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="flex items-center">
-                  <FaStar className="text-yellow-500 mr-2" />
+                  <div className="flex items-center">
+                    <FaStar className="text-yellow-500 mr-2" />
                     <div>
                       <p className="text-sm text-gray-500">Rating</p>
                       <p className="font-semibold">{course.rating || 'N/A'}</p>
@@ -226,8 +244,8 @@ const TeacherCourseDetails = () => {
                   </div>
                 </div>
                 <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="flex items-center">
-                  <FaUsers className="text-blue-500 mr-2" />
+                  <div className="flex items-center">
+                    <FaUsers className="text-blue-500 mr-2" />
                     <div>
                       <p className="text-sm text-gray-500">Students</p>
                       <p className="font-semibold">{course.students?.length || 0}</p>
@@ -235,20 +253,20 @@ const TeacherCourseDetails = () => {
                   </div>
                 </div>
                 <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="flex items-center">
-                  <FaClock className="text-green-500 mr-2" />
+                  <div className="flex items-center">
+                    <FaClock className="text-green-500 mr-2" />
                     <div>
                       <p className="text-sm text-gray-500">Duration</p>
-                      <p className="font-semibold">{course.duration} hours</p>
+                      <p className="font-semibold">{course.hours || 0} hours</p>
                     </div>
                   </div>
                 </div>
                 <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="flex items-center">
+                  <div className="flex items-center">
                     <FaBook className="text-purple-500 mr-2" />
                     <div>
                       <p className="text-sm text-gray-500">Lessons</p>
-                      <p className="font-semibold">{course.lessons?.length || 0}</p>
+                      <p className="font-semibold">{course.lessonInfo?.length || 0}</p>
                     </div>
                   </div>
                 </div>
@@ -261,7 +279,7 @@ const TeacherCourseDetails = () => {
                     <FaTag className="text-indigo-500 mr-2" />
                     <div>
                       <p className="text-sm text-gray-500">Category</p>
-                      <p className="font-semibold">{course.category || 'Uncategorized'}</p>
+                      <p className="font-semibold">{course.categoryName || 'Uncategorized'}</p>
                     </div>
                   </div>
                 </div>
@@ -336,7 +354,7 @@ const TeacherCourseDetails = () => {
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h2 className="text-2xl font-semibold text-gray-900">Course Lessons</h2>
-                  <p className="text-gray-600 mt-1">Total {(course.lessons?.length || course.lessonInfo?.length || 0)} lessons</p>
+                  <p className="text-gray-600 mt-1">Total {course.lessonInfo?.length || 0} lessons</p>
                 </div>
                 <button
                   onClick={() => navigate(`/teacher/course/${course.id}/lesson/new`)}
@@ -347,9 +365,9 @@ const TeacherCourseDetails = () => {
                 </button>
               </div>
 
-              {(course.lessons?.length > 0 || course.lessonInfo?.length > 0) ? (
+              {course.lessonInfo?.length > 0 ? (
                 <div className="space-y-4">
-                  {(course.lessons?.length > 0 ? course.lessons : course.lessonInfo).map((lesson, index) => (
+                  {course.lessonInfo.map((lesson, index) => (
                     <div 
                       key={lesson.id} 
                       className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200"
@@ -360,17 +378,17 @@ const TeacherCourseDetails = () => {
                             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-semibold">
                               {index + 1}
                             </span>
-                            <h3 className="text-xl font-semibold text-gray-900">{lesson.title || lesson.Title}</h3>
+                            <h3 className="text-xl font-semibold text-gray-900">{lesson.title}</h3>
                           </div>
-                          <p className="text-gray-600 mb-4 ml-11">{lesson.description || lesson.Description}</p>
-                          {(lesson.duration || lesson.Duration) && (
+                          <p className="text-gray-600 mb-4 ml-11">{lesson.description}</p>
+                          {lesson.duration && (
                             <div className="ml-11 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium inline-block mb-2">
-                              {lesson.duration || lesson.Duration} minutes
+                              {lesson.duration} minutes
                             </div>
                           )}
-                          {(lesson.difficulty || lesson.Difficulty) && (
+                          {lesson.difficulty && (
                             <div className="ml-11 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium inline-block mb-2">
-                              {lesson.difficulty || lesson.Difficulty}
+                              {lesson.difficulty}
                             </div>
                           )}
                         </div>
