@@ -33,6 +33,7 @@ const useAuth = () => {
     return {
         user: authStore?.user,
         isLogedin: authStore?.isLogedin,
+        role: authStore?.role,
         // role
     }
 }
