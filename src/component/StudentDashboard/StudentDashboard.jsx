@@ -50,7 +50,7 @@ export default function StudentDashboard() {
         const studentId = localStorage.getItem('userId');
         
         // Fetch enrolled courses
-        const coursesResponse = await axios.get(`https://e-learn-v1.runasp.net/api/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses?studentId=21`);
+        const coursesResponse = await axios.get(`https://e-learn-v1.runasp.net/api/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses?studentId=85`);
         
         // Check if we have valid courses data
         if (!coursesResponse.data.succeeded || !Array.isArray(coursesResponse.data.data)) {
@@ -62,7 +62,7 @@ export default function StudentDashboard() {
         
         // Fetch assignments for each course
         const assignmentsPromises = courses.map(course => 
-          axios.get(`https://e-learn-v1.runasp.net/api/Assignment/GetStudentAssignmentInCourse?studentId=21&courseId=${course.id}`)
+          axios.get(`https://e-learn-v1.runasp.net/api/Assignment/GetStudentAssignmentInCourse?studentId=85&courseId=${course.id}`)
         );
         const assignmentsResponses = await Promise.all(assignmentsPromises);
         

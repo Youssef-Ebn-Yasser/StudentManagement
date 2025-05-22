@@ -27,7 +27,7 @@ export default function EditProfile() {
         //   return;
         // }
 
-        const response = await axios.get(`https://e-learn-v1.runasp.net/api/Student/Get/6`);
+        const response = await axios.get(`https://e-learn-v1.runasp.net/api/Student/GetById/GetById/85`);
         if (response.data.succeeded) {
           const studentData = response.data.data;
           setFormData({
@@ -88,7 +88,7 @@ export default function EditProfile() {
       });
 
       const response = await axios.put(
-        `https://e-learn-v1.runasp.net/api/Student/Update/6`,
+        `https://e-learn-v1.runasp.net/api/Student/Update/85`,
         formDataToSend,
         {
           headers: {

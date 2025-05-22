@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { courseService } from '../../services/courseService';
-import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook, FaClipboardList, FaTrash, FaEdit } from 'react-icons/fa';
+import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook, FaClipboardList, FaTrash, FaEdit, FaChartLine, FaCalendarAlt, FaTag } from 'react-icons/fa';
 import Loader from '../Loader/Loader';
 import { toast } from 'react-toastify';
 
@@ -13,6 +13,7 @@ const TeacherCourseDetails = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [lessons, setLessons] = useState([]);
 
   // Debug log for id param
   console.log('Course ID from params:', id);
@@ -56,6 +57,7 @@ const TeacherCourseDetails = () => {
         console.log('Response from getCourseDetails:', response);
         if (response.succeeded) {
           setCourse(response.data);
+          setLessons(response.data.lessons || response.data.lessonInfo || []);
         } else {
           throw new Error(response.messages?.[0] || 'Failed to load course details');
         }
@@ -111,9 +113,11 @@ const TeacherCourseDetails = () => {
       try {
         const response = await courseService.deleteLesson(lessonId);
         if (response.succeeded) {
-          // Refresh course details to update lessons list
-          const updatedCourse = await courseService.getCourseDetails(id);
-          setCourse(updatedCourse.data);
+          setLessons(prevLessons => prevLessons.filter(lesson => lesson.id !== lessonId));
+          setCourse(prevCourse => ({
+            ...prevCourse,
+            lessonInfo: prevCourse.lessonInfo.filter(lesson => lesson.id !== lessonId)
+          }));
           toast.success('Lesson deleted successfully');
         } else {
           throw new Error(response.messages?.[0] || 'Failed to delete lesson');
@@ -170,6 +174,19 @@ const TeacherCourseDetails = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Back Button */}
+        <div className="mb-6">
+          <button
+            onClick={() => navigate('/teacher/courses')}
+            className="flex items-center text-gray-600 hover:text-gray-900 transition-colors duration-200"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Courses
+          </button>
+        </div>
+
         {/* Course Header */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-6">
@@ -206,34 +223,93 @@ const TeacherCourseDetails = () => {
                       </>
                     ) : (
                       <>
-                    <FaTrash className="inline-block mr-2" />
-                    Delete Course
+                        <FaTrash className="inline-block mr-2" />
+                        Delete Course
                       </>
                     )}
                   </button>
                 </div>
               </div>
               <p className="text-gray-600 mb-4">{course.description}</p>
-              <div className="flex flex-wrap gap-4 mb-4">
-                <div className="flex items-center">
-                  <FaStar className="text-yellow-500 mr-2" />
-                  <span>{course.rating}</span>
+              
+              {/* Course Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="flex items-center">
+                    <FaStar className="text-yellow-500 mr-2" />
+                    <div>
+                      <p className="text-sm text-gray-500">Rating</p>
+                      <p className="font-semibold">{course.rating || 'N/A'}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  <FaUsers className="text-blue-500 mr-2" />
-                  <span>{course.students?.length || 0} students</span>
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="flex items-center">
+                    <FaUsers className="text-blue-500 mr-2" />
+                    <div>
+                      <p className="text-sm text-gray-500">Students</p>
+                      <p className="font-semibold">{course.students?.length || 0}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  <FaClock className="text-green-500 mr-2" />
-                  <span>{course.duration} hours</span>
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="flex items-center">
+                    <FaClock className="text-green-500 mr-2" />
+                    <div>
+                      <p className="text-sm text-gray-500">Duration</p>
+                      <p className="font-semibold">{course.hours || 0} hours</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  <FaGraduationCap className="text-purple-500 mr-2" />
-                  <span>{course.level}</span>
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="flex items-center">
+                    <FaBook className="text-purple-500 mr-2" />
+                    <div>
+                      <p className="text-sm text-gray-500">Lessons</p>
+                      <p className="font-semibold">{course.lessonInfo?.length || 0}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-2xl font-bold text-gray-900">${course.price}</span>
+
+              {/* Course Details */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="flex items-center">
+                    <FaTag className="text-indigo-500 mr-2" />
+                    <div>
+                      <p className="text-sm text-gray-500">Category</p>
+                      <p className="font-semibold">{course.categoryName || 'Uncategorized'}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="flex items-center">
+                    <FaGraduationCap className="text-orange-500 mr-2" />
+                    <div>
+                      <p className="text-sm text-gray-500">Level</p>
+                      <p className="font-semibold">{course.level || 'Not specified'}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="flex items-center">
+                    <FaCalendarAlt className="text-red-500 mr-2" />
+                    <div>
+                      <p className="text-sm text-gray-500">Created</p>
+                      <p className="font-semibold">{new Date(course.createdAt).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="flex items-center">
+                    <FaChartLine className="text-green-500 mr-2" />
+                    <div>
+                      <p className="text-sm text-gray-500">Price</p>
+                      <p className="font-semibold">${course.price || 0}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -270,85 +346,78 @@ const TeacherCourseDetails = () => {
             <div>
               <h2 className="text-xl font-semibold mb-4">Course Overview</h2>
               <p className="text-gray-600 mb-4">{course.description}</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">What you'll learn</h3>
-                  <ul className="list-disc list-inside text-gray-600">
-                    <li>Master web development fundamentals</li>
-                    <li>Build responsive websites</li>
-                    <li>Create interactive web applications</li>
-                    <li>Deploy your projects online</li>
-                  </ul>
-                </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">Requirements</h3>
-                  <ul className="list-disc list-inside text-gray-600">
-                    <li>Basic computer knowledge</li>
-                    <li>No prior programming experience required</li>
-                    <li>Access to a computer with internet</li>
-                  </ul>
-                </div>
-              </div>
             </div>
           )}
 
           {activeTab === 'lessons' && (
             <div>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Course Lessons</h2>
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-2xl font-semibold text-gray-900">Course Lessons</h2>
+                  <p className="text-gray-600 mt-1">Total {course.lessonInfo?.length || 0} lessons</p>
+                </div>
                 <button
                   onClick={() => navigate(`/teacher/course/${course.id}/lesson/new`)}
-                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                  className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 flex items-center gap-2"
                 >
+                  <FaBook className="text-lg" />
                   Add New Lesson
                 </button>
               </div>
-              <div className="space-y-4">
-                {course.lessons && course.lessons.length > 0 ? (
-                  course.lessons.map((lesson) => (
-                  <div key={lesson.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h3 className="font-semibold">{lesson.title}</h3>
-                        <p className="text-gray-600">{lesson.description}</p>
-                        <div className="flex items-center mt-2">
-                          <FaClock className="text-gray-400 mr-2" />
-                            <span className="text-sm text-gray-500">
-                              {lesson.duration || 0} minutes
+
+              {course.lessonInfo?.length > 0 ? (
+                <div className="space-y-4">
+                  {course.lessonInfo.map((lesson, index) => (
+                    <div 
+                      key={lesson.id} 
+                      className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-semibold">
+                              {index + 1}
                             </span>
+                            <h3 className="text-xl font-semibold text-gray-900">{lesson.title}</h3>
+                          </div>
+                          <p className="text-gray-600 mb-4 ml-11">{lesson.description}</p>
+                          {lesson.duration && (
+                            <div className="ml-11 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium inline-block mb-2">
+                              {lesson.duration} minutes
+                            </div>
+                          )}
+                          {lesson.difficulty && (
+                            <div className="ml-11 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium inline-block mb-2">
+                              {lesson.difficulty}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => handleDeleteLesson(lesson.id)}
+                            className="p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                            title="Delete Lesson"
+                          >
+                            <FaTrash className="text-lg" />
+                          </button>
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => navigate(`/teacher/course/${course.id}/lesson/${lesson.id}/edit`)}
-                          className="text-blue-500 hover:text-blue-600"
-                            title="Edit Lesson"
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                            onClick={() => handleDeleteLesson(lesson.id)}
-                          className="text-red-500 hover:text-red-600"
-                            title="Delete Lesson"
-                        >
-                          <FaTrash />
-                        </button>
-                      </div>
                     </div>
-                  </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500">No lessons available yet</p>
-                    <button
-                      onClick={() => navigate(`/teacher/course/${course.id}/lesson/new`)}
-                      className="mt-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                    >
-                      Add Your First Lesson
-                    </button>
-                  </div>
-                )}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                  <FaBook className="text-5xl text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-500 text-lg mb-4">No lessons available yet</p>
+                  <button
+                    onClick={() => navigate(`/teacher/course/${course.id}/lesson/new`)}
+                    className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 flex items-center gap-2 mx-auto"
+                  >
+                    <FaBook className="text-lg" />
+                    Add Your First Lesson
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

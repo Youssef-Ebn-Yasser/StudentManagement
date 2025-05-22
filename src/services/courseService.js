@@ -14,8 +14,9 @@ export const courseService = {
       formData.append('Description', courseData.description?.trim() || '');
       formData.append('Price', courseData.price);
       formData.append('TeacherId', courseData.teacherId);
-      formData.append('CategoryId', 2); // Set default category ID to 2
-      formData.append('Level', courseData.level || 'Intermediate'); // Set default level to Intermediate
+      formData.append('CategoryId', courseData.categoryId);
+      formData.append('Level', courseData.level);
+      formData.append('Hours', courseData.hours);
       
       // Add image if provided
       if (courseData.image) {
@@ -32,6 +33,15 @@ export const courseService = {
       if (!courseData.teacherId || courseData.teacherId <= 0) {
         throw new Error('Valid teacher ID is required');
       }
+      if (!courseData.categoryId || courseData.categoryId <= 0) {
+        throw new Error('Valid category ID is required');
+      }
+      if (!courseData.level?.trim()) {
+        throw new Error('Course level is required');
+      }
+      if (!courseData.hours?.trim()) {
+        throw new Error('Course hours is required');
+      }
 
       // Log the form data for debugging
       console.log('Course form data:', {
@@ -39,19 +49,51 @@ export const courseService = {
         Description: courseData.description,
         Price: courseData.price,
         TeacherId: courseData.teacherId,
-        CategoryId: 2,
-        Level: courseData.level || 'Intermediate',
+        CategoryId: courseData.categoryId,
+        Level: courseData.level,
+        Hours: courseData.hours,
         HasImage: !!courseData.image
       });
 
-      const response = await axiosInstance.post('/Course/Create', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      return response.data;
+      // Add retry logic for the request
+      const maxRetries = 3;
+      let retryCount = 0;
+      let lastError = null;
+
+      while (retryCount < maxRetries) {
+        try {
+          const response = await axiosInstance.post('/Course/Create', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+            timeout: 30000, // 30 seconds timeout
+            onUploadProgress: (progressEvent) => {
+              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              console.log(`Upload progress: ${percentCompleted}%`);
+            }
+          });
+          return response.data;
+        } catch (error) {
+          lastError = error;
+          if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+            retryCount++;
+            if (retryCount < maxRetries) {
+              console.log(`Retry attempt ${retryCount} of ${maxRetries}`);
+              // Wait for 2 seconds before retrying
+              await new Promise(resolve => setTimeout(resolve, 2000));
+              continue;
+            }
+          }
+          throw error;
+        }
+      }
+
+      throw lastError;
     } catch (error) {
       console.error('Course creation error:', error.response?.data || error.message);
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        throw new Error('Request timed out. Please try again. The server might be busy or your internet connection is slow.');
+      }
       throw error;
     }
   },
@@ -100,8 +142,7 @@ export const courseService = {
   // Delete a course
   deleteCourse: async (courseId) => {
     try {
-      // Use /api prefix for Vite proxy
-      const response = await axiosInstance.delete(`/api/Course/Delete/${courseId}`);
+      const response = await axiosInstance.delete(`/Course/Delete/${courseId}?id=${courseId}`);
       return response.data;
     } catch (error) {
       console.error('Error deleting course:', error.response?.data || error.message);
@@ -202,7 +243,11 @@ export const courseService = {
   // Create material
   createMaterial: async (materialData) => {
     try {
-      const response = await axiosInstance.post('/api/Material/CreateMaterial/CreateMaterial', materialData);
+      const response = await axiosInstance.post('/api/Material/CreateMaterial/CreateMaterial', materialData, {
+        headers: {
+          'Content-Type': 'application/problem+json; charset=utf-8'
+        }
+      });
       return response.data;
     } catch (error) {
       throw error;
@@ -300,63 +345,59 @@ export const courseService = {
     }
   },
 
-  // Upload material for a lesson
-  uploadLessonMaterial: async (lessonId, materialData) => {
+  uploadLessonMaterial: async (materialData) => {
     try {
+      // Validate required fields
+      if (!materialData.title?.trim()) throw new Error('Title is required');
+      if (!materialData.content?.trim()) throw new Error('Content is required');
+      if (!materialData.lessonId) throw new Error('LessonId is required');
+      if (!materialData.file) throw new Error('File is required');
+      if (materialData.content.trim().length > 500) throw new Error('Content cannot exceed 500 characters');
+
+      // Create FormData object
       const formData = new FormData();
-      
-      // Add the file directly
-      formData.append('Data', materialData.Data);
-      
-      // Add other material properties
-      formData.append('Title', materialData.Title);
-      formData.append('Content', materialData.Content || '');
-      formData.append('LessonId', lessonId);
-      formData.append('Type', materialData.Type);
+      formData.append('Title', materialData.title.trim());
+      formData.append('Content', materialData.content.trim());
+      formData.append('LessonId', materialData.lessonId);
+      formData.append('File', materialData.file, materialData.file.name);
+      formData.append('Type', materialData.isAssignment ? 2 : 1);
 
-      console.log('Uploading material with data:', {
-        Title: materialData.Title,
-        Content: materialData.Content,
-        LessonId: lessonId,
-        Type: materialData.Type,
-        fileName: materialData.Data.name,
-        fileType: materialData.Data.type
+      console.log('Sending request with FormData:', {
+        Title: materialData.title.trim(),
+        Content: materialData.content.trim(),
+        LessonId: materialData.lessonId,
+        Type: materialData.isAssignment ? 2 : 1,
+        hasFile: !!materialData.file,
+        fileName: materialData.file.name,
+        fileType: materialData.file.type
       });
 
-      const response = await axiosInstance.post('/api/Material/CreateMaterial/CreateMaterial', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
+      const { data } = await axiosInstance.post(
+        '/api/Material/CreateMaterial/CreateMaterial',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data; boundary=' + formData._boundary
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            console.log(`Upload progress: ${percentCompleted}%`);
+          }
         }
-      });
+      );
 
-      console.log('Upload response:', response);
-      return response.data;
-    } catch (error) {
-      console.error('Error uploading material:', error);
-      
-      if (error.response) {
-        console.error('Error response:', error.response);
-        console.error('Error data:', error.response.data);
-        
-        switch (error.response.status) {
-          case 415:
-            throw new Error('Invalid file format. Please make sure you are uploading a supported file type (PDF, DOC, DOCX, TXT, or video).');
-          case 400:
-            throw new Error(`Invalid data: ${error.response.data?.message || 'Please check that all required fields are filled correctly.'}`);
-          case 401:
-            throw new Error('You are not authorized to upload materials. Please log in again.');
-          case 404:
-            throw new Error('Lesson not found. Please select a valid lesson.');
-          case 413:
-            throw new Error('File is too large. Please upload a smaller file.');
-          default:
-            throw new Error(`Upload failed: ${error.response.data?.message || 'Unknown error occurred'}`);
-        }
-      } else if (error.request) {
-        throw new Error('No response from server. Please check your internet connection.');
+      return data;
+    } catch (err) {
+      if (err.response) {
+        console.error('Upload failed:',
+          '\nStatus:', err.response.status,
+          '\nMessage:', err.response.data?.message || 'Unknown error',
+          '\nValidation Errors:', err.response.data?.errors || 'No validation errors'
+        );
       } else {
-        throw new Error(`Upload failed: ${error.message}`);
+        console.error('Upload failed:', err.message);
       }
+      throw err;
     }
   },
 

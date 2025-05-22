@@ -1,190 +1,103 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { courseService } from '../../services/courseService';
+import { toast } from 'react-toastify';
 import Loader from '../Loader/Loader';
+import { useNavigate } from 'react-router-dom';
+import { FaBook, FaFileUpload, FaCheck, FaTimes, FaClipboardList, FaHeading, FaAlignLeft, FaFileAlt } from 'react-icons/fa';
 import "./CreateCourse.css";
 
-const AddMaterial = () => {
-  const [courses, setCourses] = useState([]);
+const AddMaterial = ({ teacherId }) => {
+  const navigate = useNavigate();
   const [lessons, setLessons] = useState([]);
-  const [materials, setMaterials] = useState([]);
-  const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedLesson, setSelectedLesson] = useState('');
-  const [selectedMaterialType, setSelectedMaterialType] = useState('1'); // Default to Normal type
-  const [isLoading, setIsLoading] = useState(false);
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [file, setFile] = useState(null);
+  const [isAssignment, setIsAssignment] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const fileInputRef = useRef(null);
-
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        setIsLoading(true);
-        const response = await courseService.getAllCourses();
-        console.log('Courses response:', response);
-        setCourses(response?.data || []);
-      } catch (error) {
-        console.error('Error fetching courses:', error);
-        setError(error.message || 'Failed to load courses');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchCourses();
-  }, []);
 
   useEffect(() => {
     const fetchLessons = async () => {
-      if (!selectedCourse) {
-        setLessons([]);
-        return;
-      }
       try {
-        setIsLoading(true);
-        console.log('Fetching lessons for course:', selectedCourse);
-        const courseLessons = await courseService.getCourseLessons(selectedCourse);
-        console.log('Lessons response:', courseLessons);
-        // Ensure we have an array of lessons
-        if (Array.isArray(courseLessons)) {
-          setLessons(courseLessons);
-        } else if (courseLessons?.data) {
-          setLessons(Array.isArray(courseLessons.data) ? courseLessons.data : []);
+        setLoading(true);
+        const response = await courseService.getCourseLessons();
+        if (response.succeeded) {
+          setLessons(response.data);
         } else {
-          setLessons([]);
+          throw new Error(response.messages?.[0] || 'Failed to load lessons');
         }
       } catch (error) {
         console.error('Error fetching lessons:', error);
         setError(error.message || 'Failed to load lessons');
-        setLessons([]);
+        toast.error(error.message || 'Failed to load lessons');
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
+
     fetchLessons();
-  }, [selectedCourse]);
+  }, []);
 
-  useEffect(() => {
-    const fetchMaterials = async () => {
-      if (!selectedLesson) {
-        setMaterials([]);
-        return;
-      }
-      try {
-        setIsLoading(true);
-        console.log('Fetching materials for lesson:', selectedLesson);
-        const materialsData = await courseService.getLessonMaterials(selectedLesson);
-        console.log('Materials response:', materialsData);
-        setMaterials(materialsData || []);
-      } catch (error) {
-        console.error('Error fetching materials:', error);
-        setError(error.message || 'Failed to load materials');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchMaterials();
-  }, [selectedLesson]);
-
-  const handleUploadMaterial = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (!selectedLesson) {
-      setError('Please select a lesson first');
+      toast.error('Please select a lesson');
+      return;
+    }
+
+    if (!title.trim()) {
+      toast.error('Please enter a title');
+      return;
+    }
+
+    if (!content.trim()) {
+      toast.error('Please enter content');
+      return;
+    }
+
+    if (!file) {
+      toast.error('Please select a file');
       return;
     }
 
     try {
-      setIsLoading(true);
-      setError(null);
-
-      const formData = new FormData(e.target);
-      const file = formData.get('file');
-      
-      if (!file || file.size === 0) {
-        setError('Please select a file to upload');
-        return;
-      }
-
-      // Validate file type
-      const allowedTypes = [
-        'application/pdf',  // PDF
-        'application/msword',  // DOC
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',  // DOCX
-        'text/plain',  // TXT
-        'video/mp4',  // MP4
-        'video/quicktime',  // MOV
-        'video/x-msvideo',  // AVI
-        'application/vnd.ms-powerpoint',  // PPT
-        'application/vnd.openxmlformats-officedocument.presentationml.presentation'  // PPTX
-      ];
-
-      if (!allowedTypes.includes(file.type)) {
-        console.log('File type:', file.type);
-        setError('Invalid file type. Please upload a PDF, DOC, DOCX, TXT, PPT, PPTX, or video file (MP4, MOV, AVI).');
-        return;
-      }
-
-      // Validate file size (max 50MB)
-      const maxSize = 50 * 1024 * 1024; // 50MB in bytes
-      if (file.size > maxSize) {
-        setError('File is too large. Maximum size is 50MB.');
-        return;
-      }
-
-      // Create material data object with exact property names expected by backend
+      setLoading(true);
       const materialData = {
-        Title: formData.get('title'),
-        Content: formData.get('Content'),
-        LessonId: parseInt(selectedLesson),
-        Data: file,
-        Type: parseInt(selectedMaterialType)
+        title: title.trim(),
+        content: content.trim(),
+        lessonId: parseInt(selectedLesson),
+        file: file,
+        isAssignment: isAssignment
       };
 
-      console.log('Uploading material:', {
-        Title: materialData.Title,
-        Content: materialData.Content,
-        LessonId: materialData.LessonId,
-        Type: materialData.Type,
-        fileName: file.name,
-        fileType: file.type,
-        fileSize: file.size
-      });
-
-      await courseService.uploadLessonMaterial(selectedLesson, materialData);
+      const response = await courseService.uploadLessonMaterial(materialData);
       
-      // Refresh materials list
-      const updatedMaterials = await courseService.getLessonMaterials(selectedLesson);
-      setMaterials(updatedMaterials || []);
-      
-      // Reset form
-      e.target.reset();
-      setSelectedMaterialType('1'); // Reset to Normal type
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+      if (response.succeeded) {
+        toast.success('Material uploaded successfully');
+        // Reset form
+        setTitle('');
+        setContent('');
+        setFile(null);
+        setSelectedLesson('');
+        setIsAssignment(false);
+        // Navigate back to course details
+        navigate(-1);
+      } else {
+        throw new Error(response.messages?.[0] || 'Failed to upload material');
       }
     } catch (error) {
       console.error('Error uploading material:', error);
-      setError(error.message || 'Failed to upload material');
+      toast.error(error.message || 'Failed to upload material');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const handleDeleteMaterial = async (materialId) => {
-    if (window.confirm('Are you sure you want to delete this material?')) {
-      try {
-        setIsLoading(true);
-        await courseService.deleteMaterial(materialId);
-        setMaterials(materials.filter(material => material.id !== materialId));
-      } catch (error) {
-        console.error('Error deleting material:', error);
-        setError(error.message || 'Failed to delete material');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className="flex items-center justify-center h-[calc(100vh-300px)]">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="scale-[2.5]">
           <Loader />
         </div>
@@ -193,164 +106,139 @@ const AddMaterial = () => {
   }
 
   return (
-    <div className="form-container">
-      {error && (
-        <div className="error-message" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', zIndex: 2000, background: '#fee2e2', color: '#b91c1c', padding: '16px', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-          <p style={{ margin: 0 }}>{error}</p>
-          <button onClick={() => setError(null)} style={{ marginLeft: 16, background: '#b91c1c', color: 'white', border: 'none', borderRadius: 4, padding: '4px 12px', cursor: 'pointer' }}>Dismiss</button>
-        </div>
-      )}
-
-      <h2>Upload Course Material</h2>
-      
-      <div className="form-group">
-        <label className="required-field">Select Course</label>
-        <select 
-          value={selectedCourse}
-          onChange={(e) => {
-            console.log('Selected course:', e.target.value);
-            setSelectedCourse(e.target.value);
-            setSelectedLesson('');
-          }}
-          className="category-select"
-          required
-        >
-          <option value="">Choose a course</option>
-          {courses.map(course => (
-            <option key={course.id} value={course.id}>
-              {course.title}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {selectedCourse && (
-        <div className="form-group">
-          <label className="required-field">Select Lesson</label>
-          <select 
-            value={selectedLesson}
-            onChange={(e) => {
-              console.log('Selected lesson:', e.target.value);
-              setSelectedLesson(e.target.value);
-            }}
-            className="category-select"
-            required
-          >
-            <option value="">Choose a lesson</option>
-            {lessons.map(lesson => (
-              <option key={lesson.id} value={lesson.id}>
-                {lesson.title?.toString() || 'Untitled Lesson'}
-              </option>
-            ))}
-          </select>
-          {lessons.length === 0 && (
-            <p className="text-red-500 mt-2">No lessons available for this course.</p>
-          )}
-        </div>
-      )}
-
-      {selectedLesson && (
-        <>
-          <form onSubmit={handleUploadMaterial} className="space-y-4">
-            <div className="form-group">
-              <label className="required-field">Material Title</label>
-              <input
-                type="text"
-                name="title"
-                required
-                className="form-input"
-                placeholder="Enter material title"
-              />
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100">
+          <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
+            <div className="flex items-center">
+              <h2 className="text-2xl font-bold text-gray-900">Upload Course Material</h2>
             </div>
-
+          </div>
+          
+          <form onSubmit={handleSubmit} className="space-y-8">
             <div className="form-group">
-              <label className="required-field">Description</label>
-              <textarea
-                name="Content"
-                required
-                className="form-input"
-                rows="3"
-                placeholder="Enter material description"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="required-field">Material Type</label>
+              <label htmlFor="lesson" className="form-label">Select Lesson</label>
               <select
-                name="materialType"
-                value={selectedMaterialType}
-                onChange={(e) => setSelectedMaterialType(e.target.value)}
-                className="form-input"
+                id="lesson"
+                value={selectedLesson}
+                onChange={(e) => setSelectedLesson(e.target.value)}
+                className="form-select block w-full px-4 py-3 text-base text-gray-800 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition-all duration-200 appearance-none hover:border-[var(--primary-dark)] cursor-pointer"
+                style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg fill=\'none\' stroke=\'%236B7280\' stroke-width=\'2\' viewBox=\'0 0 24 24\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em 1.5em' }}
                 required
               >
-                <option value="1">Normal Material</option>
-                <option value="2">Assignment</option>
+                <option value="">Select a lesson</option>
+                {lessons.map((lesson) => (
+                  <option key={lesson.id} value={lesson.id}>
+                    {lesson.title}
+                  </option>
+                ))}
               </select>
-              <p className="help-text">Choose whether this is a regular material or an assignment</p>
             </div>
 
             <div className="form-group">
-              <label className="required-field">Material File</label>
-              <input
-                type="file"
-                name="file"
-                ref={fileInputRef}
-                required
-                className="form-input"
-                accept=".pdf,.doc,.docx,.txt,video/*"
-              />
-              <p className="help-text">Supported formats: PDF, DOC, DOCX, TXT, and video files</p>
+              <label htmlFor="title" className="form-label">Title</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="form-input pl-10"
+                  placeholder="Enter material title"
+                  required
+                />
+              </div>
             </div>
 
-            <button
-              type="submit"
-              className="save-button"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Uploading...' : 'Upload Material'}
-            </button>
-          </form>
+            <div className="form-group">
+              <label htmlFor="content" className="form-label">Content</label>
+              <textarea
+                id="content"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows={4}
+                className="form-textarea pl-10"
+                placeholder="Enter material content"
+                required
+              />
+            </div>
 
-          <div className="materials-section">
-            <h3>Course Materials</h3>
-            {materials.length > 0 ? (
-              <div className="materials-list">
-                {materials.map(material => (
-                  <div key={material.id} className="material-item">
-                    <div className="card-header">
-                      <h5>{material.title}</h5>
-                      <button
-                        className="delete-btn"
-                        onClick={() => handleDeleteMaterial(material.id)}
-                        title="Delete Material"
-                      >
-                        ×
-                      </button>
-                    </div>
-                    <p>{material.Content}</p>
-                    {material.filePath && (
-                      <div className="material-content">
-                        <a
-                          href={material.filePath}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="view-file-btn"
-                        >
-                          View Material
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                ))}
+            <div className="form-group">
+              <label htmlFor="file" className="form-label">File</label>
+              <div className="file-input-container group">
+                <input
+                  type="file"
+                  id="file"
+                  onChange={(e) => setFile(e.target.files[0])}
+                  className="file-input"
+                  required
+                />
+                <div className="file-input-label group-hover:bg-blue-50 transition-colors duration-200">
+                  <span className="text-gray-700">{file ? file.name : 'Choose a file'}</span>
+                </div>
               </div>
-            ) : (
-              <p>No materials available for this lesson.</p>
-            )}
-          </div>
-        </>
-      )}
+            </div>
+
+            <div className="form-group">
+              <label className="flex items-center justify-between w-full cursor-pointer px-4 py-2 rounded-full border transition-all duration-200 shadow-sm bg-gray-50 border-gray-200 group hover:bg-blue-100 focus-within:bg-blue-100">
+                <span
+                  className={`font-semibold transition-colors duration-200
+                    ${isAssignment ? 'text-blue-700' : 'text-gray-800'}
+                    group-hover:text-blue-700`}
+                >
+                  This is an assignment
+                </span>
+                <span className="relative inline-block w-16 h-9 align-middle select-none" style={{ marginLeft: '29rem' }}>
+                  <input
+                    type="checkbox"
+                    checked={isAssignment}
+                    onChange={(e) => setIsAssignment(e.target.checked)}
+                    className="sr-only peer"
+                    id="assignment-toggle"
+                    aria-checked={isAssignment}
+                  />
+                  <span
+                    className="block w-16 h-9 rounded-full transition-colors duration-300
+                      bg-gray-300 peer-checked:bg-gradient-to-r peer-checked:from-blue-500 peer-checked:to-[var(--primary-color)] border border-gray-300 peer-checked:border-blue-600"
+                  ></span>
+                  <span
+                    className="absolute left-1 top-1 w-7 h-7 rounded-full bg-white shadow-md transition-transform duration-300 flex items-center justify-center
+                      peer-checked:translate-x-7 peer-checked:bg-blue-500"
+                  >
+                    {isAssignment && (
+                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </span>
+                </span>
+              </label>
+            </div>
+
+            <div className="form-actions pt-4">
+              <button
+                type="submit"
+                disabled={loading}
+                className="ml-auto flex items-center py-2 px-6 rounded-lg font-bold text-white bg-gradient-to-r from-[var(--primary-dark)] to-[var(--primary-color)] shadow-md hover:opacity-90 hover:shadow-lg transition-all duration-200 ease-in-out disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <div className="flex items-center">
+                    <Loader className="w-5 h-5 mr-2" />
+                    Uploading...
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    <FaCheck className="mr-2 group-hover:scale-110 transition-transform duration-200" />
+                    Upload Material
+                  </div>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default AddMaterial; 
+export default AddMaterial;
