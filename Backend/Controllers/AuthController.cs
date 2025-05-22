@@ -1,4 +1,5 @@
 using Backend.DTOs.AuthDTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 
 namespace Backend.Controllers;

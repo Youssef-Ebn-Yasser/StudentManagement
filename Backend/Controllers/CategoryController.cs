@@ -35,10 +35,10 @@ public class CategoryController : ControllerBase
         return Ok(result);
     }
 
-    [HttpDelete(" Delete {id}")]
+    [HttpDelete("Delete")]
     public async Task<IActionResult> Delete([FromBody] int id)
     {
-        var result = await _categoryService.DeleteAsync(id);
+        var result = await _categoryService.DeleteAsync(int.Parse(id.ToString().Trim()));
         return Ok(result);
     }
 
