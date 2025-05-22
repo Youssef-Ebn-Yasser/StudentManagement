@@ -1,25 +1,23 @@
-import useAuth from '@/hooks/auth/useAuth';
-import { Navigate, Outlet } from 'react-router-dom';
-import NoAccess from './NoAccess/NoAccess';
+import useAuth from '@/hooks/auth/useAuth'
+import { Navigate, Outlet } from 'react-router-dom'
+import NoAccess from './NoAccess/NoAccess'
+import Loader from './Loader/Loader'
 
-
-const ProtectedRoutes = ({ isAuth, accessRole }) => {
-  const { role, isLogedin} = useAuth();
-  
-  const hasAccess = role === accessRole || accessRole === 'all';
-
- 
-
-  if (!isLogedin) {
-    return <Navigate to="/auth/login" />;
-  }
+const ProtectedRoutes = ({ isProtected, accessRole, children }) => {
+    const { role, isLogedin, loading } = useAuth()
 
   
-  if (!hasAccess) {
-    return <NoAccess />;
-  }
+    if (loading) return <Loader />
 
-  return <Outlet />;
-};
+    if (isProtected && !isLogedin) {
+        return <Navigate to="/auth/login" />
+    }
 
-export default ProtectedRoutes;
+    if (isProtected && accessRole !== 'all' && role !== accessRole) {
+        return <NoAccess />
+    }
+
+    return children
+}
+
+export default ProtectedRoutes
