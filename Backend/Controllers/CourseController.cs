@@ -54,8 +54,8 @@ public class CourseController : AppControllerBase
         return NewResult(result);
     }
 
-    [HttpDelete("Course/Delete/{id}")]
-    public async Task<IActionResult> Delete([FromQuery]int id)
+    [HttpDelete("Course/Delete")]
+    public async Task<IActionResult> Delete([FromQuery] int id)
     {
         var result = await _courseService.DeleteAsync(id);
         return NewResult(result);

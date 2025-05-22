@@ -1,6 +1,4 @@
 using Backend.DTOs.MaterialDTOs;
-using Backend.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
 {
@@ -23,7 +21,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost("CreateMaterial")]
-        public async Task<IActionResult> CreateMaterial([FromBody] CreateMaterialDto createMaterialDto)
+        public async Task<IActionResult> CreateMaterial(CreateMaterialDto createMaterialDto)
         {
             var result = await _materialService.CreateAsync(createMaterialDto);
             return NewResult(result);
@@ -43,4 +41,4 @@ namespace Backend.Controllers
             return NewResult(result);
         }
     }
-} 
+}
