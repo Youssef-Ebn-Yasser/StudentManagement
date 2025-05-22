@@ -20,9 +20,8 @@ const registerFunc = (userType) => {
 
 export const registerUser = createAsyncThunk(
     'auth/register',
-    async (data, userType, { rejectWithValue }) => {
+    async ({data, userType}, { rejectWithValue }) => {
         try {
-          console.log('data', data, userType)
             const register = registerFunc(userType)
             const response = await register(data)
             return response.data

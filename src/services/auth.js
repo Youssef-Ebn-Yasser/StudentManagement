@@ -1,7 +1,11 @@
 import axiosInstance from './axiosInstance'
 
 export const login = async (data) => {
-    const res = await axiosInstance.post('/api/Auth/login', data)
+    const res = await axiosInstance.post('/api/Auth/login', data, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
     return res.data
 }
 

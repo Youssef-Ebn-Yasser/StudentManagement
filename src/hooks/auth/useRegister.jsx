@@ -1,7 +1,7 @@
 import { registerUser } from '@/Redux/auth/registerActions'
 import { useFormik } from 'formik'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { data, useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 
 const useRegister = (userType) => {
@@ -14,9 +14,14 @@ const useRegister = (userType) => {
     }
 
     const handleReg = async (formsData) => {
-        dispatch(registerUser(formsData, userType))
+        dispatch(registerUser(
+            {
+                data: formsData,
+                userType: userType,
+            }
+        ))
             .then((res) => {
-                navigate('/auth/login')
+                // navigate('/auth/login')
             })
             .catch((error) => {
                 console.error('Registration error:', error)

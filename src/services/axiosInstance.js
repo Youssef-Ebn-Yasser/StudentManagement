@@ -4,13 +4,13 @@ const isDevelopment = import.meta.env.DEV;
 const baseURL = isDevelopment ? 'https://e-learn-v1.runasp.net' : 'https://e-learn-v1.runasp.net';
 
 const axiosInstance = axios.create({
-    baseURL,
+    baseURL: 'http://localhost:5034',
     timeout: 10000, // Set a timeout for requests
     headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        Accept: 'application/json',
     },
-    withCredentials: false // Disable credentials since backend doesn't support it
+    withCredentials: false, // Disable credentials since backend doesn't support it
 })
 
 // Add a request interceptor

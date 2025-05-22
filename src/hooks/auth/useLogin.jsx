@@ -29,18 +29,18 @@ const useLogin = () => {
     }
 
     let validationSchema = Yup.object({
-        email: Yup.string()
+        Email: Yup.string()
             .required('email is required')
             .email('invalid email'),
-        password: Yup.string()
+        Password: Yup.string()
             .required('password is required')
             .matches(/^.{6,}$/),
     })
 
     let formik = useFormik({
         initialValues: {
-            email: '',
-            password: '',
+            Email: '',
+            Password: '',
         },
         validationSchema: validationSchema,
         onSubmit: handleLgin,

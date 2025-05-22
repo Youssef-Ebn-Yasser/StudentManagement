@@ -25,12 +25,12 @@ function Login() {
                                     <input
                                         type="email"
                                         className="border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"
-                                        value={formik.values.email}
-                                        name="email"
+                                        value={formik.values.Email}
+                                        name="Email"
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
-                                        id="email"
-                                        placeholder="name@example.com"
+                                        id="Email"
+                                        placeholder="Enter your email"
                                         required
                                     />
                                     {formik.touched.email &&
@@ -47,15 +47,15 @@ function Login() {
                                     <input
                                         type="password"
                                         className="border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"
-                                        value={formik.values.password}
-                                        name="password"
+                                        value={formik.values.Password}
+                                        name="Password"
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
-                                        id="password"
+                                        id="Password"
                                         placeholder="Password"
                                         required
                                     />
-                                    {formik.touched.password &&
+                                    {formik.touched.Password &&
                                     formik.errors.password ? (
                                         <div className="text-red-500">
                                             {formik.errors.password}
