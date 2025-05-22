@@ -4,7 +4,7 @@ const isDevelopment = import.meta.env.DEV;
 const baseURL = isDevelopment ? 'https://e-learn-v1.runasp.net' : 'https://e-learn-v1.runasp.net';
 
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:5034',
+    baseURL,
     timeout: 10000, // Set a timeout for requests
     headers: {
         'Content-Type': 'application/json',
