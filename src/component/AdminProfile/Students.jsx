@@ -32,8 +32,8 @@ function Students() {
     async function handleRemovestudent(id) {
         axios.delete(`https://e-learn-v1.runasp.net/api/Student/Delete/Delete/${id}`)
         .then((response)=>{
-            console.log("Student deleted");
             toast.success('Student Deleted')
+            console.log("Student deleted");
             dispatch(allStudent())
         }).catch((error)=>{
             console.log(error||'invalid id');

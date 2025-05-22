@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 
 const userRole = localStorage.getItem('userRole');
 const ProtectedRoutes = ({ isAuth, accessRole }) => {
-  const navigate = useNavigate();z
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [tokenChecked, setTokenChecked] = useState(false);
   const [hasAccess, setHasAccess] = useState(false);
