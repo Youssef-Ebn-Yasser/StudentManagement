@@ -244,9 +244,7 @@ export const courseService = {
   createMaterial: async (materialData) => {
     try {
       const response = await axiosInstance.post('/api/Material/CreateMaterial/CreateMaterial', materialData, {
-        headers: {
-          'Content-Type': 'application/problem+json; charset=utf-8'
-        }
+       
       });
       return response.data;
     } catch (error) {
@@ -351,42 +349,37 @@ export const courseService = {
       if (!materialData.title?.trim()) throw new Error('Title is required');
       if (!materialData.content?.trim()) throw new Error('Content is required');
       if (!materialData.lessonId) throw new Error('LessonId is required');
-      if (!materialData.file) throw new Error('File is required');
-      if (materialData.content.trim().length > 500) throw new Error('Content cannot exceed 500 characters');
+      if (!materialData.data) throw new Error('File is required');
 
       // Create FormData object
       const formData = new FormData();
-      formData.append('Title', materialData.title.trim());
-      formData.append('Content', materialData.content.trim());
-      formData.append('LessonId', materialData.lessonId);
-      formData.append('File', materialData.file, materialData.file.name);
-      formData.append('Type', materialData.isAssignment ? 2 : 1);
+      formData.append('title', materialData.title.trim());
+      formData.append('content', materialData.content.trim());
+      formData.append('lessonId', materialData.lessonId);
+      formData.append('data', materialData.data);
+      formData.append('type', materialData.type);
 
       console.log('Sending request with FormData:', {
-        Title: materialData.title.trim(),
-        Content: materialData.content.trim(),
-        LessonId: materialData.lessonId,
-        Type: materialData.isAssignment ? 2 : 1,
-        hasFile: !!materialData.file,
-        fileName: materialData.file.name,
-        fileType: materialData.file.type
+        title: materialData.title.trim(),
+        content: materialData.content.trim(),
+        lessonId: materialData.lessonId,
+        type: materialData.type,
+        hasFile: !!materialData.data,
+        fileName: materialData.data.name,
+        fileType: materialData.data.type
       });
 
-      const { data } = await axiosInstance.post(
+      const response = await axiosInstance.post(
         '/api/Material/CreateMaterial/CreateMaterial',
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data; boundary=' + formData._boundary
-          },
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            console.log(`Upload progress: ${percentCompleted}%`);
+            'Content-Type': 'multipart/form-data'
           }
         }
       );
 
-      return data;
+      return response.data;
     } catch (err) {
       if (err.response) {
         console.error('Upload failed:',
