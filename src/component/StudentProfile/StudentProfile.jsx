@@ -27,19 +27,26 @@ export default function StudentProfile() {
   });
   const [currentCourseIndex, setCurrentCourseIndex] = useState(0);
 
+  // Get studentId from localStorage (set this at login)
+  const studentId = localStorage.getItem('studentId');
+
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
         setLoading(true);
 
+        if (!studentId) {
+          throw new Error('No student ID found. Please log in again.');
+        }
+
         // Fetch student details
         const studentResponse = await axios.get(
-          `https://e-learn-v1.runasp.net/api/Student/GetById/GetById/85`
+          `https://e-learn-v1.runasp.net/api/Student/GetById/GetById/${studentId}`
         );
 
         // Fetch enrolled courses
         const coursesResponse = await axios.get(
-          `https://e-learn-v1.runasp.net/api/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses?studentId=85`
+          `https://e-learn-v1.runasp.net/api/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses?studentId=${studentId}`
         );
 
         if (studentResponse.data.succeeded && coursesResponse.data.succeeded) {
@@ -68,7 +75,7 @@ export default function StudentProfile() {
     };
 
     fetchStudentData();
-  }, []);
+  }, [studentId]);
 
   const handleEditProfile = () => {
     navigate('/studentprofile/edit-profile');

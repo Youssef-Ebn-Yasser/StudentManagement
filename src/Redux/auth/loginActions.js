@@ -37,6 +37,7 @@ export const loginBuilder = (builder) => {
                 'Authorization'
             ] = `Bearer ${action.payload.token}`
             localStorage.setItem('refreshToken', action.payload.refreshToken)
+            localStorage.setItem('studentId', action.payload.user.id);
         })
         .addCase(loginUser.rejected, (state, action) => {
             state.loading = false
