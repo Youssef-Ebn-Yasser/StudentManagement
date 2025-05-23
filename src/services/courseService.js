@@ -240,6 +240,17 @@ export const courseService = {
     }
   },
 
+  // Get student assignments for a lesson
+  getStudentAssignments: async (lessonId) => {
+    try {
+      const response = await axiosInstance.get(`/api/Assignment/GetStudentAssignmentForLessonId?lessonId=${lessonId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching student assignments:', error);
+      throw error;
+    }
+  },
+
   // Create material
   createMaterial: async (materialData) => {
     try {

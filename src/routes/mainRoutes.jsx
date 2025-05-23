@@ -25,6 +25,7 @@ import AdminDashboard from '@/component/AdminDashboard/AdminDashboard'
 import CourseDashDetails from '@/component/StudentDashboard/CourseDashDetailes'
 import CourseDetails from '@/component/AdminProfile/CourseDetails'
 import StudentDetails from '@/component/AdminProfile/StudentDetails'
+import StudentAssignments from '@/component/TeacherProfile/StudentAssignments'
 
 const isAuth = true // Replace with actual authentication logic
 
@@ -171,6 +172,12 @@ const routesConfig = [
     {
         path: 'admin/dashboard',
         element: <AdminDashboard/>,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'teacher/assignments',
+        element: <StudentAssignments />,
         isProtected: false,
         accessRole: 'all',
     },
