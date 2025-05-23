@@ -32,13 +32,13 @@ public class TeacherController : AppControllerBase
         return NewResult(result);
     }
 
-    [HttpPost("Teacher/Create")]
-    public async Task<IActionResult> Create(CreateTeacherDto createTeacherDto)
-    {
-        var result = await _teacherService.CreateAsync(createTeacherDto);
+    //[HttpPost("Teacher/Create")]
+    //public async Task<IActionResult> Create(CreateTeacherDto createTeacherDto)
+    //{
+    //    var result = await _teacherService.CreateAsync(createTeacherDto);
 
-        return NewResult(result);
-    }
+    //    return NewResult(result);
+    //}
 
     [HttpPut("Teacher/Update")]
     public async Task<IActionResult> Update(UpdateTeacherDto updateTeacherDto)
