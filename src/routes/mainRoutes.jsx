@@ -62,8 +62,8 @@ const routesConfig = [
     {
         path: 'studentprofile',
         element: <StudentProfile />,
-        isProtected: false,
-        accessRole: 'all',
+        isProtected: true,
+        accessRole: 'Student',
     },
     {
         path: 'teacher/profile',
@@ -173,27 +173,23 @@ const mainRoutes = [
     {
         path: '',
         element: <Layout />,
-        children: [
-            // Public routes
-            ...routesConfig
-                .filter((route) => !route.isProtected)
-                .map(({ path, element }) => ({ path, element })),
-
-            // Protected wrapper
-            {
+        children: routesConfig.map(
+            ({ path, element, isProtected = false, accessRole = 'all' }) => ({
+                path,
                 element: (
                     <ProtectedRoutes
-                        isAuth={!!localStorage.getItem('refreshToken')}
-                        accessRole="all"
-                    />
+                        isProtected={isProtected}
+                        accessRole={accessRole}
+                    >
+                        {element}
+                    </ProtectedRoutes>
                 ),
-                children: routesConfig
-                    .filter((route) => route.isProtected)
-                    .map(({ path, element }) => ({ path, element })),
-            },
-        ],
+            })
+        ),
     },
 ]
+  
+  
 
 // const mainRoutes = [
 //   {

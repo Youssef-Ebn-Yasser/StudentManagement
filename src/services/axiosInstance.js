@@ -8,9 +8,9 @@ const axiosInstance = axios.create({
     timeout: 10000, // Set a timeout for requests
     headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        Accept: 'application/json',
     },
-    withCredentials: false // Disable credentials since backend doesn't support it
+    withCredentials: false, // Disable credentials since backend doesn't support it
 })
 
 // Add a request interceptor
