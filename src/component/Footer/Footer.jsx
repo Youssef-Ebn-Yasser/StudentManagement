@@ -2,7 +2,7 @@ import React from 'react';
 
 const Footer = () => {
     return (
-        <footer className="bg-gray-50 py-8 md:py-12 absolute right-0 left-0">
+        <footer className="bg-gray-50 py-8 md:py-12 absolute right-0 left-0 shadow-sm">
             <div className="container mx-auto px-4 lg:px-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-6 md:gap-4 mb-8">
                     {/* E-Learning Logo Section */}
