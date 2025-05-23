@@ -45,6 +45,12 @@ public class CourseController : AppControllerBase
         var result = await _courseService.GetCourseByIdAsync(id);
         return NewResult(result);
     }
+    [HttpGet("Course/GetAllCoursesOfTeacher/{teacherId}")]
+    public async Task<IActionResult> GetAllCoursesOfTeacher(int teacherId)
+    {
+        var result = await _courseService.GetAllCoursesOfTeacherAsync(teacherId);
+        return NewResult(result);
+    }
 
     [HttpPut("Course/Update/{id}")]
     public async Task<IActionResult> Update([FromBody] UpdateCourseDto updateCourseDto)
@@ -54,7 +60,7 @@ public class CourseController : AppControllerBase
         return NewResult(result);
     }
 
-    [HttpDelete("Course/Delete/{id}")]
+    [HttpDelete("Course/Delete/")]
     public async Task<IActionResult> Delete([FromQuery]int id)
     {
         var result = await _courseService.DeleteAsync(id);

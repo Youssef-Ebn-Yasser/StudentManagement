@@ -6,11 +6,12 @@ namespace Backend.Services.Implementation
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
-        public MaterialService(IUnitOfWork unitOfWork, IMapper mapper)
+        public IFileService _fileService;
+        public MaterialService(IUnitOfWork unitOfWork, IMapper mapper , IFileService fileService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _fileService = fileService;
         }
 
         public async Task<Response<List<ShowMaterialDto>>> GetAllMaterialByLessonIdAsync(int lessonId)
@@ -26,7 +27,21 @@ namespace Backend.Services.Implementation
 
         public async Task<Response<string>> CreateAsync(CreateMaterialDto createMaterialDto)
         {
-            var material = _mapper.Map<Material>(createMaterialDto);
+
+            var path = await _fileService.UploadFileAsync(createMaterialDto.Data);
+
+            var material = new Material
+            {
+                Title = createMaterialDto.Title,
+                Content = createMaterialDto.Content,
+                Type = createMaterialDto.Type,
+                LessonId = createMaterialDto.LessonId,
+                Path = path,
+                CreatedAt = DateTime.UtcNow,
+                IsDeleted = false,
+            };
+           
+           // var material = _mapper.Map<Material>(createMaterialDto);
             await _unitOfWork.Repository<Material>().AddAsync(material);
             _unitOfWork.Complete();
             return Success("Material Created Successfully");
@@ -38,7 +53,18 @@ namespace Backend.Services.Implementation
             if (existingMaterial == null)
                 return NotFound<string>("Material Not Found");
 
-            _mapper.Map(updateMaterialDto, existingMaterial);
+            var path = await _fileService.UploadFileAsync(updateMaterialDto.Data);
+
+            existingMaterial.Title = updateMaterialDto.Title;
+            existingMaterial.Content = updateMaterialDto.Content;
+            existingMaterial.Type = updateMaterialDto.Type;
+            existingMaterial.LessonId = updateMaterialDto.LessonId;
+            existingMaterial.Path = path;
+            existingMaterial.CreatedAt = DateTime.UtcNow;
+            existingMaterial.IsDeleted = false;
+
+
+            // _mapper.Map(updateMaterialDto, existingMaterial);
             _unitOfWork.Repository<Material>().Update(existingMaterial);
             _unitOfWork.Complete();
             return Success("Material Updated Successfully");

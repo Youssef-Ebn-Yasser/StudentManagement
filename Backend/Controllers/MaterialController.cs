@@ -23,14 +23,14 @@ namespace Backend.Controllers
         }
 
         [HttpPost("CreateMaterial")]
-        public async Task<IActionResult> CreateMaterial([FromBody] CreateMaterialDto createMaterialDto)
+        public async Task<IActionResult> CreateMaterial([FromForm] CreateMaterialDto createMaterialDto)
         {
             var result = await _materialService.CreateAsync(createMaterialDto);
             return NewResult(result);
         }
 
         [HttpPut("UpdateMaterial")]
-        public async Task<IActionResult> UpdateMaterial([FromBody] UpdateMaterialDto updateMaterialDto)
+        public async Task<IActionResult> UpdateMaterial([FromForm] UpdateMaterialDto updateMaterialDto)
         {
             var result = await _materialService.UpdateAsync(updateMaterialDto);
             return NewResult(result);

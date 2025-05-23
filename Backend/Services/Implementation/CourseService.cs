@@ -214,6 +214,17 @@ public class CourseService : ResponseHandler, ICourseService
         return Success(courses);
     }
 
+    public async Task<Response<List<ShowCourseDto>>> GetAllCoursesOfTeacherAsync(int teacherId)
+    {
+        var courses = await _unitOfWork.Repository<Course>()
+            .GetTableNoTracking()
+            .Where(c => c.TecherId == teacherId && c.IsDeleted == false)
+            .Include(c => c.Category)
+            .ToListAsync();
+        var result = _mapper.Map<List<ShowCourseDto>>(courses);
+        return Success(result);
+    }
+
 
     #endregion
 }
