@@ -22,8 +22,15 @@ import AddGategory from '@/component/AdminProfile/AddGategory'
 import AddCourse from '@/component/AdminProfile/AddCourse'
 import Students from '@/component/AdminProfile/Students'
 import AdminDashboard from '@/component/AdminDashboard/AdminDashboard'
-import CourseDetails from '@/component/AdminProfile/CourseDetails'
+import ControlCourse from '@/component/AdminProfile/ControlCourse'
 import StudentDetails from '@/component/AdminProfile/StudentDetails'
+import VideoMeeting from '@/component/Meeting/VideoMeeting/VideoMeeting'
+
+
+// Hardcoded meetingId/token for now; ideally these come from your backend
+
+const DUMMY_MEETING_ID = "abcde12345";
+const DUMMY_TOKEN = "84db1e11f46cd999f7f8a631acd7136799524d0478a4bb17ba2950a21ddfdd4d"; // Or env
 
 const isAuth = true // Replace with actual authentication logic
 
@@ -97,7 +104,7 @@ const routesConfig = [
     },
     {
         path: 'courses/course/:id',
-        element: <CourseDetails />,
+        element: <CoursesDetails />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -144,8 +151,8 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
-        path: 'admin/courseDetails/:id',
-        element: <CourseDetails/>,
+        path: 'admin/controlCourse/:id',
+        element: <ControlCourse/>,
         isProtected: false,
         accessRole: 'all',
     },
@@ -167,6 +174,18 @@ const routesConfig = [
         isProtected: false,
         accessRole: 'all',
     },
+    {
+        path: "video-call",
+        element: (
+          <VideoMeeting
+            meetingId={DUMMY_MEETING_ID}
+            token={DUMMY_TOKEN}
+            name={"Teacher or Student Name"}
+          />
+        ),
+        isProtected: false,
+        accessRole: "all",
+      },
 ]
 
 const mainRoutes = [
