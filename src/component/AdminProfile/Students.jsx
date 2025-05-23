@@ -6,6 +6,7 @@ import Loader from '../Loader/Loader'
 import studentImg from '../../assets/student.png'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import { Link } from 'react-router-dom'
 
 
 function Students() {
@@ -72,132 +73,165 @@ function Students() {
       }, [students]);
 
     return <>
-        <div className='p-2'>
-                <h1 className='font-medium text-2xl'><img src={stuImg} alt="stuImg" className='w-7 inline m-2' />Our Students</h1>
+        <div className='bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8'>
+            <div className="container mx-auto">
+                <h1 className='text-3xl font-bold text-gray-800 mb-8 flex items-center'>
+                    <img src={stuImg} alt="Students Icon" className='w-8 h-8 mr-3' />
+                    Our Students
+                </h1>
 
-                            <div className=" p-4 ">
-                                <input className='border-1 rounded-3xl border-gray-200 p-2 hover:shadow-lg hover:shadow-gray-400 w-[50%] transition-all duration-300 ease ms-3'
-                                type="text" placeholder={`Search students by ${searchType}`} onChange={(e)=>setSearchItem(e.target.value)}/>
-                                <select
-                                    className="p-1"
-                                    value={searchType}
-                                    onChange={(e) => setSearchType(e.target.value)}
-                                >
-                                    <option value="name">Name</option>
-                                    <option value="id">ID</option>
-                                    <option value="email">Email</option>
-                                </select>
-                            </div>
+                {/* Search Section */}
+                <div className="mb-8 p-4 bg-white rounded-lg shadow-md flex flex-col sm:flex-row items-center gap-4">
+                    <input 
+                        className='flex-grow form-input rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3 w-full sm:w-auto'
+                        type="text" 
+                        placeholder={`Search students by ${searchType}...`} 
+                        onChange={(e) => setSearchItem(e.target.value)}
+                    />
+                    <select
+                        className="form-select rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 py-3 px-4 w-full sm:w-auto"
+                        value={searchType}
+                        onChange={(e) => setSearchType(e.target.value)}>
+                        <option value="name">Name</option>
+                        <option value="id">ID</option>
+                        <option value="email">Email</option>
+                    </select>
+                </div>
 
-                            {searchItem && (
-                        <div className="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 gap-5 p-5 text-center mx-auto hover:cursor-pointer transition-all duration-300 ease">
-                            {!loading ? (
-                            <>
-                                <h1 className=" text-2xl col-span-full">
-                                <i className="fa-solid fa-magnifying-glass px-2 text-red-500 text-lg"></i>
-                                Search Results
-                                </h1>
-
-                                {filteredstudent.length > 0 ? (
-                                filteredstudent.map((student, index) => (
-                                    <div
-                                    key={student.id}
-                                    className="relative shadow rounded p-2 bg-white hover:shadow-xl hover:shadow-violet-200"
-                                    >
-                                    <img
-                                        src={student.imagePath || studentImg}
-                                        alt={student.name}
-                                        className="w-full h-48 object-fill rounded"
-                                    />
-                                    <h2 className="text-lg font-semibold mt-2">
-                                        Student Name: {student.name}
-                                    </h2>
-                                    <p className="text-lg text-red-500 font-semibold mt-2">
-                                        Id: {student.id}
-                                    </p>
-
-                                    <div className="text-center">
-                                        {enrolledCourse && enrolledCourse[student.id] ? (
-                                        enrolledCourse[student.id].length > 0 ? (
-                                            <ul className="text-center list-disc list-inside text-gray-500">
-                                            {enrolledCourse[student.id].map((course) => (
-                                                <li className="list-none" key={course.id}>
-                                                <span className="text-black">Enrolled Courses: </span>
-                                                {course.title || `Course ID: ${course.id}`}
-                                                </li>
-                                            ))}
-                                            </ul>
-                                        ) : (
-                                            <p className="text-xs text-gray-400 text-left ml-1">
-                                            No Enrolled Courses
-                                            </p>
-                                        )
-                            ) : (
-                            <p className="text-xs text-gray-400 text-left ml-1">
-                                Loading courses...
-                            </p>
-                            )}
-                        </div>
-
-                        <p className="text-gray-500 hover:text-blue-500 hover:underline transition-all duration-300 ease">
-                            <a href={`mailto:${student.email}`} target="_blank" rel="noreferrer">
-                            {student.email}
-                            </a>
-                        </p>
-
-                        <div className="text-red-500 absolute top-5 right-7 bg-white rounded-full p-3 hover:cursor-pointer hover:bg-gray-200 transition-all duration-300 ease">
-                            <button onClick={() => handleRemovestudent(student.id)}>
-                            <i className="fa-solid fa-trash-can hover:cursor-pointer"></i>
-                            </button>
-                        </div>
-                        </div>
-                            ))
-                            ) : (
-                            <p className="text-gray-500 text-center col-span-full">No matching students found.</p>
-                            )}
-                        </>
-                        ) : (
-                        <p className="text-center col-span-full text-gray-500">Loading students...</p>
-                        )}
+                {/* Student List / Search Results */}
+                {loading && (!searchItem || searchItem.length === 0) ? (
+                    <div className="flex justify-center items-center h-64">
+                        <Loader />
                     </div>
-                    )}
+                ) : (
+                    <>
+                        {searchItem && searchItem.length > 0 && (
+                            <h2 className="text-2xl font-semibold text-gray-700 mb-6 text-center">
+                                <i className="fa-solid fa-magnifying-glass px-2 text-violet-500 text-lg"></i>
+                                Search Results
+                            </h2>
+                        )}
+
+                        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
+                            {(searchItem && searchItem.length > 0 ? filteredstudent : students).length > 0 ? (
+                                (searchItem && searchItem.length > 0 ? filteredstudent : students).map((student) => (
+                                    <div 
+                                        key={student.id} 
+                                        className="relative bg-white shadow-xl rounded-xl p-4 sm:p-5 text-center flex flex-col items-center transform transition-all duration-300 ease-in-out hover:scale-105"
+                                    >
+                                        <Link to={`/admin/studentDetails/${student.id}`} className="w-full flex flex-col items-center">
+                                            <img 
+                                                src={student.imagePath || studentImg} 
+                                                alt={student.name || 'Student'} 
+                                                className="w-28 h-28 sm:w-32 sm:h-32 object-cover rounded-full border-4 border-violet-200 shadow-md mb-4" 
+                                            />
+                                            <h2 className="text-lg font-bold text-gray-800 mb-1 truncate w-full" title={student.name}>
+                                                {student.name}
+                                            </h2>
+                                            <p className="text-xs text-gray-500 mb-1">ID: {student.id}</p>
+                                            <p className="text-sm text-violet-600 hover:text-violet-700 hover:underline mb-3 truncate w-full" title={student.email}>
+                                                <a href={`mailto:${student.email}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>
+                                                    {student.email}
+                                                </a>
+                                            </p>
+                                        </Link>
+
+                                        <div className="w-full mt-2 pt-3 border-t border-gray-200 text-left">
+                                            <h4 className="text-xs font-semibold text-gray-600 mb-1">Enrolled Courses:</h4>
+                                            {enrolledCourse[student.id] ? (
+                                                enrolledCourse[student.id].length > 0 ? (
+                                                    <ul className="text-xs text-gray-500 space-y-0.5 max-h-20 overflow-y-auto">
+                                                        {enrolledCourse[student.id].map((course) => (
+                                                            <li key={course.id} className='truncate' title={course.title}>
+                                                                <i className="fas fa-book-reader text-violet-400 mr-1.5"></i>
+                                                                {course.title || `Course ID: ${course.id}`}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                ) : (
+                                                    <p className="text-xs text-gray-400">No courses</p>
+                                                )
+                                            ) : (
+                                                <p className="text-xs text-gray-400">Loading...</p>
+                                            )}
+                                        </div>
+                                        
+                                        <button 
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Prevent Link navigation
+                                                handleRemovestudent(student.id);
+                                            }}
+                                            title="Delete Student"
+                                            className='absolute top-3 right-3 text-red-500 hover:text-red-700 bg-white rounded-full p-2 w-8 h-8 flex items-center justify-center shadow-md hover:bg-red-50 transition-colors duration-200 ease-in-out'
+                                        >
+                                            <i className="fa-solid fa-trash-alt text-sm"></i>
+                                        </button>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="col-span-full text-center py-10">
+                                    {loading && searchItem && searchItem.length > 0 ? (
+                                         <Loader />
+                                    ) : (
+                                        <p className='text-gray-600 text-lg'>
+                                            {searchItem && searchItem.length > 0 ? "No matching students found." : "No students available."}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
+    </>
+}
+
+export default Students
 
 
 
-                    <div className='grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 gap-5 p-5 text-center mx-auto hover:cursor-pointer transition-all duration-300 ease'>
+{/* Previous structure for reference / if needed to revert parts - kept for thought process
+    {searchItem && searchItem.length>0? (
+        // ... search results rendering ...
+    ):(<>
+        <div className='grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 gap-5 p-5 text-center mx-auto hover:cursor-pointer transition-all duration-300 ease'>
                         {!loading?
                         (<>
                             {students && students.length > 0 ? (
                                 students.map((student) => (
-                                <div key={student.id} className="relative shadow rounded p-2 bg-white hover:shadow-xl hover:shadow-violet-200 ">
-                                    <img src={student.imagePath ||studentImg} alt={student.name} className="w-full h-48 object-fill rounded " />
-                                    <h2 className="text-lg font-semibold mt-2">Student Name : {student.name}</h2>
-                                    <p className="text-lg text-red-500 font-semibold mt-2">Id : {student.id}</p>
-                                   
-                                    <div className='text-center'>
-                                    {enrolledCourse[student.id] ? (
-                                            enrolledCourse[student.id].length > 0 ? (
-                                                <ul className="text-center list-disc list-inside text-gray-500">
-                                                    {enrolledCourse[student.id].map((course) => (
-                                                        // Added key and displaying title (assuming it exists)
-                                                        <li className='list-none' key={course.id} ><span className='text-black'> Enrolled Courses : </span>{course.title || `Course ID: ${course.id}`}</li>
-                                                    ))}
-                                                </ul>
-                                            ) : (<p className="text-xs text-gray-400 text-left ml-1">No Erolled Courses</p>)
-                                        ) : (<p className="text-xs text-gray-400 text-left ml-1">Loading courses...</p>)}
+                                    <Link to={`/admin/studentDetails/${student.id}`}>
+                                        <div key={student.id} className="relative shadow rounded p-2 bg-white hover:shadow-xl hover:shadow-violet-200 ">
+                                            <img src={student.imagePath ||studentImg} alt={student.name} className="w-full h-48 object-fill rounded " />
+                                            <h2 className="text-lg font-semibold mt-2">Student Name : {student.name}</h2>
+                                            <p className="text-lg text-red-500 font-semibold mt-2">Id : {student.id}</p>
+                                        
+                                            <div className='text-center'>
+                                            {enrolledCourse[student.id] ? (
+                                                    enrolledCourse[student.id].length > 0 ? (
+                                                        <ul className="text-center list-disc list-inside text-gray-500">
+                                                            {enrolledCourse[student.id].map((course) => (
+                                                                // Added key and displaying title (assuming it exists)
+                                                                <li className='list-none' key={course.id} ><span className='text-black'> Enrolled Courses : </span>{course.title || `Course ID: ${course.id}`}</li>
+                                                            ))}
+                                                        </ul>
+                                                    ) : (<p className="text-xs text-gray-400 text-left ml-1">No Erolled Courses</p>)
+                                                ) : (<p className="text-xs text-gray-400 text-left ml-1">Loading courses...</p>)}
 
-                                    </div>
-                                    <p className="text-gray-500 hover:text-blue-500 hover:underline transition-all duration-300 ease">
-                                        <a href={`mailto:${student.email}`} 
-                                        target='_blank' rel="noreferrer">{student.email}</a>
-                                    </p>
-                                    
-                                    <div className='text-red-500 absolute top-5 right-7 bg-white rounded-full p-3 hover:cursor-pointer hover:bg-gray-200 transition-all duration-300 ease'>
-                                        <button  onClick={()=>{handleRemovestudent(student.id)}}>
-                                            <i className="fa-solid fa-trash-can hover:cursor-pointer"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                                            </div>
+                                            <p className="text-gray-500 hover:text-blue-500 hover:underline transition-all duration-300 ease">
+                                                <a href={`mailto:${student.email}`} 
+                                                target='_blank' rel="noreferrer">{student.email}</a>
+                                            </p>
+                                            
+                                            <div className='text-red-500 absolute top-5 right-7 bg-white rounded-full p-3 hover:cursor-pointer hover:bg-gray-200 transition-all duration-300 ease'>
+                                                <button  onClick={()=>{handleRemovestudent(student.id)}}>
+                                                    <i className="fa-solid fa-trash-can hover:cursor-pointer"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                
                                 ))
                             ) : (   
                                 <p className='text-red-600'>No students available.</p>
@@ -205,8 +239,5 @@ function Students() {
                         ):<Loader/>}
                           
                     </div>
-        </div>
-    </>
-}
-
-export default Students
+    </>)}
+*/}

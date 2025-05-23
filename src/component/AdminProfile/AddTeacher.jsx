@@ -49,29 +49,12 @@ function AddTeacher() {
         
     }
     
-    async function handleAddTeacher(formsData){
-        console.log('Added',formsData);
-        
-        axios.post('https://e-learn-v1.runasp.net/api/Teacher/Teacher/Create', formsData
-        ).then((response)=>{
-            console.log(response);
-            setAddedTeacher(response.data.data)
-            toast.success('Teacher Added')
-            dispatch(allTeachers())
-            
-        }).catch((error)=>{
-            console.log(error);
-            toast.error('Invalid Id')
-            
-        })
-    }
-
+    
     let formik = useFormik({
         initialValues:{
             name:'',
             email:'',
             age:'',
-            additionalInfo:'',
             specialization:'',
             phone:'',
             password:'',
@@ -80,176 +63,217 @@ function AddTeacher() {
         onSubmit:handleAddTeacher
     })
 
+    async function handleAddTeacher(formsData){
+        console.log('Added',formsData);
+
+        const params = new URLSearchParams({
+            Name: formsData.name,
+            Email: formsData.email,
+            Age: formsData.age,
+            Specialization: formsData.specialization,
+            Phone: formsData.phone,
+            Password: formsData.password
+        });
+
+        // 2. Create FormData for the image
+        const formData = new FormData();
+        formData.append("image", formsData.image);
+        
+        axios.post(`https://e-learn-v1.runasp.net/api/Teacher/Teacher/Create?${params.toString()}`,formData 
+        ).then((response)=>{
+            toast.success('Teacher Added')
+            console.log(response);
+            setAddedTeacher(response.data.data)
+            dispatch(allTeachers())
+            
+        }).catch((error)=>{
+            toast.error(error.response.data.massage)
+            console.log(error);
+            
+        })
+    }
+
     useEffect(()=>{
         dispatch(allTeachers())
     },[])
 
     return <>
-        <div className="flex flex-col sm:flex-col  md:flex-col lg:flex-col content-center w-[100%] h-full gap-2">
-            <h2 className='font-medium text-2xl p-2'><img src={addImg} alt="stuImg" className='w-7 inline m-2' />Add Teacher</h2>
-            <form className='mx-auto p-2 w-[50%]' onSubmit={formik.handleSubmit}>
-                <div>
-                    <label htmlFor="name" className='block'>Teacher Name <span className='text-red-500'>*</span></label>
-                    <input type="text" name="name" id="name" value={formik.values.name} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                    placeholder='Enter Teacher Name'
-                    className="block border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
-                </div>
-                <div>
-                    <label htmlFor="email">Teacher Email <span className='text-red-500'>*</span></label>
-                    <input type="email" name="email" id="email" value={formik.values.email} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                    placeholder='Enter Teacher Email'
-                    className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
-                </div>
-                <div>
-                    <label htmlFor="age">Teacher Age</label>
-                    <input type="number" name="age" id="age" value={formik.values.age} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                    placeholder='Enter Teacher Age'
-                    className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
-                </div>
-                <div>
-                    <label htmlFor="additionalInfo">AdditionalInfo </label>
-                    <input type="text" name="additionalInfo" id="additionalInfo" value={formik.values.additionalInfo} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                    placeholder='Enter Additional Info'
-                    className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
-                </div>
-                <div>
-                    <label htmlFor="specialization">Specialization <span className='text-red-500'>*</span></label>
-                    <select 
-                        name="specialization" 
-                        value={formik.values.specialization} 
-                        onChange={formik.handleChange} 
-                        onBlur={formik.handleBlur}
-                        className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease">
-                        <option value="">Select level</option>
-                        <option value="beginner">Beginner</option>
-                        <option value="intermediate">Intermediate</option>
-                        <option value="advanced">Advanced</option>
-                    </select>
-                </div>
-                <div>
-                    <label htmlFor="phone">Phone</label>
-                    <input type="tel" name="phone" id="phone" value={formik.values.phone} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                    placeholder='Enter Phone Number'
-                    className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
-                </div>
-                <div>
-                    <label htmlFor="password">Password <span className='text-red-500'>*</span></label>
-                    <input type="password" name="password" id="password" value={formik.values.password} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                    placeholder='Enter Password'
-                    className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400  w-full transition-all duration-300 ease"/>
-                </div>
-                <div>
-                    <label htmlFor="image">Profile Image</label>
-                    <input type="file" name="image" id="image" accept='image/*' onBlur={formik.handleBlur}
-                    onChange={(e)=>{
-                        const file=e.currentTarget.files[0];
-                        if(file){
-                            formik.setFieldValue('image',file)
-                            setImagePreview(URL.createObjectURL(file))
-                        }else{
-                            formik.setFieldValue('image',null)
-                            setImagePreview(img)
-                        }
-                    }}
-                    className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
-                </div>
-                <div className='my-2 flex justify-center '>
-                    <button type='submit'
-                    className="bg-violet-100 text-violet-600  px-6 py-2 rounded text-xl  hover:cursor-pointer hover:shadow-sm hover:shadow-violet-300-600 transition-all duration-300 ease"
-                    >Add</button>
-                </div>
-            </form>
-
-            <hr />
-
-            <div className='p-2'>
-                <h1 className='font-medium text-2xl'><img src={teaImg} alt="stuImg" className='w-7 inline m-2' />Our Teachers</h1>
-
-                {/* /////////Search Section/////////////////////// */}
-
-
-                <div className=" p-4 ">
-                                <input className='border-1 rounded-3xl border-gray-200 p-2 hover:shadow-lg hover:shadow-gray-400 w-[50%] transition-all duration-300 ease ms-3'
-                                type="text" placeholder={`Search teachers by ${searchType}`} onChange={(e)=>setSearchItem(e.target.value)}/>
-                                <select
-                                    className="p-1"
-                                    value={searchType}
-                                    onChange={(e) => setSearchType(e.target.value)}
-                                >
-                                    <option value="name">Name</option>
-                                    <option value="id">ID</option>
-                                    <option value="email">Email</option>
+        <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
+            <div className="container mx-auto space-y-10">
+                {/* Add Teacher Form Section */}
+                <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl max-w-2xl mx-auto">
+                    <h2 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-8 flex items-center justify-center'>
+                        <img src={addImg} alt="Add Teacher Icon" className='w-8 h-8 mr-3' />
+                        Add New Teacher
+                    </h2>
+                    <form className='space-y-6' onSubmit={formik.handleSubmit}>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="name" className='block text-sm font-medium text-gray-700 mb-1'>Teacher Name <span className='text-red-500'>*</span></label>
+                                <input type="text" name="name" id="name" value={formik.values.name} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                placeholder='Enter Teacher Name'
+                                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
+                            </div>
+                            <div>
+                                <label htmlFor="email" className='block text-sm font-medium text-gray-700 mb-1'>Teacher Email <span className='text-red-500'>*</span></label>
+                                <input type="email" name="email" id="email" value={formik.values.email} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                placeholder='Enter Teacher Email'
+                                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="age" className='block text-sm font-medium text-gray-700 mb-1'>Teacher Age</label>
+                                <input type="number" name="age" id="age" value={formik.values.age} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                placeholder='Enter Teacher Age'
+                                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
+                            </div>
+                            <div>
+                                <label htmlFor="specialization" className='block text-sm font-medium text-gray-700 mb-1'>Specialization <span className='text-red-500'>*</span></label>
+                                <select 
+                                    name="specialization" 
+                                    id="specialization"
+                                    value={formik.values.specialization} 
+                                    onChange={formik.handleChange} 
+                                    onBlur={formik.handleBlur}
+                                    className="form-select w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3">
+                                    <option value="">Select Specialization</option>
+                                    <option value="beginner">Beginner</option>
+                                    <option value="intermediate">Intermediate</option>
+                                    <option value="advanced">Advanced</option>
+                                    {/* Add more relevant specializations */}
+                                    <option value="web_development">Web Development</option>
+                                    <option value="data_science">Data Science</option>
+                                    <option value="design">Design</option>
                                 </select>
                             </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="phone" className='block text-sm font-medium text-gray-700 mb-1'>Phone</label>
+                                <input type="tel" name="phone" id="phone" value={formik.values.phone} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                placeholder='Enter Phone Number'
+                                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
+                            </div>
+                            <div>
+                                <label htmlFor="password" className='block text-sm font-medium text-gray-700 mb-1'>Password <span className='text-red-500'>*</span></label>
+                                <input type="password" name="password" id="password" value={formik.values.password} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                placeholder='Enter Password'
+                                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
+                            </div>
+                        </div>
+                        <div>
+                            <label htmlFor="image" className='block text-sm font-medium text-gray-700 mb-1'>Profile Image</label>
+                            <input type="file" name="image" id="image" accept='image/*' onBlur={formik.handleBlur}
+                            onChange={(e)=>{
+                                const file=e.currentTarget.files[0];
+                                if(file){
+                                    formik.setFieldValue('image',file)
+                                    setImagePreview(URL.createObjectURL(file))
+                                }else{
+                                    formik.setFieldValue('image',null)
+                                    setImagePreview(img) // Default avatar
+                                }
+                            }}
+                            className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-2 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"/>
+                            {imagePreview && <img src={imagePreview} alt="Preview" className="mt-3 w-24 h-24 rounded-full object-cover mx-auto shadow-md"/>}
+                        </div>
+                        <div className='mt-8 flex justify-center'>
+                            <button type='submit'
+                            className="bg-violet-600 text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-50 transition-all duration-300 ease-in-out transform hover:scale-105"
+                            >Add Teacher</button>
+                        </div>
+                    </form>
+                </div>
 
-                            {searchItem && (
-                        <div className="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 gap-5 p-5 text-center mx-auto hover:cursor-pointer transition-all duration-300 ease">
-                            {!loading ? (
-                            <>
-                                <h1 className=" text-2xl col-span-full">
-                                <i className="fa-solid fa-magnifying-glass px-2 text-red-500 text-lg"></i>
-                                Search Results
-                                </h1>
+                {/* Our Teachers List Section */}
+                <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl">
+                    <h1 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-8 flex items-center'>
+                        <img src={teaImg} alt="Teachers Icon" className='w-8 h-8 mr-3' />
+                        Our Teachers
+                    </h1>
 
-                                {filteredstudent.length > 0 ? (
-                                filteredstudent.map((teacher, index) => (
-                                    <div key={teacher.id} className="relative shadow rounded p-2 bg-white hover:shadow-xl hover:shadow-violet-200 ">
-                                        <img src={teacher.imagePath ||teacherImg} alt={teacher.name} className="w-full h-48 object-fill rounded " />
-                                        <h2 className="text-lg font-semibold mt-2">teacher Name : {teacher.name}</h2>
-                                        <p className="text-lg text-red-500 font-semibold mt-2">Id : {teacher.id}</p>
-                                    
-                                        <p className="text-gray-500 hover:text-blue-500 hover:underline transition-all duration-300 ease">
-                                            <a href={`mailto:${teacher.email}`} 
-                                            target='_blank' rel="noreferrer">{teacher.email}</a>
-                                        </p>
-                                        
-                                        <div className='text-red-500 absolute top-5 right-7 bg-white rounded-full p-2 hover:cursor-pointer hover:shadow-2xl hover:shadow-gray-500'>
-                                            <button  onClick={()=>{handleRemoveTeacher(teacher.id)}}>
-                                                <i className="fa-solid fa-lock hover:cursor-pointer"></i>
+                    {/* Search Section */}
+                    <div className="mb-8 p-4 bg-gray-100 rounded-lg shadow-sm flex flex-col sm:flex-row items-center gap-4">
+                        <input 
+                            className='flex-grow form-input rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3 w-full sm:w-auto'
+                            type="text" 
+                            placeholder={`Search teachers by ${searchType}...`} 
+                            onChange={(e)=>setSearchItem(e.target.value)}
+                        />
+                        <select
+                            className="form-select rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 py-3 px-4 w-full sm:w-auto"
+                            value={searchType}
+                            onChange={(e) => setSearchType(e.target.value)}>
+                            <option value="name">Name</option>
+                            <option value="id">ID</option>
+                            <option value="email">Email</option>
+                        </select>
+                    </div>
+
+                    {/* Teacher List / Search Results */}
+                    {loading && (!searchItem || searchItem.length === 0) ? (
+                        <div className="flex justify-center items-center h-64">
+                            <Loader />
+                        </div>
+                    ) : (
+                        <>
+                            {searchItem && searchItem.length > 0 && (
+                                <h2 className="text-xl font-semibold text-gray-700 mb-6 text-center">
+                                    <i className="fa-solid fa-magnifying-glass px-2 text-violet-500"></i>
+                                    Search Results
+                                </h2>
+                            )}
+
+                            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
+                                {(searchItem && searchItem.length > 0 ? filteredstudent : teachers).length > 0 ? (
+                                    (searchItem && searchItem.length > 0 ? filteredstudent : teachers).map((teacher) => (
+                                        <div 
+                                            key={teacher.id} 
+                                            className="relative bg-white border border-gray-200 shadow-lg rounded-xl p-4 sm:p-5 text-center flex flex-col items-center transform transition-all duration-300 ease-in-out hover:shadow-violet-200 hover:scale-105"
+                                        >
+                                            <img 
+                                                src={teacher.imagePath || teacherImg} 
+                                                alt={teacher.name || 'Teacher'} 
+                                                className="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-full border-4 border-violet-200 shadow-md mb-4" 
+                                            />
+                                            <h2 className="text-md font-bold text-gray-800 mb-1 truncate w-full" title={teacher.name}>
+                                                {teacher.name}
+                                            </h2>
+                                            <p className="text-xs text-gray-500 mb-1">ID: {teacher.id}</p>
+                                            <p className="text-sm text-violet-600 hover:text-violet-700 hover:underline mb-3 truncate w-full" title={teacher.email}>
+                                                <a href={`mailto:${teacher.email}`} target="_blank" rel="noreferrer">
+                                                    {teacher.email}
+                                                </a>
+                                            </p>
+                                            {/* You can add specialization or other details here if available and desired */}
+                                            {teacher.specialization && <p className="text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full">{teacher.specialization}</p>}
+                                            
+                                            <button 
+                                                onClick={() => handleRemoveTeacher(teacher.id)}
+                                                title="Delete Teacher"
+                                                className='absolute top-3 right-3 text-red-500 hover:text-red-700 bg-white rounded-full p-2 w-8 h-8 flex items-center justify-center shadow-md hover:bg-red-50 transition-colors duration-200 ease-in-out'
+                                            >
+                                                <i className="fa-solid fa-trash-alt text-sm"></i> {/* Changed icon to fa-trash-alt for consistency */}
                                             </button>
                                         </div>
-                                    </div>
-                                        ))
+                                    ))
+                                ) : (
+                                    <div className="col-span-full text-center py-10">
+                                         {loading && searchItem && searchItem.length > 0 ? (
+                                            <Loader />
                                         ) : (
-                                        <p className="text-gray-500 text-center col-span-full">No matching Teachers found.</p>
+                                            <p className='text-gray-600 text-lg'>
+                                                {searchItem && searchItem.length > 0 ? "No matching teachers found." : "No teachers available."}
+                                            </p>
                                         )}
-                                    </>
-                                    ) : (
-                                    <p className="text-center col-span-full text-gray-500">Loading Teachers...</p>
-                                    )}
-                                </div>
-                                )}
-                {/* /////////Search Section/////////////////////// */}
-
-                    <div className='grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 gap-5 p-5 text-center mx-auto hover:cursor-pointer transition-all duration-300 ease'>
-                        {!loading?
-                        (<>
-                            {teachers && teachers.length > 0 ? (
-                                teachers.map((teacher) => (
-                                <div key={teacher.id} className="relative shadow rounded p-2 bg-white hover:shadow-xl hover:shadow-violet-200 ">
-                                    <img src={teacher.imagePath ||teacherImg} alt={teacher.name} className="w-full h-48 object-fill rounded " />
-                                    <h2 className="text-lg font-semibold mt-2">teacher Name : {teacher.name}</h2>
-                                    <p className="text-lg text-red-500 font-semibold mt-2">Id : {teacher.id}</p>
-                                   
-                                    <p className="text-gray-500 hover:text-blue-500 hover:underline transition-all duration-300 ease">
-                                        <a href={`mailto:${teacher.email}`} 
-                                        target='_blank' rel="noreferrer">{teacher.email}</a>
-                                    </p>
-                                    
-                                    <div className='text-red-500 absolute top-5 right-7 bg-white rounded-full p-2 hover:cursor-pointer hover:shadow-2xl hover:shadow-gray-500'>
-                                        <button  onClick={()=>{handleRemoveTeacher(teacher.id)}}>
-                                            <i className="fa-solid fa-lock hover:cursor-pointer"></i>
-                                        </button>
                                     </div>
-                                </div>
-                                ))
-                            ) : (   
-                                <p className='text-red-600'>No Teachers available.</p>
-                            )}</>
-                        ):<Loader/>}
-                          
-                    </div>
-        </div>
+                                )}
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
         </div>
     </>
 }
