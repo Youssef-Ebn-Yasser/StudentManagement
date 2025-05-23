@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUser, FaEnvelope, FaPhone, FaSave, FaTimes, FaGithub, FaLinkedin, FaFacebook, FaCheckCircle } from 'react-icons/fa';
+import {
+  FaUser,
+  FaEnvelope,
+  FaPhone,
+  FaSave,
+  FaTimes,
+  FaGithub,
+  FaLinkedin,
+  FaFacebook,
+  FaCheckCircle,
+} from 'react-icons/fa';
 import axios from 'axios';
 
 export default function EditProfile() {
@@ -22,8 +32,16 @@ export default function EditProfile() {
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
-        const studentId = localStorage.getItem('userId');
-        const response = await axios.get(`https://e-learn-v1.runasp.net/api/Student/GetById/GetById/85`);
+        // Use the logged-in student's ID from localStorage
+        const studentId = localStorage.getItem('studentId');
+        if (!studentId) {
+          setError('No student ID found. Please log in again.');
+          setLoading(false);
+          return;
+        }
+        const response = await axios.get(
+          `https://e-learn-v1.runasp.net/api/Student/GetById/GetById/${studentId}`
+        );
         if (response.data.succeeded) {
           const studentData = response.data.data;
           setFormData({
@@ -71,8 +89,13 @@ export default function EditProfile() {
     setLoading(true);
     setSuccess(false);
     try {
-      const studentId = localStorage.getItem('userId');
-      // Don't redirect to login, just stay on page
+      // Use the logged-in student's ID from localStorage
+      const studentId = localStorage.getItem('studentId');
+      if (!studentId) {
+        setError('No student ID found. Please log in again.');
+        setLoading(false);
+        return;
+      }
 
       const formDataToSend = new FormData();
       Object.keys(formData).forEach((key) => {
@@ -82,7 +105,7 @@ export default function EditProfile() {
       });
 
       const response = await axios.put(
-        `https://e-learn-v1.runasp.net/api/Student/Update/Update?Id=85`,
+        `https://e-learn-v1.runasp.net/api/Student/Update/Update?Id=${studentId}`,
         formDataToSend,
         {
           headers: {
