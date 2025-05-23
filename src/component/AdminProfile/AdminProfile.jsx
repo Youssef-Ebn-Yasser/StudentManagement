@@ -5,96 +5,116 @@ import teaImg from '../../assets/teachers-day.png'
 import stuImg from '../../assets/audience.png'
 import gateImg from '../../assets/gategory.png'
 import courseImg from '../../assets/online-lesson.png'
-import assignmentImg from '../../assets/assignment.png'
-import lessonImg from '../../assets/lesson.png'
 import profilePhoto from '../../assets/wallpaperflare.jpg'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { allStudent } from '@/Redux/features/allStudents/allStudents'
 import { allTeachers } from '@/Redux/features/allTeachers/allTeachers'
 import { allCourses } from '@/Redux/features/allCourses/allCourses'
+import toast from 'react-hot-toast'
+import Loader from '../Loader/Loader'
+
+
+   
 
 function AdminProfile() {
 
-    // let [profilePhoto, setProfilePhoto]= useState("../../assets/wallpaperflare.jpg")
-    let dispatch= useDispatch()
+     // let [profilePhoto, setProfilePhoto]= useState("../../assets/wallpaperflare.jpg")
+     let dispatch= useDispatch()
 
-    const {students}= useSelector((state)=>state.allStudents)
-    const {teachers}= useSelector((state)=>state.allTeachers)
-    const {courses}= useSelector((state)=>state.allCourses)
+     const {students,loading}= useSelector((state)=>state.allStudents)
+     const {teachers}= useSelector((state)=>state.allTeachers)
+     const {courses}= useSelector((state)=>state.allCourses)
+ 
+ 
+     useEffect(()=>{
+         try {
+             dispatch(allStudent())
+             dispatch(allTeachers())
+             dispatch(allCourses())
+ 
+         } catch (error) {
+             toast.error('wait!')
+         }},[dispatch])
+    return (
+        <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
+                <div className="bg-white shadow-xl rounded-lg overflow-hidden">
+                    <div className="relative">
+                        <img src={profilePhoto} alt="cover" className="w-full h-64 object-cover" />
+                    </div>
 
+                    <div className="relative py-8 px-8">
+                        <div className="absolute -top-20 left-1/2 transform -translate-x-1/2">
+                            <img src={img} alt="adminImg" className="w-48 h-48 rounded-full border-4 border-white shadow-xl" />
+                        </div>
+                        <div className="mt-20 text-center">
+                            <h1 className="text-3xl font-bold text-gray-800">Admin Name</h1>
+                            <p className="text-gray-600 mt-2">E-learning Admin Owner</p>
+                        </div>
 
-    
-    useEffect(()=>{
-        dispatch(allStudent())
-        dispatch(allTeachers())
-        dispatch(allCourses())
-    },[])
+                        <div className="mt-6 flex justify-center space-x-4">
+                            <div className="flex items-center">
+                                <img src={stuImg} alt="stuImg" className="w-6 h-6 mr-2" />
+                                <span className="text-indigo-500 font-medium text-lg">
+                                    {!loading ? <>{students && students.length}</> : <Loader />} Students
+                                </span>
+                            </div>
+                            <div className="flex items-center">
+                                <img src={teaImg} alt="teaImg" className="w-6 h-6 mr-2" />
+                                <span className="text-indigo-500 font-medium text-lg">
+                                    {!loading ? <>{teachers && teachers.length}</> : <Loader />} Teachers
+                                </span>
+                            </div>
+                            <div className="flex items-center">
+                                <img src={courseImg} alt="courseImg" className="w-6 h-6 mr-2" />
+                                <span className="text-indigo-500 font-medium text-lg">
+                                    {!loading ? <>{courses && courses.length}</> : <Loader />} Courses
+                                </span>
+                            </div>
+                        </div>
 
+                        <div className="mt-8 text-center">
+                            <div className="flex justify-center space-x-6">
+                                <a href="#" className="text-gray-400 hover:text-indigo-500"><i className="fab fa-facebook-f text-2xl"></i></a>
+                                <a href="#" className="text-gray-400 hover:text-indigo-500"><i className="fab fa-github text-2xl"></i></a>
+                                <a href="#" className="text-gray-400 hover:text-indigo-500"><i className="fab fa-linkedin-in text-2xl"></i></a>
+                                <a href="#" className="text-gray-400 hover:text-indigo-500"><i className="fab fa-instagram text-2xl"></i></a>
+                                <a href="#" className="text-gray-400 hover:text-indigo-500"><i className="fab fa-twitter text-2xl"></i></a>
+                            </div>
+                        </div>
+                    </div>
 
-    return <>
-        <div className='flex flex-col justify-center'>
-            <div className='flex flex-col h-full relative'>
-                <img src={profilePhoto} alt="cover" className='w-lvw h-[300px] object-cover' />
-                <div className='adminCard relative w-[100%] bg-white rounded-xl shadow-lg p-6 mt-[-75px] z-10 flex flex-col items-center'>
-                        <img src={img} alt="adminImg" className='w-80 h-80 rounded-full border-4 border-white -mt-16 z-20 '/>
-                        <h1 className='text-black text-center text-2xl -mt-1 z-20 font-medium'>Admin Name</h1>
-                        <p className='text-gray-600'>E-learning Admin Owner</p>
-                        <p>
-                            <img src={stuImg} alt="stuImg" className='w-5 inline' /><span className='text-indigo-500 font-medium'>{students.length}</span> Students &nbsp;
-                            <img src={teaImg} alt="stuImg" className='w-5 inline' /><span className='text-indigo-500 font-medium'>{teachers.length}</span> Teachers &nbsp;
-                            <img src={courseImg} alt="stuImg" className='w-5 inline' /><span className='text-indigo-500 font-medium'>{courses.length}</span> Courses &nbsp;
-
+                    <div className="py-8 px-8 border-t border-gray-200">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4">About Me</h2>
+                        <p className="text-gray-600 text-lg">
+                        As the platform admin, I oversee course management, user access, and system settings to ensure everything runs smoothly. I regularly monitor content quality, respond to support issues, and coordinate with instructors and developers to maintain a seamless learning experience.
+                        Let me know if you'd like it to include reminders or a more casual tone.
                         </p>
-                        <p className='flex lg:flex-row md:flex-row sm:flex-col gap-2 py-2'>
-                            <a href='#' className='bg-violet-100 text-violet-600 px-3 rounded-sm hover:shadow-lg hover:shadow-gray-300'><i class="fa-brands fa-facebook-f"></i></a>
-                            <a href='#' className='bg-violet-100 text-violet-600 px-3 rounded-sm hover:shadow-lg hover:shadow-gray-300'><i class="fa-brands fa-github"></i></a>
-                            <a href='#' className='bg-violet-100 text-violet-600 px-3 rounded-sm hover:shadow-lg hover:shadow-gray-300'><i class="fa-brands fa-linkedin-in"></i></a>
-                            <a href='#' className='bg-violet-100 text-violet-600 px-3 rounded-sm hover:shadow-lg hover:shadow-gray-300'><i class="fa-brands fa-instagram"></i></a>
-                            <a href='#' className='bg-violet-100 text-violet-600 px-3 rounded-sm hover:shadow-lg hover:shadow-gray-300'><i class="fa-brands fa-linkedin-in"></i></a>
-                            <a href='#' className='bg-violet-100 text-violet-600 px-3 rounded-sm hover:shadow-lg hover:shadow-gray-300'><i class="fa-brands fa-x-twitter"></i></a>
-                        </p>
-                </div>
-                <div className='p-5'>
-                    <h2 className='text-black text-2xl -mt-1 z-20 font-medium'>About Me</h2>
-                    <p className='text-gray-400 text-lg'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem, fugiat aliquam. Placeat architecto neque nesciunt aliquam aut. Obcaecati eum possimus tenetur harum, qui consequatur ipsum doloribus nemo fugiat explicabo et. Laborum nostrum dicta veniam, sapiente nisi porro accusantium hic deleniti, asperiores, recusandae aliquam suscipit maxime aut ullam ipsam. Nam sed eligendi illum dignissimos deleniti deserunt quas, dolore est quo animi quia, soluta corrupti excepturi? Maiores expedita, sit ea exercitationem illo, molestias voluptate deleniti tempora, consectetur quisquam explicabo quam! Ullam voluptatum molestias maiores officia ea, possimus magnam quaerat quo dolorum corporis error in, qui obcaecati blanditiis odit. Vel nesciunt consequuntur at.</p>
-                </div>
-                
-            </div>
+                    </div>
 
-            <div className='grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-5 p-5 text-center'>
-                
-                <Link to={'/admin/addteacher'}>
-                    <div className='bg-violet-100 text-violet-600 rounded-2xl p-5 text-2xl hover:shadow-lg hover:shadow-violet-200 transition-all duration-300 ease'>
-                        <span><img src={teaImg} alt="stuImg" className='w-7 inline m-2' /></span><h3>Add Teacher</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-8 px-8">
+                        <Link to="/admin/addteacher" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
+                            <img src={teaImg} alt="teaImg" className="w-12 h-12 mx-auto mb-4" />
+                            <h3 className="text-xl font-semibold text-indigo-600">Add Teacher</h3>
+                        </Link>
+                        <Link to="/admin/addgategory" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
+                            <img src={gateImg} alt="gateImg" className="w-12 h-12 mx-auto mb-4" />
+                            <h3 className="text-xl font-semibold text-indigo-600">Add Category</h3>
+                        </Link>
+                        <Link to="/admin/addcourse" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
+                            <img src={courseImg} alt="courseImg" className="w-12 h-12 mx-auto mb-4" />
+                            <h3 className="text-xl font-semibold text-indigo-600">Add Course</h3>
+                        </Link>
+                        <Link to="/admin/students" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
+                            <img src={stuImg} alt="stuImg" className="w-12 h-12 mx-auto mb-4" />
+                            <h3 className="text-xl font-semibold text-indigo-600">Students</h3>
+                        </Link>
                     </div>
-                </Link>
-                <Link to={'/admin/addgategory'}>
-                    <div className='bg-violet-100 text-violet-600 rounded-2xl p-5 text-2xl hover:shadow-lg hover:shadow-violet-200 transition-all duration-300 ease'>
-                        <span><img src={gateImg} alt="stuImg" className='w-7 inline m-2' /></span><h3>Add Gategory</h3>
-                    </div>
-                </Link>
-                <Link to={'/admin/addcourse'}>
-                    <div className='bg-violet-100 text-violet-600 rounded-2xl p-5 text-2xl hover:shadow-lg hover:shadow-violet-200 transition-all duration-300 ease'>
-                        <span><img src={courseImg} alt="stuImg" className='w-7 inline m-2' /></span><h3>Add Course</h3>
-                    </div>
-                </Link>
-                <Link to={'/admin/students'}>
-                    <div className='bg-violet-100 text-violet-600 rounded-2xl p-5 text-2xl hover:shadow-lg hover:shadow-violet-200 transition-all duration-300 ease'>
-                        <span><img src={stuImg} alt="stuImg" className='w-7 inline m-2' /></span><h3>Students</h3>
-                    </div>
-                </Link>
-                <Link to={'/admin/lessons'} className='col-span-2'>
-                    <div className='bg-violet-100 text-violet-600 rounded-2xl p-5 text-2xl hover:shadow-lg hover:shadow-violet-200 transition-all duration-300 ease'>
-                        <span><img src={lessonImg} alt="stuImg" className='w-7 inline m-2' /></span><h3>Lessons</h3>
-                    </div>
-                </Link>
-                     
-
+                </div>
             </div>
         </div>
-        
-    </>
+    );
 }
 
 export default AdminProfile

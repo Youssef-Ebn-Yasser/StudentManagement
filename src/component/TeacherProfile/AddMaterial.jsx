@@ -12,8 +12,8 @@ const AddMaterial = ({ teacherId }) => {
   const [selectedLesson, setSelectedLesson] = useState('');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [file, setFile] = useState(null);
-  const [isAssignment, setIsAssignment] = useState(false);
+  const [data, setData] = useState(null);
+  const [type, setType] = useState(1); // 1 for regular material, 2 for assignment
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -21,7 +21,7 @@ const AddMaterial = ({ teacherId }) => {
     const fetchLessons = async () => {
       try {
         setLoading(true);
-        const response = await courseService.getCourseLessons();
+        const response = await courseService.getAllLessons();
         if (response.succeeded) {
           setLessons(response.data);
         } else {
@@ -57,7 +57,7 @@ const AddMaterial = ({ teacherId }) => {
       return;
     }
 
-    if (!file) {
+    if (!data) {
       toast.error('Please select a file');
       return;
     }
@@ -68,8 +68,8 @@ const AddMaterial = ({ teacherId }) => {
         title: title.trim(),
         content: content.trim(),
         lessonId: parseInt(selectedLesson),
-        file: file,
-        isAssignment: isAssignment
+        data: data,
+        type: type
       };
 
       const response = await courseService.uploadLessonMaterial(materialData);
@@ -79,9 +79,9 @@ const AddMaterial = ({ teacherId }) => {
         // Reset form
         setTitle('');
         setContent('');
-        setFile(null);
+        setData(null);
         setSelectedLesson('');
-        setIsAssignment(false);
+        setType(1);
         // Navigate back to course details
         navigate(-1);
       } else {
@@ -92,6 +92,13 @@ const AddMaterial = ({ teacherId }) => {
       toast.error(error.message || 'Failed to upload material');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setData(selectedFile);
     }
   };
 
@@ -123,7 +130,6 @@ const AddMaterial = ({ teacherId }) => {
                 value={selectedLesson}
                 onChange={(e) => setSelectedLesson(e.target.value)}
                 className="form-select block w-full px-4 py-3 text-base text-gray-800 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition-all duration-200 appearance-none hover:border-[var(--primary-dark)] cursor-pointer"
-                style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg fill=\'none\' stroke=\'%236B7280\' stroke-width=\'2\' viewBox=\'0 0 24 24\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.5em 1.5em' }}
                 required
               >
                 <option value="">Select a lesson</option>
@@ -164,55 +170,45 @@ const AddMaterial = ({ teacherId }) => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="file" className="form-label">File</label>
+              <label htmlFor="data" className="form-label">File</label>
               <div className="file-input-container group">
                 <input
                   type="file"
-                  id="file"
-                  onChange={(e) => setFile(e.target.files[0])}
+                  id="data"
+                  onChange={handleFileChange}
                   className="file-input"
                   required
                 />
                 <div className="file-input-label group-hover:bg-blue-50 transition-colors duration-200">
-                  <span className="text-gray-700">{file ? file.name : 'Choose a file'}</span>
+                  <span className="text-gray-700">{data ? data.name : 'Choose a file'}</span>
                 </div>
               </div>
             </div>
 
             <div className="form-group">
-              <label className="flex items-center justify-between w-full cursor-pointer px-4 py-2 rounded-full border transition-all duration-200 shadow-sm bg-gray-50 border-gray-200 group hover:bg-blue-100 focus-within:bg-blue-100">
-                <span
-                  className={`font-semibold transition-colors duration-200
-                    ${isAssignment ? 'text-blue-700' : 'text-gray-800'}
-                    group-hover:text-blue-700`}
-                >
-                  This is an assignment
-                </span>
-                <span className="relative inline-block w-16 h-9 align-middle select-none" style={{ marginLeft: '29rem' }}>
+              <label className="form-label">Material Type</label>
+              <div className="flex items-center space-x-4">
+                <label className="inline-flex items-center">
                   <input
-                    type="checkbox"
-                    checked={isAssignment}
-                    onChange={(e) => setIsAssignment(e.target.checked)}
-                    className="sr-only peer"
-                    id="assignment-toggle"
-                    aria-checked={isAssignment}
+                    type="radio"
+                    value={1}
+                    checked={type === 1}
+                    onChange={(e) => setType(parseInt(e.target.value))}
+                    className="form-radio"
                   />
-                  <span
-                    className="block w-16 h-9 rounded-full transition-colors duration-300
-                      bg-gray-300 peer-checked:bg-gradient-to-r peer-checked:from-blue-500 peer-checked:to-[var(--primary-color)] border border-gray-300 peer-checked:border-blue-600"
-                  ></span>
-                  <span
-                    className="absolute left-1 top-1 w-7 h-7 rounded-full bg-white shadow-md transition-transform duration-300 flex items-center justify-center
-                      peer-checked:translate-x-7 peer-checked:bg-blue-500"
-                  >
-                    {isAssignment && (
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                  </span>
-                </span>
-              </label>
+                  <span className="ml-2">Regular Material</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    value={2}
+                    checked={type === 2}
+                    onChange={(e) => setType(parseInt(e.target.value))}
+                    className="form-radio"
+                  />
+                  <span className="ml-2">Assignment</span>
+                </label>
+              </div>
             </div>
 
             <div className="form-actions pt-4">

@@ -24,7 +24,7 @@ function TeacherProfile() {
     const fetchTeacherData = async () => {
       try {
         setIsLoading(true);
-        const response = await courseService.getTeacherStats(20);
+        const response = await courseService.getTeacherStats(64);
         setTeacherData(response.data);
       } catch (error) {
         setError(error.message || 'Failed to load teacher data');
@@ -84,7 +84,7 @@ function TeacherProfile() {
               <div className="container px-4">
                 <div className="flex flex-wrap px-4 gap-5">
                   <div className="w-full mt-10">
-                    <MainInfo teacherId={5} teacherData={teacherData} />
+                    <MainInfo teacherId={64} teacherData={teacherData} />
                   </div>
                   <div className="w-full">
                     <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
@@ -105,15 +105,15 @@ function TeacherProfile() {
           </>
         );
       case 'courses':
-        return <TeacherCourses teacherId={20} setActiveTab={setActiveTab} />;
+        return <TeacherCourses teacherId={64} setActiveTab={setActiveTab} />;
       case 'create-course':
-        return <CreateCourse teacherId={20} />;
+        return <CreateCourse teacherId={64} />;
       case 'lessons':
-        return <AddLesson teacherId={20} />;
+        return <AddLesson teacherId={64} />;
       case 'materials':
-        return <AddMaterial teacherId={20} />;
+        return <AddMaterial teacherId={64} />;
       case 'settings':
-        return <AccountSettings teacherData={{...teacherData, id: 20}} onUpdate={handleProfileUpdate} />;
+        return <AccountSettings teacherData={{...teacherData, id: 64}} onUpdate={handleProfileUpdate} />;
       default:
         return null;
     }

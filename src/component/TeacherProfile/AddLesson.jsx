@@ -63,7 +63,7 @@ const AddLesson = () => {
         title: formData.get('title'),
         description: formData.get('description'),
         courseId: editingCourseId,
-        teacherId: 36
+        teacherId: 64
       };
 
       const response = await courseService.addLesson(lessonData);
@@ -98,7 +98,7 @@ const AddLesson = () => {
         title: formData.get('title'),
         description: formData.get('description'),
         courseId: editingCourseId,
-        teacherId: 36
+        teacherId: 64
       };
 
       const updatedLesson = await courseService.updateLesson(lessonData);
@@ -118,7 +118,7 @@ const AddLesson = () => {
     if (window.confirm('Are you sure you want to delete this lesson?')) {
       try {
         setIsLoading(true);
-        await courseService.deleteLesson(lessonId, { teacherId: 36 });
+        await courseService.deleteLesson(lessonId, { teacherId: 64 });
         setLessons(lessons.filter(lesson => lesson.id !== lessonId));
       } catch (error) {
         setError(error.message || 'Failed to delete lesson');

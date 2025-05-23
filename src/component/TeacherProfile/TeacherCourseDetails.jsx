@@ -19,34 +19,7 @@ const TeacherCourseDetails = () => {
   console.log('Course ID from params:', id);
 
   // Fixed courses data
-  const fixedCourses = {
-    1: {
-      id: 1,
-      title: "Complete Web Development Course",
-      category: "Programming",
-      description: "Learn web development from scratch to advanced. This comprehensive course covers HTML, CSS, JavaScript, React, Node.js, and more. Perfect for beginners and intermediate developers looking to enhance their skills.",
-      imagePath: "https://img-c.udemycdn.com/course/750x422/1430746_2f43_10.jpg",
-      price: 49.99,
-      rating: 4.8,
-      duration: 45,
-      level: "Intermediate",
-      students: Array(125).fill(null),
-      lessons: [
-        {
-          id: 1,
-          title: "Introduction to Web Development",
-          description: "Learn the basics of web development and set up your development environment.",
-          duration: 60
-        },
-        {
-          id: 2,
-          title: "HTML5 Fundamentals",
-          description: "Master HTML5 and create structured, semantic web pages.",
-          duration: 90
-        }
-      ]
-    }
-  };
+ 
 
   useEffect(() => {
     console.log('useEffect running, id:', id);

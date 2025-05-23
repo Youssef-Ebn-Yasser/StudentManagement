@@ -11,19 +11,24 @@ import toast from 'react-hot-toast';
 function AddGategory() {
 
     let dispatch= useDispatch()
-    let [gategories, setGategories]=useState([])
+    // let [gategories, setGategories]=useState([]) // This state seems unused, gategory from Redux is used.
     let {gategory, loading}= useSelector((state)=>state.allGategory)
 
     async function handleRemoveGategory(id) {
-        axios.delete(`https://e-learn-v1.runasp.net/api/Category/ Delete${id}`)
+        axios.delete(`https://e-learn-v1.runasp.net/api/Category/Delete/${id}`,
+            {
+                data: {id}, // 👈 This sends a raw value as body
+                headers: {
+            'Content-Type': 'application/json'
+        }
+            })
         .then((response)=>{
             console.log("Lesson deleted");
-            console.log("Clicked delete for ID:", lessons.id);
-            toast.success('Lesson Deleted')
+            toast.success('Category Deleted Successfully!')
             dispatch(allGategory())
         }).catch((error)=>{
             console.log(error||'invalid id');
-            toast.error('Invalid Id')
+            toast.error(error?.response?.data?.message|| 'Try Again Later')
             
         })
    
@@ -35,12 +40,13 @@ function AddGategory() {
         axios.post('https://e-learn-v1.runasp.net/api/Category/Create',formsData)
         .then((response)=>{
             console.log(response);
-            toast.success('Gategory Added')
+            toast.success('Category Added Successfully!')
             dispatch(allGategory())
+            formik.resetForm();
             
         }).catch((error)=>{
             console.log(error);
-            toast.error('Invalid Id')
+            toast.error(error?.response?.data?.message || 'Failed to add category. Please try again.')
             
         })
     }
@@ -55,55 +61,81 @@ function AddGategory() {
     useEffect(()=>{
         dispatch(allGategory())
     },[])
+
     return <>
-        <div className='flex flex-col sm:flex-col  md:flex-col lg:flex-col content-center w-[100%] h-full gap-2'>
-            <h2 className='font-medium text-2xl p-2'><img src={addImg} alt="stuImg" className='w-7 inline m-2' />Add Gategory</h2>
-            <form  className='mx-auto p-2 w-[50%]' onSubmit={formik.handleSubmit}>
-                <div>
-                    <label htmlFor="name" className='block'>Gategory Name <span className='text-red-600'>*</span></label>
-                    <input type="text" name='name' id='name' value={formik.values.name} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                    placeholder='Enter An Describtive Gategory Name'
-                    className="block border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease" />
+        <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
+            <div className="container mx-auto space-y-10">
+                {/* Add Category Form Section */}
+                <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl max-w-lg mx-auto">
+                    <h2 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-8 flex items-center justify-center'>
+                        <img src={addImg} alt="Add Category Icon" className='w-8 h-8 mr-3' />
+                        Add New Category
+                    </h2>
+                    <form className='space-y-6' onSubmit={formik.handleSubmit}>
+                        <div>
+                            <label htmlFor="name" className='block text-sm font-medium text-gray-700 mb-1'>Category Name <span className='text-red-500'>*</span></label>
+                            <input 
+                                type="text" 
+                                name='name' 
+                                id='name' 
+                                value={formik.values.name} 
+                                onChange={formik.handleChange} 
+                                onBlur={formik.handleBlur}
+                                placeholder='e.g., Web Development, Data Science'
+                                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3" 
+                            />
+                            {formik.touched.name && formik.errors.name ? (
+                                <p className="text-red-500 text-xs mt-1">{formik.errors.name}</p>
+                            ) : null}
+                        </div>
+                        <div className='mt-8 flex justify-center'>
+                            <button 
+                                type='submit'
+                                className="bg-violet-600 text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-50 transition-all duration-300 ease-in-out transform hover:scale-105"
+                                disabled={loading || !formik.isValid || !formik.dirty} // Disable if loading, invalid or not dirty
+                            >
+                                {loading ? 'Adding...' : 'Add Category'}
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <div className='my-2 flex justify-center '>
-                    <button type='submit'
-                    className="bg-violet-100 text-violet-600  px-6 py-2 rounded text-xl  hover:cursor-pointer hover:shadow-sm hover:shadow-violet-300-600 transition-all duration-300 ease"
-                    >Add</button>
-                </div>
 
-            </form>
+                {/* Our Categories List Section */}
+                <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl">
+                    <h2 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-8 flex items-center'>
+                        <img src={gateImg} alt="Categories Icon" className='w-8 h-8 mr-3' />
+                        Our Categories
+                    </h2>
 
-            <hr/>
-
-            <div className='p-2'>
-                <h2 className='font-medium text-2xl p-2'><img src={gateImg} alt="stuImg" className='w-7 inline m-2' /> Our Gategory</h2>
-
-                <div className='flex flex-col sm:flex-col  md:flex-col lg:flex-col content-center w-[100%] h-full gap-5 p-5 mx-auto hover:cursor-pointer'>
-                        {!loading?
-                        (<>
+                    {loading && (!gategory || gategory.length === 0) ? (
+                        <div className="flex justify-center items-center h-40">
+                            <Loader />
+                        </div>
+                    ) : (
+                        <div className='space-y-4'>
                             {gategory && gategory.length > 0 ? (
                                 gategory.map((gategory) => (
-                                <div key={gategory.id} className="relative shadow p-3 pb-12 rounded bg-gray-200 hover:shadow-xl hover:shadow-violet-200 ">
-                                    <div className='flex flex-row justify-between'>
-                                    <h2 className="text-lg font-semibold mt-2">Gategory Name : <span className='text-violet-600'>{gategory.name}</span> </h2>
-                                    <p className="text-lg text-red-500 font-semibold mt-2">Gategory Id : {gategory.id}</p>
-                                    </div>
-                                                                   
-                                    <div className='text-black-500 hover:text-red-500 absolute bottom-2 right-7 bg-gray-300 rounded-full px-3 py-2 hover:cursor-pointer hover:shadow-2xl hover:shadow-gray-500'>
-                                        <button  onClick={()=>{handleRemoveGategory(gategory.id)}}>
-                                            <i className="fa-solid fa-trash-can hover:cursor-pointer"></i>
+                                    <div key={gategory.id} className="relative flex items-center justify-between bg-gray-100 p-4 rounded-lg shadow hover:shadow-md transition-shadow duration-200 ease-in-out">
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-gray-800">{gategory.name}</h3>
+                                            <p className="text-xs text-gray-500">ID: {gategory.id}</p>
+                                        </div>
+                                        <button 
+                                            onClick={() => handleRemoveGategory(gategory.id)}
+                                            title="Delete Category"
+                                            className='text-red-500 hover:text-red-700 bg-white rounded-full p-2 w-9 h-9 flex items-center justify-center shadow hover:bg-red-50 transition-colors duration-200 ease-in-out'
+                                        >
+                                            <i className="fa-solid fa-trash-alt text-md"></i>
                                         </button>
                                     </div>
-                                </div>
                                 ))
                             ) : (   
-                                <p className='text-red-600'>No lessons available.</p>
-                            )}</>
-                        ):<Loader/>}
-                          
+                                <p className='text-gray-600 text-center py-8 text-lg'>No categories available.</p>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
-            
         </div>
     </>
 }

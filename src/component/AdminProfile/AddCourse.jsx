@@ -8,6 +8,7 @@ import Loader from '../Loader/Loader'
 import axios from 'axios'
 import img from '../../assets/avatar.png'
 import toast from 'react-hot-toast'
+import { Link } from 'react-router-dom'
 
 
 
@@ -17,27 +18,37 @@ function AddCourse() {
     let dispatch= useDispatch()
     const [imagePreview, setImagePreview]= useState(img)
     const {courses,loading}= useSelector((state)=>state.allCourses)
-    const [addedCourse, setAddedCourse]= useState([])
+    // const [addedCourse, setAddedCourse]= useState([]) // This state seems unused
 
 
     async function handleAddCourse(formsData){
         console.log('Added',formsData);
+
+        const params = new URLSearchParams({
+            Title: formsData.Title,
+            Description: formsData.Description,
+            Price: formsData.Price,
+            TeacherId: formsData.TeacherId,
+            CategoryId: formsData.CategoryId,
+            Level: formsData.Level,
+            Hours: formsData.Hours
+        });
+
+        const formData = new FormData();
+        formData.append("image", formsData.image);
         
-        axios.post('https://e-learn-v1.runasp.net/api/Teacher/Teacher/Create', {},
-            {params:formsData
-            }
-        ).then((response)=>{
-            console.log(response);
-            alert("Course added successfully!");
-            toast.success('Course Added')
-            dispatch(allCourses());
-            formik.resetForm();
-            setImagePreview(null);
+        axios.post(`https://e-learn-v1.runasp.net/Course/Create?${params.toString()}`, formData)
+            .then((response)=>{            
+            toast.success('Course Added Successfully!')
+            dispatch(allCourses())
+            formik.resetForm()
+            setImagePreview(img) // Reset to default placeholder
             
         }).catch((error)=>{
             console.log(error);
-            toast.error('Invalid Id')
-            
+            // Attempt to get a more specific error message
+            const errorMsg = error.response?.data?.errors?.Image?.[0] || error.response?.data?.title || error.response?.data?.message || 'Failed to add course. Please try again.';
+            toast.error(errorMsg)
         })
     }
 
@@ -49,7 +60,7 @@ function AddCourse() {
             dispatch(allCourses())
         }).catch((error)=>{
             console.log(error||'invalid id');
-            toast.error('Invalid Id')
+            toast.error(error.response?.data?.message || 'Failed to delete course.')
             
         })
         
@@ -58,131 +69,183 @@ function AddCourse() {
 
     let formik = useFormik({
         initialValues:{
-            title:'',
-            description:'',
-            price:'',
-            teacherId:'',
-            categoryId:'',
-            level:'',
-            image:null
+            Title:'',
+            Description:'',
+            Price:'',
+            TeacherId:'',
+            CategoryId:'',
+            Level:'',
+            Hours:'',
+            image:null // Changed from Image to image to match input name and formData
         },
         onSubmit:handleAddCourse
     })
 
     useEffect(()=>{
         dispatch(allCourses())
-    },[dispatch])
+    },[dispatch]) // dispatch is stable, so this effectively runs once on mount
 
     return <>
-         <div className="flex flex-col sm:flex-col  md:flex-col lg:flex-col content-center w-[100%] h-full gap-2">
-            <h2 className='font-medium text-2xl p-2'><img src={addImg} alt="stuImg" className='w-7 inline m-2' />Add Course</h2>
-            <form className='mx-auto p-2 w-[50%]' onSubmit={formik.handleSubmit}>
-                <div>
-                    <label htmlFor="title" className='block'>Course Title <span className='text-red-500'>*</span></label>
-                    <input type="text" name="title" id="title" value={formik.values.title} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                    placeholder='Enter Course Title'
-                    className="block border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
+        <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
+            <div className="container mx-auto space-y-10">
+                {/* Add Course Form Section */}
+                <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl max-w-2xl mx-auto">
+                    <h2 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-8 flex items-center justify-center'>
+                        <img src={addImg} alt="Add Course Icon" className='w-8 h-8 mr-3' />
+                        Add New Course
+                    </h2>
+                    <form className='space-y-6' onSubmit={formik.handleSubmit}>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="Title" className='block text-sm font-medium text-gray-700 mb-1'>Course Title <span className='text-red-500'>*</span></label>
+                                <input type="text" name="Title" id="Title" value={formik.values.Title} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                placeholder='e.g., Introduction to React'
+                                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
+                            </div>
+                            <div>
+                                <label htmlFor="Price" className='block text-sm font-medium text-gray-700 mb-1'>Course Price (USD) <span className='text-red-500'>*</span></label>
+                                <input type="number" name="Price" id="Price" value={formik.values.Price} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                placeholder='e.g., 49.99'
+                                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
+                            </div>
+                        </div>
+                        <div>
+                            <label htmlFor="Description" className='block text-sm font-medium text-gray-700 mb-1'>Course Description</label>
+                            <textarea name="Description" id="Description" value={formik.values.Description} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                            placeholder='Briefly describe the course content...'
+                            rows="3"
+                            className="form-textarea w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"></textarea>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="Hours" className='block text-sm font-medium text-gray-700 mb-1'>Course Hours <span className='text-red-500'>*</span></label>
+                                <input type="number" name="Hours" id="Hours" value={formik.values.Hours} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                placeholder='e.g., 10'
+                                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
+                            </div>
+                            <div>
+                                <label htmlFor="Level" className='block text-sm font-medium text-gray-700 mb-1'>Level <span className='text-red-500'>*</span></label>
+                                <select 
+                                    id='Level'
+                                    name="Level" 
+                                    value={formik.values.Level} 
+                                    onChange={formik.handleChange} 
+                                    onBlur={formik.handleBlur}
+                                    className="form-select w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3">
+                                    <option value="">Select Level</option>
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="TeacherId" className='block text-sm font-medium text-gray-700 mb-1'>Teacher ID <span className='text-red-500'>*</span></label>
+                                <input type="text" name="TeacherId" id="TeacherId" value={formik.values.TeacherId} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                placeholder='Enter Teacher ID'
+                                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
+                            </div>
+                            <div>
+                                <label htmlFor="CategoryId" className='block text-sm font-medium text-gray-700 mb-1'>Category ID <span className='text-red-500'>*</span></label>
+                                <input type="text" name="CategoryId" id="CategoryId" value={formik.values.CategoryId} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                placeholder='Enter Category ID'
+                                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
+                            </div>
+                        </div>
+                        <div>
+                            <label htmlFor="image" className='block text-sm font-medium text-gray-700 mb-1'>Course Image</label>
+                            <input type="file" name="image" id="image" accept='image/*' onBlur={formik.handleBlur} // Changed name to "image"
+                            onChange={(e)=>{
+                                const file=e.currentTarget.files[0];
+                                if(file){
+                                    formik.setFieldValue('image',file) // Changed to "image"
+                                    setImagePreview(URL.createObjectURL(file))
+                                }else{
+                                    formik.setFieldValue('image',null) // Changed to "image"
+                                    setImagePreview(img) // Default placeholder
+                                }
+                            }}
+                            className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-2 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"/>
+                            {imagePreview && <img src={imagePreview} alt="Preview" className="mt-3 w-32 h-32 object-contain rounded-md mx-auto shadow-md"/>}
+                        </div>
+                        <div className='mt-8 flex justify-center'>
+                            <button 
+                                type='submit'
+                                className="bg-violet-600 text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-50 transition-all duration-300 ease-in-out transform hover:scale-105"
+                                disabled={loading || !formik.isValid || !formik.dirty}
+                            >
+                                {loading ? 'Adding...' : 'Add Course'}
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <div>
-                    <label htmlFor="description">Course Description </label>
-                    <input type="text" name="description" id="description" value={formik.values.description} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                    placeholder='Enter Course Description'
-                    className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
-                </div>
-                <div>
-                    <label htmlFor="price">Course Price <span className='text-red-500'>*</span></label>
-                    <input type="number" name="price" id="price" value={formik.values.price} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                    placeholder='Enter Course Price'
-                    className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
-                </div>
-                <div>
-                    <label htmlFor="teacherId">TeacherId <span className='text-red-500'>*</span></label>
-                    <input type="text" name="teacherId" id="teacherId" value={formik.values.teacherId} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                    placeholder='Enter TeacherId'
-                    className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
-                </div>
-                <div>
-                    <label htmlFor="categoryId">CategoryId <span className='text-red-500'>*</span></label>
-                    <input type="text" name="categoryId" id="categoryId" value={formik.values.categoryId} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                    placeholder='Enter CategoryId'
-                    className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
-                </div>
-                <div>
-                    <label htmlFor="level">Level</label>
-                    <select 
-                        name="level" 
-                        required 
-                        value={formik.values.level} 
-                        onChange={formik.handleChange} 
-                        onBlur={formik.handleBlur}
-                        className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease">
-                        <option value="">Select level</option>
-                        <option value="beginner">Beginner</option>
-                        <option value="intermediate">Intermediate</option>
-                        <option value="advanced">Advanced</option>
-                    </select>
-                </div>
-                <div>
-                    <label htmlFor="image">Image</label>
-                    <input type="file" name="image" id="image" accept='image/*' onBlur={formik.handleBlur}
-                    onChange={(e)=>{
-                        const file=e.currentTarget.files[0];
-                        if(file){
-                            formik.setFieldValue('image',file)
-                            setImagePreview(URL.createObjectURL(file))
-                        }else{
-                            formik.setFieldValue('image',null)
-                            setImagePreview(img)
-                        }
-                    }}
-                    className="border-1 border-gray-200 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"/>
-                </div>
-                <div className='my-2 flex justify-center '>
-                    <button type='submit'
-                    className="bg-violet-100 text-violet-600  px-6 py-2 rounded text-xl  hover:cursor-pointer hover:shadow-sm hover:shadow-violet-300-600 transition-all duration-300 ease"
-                    >Add</button>
-                </div>
-            </form>
 
-            <hr />
+                {/* Our Courses List Section */}
+                <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl">
+                    <h2 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-8 flex items-center'>
+                        <img src={courseImg} alt="Courses Icon" className='w-8 h-8 mr-3' />
+                        Our Courses
+                    </h2>
 
-            <div className='p-2'>
-                <h1 className='font-medium text-2xl'><img src={courseImg} alt="stuImg" className='w-7 inline m-2' />Our Courses</h1>
-                    <div className='grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 gap-5 p-5 text-center mx-auto hover:cursor-pointer'>
-                        {!loading?
-                        (<>
+                    {loading && (!courses || courses.length === 0) ? (
+                        <div className="flex justify-center items-center h-64">
+                            <Loader />
+                        </div>
+                    ) : (
+                        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
                             {courses && courses.length > 0 ? (
                                 courses.map((course) => (
-                                <div key={course.id} className="relative shadow p-2 rounded bg-white hover:shadow-xl hover:shadow-violet-200 ">
-                                    <img src={course.imagePath} alt={course.title} className="w-full h-48 object-cover rounded " />
-                                    <h2 className="text-lg font-semibold mt-2">{course.title}</h2>
-                                    <p className="text-lg text-red-500 font-semibold mt-2">Id : {course.id}</p>
-                                    <p className="text-gray-500">{course.description}</p>
-                                    <p className="text-gray-500"><span className='text-black'>Level :</span> {course.level}</p>
-                                    <p className="text-gray-500"><span className='text-black'>Category Name :</span> {course.categoryName}</p>
-                                    <p className="text-violet-600 font-bold mt-1">{course.price} USD</p>
-                                    <div className='text-red-500 absolute top-5 right-7 bg-white rounded-full p-2 hover:cursor-pointer hover:shadow-2xl hover:shadow-gray-500'>
-                                        <button  onClick={()=>{handleRemoveCourse(course.id)}}>
-                                            <i className="fa-solid fa-trash-can hover:cursor-pointer"></i>
+                                    <div key={course.id} className="relative bg-white border border-gray-200 shadow-lg rounded-xl overflow-hidden flex flex-col transform transition-all duration-300 ease-in-out hover:shadow-violet-200 hover:scale-105">
+                                        <Link to={`/admin/courseDetails/${course.id}`} className="block">
+                                            <img 
+                                                src={course.imagePath || courseImg} // Use actual imagePath or fallback
+                                                alt={course.title || 'Course Image'} 
+                                                className="w-full h-48 object-cover" 
+                                            />
+                                        </Link>
+                                        <div className="p-4 flex flex-col flex-grow">
+                                            <Link to={`/admin/courseDetails/${course.id}`} className="block">
+                                                <h3 className="text-lg font-bold text-gray-800 mb-1 truncate" title={course.title}>
+                                                    {course.title}
+                                                </h3>
+                                            </Link>
+                                            <p className="text-xs text-gray-500 mb-2">ID: {course.id}</p>
+                                            <p className="text-sm text-gray-600 mb-2 line-clamp-2 flex-grow" title={course.description}>
+                                                {course.description || "No description available."}
+                                            </p>
+                                            <div className="flex justify-between items-center text-xs text-gray-500 mb-3">
+                                                <span>Level: <span className="font-medium text-gray-700">{course.level || 'N/A'}</span></span>
+                                                <span>Category: <span className="font-medium text-gray-700">{course.categoryName || 'N/A'}</span></span>
+                                            </div>
+                                            <p className="text-xl font-bold text-violet-600 mb-3 text-center">
+                                                {course.price ? `${course.price.toFixed(2)} USD` : 'Free'}
+                                            </p>
+                                        </div>
+                                        <button 
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Prevent Link navigation
+                                                handleRemoveCourse(course.id);
+                                            }}
+                                            title="Delete Course"
+                                            className='absolute top-3 right-3 text-red-500 hover:text-red-700 bg-white rounded-full p-2 w-8 h-8 flex items-center justify-center shadow-md hover:bg-red-50 transition-colors duration-200 ease-in-out'
+                                        >
+                                            <i className="fa-solid fa-trash-alt text-sm"></i>
                                         </button>
                                     </div>
-                                </div>
                                 ))
                             ) : (   
-                                <p className='text-red-600'>No courses available.</p>
-                            )}</>
-                        ):<Loader/>}
-                          
-                    </div>
+                                <div className="col-span-full text-center py-10">
+                                    <p className='text-gray-600 text-lg'>No courses available.</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     </>
 }
 
 export default AddCourse
-
-
-
-
-
-
+                                           
