@@ -21,11 +21,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost("CreateMaterial")]
-<<<<<<< HEAD
         public async Task<IActionResult> CreateMaterial([FromForm] CreateMaterialDto createMaterialDto)
-=======
-        public async Task<IActionResult> CreateMaterial(CreateMaterialDto createMaterialDto)
->>>>>>> 3e154ce106aab0628184c1c4b3cde2f145b5ed4c
         {
             var result = await _materialService.CreateAsync(createMaterialDto);
             return NewResult(result);

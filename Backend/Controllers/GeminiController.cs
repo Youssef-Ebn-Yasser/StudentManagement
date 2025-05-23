@@ -11,7 +11,7 @@ public class GeminiController : ControllerBase
         _gemini = gemini;
     }
 
-    [HttpPost("chat")]
+    [HttpPost("chatboot")]
     public async Task<IActionResult> Chat([FromBody] PromptRequest request)
     {
         var response = await _gemini.GetResponseAsync(request.Prompt);

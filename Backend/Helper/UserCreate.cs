@@ -19,21 +19,21 @@ public static class UserCreate
             UserType.Student => new Student
             {
                 Email = user.Email,
-                UserName = user.Name,
+                UserName = user.Name + user.Email + UserType.Student,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 Name = user.Name,
             },
             UserType.Teacher => new Teacher
             {
                 Email = user.Email,
-                UserName = user.Name,
+                UserName = user.Name + user.Email + UserType.Teacher,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 Name = user.Name,
             },
             UserType.Admin => new Admin
             {
                 Email = user.Email,
-                UserName = user.Name,
+                UserName = user.Name + user.Email + UserType.Admin,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 Name = user.Name,
             },

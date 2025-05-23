@@ -9,16 +9,19 @@ public class TeacherService : ResponseHandler, ITeacherService
     public IUnitOfWork _unitOfWork { get; }
     public IFileService _fileService { get; }
     public IMapper _mapper { get; }
+    public IAuthenticationService _authenticationService { get; }
     #endregion
 
     #region   Constructor
     public TeacherService(IUnitOfWork unitOfWork,
                           IFileService fileService,
-                          IMapper mapper)
+                          IMapper mapper,
+                          IAuthenticationService authenticationService)
     {
         _unitOfWork = unitOfWork;
         _fileService = fileService;
         _mapper = mapper;
+        _authenticationService = authenticationService;
     }
     #endregion
 
@@ -94,7 +97,7 @@ public class TeacherService : ResponseHandler, ITeacherService
 
     public async Task<Response<string>> CreateAsync(CreateTeacherDto createTeacherDto)
     {
-        // check if exist by name 
+        // check if exist by name
         var exist = await _isTeacherExistByNameAsync(createTeacherDto.Name);
         if (exist) return BadRequest<string>($"this teacher is already exist");
 
