@@ -1,32 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
-const courseProgress = [
-  {
-    code: 'CS301',
-    name: 'Database Systems',
-    progress: 75,
-    grade: 'B+',
-  },
-  {
-    code: 'CS401',
-    name: 'Advanced Algorithms',
-    progress: 60,
-    grade: 'A-',
-  },
-  {
-    code: 'DES201',
-    name: 'User Interface Design',
-    progress: 90,
-    grade: 'A',
-  },
-  {
-    code: 'CS450',
-    name: 'Network Security',
-    progress: 40,
-    grade: 'B',
-  },
-];
+import { useNavigate } from 'react-router-dom';
 
 export default function StudentDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -39,64 +13,100 @@ export default function StudentDashboard() {
     summary: {
       assignments: 0,
       courses: 0,
-      teachers: 0
-    }
+      teachers: 0,
+    },
   });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        const studentId = localStorage.getItem('userId');
-        
-        // Fetch enrolled courses
-        const coursesResponse = await axios.get(`https://e-learn-v1.runasp.net/api/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses?studentId=85`);
-        
-        // Check if we have valid courses data
+
+        // Fetch enrolled courses for student ID 85
+        const coursesResponse = await axios.get(
+          `https://e-learn-v1.runasp.net/api/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses?studentId=85`
+        );
+
+        // Validate courses response
         if (!coursesResponse.data.succeeded || !Array.isArray(coursesResponse.data.data)) {
           console.error('Invalid courses response:', coursesResponse.data);
           throw new Error('Invalid courses data received');
         }
 
         const courses = coursesResponse.data.data;
-        
+
         // Fetch assignments for each course
-        const assignmentsPromises = courses.map(course => 
-          axios.get(`https://e-learn-v1.runasp.net/api/Assignment/GetStudentAssignmentInCourse?studentId=85&courseId=${course.id}`)
+        const assignmentsPromises = courses.map((course) =>
+          axios.get(
+            `https://e-learn-v1.runasp.net/api/Assignment/GetStudentAssignmentInCourse?studentId=85&courseId=${course.id}`
+          )
         );
         const assignmentsResponses = await Promise.all(assignmentsPromises);
-        
-        // Process assignments data
-        const allAssignments = assignmentsResponses.flatMap(response => response.data);
-        
-        // Get unique teachers from courses
-        const teachers = [...new Set(courses.map(course => course.teacher))];
 
+        // Process assignments data
+        const allAssignments = assignmentsResponses.flatMap((response, idx) => {
+          const assignmentData = response.data.data || [];
+          if (assignmentData.length && assignmentData[0].path) {
+            return [{
+              title: 'Assignment PDF',
+              courseName: courses[idx].title,
+              dueDate: '',
+              status: 'Available',
+              progress: 0,
+              path: assignmentData[0].path,
+            }];
+          }
+          return [];
+        });
+
+        // Get unique teachers from courses (filter out courses without teacher)
+        const teachers = [
+          ...new Map(
+            courses
+              .filter((course) => course.teacher)
+              .map((course) => [
+                course.teacher.id,
+                {
+                  name: course.teacher.name,
+                  specialization: course.teacher.specialization,
+                  email: course.teacher.email,
+                  initials: course.teacher.name
+                    .split(' ')
+                    .map((n) => n[0])
+                    .join(''),
+                  subject: course.teacher.specialization,
+                },
+              ])
+          ).values(),
+        ];
+
+        // Update dashboard data
         setDashboardData({
-          assignments: allAssignments.map(assignment => ({
+          assignments: allAssignments.map((assignment) => ({
             title: assignment.title,
             course: assignment.courseName,
-            due: new Date(assignment.dueDate).toLocaleDateString(),
+            due: assignment.dueDate
+              ? new Date(assignment.dueDate).toLocaleDateString()
+              : '',
             status: assignment.status,
-            percent: assignment.progress || 0
+            percent: assignment.progress || 0,
+            path: assignment.path,
           })),
-          courses: courses.map(course => ({
+          courses: courses.map((course) => ({
+            id: course.id, // <-- include id for navigation
             code: course.code,
             name: course.title,
             progress: course.progress || 0,
-            grade: course.grade || 'N/A'
+            grade: course.grade || 'N/A',
           })),
-          teachers: teachers.map(teacher => ({
-            name: teacher.name,
-            subject: teacher.specialization,
-            email: teacher.email,
-            initials: teacher.name.split(' ').map(n => n[0]).join('')
-          })),
+          teachers,
           summary: {
             assignments: allAssignments.length,
             courses: courses.length,
-            teachers: teachers.length
-          }
+            teachers: teachers.length,
+          },
         });
       } catch (err) {
         setError('Failed to fetch dashboard data');
@@ -181,8 +191,8 @@ export default function StudentDashboard() {
       {/* Content based on active tab */}
       {activeTab === 'assignments' && (
         <div className="grid md:grid-cols-2 gap-4 mb-8">
-          {dashboardData.assignments.map((assignment) => (
-            <div key={assignment.title} className="bg-white border rounded-xl p-5 shadow-sm">
+          {dashboardData.assignments.map((assignment, idx) => (
+            <div key={assignment.title + idx} className="bg-white border rounded-xl p-5 shadow-sm">
               <div className="flex items-center mb-2">
                 <i className="fa fa-file-alt text-indigo-600 mr-2" />
                 <span className="font-semibold text-lg">{assignment.title}</span>
@@ -199,6 +209,19 @@ export default function StudentDashboard() {
                 </div>
               )}
               <div className="text-gray-400 text-sm">Due: {assignment.due}</div>
+              {/* PDF Link Only */}
+              {assignment.path && (
+                <div className="mt-4">
+                  <a
+                    href={assignment.path}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-indigo-600 underline"
+                  >
+                    Open Assignment PDF in new tab
+                  </a>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -227,7 +250,11 @@ export default function StudentDashboard() {
       {activeTab === 'courses' && (
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           {dashboardData.courses.map((course) => (
-            <div key={course.code} className="bg-white border rounded-xl p-5 shadow-sm">
+            <div
+              key={course.id}
+              className="bg-white border rounded-xl p-5 shadow-sm cursor-pointer hover:shadow-md transition"
+              onClick={() => navigate(`/studentdashboard/course/${course.id}`)} // Go to course details
+            >
               <div className="flex items-center mb-2">
                 <i className="fa fa-book-open text-indigo-500 mr-2" />
                 <span className="font-semibold text-md">{course.code}: {course.name}</span>
@@ -250,11 +277,19 @@ export default function StudentDashboard() {
 
       {activeTab === 'overview' && (
         <>
-          {/* Recent Assignments */}
-          <h2 className="text-xl font-bold text-indigo-700 mb-4">Recent Assignments</h2>
+          {/* Recent Assignments with View All */}
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-indigo-700">Recent Assignments</h2>
+            <button
+              onClick={() => setActiveTab('assignments')}
+              className="text-indigo-600 font-medium hover:underline text-sm"
+            >
+              View All
+            </button>
+          </div>
           <div className="grid md:grid-cols-2 gap-4 mb-8">
-            {dashboardData.assignments.slice(0, 2).map((assignment) => (
-              <div key={assignment.title} className="bg-white border rounded-xl p-5 shadow-sm">
+            {dashboardData.assignments.slice(0, 2).map((assignment, idx) => (
+              <div key={assignment.title + idx} className="bg-white border rounded-xl p-5 shadow-sm">
                 <div className="flex items-center mb-2">
                   <i className="fa fa-file-alt text-indigo-600 mr-2" />
                   <span className="font-semibold text-lg">{assignment.title}</span>
@@ -271,6 +306,19 @@ export default function StudentDashboard() {
                   </div>
                 )}
                 <div className="text-gray-400 text-sm">Due: {assignment.due}</div>
+                {/* PDF Link Only */}
+                {assignment.path && (
+                  <div className="mt-4">
+                    <a
+                      href={assignment.path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-indigo-600 underline"
+                    >
+                      Open Assignment PDF in new tab
+                    </a>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -287,7 +335,11 @@ export default function StudentDashboard() {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {dashboardData.courses.slice(0, 4).map((course) => (
-              <div key={course.code} className="bg-white border rounded-xl p-5 shadow-sm">
+              <div
+                key={course.id}
+                className="bg-white border rounded-xl p-5 shadow-sm cursor-pointer hover:shadow-md transition"
+                onClick={() => navigate(`/studentdashboard/course/${course.id}`)} // Go to course details
+              >
                 <div className="flex items-center mb-2">
                   <i className="fa fa-book-open text-indigo-500 mr-2" />
                   <span className="font-semibold text-md">{course.code}: {course.name}</span>

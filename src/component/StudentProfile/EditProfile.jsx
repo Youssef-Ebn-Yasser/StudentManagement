@@ -1,32 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUser, FaEnvelope, FaPhone, FaGraduationCap, FaSave, FaTimes } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaPhone, FaSave, FaTimes, FaGithub, FaLinkedin, FaFacebook, FaCheckCircle } from 'react-icons/fa';
 import axios from 'axios';
 
 export default function EditProfile() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    bio: '',
-    education: '',
-    skills: '',
-    interests: '',
-    image: null
+    image: null,
+    github: '',
+    linkedin: '',
+    facebook: '',
+    telegram: '',
   });
 
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
         const studentId = localStorage.getItem('userId');
-        // if (!studentId) {
-        //   navigate('/login');
-        //   return;
-        // }
-
         const response = await axios.get(`https://e-learn-v1.runasp.net/api/Student/GetById/GetById/85`);
         if (response.data.succeeded) {
           const studentData = response.data.data;
@@ -34,11 +30,11 @@ export default function EditProfile() {
             name: studentData.name || '',
             email: studentData.email || '',
             phone: studentData.phone || '',
-            bio: studentData.bio || '',
-            education: studentData.education || '',
-            skills: studentData.skills || '',
-            interests: studentData.interests || '',
-            image: studentData.imagePath || null
+            image: studentData.imagePath || null,
+            github: studentData.github || '',
+            linkedin: studentData.linkedin || '',
+            facebook: studentData.facebook || '',
+            telegram: studentData.telegram || '',
           });
         }
       } catch (err) {
@@ -54,18 +50,18 @@ export default function EditProfile() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        image: file
+        image: file,
       }));
     }
   };
@@ -73,22 +69,20 @@ export default function EditProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setSuccess(false);
     try {
       const studentId = localStorage.getItem('userId');
-      if (!studentId) {
-        navigate('/login');
-        return;
-      }
+      // Don't redirect to login, just stay on page
 
       const formDataToSend = new FormData();
-      Object.keys(formData).forEach(key => {
+      Object.keys(formData).forEach((key) => {
         if (formData[key] !== null) {
           formDataToSend.append(key, formData[key]);
         }
       });
 
       const response = await axios.put(
-        `https://e-learn-v1.runasp.net/api/Student/Update/85`,
+        `https://e-learn-v1.runasp.net/api/Student/Update/Update?Id=85`,
         formDataToSend,
         {
           headers: {
@@ -98,7 +92,8 @@ export default function EditProfile() {
       );
 
       if (response.data.succeeded) {
-        navigate('/profile');
+        setSuccess(true);
+        // Optionally update formData with new data if needed
       } else {
         throw new Error(response.data.message || 'Failed to update profile');
       }
@@ -138,12 +133,25 @@ export default function EditProfile() {
             </div>
           )}
 
+          {success && (
+            <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg flex items-center gap-2">
+              <FaCheckCircle className="text-green-500" />
+              Changes have been saved successfully!
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Profile Image */}
             <div className="flex items-center gap-6">
               <div className="relative">
                 <img
-                  src={formData.image || 'https://via.placeholder.com/150'}
+                  src={
+                    formData.image && typeof formData.image === 'string'
+                      ? formData.image
+                      : formData.image && typeof formData.image === 'object'
+                      ? URL.createObjectURL(formData.image)
+                      : 'https://via.placeholder.com/150'
+                  }
                   alt="Profile"
                   className="w-32 h-32 rounded-full object-cover"
                 />
@@ -191,7 +199,7 @@ export default function EditProfile() {
                   required
                 />
               </div>
-              <div>
+              <div className="col-span-full">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Phone Number
                 </label>
@@ -203,60 +211,62 @@ export default function EditProfile() {
                   className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
+            </div>
+
+            {/* Social Links */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Education
+                  GitHub
                 </label>
                 <input
-                  type="text"
-                  name="education"
-                  value={formData.education}
+                  type="url"
+                  name="github"
+                  value={formData.github}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="https://github.com/username"
                 />
               </div>
-            </div>
-
-            {/* Additional Information */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Bio
-              </label>
-              <textarea
-                name="bio"
-                value={formData.bio}
-                onChange={handleInputChange}
-                rows="4"
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              ></textarea>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Skills
-              </label>
-              <textarea
-                name="skills"
-                value={formData.skills}
-                onChange={handleInputChange}
-                rows="2"
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter your skills (comma-separated)"
-              ></textarea>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Interests
-              </label>
-              <textarea
-                name="interests"
-                value={formData.interests}
-                onChange={handleInputChange}
-                rows="2"
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter your interests (comma-separated)"
-              ></textarea>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  LinkedIn
+                </label>
+                <input
+                  type="url"
+                  name="linkedin"
+                  value={formData.linkedin}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="https://linkedin.com/in/username"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Facebook
+                </label>
+                <input
+                  type="url"
+                  name="facebook"
+                  value={formData.facebook}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="https://facebook.com/username"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Telegram
+                </label>
+                <input
+                  type="url"
+                  name="telegram"
+                  value={formData.telegram}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="https://t.me/username"
+                />
+              </div>
             </div>
 
             <div className="flex justify-end gap-4">
@@ -280,4 +290,4 @@ export default function EditProfile() {
       </div>
     </div>
   );
-} 
+}
