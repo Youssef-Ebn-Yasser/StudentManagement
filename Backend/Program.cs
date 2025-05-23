@@ -1,5 +1,4 @@
 using Backend.ChatHubs;
-using Backend.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Stripe;
 
@@ -19,6 +18,12 @@ builder.Services.AddConnectionDependency(builder.Configuration)
                 .AddClassesDependencies();
 
 builder.Services.AddHttpClient();
+
+
+#region   Chat
+builder.Services.AddHttpClient<GeminiService>();
+builder.Services.AddEndpointsApiExplorer();
+#endregion
 
 #region Payment stripe
 
