@@ -10,7 +10,6 @@ import CreateCourse from '@/component/TeacherProfile/CreateCourse'
 import TeacherCourses from '@/component/TeacherProfile/TeacherCourses'
 import AccountSettings from '@/component/TeacherProfile/settingsPage/AccountSettings'
 import TeacherCourseDetails from '@/component/TeacherProfile/TeacherCourseDetails'
-import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
 import StudentDashboard from '@/component/StudentDashboard/StudentDashboard'
 import StudentProfile from '@/component/StudentProfile/StudentProfile'
 import EditProfile from '@/component/StudentProfile/EditProfile'
@@ -25,6 +24,8 @@ import AdminDashboard from '@/component/AdminDashboard/AdminDashboard'
 import CourseDashDetails from '@/component/StudentDashboard/CourseDashDetailes'
 import CourseDetails from '@/component/AdminProfile/CourseDetails'
 import StudentDetails from '@/component/AdminProfile/StudentDetails'
+import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
+
 
 const isAuth = true // Replace with actual authentication logic
 
@@ -98,7 +99,7 @@ const routesConfig = [
     },
     {
         path: 'courses/course/:id',
-        element: <CourseDetails />,
+        element: <CoursesDetails />,
         isProtected: false,
         accessRole: 'all',
     },
