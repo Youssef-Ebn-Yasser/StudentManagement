@@ -142,7 +142,7 @@ export const courseService = {
   // Delete a course
   deleteCourse: async (courseId) => {
     try {
-      const response = await axiosInstance.delete(`/Course/Delete/${courseId}?id=${courseId}`);
+      const response = await axiosInstance.delete(`/Course/Delete?id=${courseId}`);
       return response.data;
     } catch (error) {
       console.error('Error deleting course:', error.response?.data || error.message);
@@ -236,6 +236,17 @@ export const courseService = {
       return response.data;
     } catch (error) {
       console.error('Error fetching lesson materials:', error);
+      throw error;
+    }
+  },
+
+  // Get student assignments for a lesson
+  getStudentAssignments: async (lessonId) => {
+    try {
+      const response = await axiosInstance.get(`/api/Assignment/GetStudentAssignmentForLessonId?lessonId=${lessonId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching student assignments:', error);
       throw error;
     }
   },

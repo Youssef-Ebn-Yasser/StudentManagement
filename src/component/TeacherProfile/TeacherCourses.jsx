@@ -232,39 +232,41 @@ const TeacherCourses = ({ teacherId, setActiveTab }) => {
           ) : filteredAndSortedCourses.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8 xl:gap-10">
               {filteredAndSortedCourses.map((course) => (
-                <div key={course?.id || Math.random()} className="bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition duration-300 flex flex-col">
-                  <img
-                    src={course?.imagePath || 'https://via.placeholder.com/300x200'}
-                    alt={course?.title || 'Course'}
-                    className="w-full h-64 object-cover rounded-t-xl"
-                  />
-                  <div className="p-6 flex-grow">
-                    <div className="flex justify-between items-start mb-4">
-                      <h3 className="text-xl font-semibold text-gray-900 line-clamp-2">
-                        {course?.title || 'Untitled Course'}
-                      </h3>
+                <div 
+                  key={course?.id || Math.random()} 
+                  className="w-full border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group hover:shadow-lg transition duration-300"
+                >
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={course?.imagePath || 'https://via.placeholder.com/300x200'}
+                      alt={course?.title || 'Course'}
+                      className="block w-full h-32 sm:h-36 md:h-40 object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                  </div>
+                  <div className="p-2 sm:p-3">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-gray-500 text-xs sm:text-sm">{course?.level || 'All Levels'}</span>
                     </div>
-                    <p className="text-gray-600 mb-4 line-clamp-3">
+                    <h3 className="mt-0 mb-1 text-base sm:text-lg font-semibold text-black line-clamp-2">
+                      {course?.title || 'Untitled Course'}
+                    </h3>
+                    <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-2">
                       {course?.description || 'No description available'}
                     </p>
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center">
-                        <FaStar className="text-yellow-400 mr-1" />
-                        <span className="text-gray-700">{course?.rating || 0}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <FaUsers className="text-gray-400 mr-1" />
-                        <span className="text-gray-700">{course?.students || 0} students</span>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <FaStar className="text-yellow-500 text-xs sm:text-sm" />
+                        <span className="ml-1 text-xs sm:text-sm text-black">{course?.rating || 0}</span>
+                        <span className="text-gray-500 text-xs sm:text-sm ps-1">({course?.students || 0})</span>
                       </div>
+                      <span className="text-lg sm:text-xl font-bold text-black">${course?.price || 0}</span>
                     </div>
-                    <div className="mt-auto">
                     <button 
-                        onClick={() => navigate(`/teacher/course/${course.id}`)}
-                        className="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200"
+                      onClick={() => navigate(`/teacher/course/${course.id}`)}
+                      className="w-full mt-3 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 text-sm"
                     >
                       View Details
                     </button>
-                    </div>
                   </div>
                 </div>
               ))}
