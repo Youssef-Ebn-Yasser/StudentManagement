@@ -15,11 +15,12 @@ function AddGategory() {
     let {gategory, loading}= useSelector((state)=>state.allGategory)
 
     async function handleRemoveGategory(id) {
-        axios.delete(`https://e-learn-v1.runasp.net/api/Category/Delete/${id}`,
+        axios.delete(`https://e-learn-v1.runasp.net/api/Category/Delete`,
             {
-                data: {id}, // 👈 This sends a raw value as body
+                data :id ,
+                // 👈 This sends a raw value as body
                 headers: {
-            'Content-Type': 'application/json'
+                    'Content-Type': 'application/json'
         }
             })
         .then((response)=>{

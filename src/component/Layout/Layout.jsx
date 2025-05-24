@@ -6,7 +6,7 @@ import {Outlet} from 'react-router-dom'
 function Layout() {
     return <>
     <Navbar/>
-        <Outlet></Outlet>
+        <Outlet className='min-h-lvh'></Outlet>
     <Footer/>
     </>
 }

@@ -53,7 +53,7 @@ function AddCourse() {
     }
 
     async function handleRemoveCourse(id) {
-        axios.delete(`https://e-learn-v1.runasp.net/Course/Delete/${id}`)
+        axios.delete(`https://e-learn-v1.runasp.net/Course/Delete?id=${id}`)
         .then((response)=>{
             console.log("Course deleted");
             toast.success('Course Deleted')

@@ -24,7 +24,7 @@ import Students from '@/component/AdminProfile/Students'
 import AdminDashboard from '@/component/AdminDashboard/AdminDashboard'
 import ControlCourse from '@/component/AdminProfile/ControlCourse'
 import StudentDetails from '@/component/AdminProfile/StudentDetails'
-import VideoMeeting from '@/component/Meeting/VideoMeeting/VideoMeeting'
+import MeetingRoom from '@/component/Meeting/MeetingRoom/MeetingRoom'
 
 
 // Hardcoded meetingId/token for now; ideally these come from your backend
@@ -177,7 +177,7 @@ const routesConfig = [
     {
         path: "video-call",
         element: (
-          <VideoMeeting
+          <MeetingRoom
             meetingId={DUMMY_MEETING_ID}
             token={DUMMY_TOKEN}
             name={"Teacher or Student Name"}
