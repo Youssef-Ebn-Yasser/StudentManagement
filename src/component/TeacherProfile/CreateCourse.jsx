@@ -479,7 +479,6 @@ const CreateCourse = () => {
         )}
 
         <div className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Courses</h2>
           {Object.entries(getCoursesByCategory()).map(([category, categoryCourses]) => (
             categoryCourses.length > 0 && (
               <div key={category} className="category-section">

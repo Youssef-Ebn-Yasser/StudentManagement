@@ -142,7 +142,7 @@ export const courseService = {
   // Delete a course
   deleteCourse: async (courseId) => {
     try {
-      const response = await axiosInstance.delete(`/Course/Delete/${courseId}?id=${courseId}`);
+      const response = await axiosInstance.delete(`/Course/Delete?id=${courseId}`);
       return response.data;
     } catch (error) {
       console.error('Error deleting course:', error.response?.data || error.message);
