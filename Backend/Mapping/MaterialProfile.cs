@@ -1,15 +1,13 @@
 ﻿using Backend.DTOs.MaterialDTOs;
-using AutoMapper;
-namespace Backend.Mapping
+namespace Backend.Mapping;
+
+public class MaterialProfile : Profile
 {
-    public class MaterialProfile : Profile
+    public MaterialProfile()
     {
-        public MaterialProfile()
-        {
-            CreateMap<Material, ShowMaterialDto>();
+        CreateMap<Material, ShowMaterialDto>();
+        CreateMap<CreateMaterialDto, Material>();
+        CreateMap<UpdateMaterialDto, Material>();
 
-
-        }
-    
     }
 }
