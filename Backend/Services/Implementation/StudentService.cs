@@ -8,13 +8,15 @@ public class StudentService : ResponseHandler, IStudentService
     #region   Fields
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly IFileService _fileService;
     #endregion
 
     #region Constructor
-    public StudentService(IUnitOfWork unitOfWork, IMapper mapper)
+    public StudentService(IUnitOfWork unitOfWork, IMapper mapper, IFileService fileService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _fileService = fileService;
     }
     #endregion
 
@@ -203,8 +205,13 @@ public class StudentService : ResponseHandler, IStudentService
         if (student == null)
             return BadRequest<string>($"this Student with this id : {updateStudentDto.Id} not exist");
 
-        _mapper.Map(student, updateStudentDto);
+        _mapper.Map(updateStudentDto, student);
 
+        if (updateStudentDto.Image != null)
+        {
+            var path = await _fileService.UploadFileAsync(updateStudentDto.Image);
+            student.ImageUrl = path;
+        }
         _unitOfWork.Repository<Student>().Update(student);
         var result = _unitOfWork.Complete();
 
