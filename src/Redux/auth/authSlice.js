@@ -12,6 +12,7 @@ const initialState = {
     token: null,
     isLogedin: false,
     role: null,
+    isAdmin: false,
     loading: true,
     error: null,
 }
@@ -27,8 +28,10 @@ const authSlice = createSlice({
             state.expirationDate = null
             state.token = null
             state.isLogedin = false
+            state.isAdmin = false
             localStorage.removeItem('refreshToken')
             localStorage.removeItem('expirationDate')
+            localStorage.removeItem('isAdmin')
         },
     },
     extraReducers: (builder) => {

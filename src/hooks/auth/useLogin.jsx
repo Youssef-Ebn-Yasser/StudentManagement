@@ -18,13 +18,21 @@ const useLogin = () => {
 
     const handleLgin = async (formsData) => {
         dispatch(loginUser(formsData))
-            .then(() => {
+            .then((response) => {
                 setAuthToken()
-                navigate('/')
+                // Redirect based on role
+                const isAdmin = response?.payload?.isAdmin;
+                const isTeacher = response?.payload?.isTeacher;
+                if (isAdmin) {
+                    navigate('/admin/dashboard');
+                } else if (isTeacher) {
+                    navigate('/teacher/profile');
+                } else {
+                    navigate('/');
+                }
             })
             .catch((error) => {
                 // Error handling is kept in catch block but without logging
-
             })
     }
 

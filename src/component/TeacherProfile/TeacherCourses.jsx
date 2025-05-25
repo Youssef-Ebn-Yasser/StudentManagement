@@ -237,11 +237,11 @@ const TeacherCourses = ({ teacherId, setActiveTab }) => {
                   className="w-full border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group hover:shadow-lg transition duration-300"
                 >
                   <div className="relative overflow-hidden">
-                    <img
-                      src={course?.imagePath || 'https://via.placeholder.com/300x200'}
-                      alt={course?.title || 'Course'}
+                  <img
+                    src={course?.imagePath || 'https://via.placeholder.com/300x200'}
+                    alt={course?.title || 'Course'}
                       className="block w-full h-32 sm:h-36 md:h-40 object-cover transition-transform duration-300 group-hover:scale-110"
-                    />
+                  />
                   </div>
                   <div className="p-2 sm:p-3">
                     <div className="flex justify-between items-center mb-1">
@@ -254,7 +254,7 @@ const TeacherCourses = ({ teacherId, setActiveTab }) => {
                       {course?.description || 'No description available'}
                     </p>
                     <div className="flex justify-between items-center">
-                      <div className="flex items-center">
+                        <div className="flex items-center">
                         <FaStar className="text-yellow-500 text-xs sm:text-sm" />
                         <span className="ml-1 text-xs sm:text-sm text-black">{course?.rating || 0}</span>
                         <span className="text-gray-500 text-xs sm:text-sm ps-1">({course?.students || 0})</span>
@@ -262,7 +262,7 @@ const TeacherCourses = ({ teacherId, setActiveTab }) => {
                       <span className="text-lg sm:text-xl font-bold text-black">${course?.price || 0}</span>
                     </div>
                     <button 
-                      onClick={() => navigate(`/teacher/course/${course.id}`)}
+                        onClick={() => navigate(`/teacher/course/${course.id}`)}
                       className="w-full mt-3 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 text-sm"
                     >
                       View Details

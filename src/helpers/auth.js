@@ -2,34 +2,62 @@ import { fetchJWTToken } from '@/Redux/auth/authorizeAcions'
 import store from '@/Redux/store'
 
 export const setAuthToken = () => {
-    console.log('Setting auth token')
     const checkAndRefreshToken = async () => {
-        console.log(store.getState()) 
-        const expirationDateStr = store.getState().auth.expirationDate
+        const state = store.getState()
+        const { user, expirationDate: expirationDateStr, isLogedin } = state.auth
 
-
+        // If user is not logged in or no expiration date, don't set up refresh
+        if (!isLogedin || !expirationDateStr || !user?.id) {
+            if (window.authRefreshTimer) {
+                clearTimeout(window.authRefreshTimer)
+            }
+            return
+        }
 
         const expirationDate = new Date(expirationDateStr)
         const currentDate = new Date()
         const timeUntilExpiry = expirationDate.getTime() - currentDate.getTime()
 
-        let refreshDelay = timeUntilExpiry - 60 * 1000 // refresh 1 minute before expiry
-        // If it's already expiring soon or expired, refresh immediately
-        if (refreshDelay <= 0) {
+        // If token is already expired, try to refresh immediately
+        if (timeUntilExpiry <= 0) {
             if (window.authRefreshTimer) {
                 clearTimeout(window.authRefreshTimer)
             }
-            const userId = store.getState().auth.user?.id
-            await store.dispatch(fetchJWTToken(userId))
-            const newExpiration = new Date(store.getState().auth.expirationDate)
-            refreshDelay = newExpiration.getTime() - currentDate.getTime() - 60 * 1000 // refresh 1 minute before new expiry
+            try {
+                await store.dispatch(fetchJWTToken(user.id))
+                // After successful refresh, set up the next refresh
+                const newExpiration = new Date(store.getState().auth.expirationDate)
+                const newTimeUntilExpiry = newExpiration.getTime() - currentDate.getTime()
+                const refreshDelay = newTimeUntilExpiry - 60 * 1000 // refresh 1 minute before expiry
+                
+                if (refreshDelay > 0) {
+                    window.authRefreshTimer = setTimeout(() => {
+                        setAuthToken()
+                    }, refreshDelay)
+                }
+            } catch (error) {
+                console.error('Failed to refresh token:', error)
+                // If refresh fails, clear the timer and let the user re-login
+                if (window.authRefreshTimer) {
+                    clearTimeout(window.authRefreshTimer)
+                }
+            }
+            return
         }
 
-        window.authRefreshTimer = setTimeout(() => {
-            setAuthToken() // recursively set up the next refresh
-        }, refreshDelay)
+        // Set up refresh for when token is about to expire
+        const refreshDelay = timeUntilExpiry - 60 * 1000 // refresh 1 minute before expiry
+        if (refreshDelay > 0) {
+            window.authRefreshTimer = setTimeout(() => {
+                setAuthToken()
+            }, refreshDelay)
+        }
 
-        return () => clearTimeout(window.authRefreshTimer)
+        return () => {
+            if (window.authRefreshTimer) {
+                clearTimeout(window.authRefreshTimer)
+            }
+        }
     }
 
     return checkAndRefreshToken()

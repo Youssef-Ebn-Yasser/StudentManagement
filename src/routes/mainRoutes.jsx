@@ -99,7 +99,7 @@ const routesConfig = [
     },
     {
         path: 'courses/course/:id',
-        element: <CourseDetails />,
+        element: <CoursesDetails />,
         isProtected: false,
         accessRole: 'all',
     },

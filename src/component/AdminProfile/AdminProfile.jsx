@@ -14,28 +14,37 @@ import { allCourses } from '@/Redux/features/allCourses/allCourses'
 import toast from 'react-hot-toast'
 import Loader from '../Loader/Loader'
 
-
-   
-
 function AdminProfile() {
+    let dispatch = useDispatch()
+    const [adminData, setAdminData] = useState(null)
+    const [loading, setLoading] = useState(true)
 
-     // let [profilePhoto, setProfilePhoto]= useState("../../assets/wallpaperflare.jpg")
-     let dispatch= useDispatch()
+    const { students } = useSelector((state) => state.allStudents)
+    const { teachers } = useSelector((state) => state.allTeachers)
+    const { courses } = useSelector((state) => state.allCourses)
+    const { user } = useSelector((state) => state.auth)
 
-     const {students,loading}= useSelector((state)=>state.allStudents)
-     const {teachers}= useSelector((state)=>state.allTeachers)
-     const {courses}= useSelector((state)=>state.allCourses)
- 
- 
-     useEffect(()=>{
-         try {
-             dispatch(allStudent())
-             dispatch(allTeachers())
-             dispatch(allCourses())
- 
-         } catch (error) {
-             toast.error('wait!')
-         }},[dispatch])
+    useEffect(() => {
+        const fetchAdminData = async () => {
+            try {
+                const adminId = localStorage.getItem('adminId')
+                if (adminId) {
+                    const response = await axios.get(`https://e-learn-v1.runasp.net/api/Admin/Admin/ById/${adminId}`)
+                    setAdminData(response.data.data)
+                }
+                setLoading(false)
+            } catch (error) {
+                console.error('Error fetching admin data:', error)
+                setLoading(false)
+            }
+        }
+
+        fetchAdminData()
+        dispatch(allStudent())
+        dispatch(allTeachers())
+        dispatch(allCourses())
+    }, [dispatch])
+
     return (
         <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
@@ -49,8 +58,11 @@ function AdminProfile() {
                             <img src={img} alt="adminImg" className="w-48 h-48 rounded-full border-4 border-white shadow-xl" />
                         </div>
                         <div className="mt-20 text-center">
-                            <h1 className="text-3xl font-bold text-gray-800">Admin Name</h1>
+                            <h1 className="text-3xl font-bold text-gray-800">{adminData?.name || user?.name || 'Admin'}</h1>
                             <p className="text-gray-600 mt-2">E-learning Admin Owner</p>
+                            {adminData?.nationalId && (
+                                <p className="text-gray-500 mt-1">National ID: {adminData.nationalId}</p>
+                            )}
                         </div>
 
                         <div className="mt-6 flex justify-center space-x-4">

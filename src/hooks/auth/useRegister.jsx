@@ -21,7 +21,7 @@ const useRegister = (userType) => {
             }
         ))
             .then((res) => {
-                // navigate('/auth/login')
+                navigate('/auth/login')
             })
             .catch((error) => {
                 console.error('Registration error:', error)
