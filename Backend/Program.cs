@@ -5,6 +5,23 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
+// 1. Register the HTTP client for your AI service
+builder.Services.AddHttpClient("FastAPI", client =>
+{
+    client.BaseAddress = new Uri("http://127.0.0.1:8001/");
+});
+
+// 2. Register SignalR for real-time alerts
+builder.Services.AddSignalR();
+
+// …later, in your middleware setup…
+
+// 3. Serve any static files (e.g. your front-end HTML/JS)
+app.UseStaticFiles();
+
+
+// 5. Map the SignalR hub endpoint for cheating alerts
+app.MapHub<CheatAlertHub>("/cheat-alerts");
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR();
