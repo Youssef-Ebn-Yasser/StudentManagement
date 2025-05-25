@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { courseService } from '../../services/courseService';
-import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook, FaClipboardList, FaTrash, FaEdit, FaChartLine, FaCalendarAlt, FaTag } from 'react-icons/fa';
+import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook, FaClipboardList, FaTrash, FaEdit, FaChartLine, FaCalendarAlt, FaTag, FaFileAlt } from 'react-icons/fa';
 import Loader from '../Loader/Loader';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 
 const TeacherCourseDetails = () => {
   const { id } = useParams();
@@ -14,12 +15,13 @@ const TeacherCourseDetails = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isDeleting, setIsDeleting] = useState(false);
   const [lessons, setLessons] = useState([]);
+  const [lessonMaterials, setLessonMaterials] = useState({});
+  const [editingMaterial, setEditingMaterial] = useState(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [materialFile, setMaterialFile] = useState(null);
 
   // Debug log for id param
   console.log('Course ID from params:', id);
-
-  // Fixed courses data
- 
 
   useEffect(() => {
     console.log('useEffect running, id:', id);
@@ -30,7 +32,24 @@ const TeacherCourseDetails = () => {
         console.log('Response from getCourseDetails:', response);
         if (response.succeeded) {
           setCourse(response.data);
-          setLessons(response.data.lessons || response.data.lessonInfo || []);
+          const courseLessons = response.data.lessons || response.data.lessonInfo || [];
+          setLessons(courseLessons);
+          
+          // Fetch materials for each lesson
+          const materialsPromises = courseLessons.map(lesson => 
+            axios.get(`https://e-learn-v1.runasp.net/api/Material/GetMaterialsByLessonId/GetMaterialsByLessonId/${lesson.id}`)
+          );
+          
+          const materialsResponses = await Promise.all(materialsPromises);
+          const materialsMap = {};
+          
+          materialsResponses.forEach((response, index) => {
+            if (response.data.succeeded) {
+              materialsMap[courseLessons[index].id] = response.data.data || [];
+            }
+          });
+          
+          setLessonMaterials(materialsMap);
         } else {
           throw new Error(response.messages?.[0] || 'Failed to load course details');
         }
@@ -99,6 +118,114 @@ const TeacherCourseDetails = () => {
         console.error('Error deleting lesson:', error);
         toast.error(error.message || 'Failed to delete lesson');
       }
+    }
+  };
+
+  const handleDeleteMaterial = async (materialId) => {
+    if (window.confirm('Are you sure you want to delete this material?')) {
+      try {
+        const response = await axios.delete(`https://e-learn-v1.runasp.net/api/Material/DeleteMaterial/DeleteMaterial/${materialId}`);
+        
+        if (response.data.succeeded) {
+          // Update the materials state by removing the deleted material
+          setLessonMaterials(prevMaterials => {
+            const updatedMaterials = { ...prevMaterials };
+            Object.keys(updatedMaterials).forEach(lessonId => {
+              updatedMaterials[lessonId] = updatedMaterials[lessonId].filter(
+                material => material.id !== materialId
+              );
+            });
+            return updatedMaterials;
+          });
+          
+          toast.success('Material deleted successfully');
+        } else {
+          throw new Error(response.data.messages?.[0] || 'Failed to delete material');
+        }
+      } catch (error) {
+        console.error('Error deleting material:', error);
+        toast.error(error.response?.data?.message || error.message || 'Failed to delete material');
+      }
+    }
+  };
+
+  const handleUpdateMaterial = async (materialId, updatedData) => {
+    try {
+      setIsUpdating(true);
+      
+      // Create FormData to handle file upload
+      const formData = new FormData();
+      formData.append('Id', materialId);
+      formData.append('Title', updatedData.title);
+      formData.append('Content', updatedData.content);
+      formData.append('LessonId', updatedData.lessonId);
+      formData.append('Type', updatedData.type || 1);
+      
+      // Only append file if a new one is selected
+      if (materialFile) {
+        formData.append('Data', materialFile);
+      }
+
+      const response = await axios.put(
+        'https://e-learn-v1.runasp.net/api/Material/UpdateMaterial/UpdateMaterial',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          }
+        }
+      );
+
+      if (response.data.succeeded) {
+        // Update the materials state with the updated material
+        setLessonMaterials(prevMaterials => {
+          const updatedMaterials = { ...prevMaterials };
+          Object.keys(updatedMaterials).forEach(lessonId => {
+            updatedMaterials[lessonId] = updatedMaterials[lessonId].map(material => 
+              material.id === materialId ? { ...material, ...updatedData } : material
+            );
+          });
+          return updatedMaterials;
+        });
+
+        toast.success('Material updated successfully');
+        setEditingMaterial(null);
+        setMaterialFile(null);
+      } else {
+        throw new Error(response.data.messages?.[0] || 'Failed to update material');
+      }
+    } catch (error) {
+      console.error('Error updating material:', error);
+      toast.error(error.response?.data?.message || error.message || 'Failed to update material');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleEditClick = (material) => {
+    setEditingMaterial(material);
+    setMaterialFile(null);
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!editingMaterial) return;
+
+    const updatedData = {
+      id: editingMaterial.id,
+      title: editingMaterial.title,
+      content: editingMaterial.content,
+      lessonId: editingMaterial.lessonId,
+      type: editingMaterial.type || 1
+    };
+
+    await handleUpdateMaterial(editingMaterial.id, updatedData);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setMaterialFile(file);
     }
   };
 
@@ -339,7 +466,7 @@ const TeacherCourseDetails = () => {
               </div>
 
               {course.lessonInfo?.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {course.lessonInfo.map((lesson, index) => (
                     <div 
                       key={lesson.id} 
@@ -364,32 +491,129 @@ const TeacherCourseDetails = () => {
                               {lesson.difficulty}
                             </div>
                           )}
-                        </div>
-                        <div className="flex gap-3">
-                          <button
-                            onClick={() => handleDeleteLesson(lesson.id)}
-                            className="p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-                            title="Delete Lesson"
-                          >
-                            <FaTrash className="text-lg" />
-                          </button>
+                          
+                          {/* Materials Section */}
+                          <div className="ml-11 mt-4">
+                            <div className="flex items-center justify-between mb-3">
+                              <h4 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
+                                <FaFileAlt className="text-blue-500" />
+                                Materials
+                              </h4>
+                              <button
+                                onClick={() => navigate(`/teacher/course/${course.id}/lesson/${lesson.id}/material/new`)}
+                                className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 flex items-center gap-2"
+                              >
+                                <FaFileAlt className="text-sm" />
+                                Add Material
+                              </button>
+                            </div>
+                            
+                            {lessonMaterials[lesson.id]?.length > 0 ? (
+                              <div className="space-y-3">
+                                {lessonMaterials[lesson.id].map((material) => (
+                                  <div 
+                                    key={material.id}
+                                    className="bg-gray-50 p-3 rounded-lg flex items-center justify-between"
+                                  >
+                                    {editingMaterial?.id === material.id ? (
+                                      <form onSubmit={handleEditSubmit} className="flex-1">
+                                        <div className="space-y-3">
+                                          <input
+                                            type="text"
+                                            value={editingMaterial.title}
+                                            onChange={(e) => setEditingMaterial(prev => ({ ...prev, title: e.target.value }))}
+                                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Material Title"
+                                            required
+                                          />
+                                          <textarea
+                                            value={editingMaterial.content}
+                                            onChange={(e) => setEditingMaterial(prev => ({ ...prev, content: e.target.value }))}
+                                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Material Content"
+                                            rows="3"
+                                            required
+                                          />
+                                          <div className="flex items-center gap-2">
+                                            <label className="text-sm text-gray-600">Material Type:</label>
+                                            <select
+                                              value={editingMaterial.type || 1}
+                                              onChange={(e) => setEditingMaterial(prev => ({ ...prev, type: parseInt(e.target.value) }))}
+                                              className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            >
+                                              <option value={1}>Regular Material</option>
+                                              <option value={2}>Assignment</option>
+                                            </select>
+                                          </div>
+                                          <div>
+                                            <label className="block text-sm text-gray-600 mb-1">Update File (Optional)</label>
+                                            <input
+                                              type="file"
+                                              onChange={handleFileChange}
+                                              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                          </div>
+                                          <div className="flex justify-end gap-2">
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                setEditingMaterial(null);
+                                                setMaterialFile(null);
+                                              }}
+                                              className="px-3 py-1 text-gray-600 hover:text-gray-800"
+                                              disabled={isUpdating}
+                                            >
+                                              Cancel
+                                            </button>
+                                            <button
+                                              type="submit"
+                                              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+                                              disabled={isUpdating}
+                                            >
+                                              {isUpdating ? 'Updating...' : 'Save Changes'}
+                                            </button>
+                                          </div>
+                                        </div>
+                                      </form>
+                                    ) : (
+                                      <>
+                                        <div className="flex items-center gap-3">
+                                          <FaFileAlt className="text-gray-500" />
+                                          <div>
+                                            <h5 className="font-medium text-gray-800">{material.title}</h5>
+                                            <p className="text-sm text-gray-600">{material.content}</p>
+                                          </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <button
+                                            onClick={() => handleEditClick(material)}
+                                            className="text-gray-500 hover:text-gray-600"
+                                          >
+                                            <FaEdit />
+                                          </button>
+                                          <button
+                                            onClick={() => handleDeleteMaterial(material.id)}
+                                            className="text-red-500 hover:text-red-600"
+                                          >
+                                            <FaTrash />
+                                          </button>
+                                        </div>
+                                      </>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-gray-500 text-sm">No materials uploaded yet</p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
-                  <FaBook className="text-5xl text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 text-lg mb-4">No lessons available yet</p>
-                  <button
-                    onClick={() => navigate(`/teacher/course/${course.id}/lesson/new`)}
-                    className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 flex items-center gap-2 mx-auto"
-                  >
-                    <FaBook className="text-lg" />
-                    Add Your First Lesson
-                  </button>
-                </div>
+                <p className="text-gray-500 text-center py-4">No lessons available</p>
               )}
             </div>
           )}

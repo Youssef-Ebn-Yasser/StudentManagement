@@ -109,6 +109,17 @@ export const courseService = {
     }
   },
 
+  // Get teacher's courses
+  getTeacherCourses: async (teacherId) => {
+    try {
+      const response = await axiosInstance.get(`/Course/GetAllCoursesOfTeacher/${teacherId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error in getTeacherCourses:', error);
+      throw error;
+    }
+  },
+
   // Get paginated courses for home page
   getPaginatedCourses: async (page = 1, pageSize = 10) => {
     try {
@@ -354,54 +365,18 @@ export const courseService = {
     }
   },
 
-  uploadLessonMaterial: async (materialData) => {
+  // Upload lesson material
+  uploadLessonMaterial: async (formData) => {
     try {
-      // Validate required fields
-      if (!materialData.title?.trim()) throw new Error('Title is required');
-      if (!materialData.content?.trim()) throw new Error('Content is required');
-      if (!materialData.lessonId) throw new Error('LessonId is required');
-      if (!materialData.data) throw new Error('File is required');
-
-      // Create FormData object
-      const formData = new FormData();
-      formData.append('title', materialData.title.trim());
-      formData.append('content', materialData.content.trim());
-      formData.append('lessonId', materialData.lessonId);
-      formData.append('data', materialData.data);
-      formData.append('type', materialData.type);
-
-      console.log('Sending request with FormData:', {
-        title: materialData.title.trim(),
-        content: materialData.content.trim(),
-        lessonId: materialData.lessonId,
-        type: materialData.type,
-        hasFile: !!materialData.data,
-        fileName: materialData.data.name,
-        fileType: materialData.data.type
-      });
-
-      const response = await axiosInstance.post(
-        '/api/Material/CreateMaterial/CreateMaterial',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+      const response = await axiosInstance.post('/api/Material/CreateMaterial/CreateMaterial', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
         }
-      );
-
+      });
       return response.data;
-    } catch (err) {
-      if (err.response) {
-        console.error('Upload failed:',
-          '\nStatus:', err.response.status,
-          '\nMessage:', err.response.data?.message || 'Unknown error',
-          '\nValidation Errors:', err.response.data?.errors || 'No validation errors'
-        );
-      } else {
-        console.error('Upload failed:', err.message);
-      }
-      throw err;
+    } catch (error) {
+      console.error('Error uploading material:', error);
+      throw error;
     }
   },
 

@@ -3,10 +3,13 @@ import { courseService } from '../../services/courseService';
 import { useParams, useNavigate } from 'react-router-dom';
 import Loader from '../Loader/Loader';
 import "./CreateCourse.css";
+import { useSelector } from 'react-redux';
 
 const AddLesson = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
+  const teacherId = user?.id;
   const [courses, setCourses] = useState([]);
   const [lessons, setLessons] = useState([]);
   const [editingLesson, setEditingLesson] = useState(null);
@@ -26,16 +29,24 @@ const AddLesson = () => {
     const fetchCourses = async () => {
       try {
         setIsLoading(true);
-        const response = await courseService.getAllCourses();
-        setCourses(response?.data || []);
+        if (!teacherId) {
+          throw new Error('Teacher ID is required');
+        }
+        const response = await courseService.getTeacherCourses(teacherId);
+        if (response.succeeded) {
+          setCourses(response.data || []);
+        } else {
+          throw new Error(response.messages?.[0] || 'Failed to load courses');
+        }
       } catch (error) {
+        console.error('Error fetching courses:', error);
         setError(error.message || 'Failed to load courses');
       } finally {
         setIsLoading(false);
       }
     };
     fetchCourses();
-  }, []);
+  }, [teacherId]);
 
   useEffect(() => {
     if (editingCourseId) {
@@ -63,7 +74,7 @@ const AddLesson = () => {
         title: formData.get('title'),
         description: formData.get('description'),
         courseId: editingCourseId,
-        teacherId: 64
+        teacherId: teacherId
       };
 
       const response = await courseService.addLesson(lessonData);
@@ -98,7 +109,7 @@ const AddLesson = () => {
         title: formData.get('title'),
         description: formData.get('description'),
         courseId: editingCourseId,
-        teacherId: 64
+        teacherId: teacherId
       };
 
       const updatedLesson = await courseService.updateLesson(lessonData);
@@ -118,7 +129,7 @@ const AddLesson = () => {
     if (window.confirm('Are you sure you want to delete this lesson?')) {
       try {
         setIsLoading(true);
-        await courseService.deleteLesson(lessonId, { teacherId: 64 });
+        await courseService.deleteLesson(lessonId, { teacherId });
         setLessons(lessons.filter(lesson => lesson.id !== lessonId));
       } catch (error) {
         setError(error.message || 'Failed to delete lesson');
