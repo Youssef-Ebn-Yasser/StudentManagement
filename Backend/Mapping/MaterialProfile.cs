@@ -6,6 +6,8 @@ namespace Backend.Mapping
     {
         public MaterialProfile()
         {
+            CreateMap<Material, ShowMaterialDto>();
+
 
         }
     
