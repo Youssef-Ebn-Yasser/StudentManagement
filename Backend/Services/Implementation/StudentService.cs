@@ -96,6 +96,9 @@ public class StudentService : ResponseHandler, IStudentService
                        Level = _.Course.Level,
                        CategoryName = _.Course.Category.CategoryName,
                        ImagePath = _.Course.ImagePath,
+                       Hours = _.Course.Hours,
+                       TeacherName = _.Course.Teacher.Name
+
                    })
                    .ToListAsync();
 
