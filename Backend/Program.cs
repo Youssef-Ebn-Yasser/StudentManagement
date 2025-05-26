@@ -34,6 +34,7 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 // Dependencies
 builder.Services.AddConnectionDependency(builder.Configuration)
                 .AddCustomAuthentication(builder.Configuration)
+<<<<<<< Updated upstream
 
                 .AddClassesDependencies();
 builder.Services.AddSingleton(sp =>
@@ -49,6 +50,15 @@ builder.Services.AddSingleton(sp =>
 builder.Services.AddScoped<IFaceService, FaceService>();
 builder.Services.AddScoped<IChatbotService, OpenAIService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+=======
+    
+               .AddClassesDependencies();
+// Register ONNX Model Service as Singleton for efficiency (loads models once)
+builder.Services.AddSingleton<Backend.Services.OnnxModelService>(); // Ensure correct namespace
+
+// Register Proctoring Service (Scoped is generally a good choice for services using other scoped/singleton services)
+builder.Services.AddScoped<Backend.Services.ProctoringService>(); // Ensure correct namespace
+>>>>>>> Stashed changes
 
 
 var app = builder.Build();

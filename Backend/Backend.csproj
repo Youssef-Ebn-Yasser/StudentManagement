@@ -10,18 +10,30 @@
 
   <ItemGroup>
 
+<<<<<<< Updated upstream
     <PackageReference Include="Azure.Identity" Version="1.7.0" />
 
     <PackageReference Include="Emgu.CV" Version="4.10.0.5680" />
+=======
+    <PackageReference Include="Emgu.CV" Version="3.2.0.2721" />
+
+    <PackageReference Include="Face.Detection.API" Version="1.0.0" />
+
+    <PackageReference Include="MailKit" Version="4.11.0" />
+>>>>>>> Stashed changes
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
 
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
 
+<<<<<<< Updated upstream
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="9.0.4" />
 
     <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="7.0.1" />
+=======
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
+>>>>>>> Stashed changes
 
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
@@ -33,10 +45,19 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+<<<<<<< Updated upstream
     <PackageReference Include="Microsoft.ML" Version="4.0.2" />
     <PackageReference Include="Microsoft.ML.Recommender" Version="0.22.2" />
     <PackageReference Include="MimeKit" Version="4.11.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+=======
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.22.0" />
+    <PackageReference Include="Microsoft.ML.OnnxTransformer" Version="1.7.0" />
+    <PackageReference Include="MimeKit" Version="4.11.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.6" />
+>>>>>>> Stashed changes
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.0" />
 
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
