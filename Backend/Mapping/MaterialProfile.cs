@@ -6,7 +6,8 @@ namespace Backend.Mapping
     {
         public MaterialProfile()
         {
-            CreateMap<Material, ShowMaterialDto>();
+            CreateMap<Material, ShowMaterialDto>()
+                .ForMember(m => m.Data, ma => ma.MapFrom(opt => opt.Path));
 
 
         }
