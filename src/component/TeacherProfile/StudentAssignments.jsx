@@ -2,26 +2,108 @@ import React, { useState, useEffect } from 'react';
 import { FaFilePdf, FaBook, FaSpinner, FaExclamationTriangle, FaSearch, FaArrowLeft } from 'react-icons/fa';
 import { courseService } from '../../services/courseService';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const StudentAssignments = () => {
     const navigate = useNavigate();
-    const [assignments, setAssignments] = useState([]);
+    const { user } = useSelector((state) => state.auth);
+    const teacherId = user?.id;
+    const [courses, setCourses] = useState([]);
+    const [selectedCourse, setSelectedCourse] = useState('');
     const [lessons, setLessons] = useState([]);
     const [selectedLessonId, setSelectedLessonId] = useState('');
+    const [assignments, setAssignments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [errorType, setErrorType] = useState(null);
 
+    // Fetch teacher's courses
     useEffect(() => {
-        fetchLessons();
-    }, []);
+        const fetchCourses = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                if (!teacherId) {
+                    throw new Error('Teacher ID is required');
+                }
+                const response = await courseService.getTeacherCourses(teacherId);
+                if (response.succeeded) {
+                    setCourses(response.data || []);
+                } else {
+                    throw new Error(response.messages?.[0] || 'Failed to load courses');
+                }
+            } catch (err) {
+                console.error('Error fetching courses:', err);
+                setError(getErrorMessage(err));
+                setErrorType(err.response?.status === 404 ? 'notFound' : 'error');
+            } finally {
+                setLoading(false);
+            }
+        };
 
+        fetchCourses();
+    }, [teacherId]);
+
+    // Fetch lessons when course is selected
     useEffect(() => {
-        if (selectedLessonId) {
-            fetchAssignments();
-        } else {
-            setAssignments([]);
-        }
+        const fetchLessons = async () => {
+            if (!selectedCourse) {
+                setLessons([]);
+                return;
+            }
+
+            try {
+                setLoading(true);
+                setError(null);
+                const response = await courseService.getCourseDetails(selectedCourse);
+                if (response.succeeded) {
+                    const courseLessons = response.data.lessons || response.data.lessonInfo || [];
+                    setLessons(courseLessons);
+                } else {
+                    throw new Error(response.messages?.[0] || 'Failed to load lessons');
+                }
+            } catch (err) {
+                console.error('Error fetching lessons:', err);
+                setError(getErrorMessage(err));
+                setErrorType(err.response?.status === 404 ? 'notFound' : 'error');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchLessons();
+    }, [selectedCourse]);
+
+    // Fetch assignments when lesson is selected
+    useEffect(() => {
+        const fetchAssignments = async () => {
+            if (!selectedLessonId) {
+                setAssignments([]);
+                return;
+            }
+
+            try {
+                setLoading(true);
+                setError(null);
+                const response = await courseService.getStudentAssignments(selectedLessonId);
+                if (response && response.succeeded) {
+                    setAssignments(Array.isArray(response.data) ? response.data : [response.data]);
+                } else {
+                    setAssignments([]);
+                    setError('No assignments found for this lesson');
+                    setErrorType('empty');
+                }
+            } catch (err) {
+                console.error('Error fetching assignments:', err);
+                setError(getErrorMessage(err));
+                setErrorType(err.response?.status === 404 ? 'notFound' : 'error');
+                setAssignments([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAssignments();
     }, [selectedLessonId]);
 
     const getErrorMessage = (error) => {
@@ -42,53 +124,6 @@ const StudentAssignments = () => {
         return error.message || "An unexpected error occurred.";
     };
 
-    const fetchLessons = async () => {
-        try {
-            setError(null);
-            setErrorType(null);
-            const response = await courseService.getAllLessons();
-            if (Array.isArray(response)) {
-                setLessons(response);
-            } else if (response && Array.isArray(response.data)) {
-                setLessons(response.data);
-            } else {
-                setLessons([]);
-                setError('Invalid lessons data format received');
-                setErrorType('data');
-            }
-            setLoading(false);
-        } catch (err) {
-            console.error('Error fetching lessons:', err);
-            setError(getErrorMessage(err));
-            setErrorType(err.response?.status === 404 ? 'notFound' : 'error');
-            setLessons([]);
-            setLoading(false);
-        }
-    };
-
-    const fetchAssignments = async () => {
-        try {
-            setError(null);
-            setErrorType(null);
-            setLoading(true);
-            const response = await courseService.getStudentAssignments(selectedLessonId);
-            if (response && response.succeeded) {
-                setAssignments(Array.isArray(response.data) ? response.data : [response.data]);
-            } else {
-                setAssignments([]);
-                setError('No assignments found for this lesson');
-                setErrorType('empty');
-            }
-            setLoading(false);
-        } catch (err) {
-            console.error('Error fetching assignments:', err);
-            setError(getErrorMessage(err));
-            setErrorType(err.response?.status === 404 ? 'notFound' : 'error');
-            setAssignments([]);
-            setLoading(false);
-        }
-    };
-
     const handleViewAssignment = (path) => {
         window.open(path, '_blank');
     };
@@ -97,72 +132,40 @@ const StudentAssignments = () => {
         switch (errorType) {
             case 'notFound':
                 return (
-                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md shadow-sm">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <FaSearch className="h-5 w-5 text-yellow-400" />
-                            </div>
-                            <div className="ml-3">
-                                <h3 className="text-sm font-medium text-yellow-800">Resource Not Found</h3>
-                                <p className="text-sm text-yellow-700 mt-1">{error}</p>
-                            </div>
-                        </div>
+                    <div className="text-center py-8">
+                        <FaExclamationTriangle className="mx-auto text-yellow-500 text-4xl mb-4" />
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Resource Not Found</h3>
+                        <p className="text-gray-600">{error}</p>
                     </div>
                 );
             case 'empty':
                 return (
-                    <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-md shadow-sm">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <FaBook className="h-5 w-5 text-blue-400" />
-                            </div>
-                            <div className="ml-3">
-                                <h3 className="text-sm font-medium text-blue-800">No Assignments</h3>
-                                <p className="text-sm text-blue-700 mt-1">{error}</p>
-                            </div>
-                        </div>
-                    </div>
-                );
-            case 'data':
-                return (
-                    <div className="bg-orange-50 border-l-4 border-orange-400 p-4 rounded-md shadow-sm">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <FaExclamationTriangle className="h-5 w-5 text-orange-400" />
-                            </div>
-                            <div className="ml-3">
-                                <h3 className="text-sm font-medium text-orange-800">Data Format Error</h3>
-                                <p className="text-sm text-orange-700 mt-1">{error}</p>
-                            </div>
-                        </div>
+                    <div className="text-center py-8">
+                        <FaBook className="mx-auto text-gray-400 text-4xl mb-4" />
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No Assignments Available</h3>
+                        <p className="text-gray-600">{error}</p>
                     </div>
                 );
             default:
                 return (
-                    <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md shadow-sm">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <FaExclamationTriangle className="h-5 w-5 text-red-500" />
-                            </div>
-                            <div className="ml-3">
-                                <h3 className="text-sm font-medium text-red-800">Error</h3>
-                                <p className="text-sm text-red-700 mt-1">{error}</p>
-                            </div>
-                        </div>
+                    <div className="text-center py-8">
+                        <FaExclamationTriangle className="mx-auto text-red-500 text-4xl mb-4" />
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Error</h3>
+                        <p className="text-gray-600">{error}</p>
                     </div>
                 );
         }
     };
 
-    if (loading && !selectedLessonId) {
+    if (loading && !courses.length) {
         return (
-            <div className="flex justify-center items-center h-[200px]">
+            <div className="min-h-screen flex items-center justify-center">
                 <FaSpinner className="animate-spin text-4xl text-indigo-600" />
             </div>
         );
     }
 
-    if (error) {
+    if (error && !courses.length) {
         return (
             <div className="space-y-4">
                 <button
@@ -210,25 +213,53 @@ const StudentAssignments = () => {
                     </div>
                 </div>
                 <div className="p-6">
+                    {/* Course Selection */}
                     <div className="mb-6">
-                        <label htmlFor="lessonSelect" className="block text-sm font-medium text-gray-700 mb-2">
-                            Select Lesson
+                        <label htmlFor="courseSelect" className="block text-sm font-medium text-gray-700 mb-2">
+                            Select Course
                         </label>
                         <select
-                            id="lessonSelect"
-                            value={selectedLessonId}
-                            onChange={(e) => setSelectedLessonId(e.target.value)}
+                            id="courseSelect"
+                            value={selectedCourse}
+                            onChange={(e) => {
+                                setSelectedCourse(e.target.value);
+                                setSelectedLessonId(''); // Reset lesson selection
+                                setAssignments([]); // Reset assignments
+                            }}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
                         >
-                            <option value="">Choose a lesson</option>
-                            {Array.isArray(lessons) && lessons.map((lesson) => (
-                                <option key={lesson.id} value={lesson.id}>
-                                    {lesson.title}
+                            <option value="">Choose a course</option>
+                            {courses.map((course) => (
+                                <option key={course.id} value={course.id}>
+                                    {course.title}
                                 </option>
                             ))}
                         </select>
                     </div>
 
+                    {/* Lesson Selection */}
+                    {selectedCourse && (
+                        <div className="mb-6">
+                            <label htmlFor="lessonSelect" className="block text-sm font-medium text-gray-700 mb-2">
+                                Select Lesson
+                            </label>
+                            <select
+                                id="lessonSelect"
+                                value={selectedLessonId}
+                                onChange={(e) => setSelectedLessonId(e.target.value)}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+                            >
+                                <option value="">Choose a lesson</option>
+                                {lessons.map((lesson) => (
+                                    <option key={lesson.id} value={lesson.id}>
+                                        {lesson.title}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
+                    {/* Assignments List */}
                     {selectedLessonId && (
                         <div className="overflow-x-auto rounded-lg border border-gray-200">
                             <table className="min-w-full divide-y divide-gray-200">
@@ -256,7 +287,7 @@ const StudentAssignments = () => {
                                         </tr>
                                     ) : assignments.length > 0 ? (
                                         assignments.map((assignment, index) => (
-                                            <tr key={index} className="hover:bg-gray-50 transition-colors duration-200">
+                                            <tr key={index}>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                     {assignment.studentName}
                                                 </td>

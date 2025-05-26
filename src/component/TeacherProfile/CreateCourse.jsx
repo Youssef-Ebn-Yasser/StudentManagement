@@ -6,8 +6,12 @@ import Loader from '../Loader/Loader';
 import "./CreateCourse.css";
 import axiosInstance from '../../services/axiosInstance';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const CreateCourse = () => {
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
+  const teacherId = user?.id;
   const [activeTab, setActiveTab] = useState('courses');
   const [courses, setCourses] = useState([]);
   const [editingCourse, setEditingCourse] = useState(null);
@@ -16,7 +20,6 @@ const CreateCourse = () => {
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
-  const navigate = useNavigate();
 
   const courseCategories = {
     PROGRAMMING: 'Programming',
@@ -117,7 +120,7 @@ const CreateCourse = () => {
         title: formData.get('title')?.trim(),
         description: formData.get('description')?.trim(),
         price: parseFloat(formData.get('price')),
-        teacherId: 36, // This should be dynamically set based on the logged-in teacher
+        teacherId: teacherId, // Use the teacherId from Redux
         categoryId: parseInt(formData.get('categoryId')),
         level: formData.get('level'),
         hours: formData.get('hours'),
@@ -126,6 +129,10 @@ const CreateCourse = () => {
 
       // Log the data being sent
       console.log('Sending course data:', courseData);
+
+      if (!teacherId) {
+        throw new Error('Teacher ID is required');
+      }
 
       const response = await courseService.createCourse(courseData);
       console.log('Course created successfully:', response);
@@ -386,14 +393,24 @@ const CreateCourse = () => {
 
         <div className="form-group">
           <label className="required-field">Level</label>
-          <input
-            type="text"
+          <select
             name="level"
             required
             defaultValue={course?.level}
-            placeholder="Enter course level (e.g., 'Beginner', 'Intermediate', 'Advanced')"
-            className={errors.level ? 'error' : ''}
-          />
+            className={`
+              w-full px-4 py-2.5 rounded-lg border
+              ${errors.level ? 'border-red-500' : 'border-gray-300'}
+              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+              transition-all duration-200 ease-in-out
+              appearance-none cursor-pointer
+              hover:border-blue-400
+            `}
+          >
+            <option value="">Select Level</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+          </select>
           {errors.level && <span className="error-message">{errors.level}</span>}
         </div>
 
