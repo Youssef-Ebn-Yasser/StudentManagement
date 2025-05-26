@@ -2,11 +2,12 @@
 //This component will provide the text-based communication within your meeting. Participants will be able to type comments and see messages sent by others.
 
 
-import React, { useEffect, useRef } from 'react'
+import { useMeeting } from '@videosdk.live/react-sdk';
+import React, { useEffect, useRef, useState } from 'react'
 
 function MeetingChat() {
 
-    comst [currentMessage, setCurrentMessage] = useState('');
+    const [currentMessage, setCurrentMessage] = useState('');
     // The 'messages' array from useMeeting contains all data messages received on the meeting.
     //  // By default, it will include messages sent via `publish('CHAT', ...)`
     const { publish, messages: receivedMessages } = useMeeting(); // 'publish' sends messages, 'messages' array holds received ones.

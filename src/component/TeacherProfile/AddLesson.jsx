@@ -191,7 +191,12 @@ const AddLesson = () => {
   };
 
   return (
-    <div className="form-container">
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="w-full min-h-screen bg-white p-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Add New Lesson</h1>
+        </div>
+
       {error && (
         <div className="error-message" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', zIndex: 2000, background: '#fee2e2', color: '#b91c1c', padding: '16px', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
           <p style={{ margin: 0 }}>{error}</p>
@@ -250,7 +255,6 @@ const AddLesson = () => {
               )}
 
               <div className="items-list">
-                <h3>Course Lessons</h3>
                 {lessons.length > 0 ? (
                   lessons.map(lesson => (
                     <div key={lesson.id} className="lesson-card">
@@ -285,13 +289,14 @@ const AddLesson = () => {
                     </div>
                   ))
                 ) : (
-                  <p>No lessons available for this course.</p>
+                    <></>
                 )}
               </div>
             </>
           )}
         </>
       )}
+      </div>
     </div>
   );
 };

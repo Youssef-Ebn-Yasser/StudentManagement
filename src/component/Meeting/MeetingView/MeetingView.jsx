@@ -1,6 +1,10 @@
 //│   ├── MeetingView.jsx               // Orchestrates the display of meeting participants and controls
 import { useMeeting } from '@videosdk.live/react-sdk'
 import React, { useEffect } from 'react'
+import ParticipantView from '../ParticipantView/ParticipantView' // Make sure to import ParticipantView
+import MeetingControls from '../MeetingControls/MeetingControls' // Make sure to import MeetingControls
+import MeetingChat from '../MeetingChat/MeetingChat' // Make sure to import MeetingChat
+import toast from 'react-hot-toast'; 
 
 function MeetingView({meetingId , onMeetingLeave, role}) {
     const{
@@ -16,7 +20,7 @@ function MeetingView({meetingId , onMeetingLeave, role}) {
         // These are default states, can be toggled by controls
         micEnabled: true,
         webcamEnabled: true,
-        name: role === 'teacher' ? `Teacher ${role}` : `Student ${role}`, // Set initial display name
+        // name: role === 'teacher' ? `Teacher ${role}` : `Student ${role}`, // Set initial display name
         // You can add more config like enable_recording, enable_streaming here if not set by token
     
           // --- Meeting Event Callbacks ---
@@ -32,8 +36,8 @@ function MeetingView({meetingId , onMeetingLeave, role}) {
                 console.log("Meeting Joined successfully!");
                 toast.success("You have joined the meeting!", { autoClose: 2000 });
                 // Automatically join mic and webcam after successful meeting join
-                toggleMic();
-                toggleWebcam();
+                if (!micOn) toggleMic();
+                if (!webcamOn) toggleWebcam();
             },
             onMeetingLeft: () => {
                 console.log("Meeting Left.");
@@ -52,18 +56,18 @@ function MeetingView({meetingId , onMeetingLeave, role}) {
         // Effect to automatically join the meeting when component mounts and meetingId is available
 
         useEffect(()=>{
-            if(meetingId&&join){
+            if(meetingId && join){
                 console.log(`Attempting to join meeting: ${meetingId}`);
                 join();
             }
             // Clean up when component unmounts (e.g., if user navigates away)
             return () => {
                 // You might want to leave the meeting automatically here if meetingId exists
-                if (meetingId && leave) {
-                leave();
-                }
+                // if (meetingId && leave) {
+                // leave();
+                // }
         };
-        },[meetingId,join,leave])
+        },[meetingId,join])
 
         // Convert the participants Map to an array for easier rendering
         // The 'values()' method of Map returns an iterator, so we spread it into an array.

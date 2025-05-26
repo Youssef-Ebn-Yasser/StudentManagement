@@ -51,28 +51,29 @@ function Navbar() {
                 {/* Navbar Links (Large Screens) */}
                 <div className={`hidden lg:flex items-center gap-6 ml-[150px] ${styles.navLinks}`}>
                     <ul className="flex items-center gap-4">
+                        {/* Common links for all users */}
+                        <li><NavLink to="/" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Home</NavLink></li>
+                        <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
+                        <li><NavLink to="/about" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>About</NavLink></li>
+
+                        {/* Role-specific links */}
                         {isLoggedIn && userRole === 'Student' && (
                           <>
-                            <li><NavLink to="/" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Home</NavLink></li>
-                            <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
                             <li><NavLink to="/studentdashboard" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Dashboard</NavLink></li>
-                            <li><NavLink to="/about" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>About</NavLink></li>
                           </>
                         )}
                         {isLoggedIn && userRole === 'Teacher' && (
                           <>
-                            <li><NavLink to="/" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Home</NavLink></li>
                             <li><NavLink to="/teacher/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>My Courses</NavLink></li>
-                            <li><NavLink to="/studentdashboard" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Dashboard</NavLink></li>
-                            <li><NavLink to="/about" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>About</NavLink></li>
                           </>
                         )}
-                        {(!isLoggedIn || (!['Student', 'Teacher'].includes(userRole))) && (
+                        {isLoggedIn && userRole === 'Admin' && (
                           <>
-                            <li><NavLink to="/" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Home</NavLink></li>
-                            <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
-                            <li><NavLink to="/studentdashboard" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Dashboard</NavLink></li>
-                            <li><NavLink to="/about" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>About</NavLink></li>
+                            <li><NavLink to="/admin/dashboard" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Dashboard</NavLink></li>
+                            <li><NavLink to="/admin/students" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Students</NavLink></li>
+                            <li><NavLink to="/admin/addteacher" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Teachers</NavLink></li>
+                            <li><NavLink to="/admin/addcourse" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
+                            <li><NavLink to="/admin/addgategory" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Categories</NavLink></li>
                           </>
                         )}
                     </ul>
@@ -96,7 +97,11 @@ function Navbar() {
                       )}
                     </div>
                   )}
-                  <Link to="/studentprofile">
+                  <Link to={
+                    userRole === 'Teacher' ? "/teacher/profile" : 
+                    userRole === 'Admin' ? "/admin/profile" : 
+                    "/studentprofile"
+                  }>
                     <div className={`w-[24px] h-[24px] overflow-hidden ${styles.profileIcon}`}>
                       <img src={img} alt="user profile" className="w-full h-full object-cover" />
                     </div>
@@ -105,8 +110,16 @@ function Navbar() {
 
                 {/* Auth Button (Large Screens) */}
                 <div className={`hidden lg:block ml-4 ${styles.button}`}>
-                  {(isLoggedIn && (userRole === 'Student' || userRole === 'Teacher')) ? (
-                    <button onClick={() => dispatch(logout())} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Logout</button>
+                  {isLoggedIn ? (
+                    <button 
+                      onClick={() => {
+                        dispatch(logout());
+                        navigate('/auth/login');
+                      }} 
+                      className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors duration-200"
+                    >
+                      Logout
+                    </button>
                   ) : (
                     <Link to="/auth/login"><Button /></Link>
                   )}
@@ -119,233 +132,196 @@ function Navbar() {
             } ${styles.dropdownMenu}`}>
                 <div className="p-4">
                     <ul className="flex flex-col gap-6 items-center">
+                        {/* Common links for all users */}
+                        <li className="w-full text-center">
+                            <NavLink 
+                                to="/" 
+                                className={({ isActive }) => 
+                                    `block py-2 px-4 text-lg font-medium relative
+                                    ${isActive 
+                                        ? 'text-indigo-600 after:scale-x-100' 
+                                        : 'text-gray-700 hover:text-indigo-600'
+                                    }
+                                    after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
+                                    after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
+                                    after:origin-center after:transition-transform after:duration-300 after:ease-in-out
+                                    hover:after:scale-x-100`
+                                }
+                            >
+                                Home
+                            </NavLink>
+                        </li>
+                        <li className="w-full text-center">
+                            <NavLink 
+                                to="/courses" 
+                                className={({ isActive }) => 
+                                    `block py-2 px-4 text-lg font-medium relative
+                                    ${isActive 
+                                        ? 'text-indigo-600 after:scale-x-100' 
+                                        : 'text-gray-700 hover:text-indigo-600'
+                                    }
+                                    after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
+                                    after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
+                                    after:origin-center after:transition-transform after:duration-300 after:ease-in-out
+                                    hover:after:scale-x-100`
+                                }
+                            >
+                                Courses
+                            </NavLink>
+                        </li>
+                        <li className="w-full text-center">
+                            <NavLink 
+                                to="/about" 
+                                className={({ isActive }) => 
+                                    `block py-2 px-4 text-lg font-medium relative
+                                    ${isActive 
+                                        ? 'text-indigo-600 after:scale-x-100' 
+                                        : 'text-gray-700 hover:text-indigo-600'
+                                    }
+                                    after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
+                                    after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
+                                    after:origin-center after:transition-transform after:duration-300 after:ease-in-out
+                                    hover:after:scale-x-100`
+                                }
+                            >
+                                About
+                            </NavLink>
+                        </li>
+
+                        {/* Role-specific links */}
                         {isLoggedIn && userRole === 'Student' && (
-                            <>
-                                <li className="w-full text-center">
-                                    <NavLink 
-                                        to="/" 
-                                        className={({ isActive }) => 
-                                            `block py-2 px-4 text-lg font-medium relative
-                                            ${isActive 
-                                                ? 'text-indigo-600 after:scale-x-100' 
-                                                : 'text-gray-700 hover:text-indigo-600'
-                                            }
-                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
-                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
-                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
-                                            hover:after:scale-x-100`
+                            <li className="w-full text-center">
+                                <NavLink 
+                                    to="/studentdashboard" 
+                                    className={({ isActive }) => 
+                                        `block py-2 px-4 text-lg font-medium relative
+                                        ${isActive 
+                                            ? 'text-indigo-600 after:scale-x-100' 
+                                            : 'text-gray-700 hover:text-indigo-600'
                                         }
-                                    >
-                                        Home
-                                    </NavLink>
-                                </li>
-                                <li className="w-full text-center">
-                                    <NavLink 
-                                        to="/courses" 
-                                        className={({ isActive }) => 
-                                            `block py-2 px-4 text-lg font-medium relative
-                                            ${isActive 
-                                                ? 'text-indigo-600 after:scale-x-100' 
-                                                : 'text-gray-700 hover:text-indigo-600'
-                                            }
-                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
-                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
-                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
-                                            hover:after:scale-x-100`
-                                        }
-                                    >
-                                        Courses
-                                    </NavLink>
-                                </li>
-                                <li className="w-full text-center">
-                                    <NavLink 
-                                        to="/studentdashboard" 
-                                        className={({ isActive }) => 
-                                            `block py-2 px-4 text-lg font-medium relative
-                                            ${isActive 
-                                                ? 'text-indigo-600 after:scale-x-100' 
-                                                : 'text-gray-700 hover:text-indigo-600'
-                                            }
-                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
-                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
-                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
-                                            hover:after:scale-x-100`
-                                        }
-                                    >
-                                        Dashboard
-                                    </NavLink>
-                                </li>
-                                <li className="w-full text-center">
-                                    <NavLink 
-                                        to="/about" 
-                                        className={({ isActive }) => 
-                                            `block py-2 px-4 text-lg font-medium relative
-                                            ${isActive 
-                                                ? 'text-indigo-600 after:scale-x-100' 
-                                                : 'text-gray-700 hover:text-indigo-600'
-                                            }
-                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
-                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
-                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
-                                            hover:after:scale-x-100`
-                                        }
-                                    >
-                                        About
-                                    </NavLink>
-                                </li>
-                            </>
+                                        after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
+                                        after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
+                                        after:origin-center after:transition-transform after:duration-300 after:ease-in-out
+                                        hover:after:scale-x-100`
+                                    }
+                                >
+                                    Dashboard
+                                </NavLink>
+                            </li>
                         )}
                         {isLoggedIn && userRole === 'Teacher' && (
-                            <>
-                                <li className="w-full text-center">
-                                    <NavLink 
-                                        to="/" 
-                                        className={({ isActive }) => 
-                                            `block py-2 px-4 text-lg font-medium relative
-                                            ${isActive 
-                                                ? 'text-indigo-600 after:scale-x-100' 
-                                                : 'text-gray-700 hover:text-indigo-600'
-                                            }
-                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
-                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
-                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
-                                            hover:after:scale-x-100`
+                            <li className="w-full text-center">
+                                <NavLink 
+                                    to="/teacher/courses" 
+                                    className={({ isActive }) => 
+                                        `block py-2 px-4 text-lg font-medium relative
+                                        ${isActive 
+                                            ? 'text-indigo-600 after:scale-x-100' 
+                                            : 'text-gray-700 hover:text-indigo-600'
                                         }
-                                    >
-                                        Home
-                                    </NavLink>
-                                </li>
-                                <li className="w-full text-center">
-                                    <NavLink 
-                                        to="/teacher/courses" 
-                                        className={({ isActive }) => 
-                                            `block py-2 px-4 text-lg font-medium relative
-                                            ${isActive 
-                                                ? 'text-indigo-600 after:scale-x-100' 
-                                                : 'text-gray-700 hover:text-indigo-600'
-                                            }
-                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
-                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
-                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
-                                            hover:after:scale-x-100`
-                                        }
-                                    >
-                                        My Courses
-                                    </NavLink>
-                                </li>
-                                <li className="w-full text-center">
-                                    <NavLink 
-                                        to="/studentdashboard" 
-                                        className={({ isActive }) => 
-                                            `block py-2 px-4 text-lg font-medium relative
-                                            ${isActive 
-                                                ? 'text-indigo-600 after:scale-x-100' 
-                                                : 'text-gray-700 hover:text-indigo-600'
-                                            }
-                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
-                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
-                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
-                                            hover:after:scale-x-100`
-                                        }
-                                    >
-                                        Dashboard
-                                    </NavLink>
-                                </li>
-                                <li className="w-full text-center">
-                                    <NavLink 
-                                        to="/about" 
-                                        className={({ isActive }) => 
-                                            `block py-2 px-4 text-lg font-medium relative
-                                            ${isActive 
-                                                ? 'text-indigo-600 after:scale-x-100' 
-                                                : 'text-gray-700 hover:text-indigo-600'
-                                            }
-                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
-                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
-                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
-                                            hover:after:scale-x-100`
-                                        }
-                                    >
-                                        About
-                                    </NavLink>
-                                </li>
-                            </>
+                                        after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
+                                        after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
+                                        after:origin-center after:transition-transform after:duration-300 after:ease-in-out
+                                        hover:after:scale-x-100`
+                                    }
+                                >
+                                    My Courses
+                                </NavLink>
+                            </li>
                         )}
-                        {(!isLoggedIn || (!['Student', 'Teacher'].includes(userRole))) && (
-                            <>
-                                <li className="w-full text-center">
-                                    <NavLink 
-                                        to="/" 
-                                        className={({ isActive }) => 
-                                            `block py-2 px-4 text-lg font-medium relative
-                                            ${isActive 
-                                                ? 'text-indigo-600 after:scale-x-100' 
-                                                : 'text-gray-700 hover:text-indigo-600'
-                                            }
-                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
-                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
-                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
-                                            hover:after:scale-x-100`
+                        {isLoggedIn && userRole === 'Admin' && (
+                          <>
+                            <li className="w-full text-center">
+                                <NavLink 
+                                    to="/admin/dashboard" 
+                                    className={({ isActive }) => 
+                                        `block py-2 px-4 text-lg font-medium relative
+                                        ${isActive 
+                                            ? 'text-indigo-600 after:scale-x-100' 
+                                            : 'text-gray-700 hover:text-indigo-600'
                                         }
-                                    >
-                                        Home
-                                    </NavLink>
-                                </li>
-                                <li className="w-full text-center">
-                                    <NavLink 
-                                        to="/courses" 
-                                        className={({ isActive }) => 
-                                            `block py-2 px-4 text-lg font-medium relative
-                                            ${isActive 
-                                                ? 'text-indigo-600 after:scale-x-100' 
-                                                : 'text-gray-700 hover:text-indigo-600'
-                                            }
-                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
-                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
-                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
-                                            hover:after:scale-x-100`
+                                        after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
+                                        after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
+                                        after:origin-center after:transition-transform after:duration-300 after:ease-in-out
+                                        hover:after:scale-x-100`
+                                    }
+                                >
+                                    Dashboard
+                                </NavLink>
+                            </li>
+                            <li className="w-full text-center">
+                                <NavLink 
+                                    to="/admin/students" 
+                                    className={({ isActive }) => 
+                                        `block py-2 px-4 text-lg font-medium relative
+                                        ${isActive 
+                                            ? 'text-indigo-600 after:scale-x-100' 
+                                            : 'text-gray-700 hover:text-indigo-600'
                                         }
-                                    >
-                                        Courses
-                                    </NavLink>
-                                </li>
-                                <li className="w-full text-center">
-                                    <NavLink 
-                                        to="/studentdashboard" 
-                                        className={({ isActive }) => 
-                                            `block py-2 px-4 text-lg font-medium relative
-                                            ${isActive 
-                                                ? 'text-indigo-600 after:scale-x-100' 
-                                                : 'text-gray-700 hover:text-indigo-600'
-                                            }
-                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
-                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
-                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
-                                            hover:after:scale-x-100`
+                                        after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
+                                        after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
+                                        after:origin-center after:transition-transform after:duration-300 after:ease-in-out
+                                        hover:after:scale-x-100`
+                                    }
+                                >
+                                    Students
+                                </NavLink>
+                            </li>
+                            <li className="w-full text-center">
+                                <NavLink 
+                                    to="/admin/addteacher" 
+                                    className={({ isActive }) => 
+                                        `block py-2 px-4 text-lg font-medium relative
+                                        ${isActive 
+                                            ? 'text-indigo-600 after:scale-x-100' 
+                                            : 'text-gray-700 hover:text-indigo-600'
                                         }
-                                    >
-                                        Dashboard
-                                    </NavLink>
-                                </li>
-                                <li className="w-full text-center">
-                                    <NavLink 
-                                        to="/about" 
-                                        className={({ isActive }) => 
-                                            `block py-2 px-4 text-lg font-medium relative
-                                            ${isActive 
-                                                ? 'text-indigo-600 after:scale-x-100' 
-                                                : 'text-gray-700 hover:text-indigo-600'
-                                            }
-                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
-                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
-                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
-                                            hover:after:scale-x-100`
+                                        after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
+                                        after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
+                                        after:origin-center after:transition-transform after:duration-300 after:ease-in-out
+                                        hover:after:scale-x-100`
+                                    }
+                                >
+                                    Teachers
+                                </NavLink>
+                            </li>
+                            <li className="w-full text-center">
+                                <NavLink 
+                                    to="/admin/addcourse" 
+                                    className={({ isActive }) => 
+                                        `block py-2 px-4 text-lg font-medium relative
+                                        ${isActive 
+                                            ? 'text-indigo-600 after:scale-x-100' 
+                                            : 'text-gray-700 hover:text-indigo-600'
                                         }
-                                    >
-                                        About
-                                    </NavLink>
-                                </li>
-                            </>
+                                        after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
+                                        after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
+                                        after:origin-center after:transition-transform after:duration-300 after:ease-in-out
+                                        hover:after:scale-x-100`
+                                    }
+                                >
+                                    Courses
+                                </NavLink>
+                            </li>
+                            <li className="w-full text-center">
+                                <NavLink 
+                                    to="/admin/addgategory" 
+                                    className={({ isActive }) => 
+                                        `block py-2 px-4 text-lg font-medium relative
+                                        ${isActive 
+                                            ? 'text-indigo-600 after:scale-x-100' 
+                                            : 'text-gray-700 hover:text-indigo-600'
+                                        }
+                                        after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
+                                        after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
+                                        after:origin-center after:transition-transform after:duration-300 after:ease-in-out
+                                        hover:after:scale-x-100`
+                                    }
+                                >
+                                    Categories
+                                </NavLink>
+                            </li>
+                          </>
                         )}
                     </ul>
                     
@@ -362,32 +338,40 @@ function Navbar() {
                             </span>
                         </div>
                         
-                        {isLoggedIn && (userRole === 'Student' || userRole === 'Teacher') && (
+                        {isLoggedIn ? (
                             <div className="flex items-center justify-between px-4">
-                                <div className="relative">
-                                    <div className="w-[32px] h-[32px] text-gray-700 cursor-pointer hover:text-indigo-600 transition-colors duration-200" onClick={toggleNotification}>
-                                        <i className="fa-solid fa-bell text-xl"></i>
-                                    </div>
-                                    {isNotificationVisible && (
-                                        <div className="absolute right-0 mt-2 w-[200px] bg-white shadow-lg rounded-md p-4">
-                                            <p className="text-sm text-gray-700">No new notifications</p>
+                                {userRole === 'Student' || userRole === 'Teacher' ? (
+                                    <div className="relative">
+                                        <div className="w-[32px] h-[32px] text-gray-700 cursor-pointer hover:text-indigo-600 transition-colors duration-200" onClick={toggleNotification}>
+                                            <i className="fa-solid fa-bell text-xl"></i>
                                         </div>
-                                    )}
-                                </div>
-                                <Link to="/studentprofile">
+                                        {isNotificationVisible && (
+                                            <div className="absolute right-0 mt-2 w-[200px] bg-white shadow-lg rounded-md p-4">
+                                                <p className="text-sm text-gray-700">No new notifications</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : <div></div>}
+                                <Link to={
+                                    userRole === 'Teacher' ? "/teacher/profile" : 
+                                    userRole === 'Admin' ? "/admin/profile" : 
+                                    "/studentprofile"
+                                }>
                                     <div className="w-[22px] h-[22px] rounded-full overflow-hidden border border-indigo-100 hover:border-indigo-300 transition-colors duration-200">
                                         <img src={img} alt="user profile" className="w-full h-full object-cover" />
                                     </div>
                                 </Link>
                                 <button 
-                                    onClick={() => dispatch(logout())} 
+                                    onClick={() => {
+                                        dispatch(logout());
+                                        navigate('/auth/login');
+                                    }} 
                                     className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md transition-colors duration-200"
                                 >
                                     Logout
                                 </button>
                             </div>
-                        )}
-                        {(!isLoggedIn || !['Student', 'Teacher'].includes(userRole)) && (
+                        ) : (
                             <Link to="/auth/login" className="w-full">
                                 <Button />
                             </Link>

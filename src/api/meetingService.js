@@ -1,5 +1,7 @@
 //│   └── meetingService.js             // Functions for interacting with your backend (e.g., createMeeting API call, getToken API call, saveChatMessage API call)
 
+import axios from "axios";
+
 // THIS MUST BE REPLACED BY SECURE TOKEN GENERATION FROM YOUR .NET BACKEND IN PRODUCTION.
 
 const VIDEOSDK_BACKEND_BASE_URL="https://e-learn-v1.runasp.net"
@@ -8,62 +10,67 @@ export async function fetchAuthToken(){
     console.warn("WARNING: Using direct API key for token generation. This is INSECURE for production!");
 
     try{
-        const response = await fetch(`${VIDEOSDK_BACKEND_BASE_URL}/api/VideoSDK/generateVideoSDKToken`,{
-            method:'POST',
+        const response = await axios.post(`${VIDEOSDK_BACKEND_BASE_URL}/api/VideoSDK/generateVideoSDKToken`,{
             headers:{
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({}),
            
         })
-        if(!response.ok){
-            const errorText = await response.text();
-            let errorData={};
-            try{
-              errorData = JSON.parse(errorText)
-            }catch(e){
-              throw new Error(`HTTP error! Status: ${response.status}. Raw response: ${errorText.substring(0, 200)}...`)
-            }
-            throw new Error(`HTTP error! status: ${response.status}, Message: ${errorData.message || response.statusText}`);
+        const data = response.data; 
+        if(!data.token){
+          throw new Error(data.error);
 
-        }
-        const data = await response.json();
-        if (!data.token) {
-          throw new Error(`Token not found in backend response. Ensure backend returns ${data.token}`);
-        }
+          }
         return data.token;
     }catch (error) {
-        console.error("Error fetching authentication token from backend:", error);
-        throw new Error(`Failed to fetch authentication token from backend: ${error.message}`);
+      console.error("Error fetching authentication token from backend:", error);
+      // --- FIX 3: Handle Axios errors in catch block ---
+      // Check if it's an Axios error with a response from the server
+      if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          const errorMessage = error.response.data?.message || error.response.statusText || error.message;
+          throw new Error(`Failed to fetch authentication token from backend: HTTP error! Status: ${error.response.status}, Message: ${errorMessage}`);
+      } else if (error.request) {
+          // The request was made but no response was received
+          throw new Error(`Failed to fetch authentication token from backend: No response from server. Check network or backend status.`);
+      } else {
+          // Something else happened in setting up the request that triggered an Error
+          throw new Error(`Failed to fetch authentication token from backend: ${error.message}`);
+      }
     }
 }
 
 // * Creates a new meeting ID using the VideoSDK API directly (for development).
 
 export async function createMeetingId(token) {
+  console.log(token);
+  
     try{
-        const response = await fetch(`https://api.videosdk.live/v2/rooms`,{
-            method:"POST",
+        const response = await axios.post(`https://api.videosdk.live/v2/rooms`,{},
+          {
             headers: {
-                authorization: `${token}`, // Token goes in the Authorization header for VideoSDK's API
-                "Content-Type": "application/json",
+                authorization: `${token}` // Token goes in the Authorization header for VideoSDK's API
               },
-              body: JSON.stringify({}), // You can send an empty body or custom room properties here
             });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`HTTP error! status: ${response.status}, Message: ${errorData.error || response.statusText}`);
-            }
-            const { roomId } = await response.json();
+            const { roomId } = response.data;
             if (!roomId) {
               throw new Error("Meeting ID not found in response.");
-            }
-            return roomId
+          }
+          return roomId;
               
         }
         catch (error) {
-            console.error("Error creating meeting ID:", error);
-            throw new Error(`Failed to create meeting ID: ${error.message}`);
+          console.error("Error creating meeting ID:", error);
+          // --- FIX 2: Handle Axios errors in catch block ---
+          if (error.response) {
+              const errorMessage = error.response.data?.message || error.response.data?.error || error.response.statusText || error.message;
+              throw new Error(`Failed to create meeting ID: HTTP error! Status: ${error.response.status}, Message: ${errorMessage}`);
+          } else if (error.request) {
+              throw new Error(`Failed to create meeting ID: No response from VideoSDK API. Check network or API status.`);
+          } else {
+              throw new Error(`Failed to create meeting ID: ${error.message}`);
+          }
           }
 }
 

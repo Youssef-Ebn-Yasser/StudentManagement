@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import {allTeachers} from '@/Redux/features/allTeachers/allTeachers'
 import Loader from '../Loader/Loader'
 import toast from 'react-hot-toast'
+import * as Yup from 'yup';
+
 
 
 function AddTeacher() {
@@ -49,37 +51,41 @@ function AddTeacher() {
         
     }
     
+    let validationSchema=Yup.object({
+        name:Yup.string().required('name is required').min(3,'min length is 3'). max(15,'max lenght is 10'),
+        email:Yup.string().required('email is required').email('invalid email'),
+        password:Yup.string().required('password is required').matches(/^.{6,}$/),
+        confirmPassword:Yup.string().required('rePassword is required').oneOf([Yup.ref('password')],'password not match')
+    })
     
     let formik = useFormik({
         initialValues:{
             name:'',
             email:'',
-            age:'',
-            specialization:'',
-            phone:'',
             password:'',
-            image:null
+            confirmPassword:''
         },
+        validationSchema: validationSchema,
         onSubmit:handleAddTeacher
     })
 
     async function handleAddTeacher(formsData){
         console.log('Added',formsData);
 
-        const params = new URLSearchParams({
-            Name: formsData.name,
-            Email: formsData.email,
-            Age: formsData.age,
-            Specialization: formsData.specialization,
-            Phone: formsData.phone,
-            Password: formsData.password
-        });
+        // const params = new URLSearchParams({
+        //     Name: formsData.name,
+        //     Email: formsData.email,
+        //     Age: formsData.age,
+        //     Specialization: formsData.specialization,
+        //     Phone: formsData.phone,
+        //     Password: formsData.password
+        // });
 
         // 2. Create FormData for the image
-        const formData = new FormData();
-        formData.append("image", formsData.image);
+        // const formData = new FormData();
+        // formData.append("image", formsData.image);
         
-        axios.post(`https://e-learn-v1.runasp.net/api/Teacher/Teacher/Create?${params.toString()}`,formData 
+        axios.post(`https://e-learn-v1.runasp.net/api/Auth/register/teacher`,formsData 
         ).then((response)=>{
             toast.success('Teacher Added')
             console.log(response);
@@ -113,71 +119,33 @@ function AddTeacher() {
                                 <input type="text" name="name" id="name" value={formik.values.name} onChange={formik.handleChange} onBlur={formik.handleBlur}
                                 placeholder='Enter Teacher Name'
                                 className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
+                                <div>{formik.errors.name && formik.touched.name && <p className='text-red-500'>{formik.errors.name}</p>}</div>
                             </div>
                             <div>
                                 <label htmlFor="email" className='block text-sm font-medium text-gray-700 mb-1'>Teacher Email <span className='text-red-500'>*</span></label>
                                 <input type="email" name="email" id="email" value={formik.values.email} onChange={formik.handleChange} onBlur={formik.handleBlur}
                                 placeholder='Enter Teacher Email'
                                 className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
+                                <div>{formik.errors.email && formik.touched.email && <p className='text-red-500'>{formik.errors.email}</p>}</div>
                             </div>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div>
-                                <label htmlFor="age" className='block text-sm font-medium text-gray-700 mb-1'>Teacher Age</label>
-                                <input type="number" name="age" id="age" value={formik.values.age} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                                placeholder='Enter Teacher Age'
-                                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
-                            </div>
-                            <div>
-                                <label htmlFor="specialization" className='block text-sm font-medium text-gray-700 mb-1'>Specialization <span className='text-red-500'>*</span></label>
-                                <select 
-                                    name="specialization" 
-                                    id="specialization"
-                                    value={formik.values.specialization} 
-                                    onChange={formik.handleChange} 
-                                    onBlur={formik.handleBlur}
-                                    className="form-select w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3">
-                                    <option value="">Select Specialization</option>
-                                    <option value="beginner">Beginner</option>
-                                    <option value="intermediate">Intermediate</option>
-                                    <option value="advanced">Advanced</option>
-                                    {/* Add more relevant specializations */}
-                                    <option value="web_development">Web Development</option>
-                                    <option value="data_science">Data Science</option>
-                                    <option value="design">Design</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div>
-                                <label htmlFor="phone" className='block text-sm font-medium text-gray-700 mb-1'>Phone</label>
-                                <input type="tel" name="phone" id="phone" value={formik.values.phone} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                                placeholder='Enter Phone Number'
-                                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
-                            </div>
                             <div>
                                 <label htmlFor="password" className='block text-sm font-medium text-gray-700 mb-1'>Password <span className='text-red-500'>*</span></label>
                                 <input type="password" name="password" id="password" value={formik.values.password} onChange={formik.handleChange} onBlur={formik.handleBlur}
                                 placeholder='Enter Password'
                                 className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
+                                <div>{formik.errors.password && formik.touched.password && <p className='text-red-500'>{formik.errors.password}</p>}</div>
+                            </div>
+                            <div>
+                                <label htmlFor="confirmPassword" className='block text-sm font-medium text-gray-700 mb-1'>Confirm Password <span className='text-red-500'>*</span></label>
+                                <input type="password" name="confirmPassword" id="confirmPassword" value={formik.values.confirmPassword} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                placeholder='Enter confirmPassword'
+                                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
+                                <div>{formik.errors.confirmPassword && formik.touched.confirmPassword && <p className='text-red-500'>{formik.errors.confirmPassword}</p>}</div>
                             </div>
                         </div>
-                        <div>
-                            <label htmlFor="image" className='block text-sm font-medium text-gray-700 mb-1'>Profile Image</label>
-                            <input type="file" name="image" id="image" accept='image/*' onBlur={formik.handleBlur}
-                            onChange={(e)=>{
-                                const file=e.currentTarget.files[0];
-                                if(file){
-                                    formik.setFieldValue('image',file)
-                                    setImagePreview(URL.createObjectURL(file))
-                                }else{
-                                    formik.setFieldValue('image',null)
-                                    setImagePreview(img) // Default avatar
-                                }
-                            }}
-                            className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-2 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"/>
-                            {imagePreview && <img src={imagePreview} alt="Preview" className="mt-3 w-24 h-24 rounded-full object-cover mx-auto shadow-md"/>}
-                        </div>
+                        
                         <div className='mt-8 flex justify-center'>
                             <button type='submit'
                             className="bg-violet-600 text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-50 transition-all duration-300 ease-in-out transform hover:scale-105"

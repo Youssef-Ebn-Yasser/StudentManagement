@@ -10,7 +10,6 @@ import CreateCourse from '@/component/TeacherProfile/CreateCourse'
 import TeacherCourses from '@/component/TeacherProfile/TeacherCourses'
 import AccountSettings from '@/component/TeacherProfile/settingsPage/AccountSettings'
 import TeacherCourseDetails from '@/component/TeacherProfile/TeacherCourseDetails'
-import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
 import StudentDashboard from '@/component/StudentDashboard/StudentDashboard'
 import StudentProfile from '@/component/StudentProfile/StudentProfile'
 import EditProfile from '@/component/StudentProfile/EditProfile'
@@ -24,15 +23,11 @@ import Students from '@/component/AdminProfile/Students'
 import AdminDashboard from '@/component/AdminDashboard/AdminDashboard'
 import ControlCourse from '@/component/AdminProfile/ControlCourse'
 import StudentDetails from '@/component/AdminProfile/StudentDetails'
+import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
 import MeetingRoom from '@/component/Meeting/MeetingRoom/MeetingRoom'
+import StudentAssignments from '@/component/TeacherProfile/StudentAssignments'
+import CourseDashDetails from '@/component/StudentDashboard/CourseDashDetailes'
 
-
-// Hardcoded meetingId/token for now; ideally these come from your backend
-
-const DUMMY_MEETING_ID = "abcde12345";
-const DUMMY_TOKEN = "84db1e11f46cd999f7f8a631acd7136799524d0478a4bb17ba2950a21ddfdd4d"; // Or env
-
-const isAuth = true // Replace with actual authentication logic
 
 const routesConfig = [
     { path: '', element: <Home />, isProtected: false, accessRole: 'all' },
@@ -109,6 +104,13 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
+        path: 'studentdashboard/course/:id',
+        element: <CourseDashDetails />,
+        // element: <CoursesDetails />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
         path: 'teacher/settings',
         element: <AccountSettings />,
         isProtected: false,
@@ -175,13 +177,15 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
+        path: 'teacher/assignments',
+        element: <StudentAssignments />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
         path: "video-call",
         element: (
-          <MeetingRoom
-            meetingId={DUMMY_MEETING_ID}
-            token={DUMMY_TOKEN}
-            name={"Teacher or Student Name"}
-          />
+          <MeetingRoom/>
         ),
         isProtected: false,
         accessRole: "all",

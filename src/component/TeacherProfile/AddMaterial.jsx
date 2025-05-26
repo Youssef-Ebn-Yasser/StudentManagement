@@ -113,125 +113,121 @@ const AddMaterial = ({ teacherId }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100">
-          <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
-            <div className="flex items-center">
-              <h2 className="text-2xl font-bold text-gray-900">Upload Course Material</h2>
-            </div>
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="w-full min-h-screen bg-white p-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Upload Course Material</h1>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="form-group">
+            <label htmlFor="lesson" className="form-label">Select Lesson</label>
+            <select
+              id="lesson"
+              value={selectedLesson}
+              onChange={(e) => setSelectedLesson(e.target.value)}
+              className="form-select block w-full px-4 py-3 text-base text-gray-800 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition-all duration-200 appearance-none hover:border-[var(--primary-dark)] cursor-pointer"
+              required
+            >
+              <option value="">Select a lesson</option>
+              {lessons.map((lesson) => (
+                <option key={lesson.id} value={lesson.id}>
+                  {lesson.title}
+                </option>
+              ))}
+            </select>
           </div>
-          
-          <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="form-group">
-              <label htmlFor="lesson" className="form-label">Select Lesson</label>
-              <select
-                id="lesson"
-                value={selectedLesson}
-                onChange={(e) => setSelectedLesson(e.target.value)}
-                className="form-select block w-full px-4 py-3 text-base text-gray-800 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition-all duration-200 appearance-none hover:border-[var(--primary-dark)] cursor-pointer"
-                required
-              >
-                <option value="">Select a lesson</option>
-                {lessons.map((lesson) => (
-                  <option key={lesson.id} value={lesson.id}>
-                    {lesson.title}
-                  </option>
-                ))}
-              </select>
-            </div>
 
-            <div className="form-group">
-              <label htmlFor="title" className="form-label">Title</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="form-input pl-10"
-                  placeholder="Enter material title"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="content" className="form-label">Content</label>
-              <textarea
-                id="content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                rows={4}
-                className="form-textarea pl-10"
-                placeholder="Enter material content"
+          <div className="form-group">
+            <label htmlFor="title" className="form-label">Title</label>
+            <div className="relative">
+              <input
+                type="text"
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="form-input pl-10"
+                placeholder="Enter material title"
                 required
               />
             </div>
+          </div>
 
-            <div className="form-group">
-              <label htmlFor="data" className="form-label">File</label>
-              <div className="file-input-container group">
+          <div className="form-group">
+            <label htmlFor="content" className="form-label">Content</label>
+            <textarea
+              id="content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={4}
+              className="form-textarea pl-10"
+              placeholder="Enter material content"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="data" className="form-label">File</label>
+            <div className="file-input-container group">
+              <input
+                type="file"
+                id="data"
+                onChange={handleFileChange}
+                className="file-input"
+                required
+              />
+              <div className="file-input-label group-hover:bg-blue-50 transition-colors duration-200">
+                <span className="text-gray-700">{data ? data.name : 'Choose a file'}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Material Type</label>
+            <div className="flex items-center space-x-4">
+              <label className="inline-flex items-center">
                 <input
-                  type="file"
-                  id="data"
-                  onChange={handleFileChange}
-                  className="file-input"
-                  required
+                  type="radio"
+                  value={1}
+                  checked={type === 1}
+                  onChange={(e) => setType(parseInt(e.target.value))}
+                  className="form-radio"
                 />
-                <div className="file-input-label group-hover:bg-blue-50 transition-colors duration-200">
-                  <span className="text-gray-700">{data ? data.name : 'Choose a file'}</span>
+                <span className="ml-2">Regular Material</span>
+              </label>
+              <label className="inline-flex items-center">
+                <input
+                  type="radio"
+                  value={2}
+                  checked={type === 2}
+                  onChange={(e) => setType(parseInt(e.target.value))}
+                  className="form-radio"
+                />
+                <span className="ml-2">Assignment</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="form-actions pt-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className="ml-auto flex items-center py-2 px-6 rounded-lg font-bold text-white bg-gradient-to-r from-[var(--primary-dark)] to-[var(--primary-color)] shadow-md hover:opacity-90 hover:shadow-lg transition-all duration-200 ease-in-out disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="flex items-center">
+                  <Loader className="w-5 h-5 mr-2" />
+                  Uploading...
                 </div>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Material Type</label>
-              <div className="flex items-center space-x-4">
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    value={1}
-                    checked={type === 1}
-                    onChange={(e) => setType(parseInt(e.target.value))}
-                    className="form-radio"
-                  />
-                  <span className="ml-2">Regular Material</span>
-                </label>
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    value={2}
-                    checked={type === 2}
-                    onChange={(e) => setType(parseInt(e.target.value))}
-                    className="form-radio"
-                  />
-                  <span className="ml-2">Assignment</span>
-                </label>
-              </div>
-            </div>
-
-            <div className="form-actions pt-4">
-              <button
-                type="submit"
-                disabled={loading}
-                className="ml-auto flex items-center py-2 px-6 rounded-lg font-bold text-white bg-gradient-to-r from-[var(--primary-dark)] to-[var(--primary-color)] shadow-md hover:opacity-90 hover:shadow-lg transition-all duration-200 ease-in-out disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <div className="flex items-center">
-                    <Loader className="w-5 h-5 mr-2" />
-                    Uploading...
-                  </div>
-                ) : (
-                  <div className="flex items-center">
-                    <FaCheck className="mr-2 group-hover:scale-110 transition-transform duration-200" />
-                    Upload Material
-                  </div>
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
+              ) : (
+                <div className="flex items-center">
+                  <FaCheck className="mr-2 group-hover:scale-110 transition-transform duration-200" />
+                  Upload Material
+                </div>
+              )}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

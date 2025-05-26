@@ -13,18 +13,23 @@ import AccountSettings from "./settingsPage/AccountSettings";
 import { courseService } from '../../services/courseService';
 import Loader from '../Loader/Loader';
 import TeacherDashboard from '../TeacherDashboard/TeacherDashboard';
+import { useSelector } from 'react-redux';
 
 function TeacherProfile() {
   const [activeTab, setActiveTab] = useState('profile');
   const [teacherData, setTeacherData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchTeacherData = async () => {
       try {
         setIsLoading(true);
-        const response = await courseService.getTeacherStats(64);
+        if (!user?.id) {
+          throw new Error('Teacher ID not found');
+        }
+        const response = await courseService.getTeacherStats(user.id);
         setTeacherData(response.data);
       } catch (error) {
         setError(error.message || 'Failed to load teacher data');
@@ -34,7 +39,7 @@ function TeacherProfile() {
     };
 
     fetchTeacherData();
-  }, []);
+  }, [user?.id]);
 
   const stats = [
     {
@@ -84,7 +89,7 @@ function TeacherProfile() {
               <div className="container px-4">
                 <div className="flex flex-wrap px-4 gap-5">
                   <div className="w-full mt-10">
-                    <MainInfo teacherId={64} teacherData={teacherData} />
+                    <MainInfo teacherId={user?.id} teacherData={teacherData} />
                   </div>
                   <div className="w-full">
                     <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
@@ -105,15 +110,15 @@ function TeacherProfile() {
           </>
         );
       case 'courses':
-        return <TeacherCourses teacherId={64} setActiveTab={setActiveTab} />;
+        return <TeacherCourses teacherId={user?.id} setActiveTab={setActiveTab} />;
       case 'create-course':
-        return <CreateCourse teacherId={64} />;
+        return <CreateCourse teacherId={user?.id} />;
       case 'lessons':
-        return <AddLesson teacherId={64} />;
+        return <AddLesson teacherId={user?.id} />;
       case 'materials':
-        return <AddMaterial teacherId={64} />;
+        return <AddMaterial teacherId={user?.id} />;
       case 'settings':
-        return <AccountSettings teacherData={{...teacherData, id: 64}} onUpdate={handleProfileUpdate} />;
+        return <AccountSettings teacherData={{...teacherData, id: user?.id}} onUpdate={handleProfileUpdate} />;
       default:
         return null;
     }
