@@ -27,6 +27,7 @@ import StudentDetails from '@/component/AdminProfile/StudentDetails'
 import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
 import AddMaterial from '@/component/TeacherProfile/AddMaterial'
 import StudentAssignments from '@/component/TeacherProfile/StudentAssignments'
+import TeacherProfileView from '@/component/StudentDashboard/TeacherProfileView'
 
 const isAuth = true // Replace with actual authentication logic
 
@@ -101,6 +102,12 @@ const routesConfig = [
     {
         path: 'courses/course/:id',
         element: <CoursesDetails />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'courses/teacher/:teacherName',
+        element: <TeacherProfileView />,
         isProtected: false,
         accessRole: 'all',
     },

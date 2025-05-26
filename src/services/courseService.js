@@ -169,11 +169,11 @@ export const courseService = {
         'https://e-learn-v1.runasp.net/Course/Update',
         body,
         {
-          headers: {
+        headers: {
             'Content-Type': 'application/json',
             'Accept': '*/*',
             'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
+        },
           timeout: 30000
         }
       );
@@ -536,4 +536,4 @@ export const getPaginatedCourses = async (page = 1, enOrderBy = 0) => {
     console.error('Error fetching paginated courses:', error);
     throw error;
   }
-};
+}; 

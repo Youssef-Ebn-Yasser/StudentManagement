@@ -186,7 +186,15 @@ export default function CourseDashDetails() {
                   <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
                   </svg>
-                  <span className="ml-1 text-gray-600">Teacher: {course.teacherName || 'Not specified'}</span>
+                  <span className="ml-1 text-gray-600">
+                    Teacher:{' '}
+                    <button
+                      onClick={() => navigate(`/courses/teacher/${course.teacherName}`)}
+                      className="text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      {course.teacherName || 'Not specified'}
+                    </button>
+                  </span>
                 </div>
               </div>
 

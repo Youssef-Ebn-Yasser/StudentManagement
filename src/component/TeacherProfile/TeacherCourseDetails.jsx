@@ -64,7 +64,22 @@ const TeacherCourseDetails = () => {
   }, [id]);
 
   const handleDeleteCourse = async () => {
-    if (window.confirm('Are you sure you want to delete this course? This action cannot be undone.')) {
+    if (window.confirm(`
+      Are you sure you want to delete this course?
+      
+      Course Details:
+      Title: ${course.title}
+      Category: ${course.category}
+      Level: ${course.level}
+      
+      ⚠️ Warning: This action will permanently delete:
+      - The course itself
+      - All lessons in this course
+      - All materials and assignments associated with these lessons
+      - All uploaded files and resources
+      
+      This action cannot be undone.
+    `)) {
       try {
         setIsDeleting(true);
         console.log('Starting course deletion for ID:', id);
@@ -72,7 +87,7 @@ const TeacherCourseDetails = () => {
         console.log('Delete response:', response);
         
         if (response?.succeeded) {
-          toast.success('Course deleted successfully');
+          toast.success('Course and all associated content deleted successfully');
           navigate('/teacher/courses'); // Navigate back to courses list
         } else {
           throw new Error(response?.message || 'Failed to delete course');

@@ -274,9 +274,6 @@ const TeacherCourses = ({ setActiveTab }) => {
                       />
                       </div>
                       <div className="p-2 sm:p-3">
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-gray-500 text-xs sm:text-sm">{course?.level || 'All Levels'}</span>
-                        </div>
                         <h3 className="mt-0 mb-1 text-base sm:text-lg font-semibold text-black line-clamp-2">
                           {course?.title || 'Untitled Course'}
                         </h3>
