@@ -32,7 +32,7 @@ public class PaymentsController : ControllerBase
         {
             var options = new SessionCreateOptions
             {
-                SuccessUrl = "http://127.0.0.1:5500/index.html",
+                SuccessUrl = $"http://localhost:5175/courses/course/{request.CourseId}?payment=success",
                 CancelUrl = "http://127.0.0.1:5500/faild.html",
                 LineItems = new List<SessionLineItemOptions>
                 {
