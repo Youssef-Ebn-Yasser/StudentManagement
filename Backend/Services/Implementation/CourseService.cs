@@ -28,6 +28,7 @@ public class CourseService : ResponseHandler, ICourseService
     {
         var courses = await _unitOfWork.Repository<Course>()
         .GetTableNoTracking()
+        .Where(c => c.IsDeleted == false)
         .Include(c => c.Category)
         .ToListAsync();
 
@@ -59,16 +60,16 @@ public class CourseService : ResponseHandler, ICourseService
     public async Task<Response<ShowCourseDto>> GetCourseByIdAsync(int id)
     {
         var course = await _unitOfWork.Repository<Course>()
-            .GetTableNoTracking()
-            .Where(c => c.IsDeleted == false)
-            .Include(c => c.Category)
-            .Include(c => c.Teacher)
-            .Include(c => c.lessons)
-            .Include(c => c.StudentCourses)
-                .ThenInclude(sc => sc.Student)
-                    .ThenInclude(s => s.Comments)
-                        .ThenInclude(c => c.Lesson)
-            .FirstOrDefaultAsync(c => c.Id == id);
+                                                       .GetTableNoTracking()
+                                                       .Where(c => c.IsDeleted == false)
+                                                       .Include(c => c.Category)
+                                                       .Include(c => c.Teacher)
+                                                       .Include(c => c.lessons)
+                                                       .Include(c => c.StudentCourses)
+                                                       .ThenInclude(sc => sc.Student)
+                                                       .ThenInclude(s => s.Comments)
+                                                       .ThenInclude(c => c.Lesson)
+                                                       .FirstOrDefaultAsync(c => c.Id == id);
 
         if (course == null)
             return NotFound<ShowCourseDto>("Course not found");
@@ -139,27 +140,27 @@ public class CourseService : ResponseHandler, ICourseService
         return Created<string>("Course created successfully");
     }
 
-    public async Task<Response<string>> UpdateAsync(UpdateCourseDto createCourseDto)
+    public async Task<Response<string>> UpdateAsync(UpdateCourseDto updateCourseDto)
     {
-        if (createCourseDto == null || string.IsNullOrWhiteSpace(createCourseDto.Id))
+        if (updateCourseDto == null || string.IsNullOrWhiteSpace(updateCourseDto.Id))
             return BadRequest<string>("Invalid course data");
 
-        var course = await _unitOfWork.Repository<Course>().GetByIdAsync(int.Parse(createCourseDto.Id));
+        var course = await _unitOfWork.Repository<Course>().GetByIdAsync(int.Parse(updateCourseDto.Id));
         if (course == null)
             return NotFound<string>("Course not found");
 
         string? newImagePath = course.ImagePath;
 
-        if (createCourseDto.Image != null)
+        if (updateCourseDto.Image != null)
         {
             var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Images");
             Directory.CreateDirectory(uploadsFolder);
 
-            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(createCourseDto.Image.FileName);
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(updateCourseDto.Image.FileName);
             var filePath = Path.Combine(uploadsFolder, fileName);
 
             using var stream = new FileStream(filePath, FileMode.Create);
-            await createCourseDto.Image.CopyToAsync(stream);
+            await updateCourseDto.Image.CopyToAsync(stream);
 
             newImagePath = $"/Images/{fileName}";
 
@@ -171,10 +172,11 @@ public class CourseService : ResponseHandler, ICourseService
             }
         }
 
-        _mapper.Map(createCourseDto, course);
+        _mapper.Map(updateCourseDto, course);
         course.ImagePath = newImagePath;
 
         _unitOfWork.Repository<Course>().Update(course);
+        _unitOfWork.Complete();
         return Success("Course updated successfully");
     }
 
@@ -219,7 +221,9 @@ public class CourseService : ResponseHandler, ICourseService
         var courses = await _unitOfWork.Repository<Course>()
             .GetTableNoTracking()
             .Where(c => c.TecherId == teacherId && c.IsDeleted == false)
+            .Include(c => c.Teacher)
             .Include(c => c.Category)
+            .Include(c => c.lessons)
             .ToListAsync();
         var result = _mapper.Map<List<ShowCourseDto>>(courses);
         return Success(result);
