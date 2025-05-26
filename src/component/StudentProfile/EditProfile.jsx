@@ -6,9 +6,6 @@ import {
   FaPhone,
   FaSave,
   FaTimes,
-  FaGithub,
-  FaLinkedin,
-  FaFacebook,
   FaCheckCircle,
 } from 'react-icons/fa';
 import axios from 'axios';
@@ -23,16 +20,11 @@ export default function EditProfile() {
     email: '',
     phone: '',
     image: null,
-    github: '',
-    linkedin: '',
-    facebook: '',
-    telegram: '',
   });
 
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
-        // Use the logged-in student's ID from localStorage
         const studentId = localStorage.getItem('studentId');
         if (!studentId) {
           setError('No student ID found. Please log in again.');
@@ -49,10 +41,6 @@ export default function EditProfile() {
             email: studentData.email || '',
             phone: studentData.phone || '',
             image: studentData.imagePath || null,
-            github: studentData.github || '',
-            linkedin: studentData.linkedin || '',
-            facebook: studentData.facebook || '',
-            telegram: studentData.telegram || '',
           });
         }
       } catch (err) {
@@ -89,7 +77,6 @@ export default function EditProfile() {
     setLoading(true);
     setSuccess(false);
     try {
-      // Use the logged-in student's ID from localStorage
       const studentId = localStorage.getItem('studentId');
       if (!studentId) {
         setError('No student ID found. Please log in again.');
@@ -116,7 +103,6 @@ export default function EditProfile() {
 
       if (response.data.succeeded) {
         setSuccess(true);
-        // Optionally update formData with new data if needed
       } else {
         throw new Error(response.data.message || 'Failed to update profile');
       }
@@ -232,62 +218,6 @@ export default function EditProfile() {
                   value={formData.phone}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
-
-            {/* Social Links */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  GitHub
-                </label>
-                <input
-                  type="url"
-                  name="github"
-                  value={formData.github}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="https://github.com/username"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  LinkedIn
-                </label>
-                <input
-                  type="url"
-                  name="linkedin"
-                  value={formData.linkedin}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="https://linkedin.com/in/username"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Facebook
-                </label>
-                <input
-                  type="url"
-                  name="facebook"
-                  value={formData.facebook}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="https://facebook.com/username"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Telegram
-                </label>
-                <input
-                  type="url"
-                  name="telegram"
-                  value={formData.telegram}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="https://t.me/username"
                 />
               </div>
             </div>

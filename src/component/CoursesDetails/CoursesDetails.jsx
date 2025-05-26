@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook, FaRegHeart, FaShareAlt } from 'react-icons/fa';
+import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook } from 'react-icons/fa';
 import Loader from '../Loader/Loader';
 import styles from '../Courses/Courses.module.css';
 import { loadStripe } from '@stripe/stripe-js';
@@ -18,13 +18,7 @@ const mockBenefits = [
   { icon: <FaUsers />, text: '24/7 support' },
 ];
 
-const mockReviews = [
-  { name: 'John Doe', rating: 5, comment: 'Great course!' },
-  { name: 'Jane Smith', rating: 4, comment: 'Very informative.' },
-];
-
 const mockGallery = [
-  // Main image will be course.imagePath
   'https://images.unsplash.com/photo-1461749280684-dccba630e2f6',
   'https://images.unsplash.com/photo-1519389950473-47ba0277781c',
 ];
@@ -38,62 +32,42 @@ export default function CoursesDetails() {
   const [activeTab, setActiveTab] = useState('description');
   const [relatedCourses, setRelatedCourses] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [newComment, setNewComment] = useState('');
 
-  // Add handlePayment function
+  // Helper to format date
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+  };
+
+  // Payment handler: open Stripe in the same tab
   const handlePayment = async () => {
+    const studentId = localStorage.getItem('studentId');
+    if (!studentId) {
+      navigate('/auth/login');
+      return;
+    }
     setIsProcessing(true);
     try {
-      // Hardcoded student ID for testing
-      const studentId = 3;
-      
-      console.log('Starting payment process with:', {
-        studentId,
-        courseId: id,
-        coursePrice: course?.price
-      });
-
-      // Create payment intent with proper data structure
       const paymentData = {
-        studentId: studentId,
-        courseId: parseInt(id),
-        amount: Math.round(course.price * 100), // Convert to cents and round to avoid floating point issues
+        amount: Math.round(course.price),
+        paymentDate: new Date().toISOString(),
         currency: 'USD',
-        paymentDate: new Date().toISOString()
+        studentId: Number(studentId),
+        courseId: parseInt(id)
       };
-
-      console.log('Sending payment request with data:', paymentData);
-
-      // Create payment intent and get Stripe URL
       const response = await axios.post('https://e-learn-v1.runasp.net/api/Payments/create-payment-intent', paymentData);
-
-      console.log('Payment response:', response.data);
-
       if (response.data && response.data.url) {
-        // Add event listener for the back button
-        window.addEventListener('popstate', () => {
-          navigate(`/courses/course/${id}`);
-        });
-
-        // Redirect to Stripe checkout page
+        // Save info to enroll after redirect
+        localStorage.setItem('pendingEnrollCourseId', id);
+        // Open Stripe checkout in the same tab
         window.location.href = response.data.url;
       } else {
         throw new Error('Invalid payment response: No URL received');
       }
     } catch (error) {
-      console.error('Payment error details:', {
-        error: error,
-        response: error.response?.data,
-        status: error.response?.status,
-        message: error.message
-      });
-
       let errorMessage = 'An error occurred during payment processing.';
-
       if (error.response) {
         const serverError = error.response.data;
-        console.log('Server error response:', serverError);
-        
         if (typeof serverError === 'object') {
           if (serverError.massage) {
             errorMessage = serverError.massage;
@@ -112,71 +86,73 @@ export default function CoursesDetails() {
       } else {
         errorMessage = error.message || 'An unexpected error occurred';
       }
-
       alert(`Error: ${errorMessage}`);
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const handleAddComment = async () => {
-    if (!newComment.trim()) return;
-    
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/Comment/create`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          content: newComment,
-          courseId: course.id,
-          studentId: localStorage.getItem('userId'),
-          lessonId: course.lessonInfo[0]?.id // Using first lesson as default
-        })
-      });
+  // Enroll student after successful payment (when redirected back)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentSuccess = urlParams.get('payment') === 'success';
+    const pendingCourseId = localStorage.getItem('pendingEnrollCourseId');
+    const studentId = localStorage.getItem('studentId');
 
-      if (response.ok) {
-        // Refresh course details to get updated comments
-        fetchCourseDetails();
-        setNewComment('');
+    if (paymentSuccess && pendingCourseId && studentId) {
+      axios.post('https://e-learn-v1.runasp.net/api/Student/EnrollToCourse/EnrollToCourse', {
+        studentId: Number(studentId),
+        courseId: Number(pendingCourseId)
+      })
+      .then(res => {
+        if (res.data && res.data.succeeded) {
+          alert('Enroll Success');
+        } else {
+          alert('Enroll failed: ' + (res.data?.massage || 'Unknown error'));
+        }
+      })
+      .catch(() => {
+        alert('Enroll failed: Network or server error');
+      })
+      .finally(() => {
+        localStorage.removeItem('pendingEnrollCourseId');
+      });
+    }
+  }, []);
+
+  // Fetch course details
+  const fetchCourseDetails = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`https://e-learn-v1.runasp.net/Course/Get/${id}`);
+      if (response.data.succeeded) {
+        setCourse(response.data.data);
+      } else {
+        throw new Error(response.data.massage || 'Failed to load course details');
       }
-    } catch (error) {
-      console.error('Error adding comment:', error);
+    } catch (err) {
+      setError(err.message || 'Failed to load course details');
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    const fetchCourseDetails = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`https://e-learn-v1.runasp.net/Course/Get/${id}`);
-        if (response.data.succeeded) {
-          setCourse(response.data.data);
-        } else {
-          throw new Error(response.data.massage || 'Failed to load course details');
-        }
-      } catch (err) {
-        setError(err.message || 'Failed to load course details');
-        console.error('Error fetching course details:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchCourseDetails();
+    // eslint-disable-next-line
   }, [id]);
 
-  // Fetch all courses and filter related ones
+  // Fetch all courses and filter related ones by same category
   useEffect(() => {
     const fetchRelatedCourses = async () => {
       if (!course) return;
       try {
         const res = await axios.get('https://e-learn-v1.runasp.net/Course/GetAll');
         const allCourses = res.data.data || [];
+        // Only show courses with the same category, and not the current course
         const filtered = allCourses.filter(c =>
           c.id !== course.id &&
-          (c.categoryName === course.categoryName || c.description.toLowerCase().includes(course.description.toLowerCase()))
+          c.categoryName === course.categoryName
         );
         setRelatedCourses(filtered.slice(0, 4)); // Show up to 4 related courses
       } catch (err) {
@@ -199,7 +175,7 @@ export default function CoursesDetails() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-500 text-xl mb-4">{error}</p>
-          <button 
+          <button
             onClick={() => navigate(-1)}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
@@ -215,7 +191,7 @@ export default function CoursesDetails() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-600 text-xl mb-4">Course not found</p>
-          <button 
+          <button
             onClick={() => navigate(-1)}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
@@ -226,10 +202,8 @@ export default function CoursesDetails() {
     );
   }
 
-  // Mocked data for demonstration
   const teacherName = course.teacherName || 'Klara Weaver';
   const rating = 4.5;
-  const reviewCount = 99;
   const price = course.price || 49;
   const lessonsCount = course.lessonInfo?.length || 0;
   const gallery = [course.imagePath, ...mockGallery];
@@ -253,24 +227,20 @@ export default function CoursesDetails() {
             <div className="w-full md:w-1/2">
               <h1 className="text-3xl font-bold text-gray-900 mb-4">{course.title}</h1>
               <p className="text-gray-600 mb-6">{course.description}</p>
-              
+
               <div className="flex items-center gap-4 mb-6">
                 <div className="flex items-center">
                   {rating}
-                  <i className="fas fa-star text-yellow-400 pe-3"></i>
-                  <span className="ml-1 text-gray-600">{lessonsCount} lessons</span>
+                  <FaStar className="text-yellow-400 ml-1" />
+                  <span className="ml-2 text-gray-600">{lessonsCount} lessons</span>
                 </div>
                 <div className="flex items-center">
-                  <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                  </svg>
+                  <FaClock className="text-gray-400" />
                   <span className="ml-1 text-gray-600">{course.hours} hours</span>
                 </div>
                 <div className="flex items-center">
-                  <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
-                  </svg>
-                  <span className="ml-1 text-gray-600">Teacher: {course.teacherName || 'Not specified'}</span>
+                  <FaUsers className="text-gray-400" />
+                  <span className="ml-1 text-gray-600">Teacher: {teacherName}</span>
                 </div>
               </div>
 
@@ -310,7 +280,7 @@ export default function CoursesDetails() {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
               >
-                Curriculum
+                Lessons
               </button>
             </nav>
           </div>
@@ -335,12 +305,44 @@ export default function CoursesDetails() {
           </div>
         </div>
 
+
+        {/* Comments Section */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Student Comments</h2>
+          {course.commentInfo && course.commentInfo.length > 0 ? (
+            <div className="space-y-6">
+              {course.commentInfo.slice(0, 3).map((comment) => (
+                <div
+                  key={comment.id}
+                  className="flex items-start gap-4 bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-100"
+                >
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-lg">
+                      {comment.studentName ? comment.studentName[0].toUpperCase() : 'S'}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-indigo-700">{comment.studentName || 'Student'}</span>
+                      <span className="text-xs text-gray-400">{formatDate(comment.createdAt)}</span>
+                    </div>
+                    <p className="text-gray-700 text-base">{comment.content}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">No comments yet for this course.</p>
+          )}
+        </div>
+
+
         {/* Related Courses */}
         <div className="mt-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Related Courses</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {relatedCourses.map((relatedCourse) => (
-              <Link 
+              <Link
                 key={relatedCourse.id}
                 to={`/courses/course/${relatedCourse.id}`}
               >
@@ -368,7 +370,7 @@ export default function CoursesDetails() {
                     </h3>
                     <div className="flex justify-between items-center mt-auto">
                       <div className="flex items-center">
-                        <i className="fas fa-star text-yellow-500 text-sm"></i>
+                        <FaStar className="text-yellow-500 text-sm" />
                         <span className="ml-1 text-sm text-black">4.5</span>
                         <span className="text-gray-500 text-sm ps-1">(1253)</span>
                       </div>

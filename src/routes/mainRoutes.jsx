@@ -25,8 +25,8 @@ import CourseDashDetails from '@/component/StudentDashboard/CourseDashDetailes'
 import CourseDetails from '@/component/AdminProfile/CourseDetails'
 import StudentDetails from '@/component/AdminProfile/StudentDetails'
 import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
-
 import StudentAssignments from '@/component/TeacherProfile/StudentAssignments'
+import LessonDetails from '@/component/StudentDashboard/LessonDetails'
 
 const isAuth = true // Replace with actual authentication logic
 
@@ -62,6 +62,12 @@ const routesConfig = [
         isProtected: false,
         accessRole: 'all',
     },
+    {
+    path: '/studentdashboard/course/:courseId/lesson/:lessonId',
+    element: <LessonDetails />,
+    isProtected: false,
+    accessRole: 'all',
+   },
     {
         path: 'studentprofile',
         element: <StudentProfile />,

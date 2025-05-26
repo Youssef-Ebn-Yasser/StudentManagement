@@ -6,8 +6,6 @@ import img from '../../assets/avatar.png'; // Import the logo image
 import Button from './Button';
 import styles from './Navbar.module.css'; // Import the CSS module
 import SearchBar from './SearchBar';
-// import { useAuth } from '@/contexts/AuthContext';
-
 
 function Navbar() {
     const dispatch = useDispatch();
@@ -29,6 +27,15 @@ function Navbar() {
     const handleSearch = (query) => {
         navigate(`/courses?q=${encodeURIComponent(query)}`);
     };
+
+    // Logout handler that clears localStorage
+const handleLogout = () => {
+    localStorage.removeItem('studentId');
+    localStorage.removeItem('isTeacher');
+    localStorage.removeItem('pendingEnrollCourseId'); // <-- Add this line
+    dispatch(logout());
+    navigate('/auth/login');
+};
 
     return (
         <div className='h-[56px]'>
@@ -112,10 +119,7 @@ function Navbar() {
                 <div className={`hidden lg:block ml-4 ${styles.button}`}>
                   {isLoggedIn ? (
                     <button 
-                      onClick={() => {
-                        dispatch(logout());
-                        navigate('/auth/login');
-                      }} 
+                      onClick={handleLogout}
                       className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors duration-200"
                     >
                       Logout
@@ -362,10 +366,7 @@ function Navbar() {
                                     </div>
                                 </Link>
                                 <button 
-                                    onClick={() => {
-                                        dispatch(logout());
-                                        navigate('/auth/login');
-                                    }} 
+                                    onClick={handleLogout}
                                     className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md transition-colors duration-200"
                                 >
                                     Logout

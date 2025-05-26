@@ -163,27 +163,25 @@ function Courses() {
                     className="block w-full h-[140px] lg:h-[180px] object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                 </div>
-                <div className='p-3 lg:p-4 flex-1 flex flex-col'>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-500 text-xs lg:text-sm truncate max-w-[60%]">{course.title}</span>
-                    {course.level && (
-                      <span className="bg-red-400 text-white py-1 px-2 rounded-xl text-xs">
-                        {course.level} Level
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="mt-0 mb-2 text-sm lg:text-lg font-semibold text-black line-clamp-2 flex-1">
-                    {course.description}
-                  </h3>
-                  <div className="flex justify-between items-center mt-auto">
-                    <div className="flex items-center">
-                      <i className="fas fa-star text-yellow-500 text-xs lg:text-sm"></i>
-                      <span className="ml-1 text-xs lg:text-sm text-black">4.5</span>
-                      <span className="text-gray-500 text-xs lg:text-sm ps-1">(1253)</span>
-                    </div>
-                    <span className="text-base lg:text-xl font-bold text-black">${course.price}</span>
-                  </div>
-                </div>
+<div className='p-3 lg:p-4 flex-1 flex flex-col'>
+  <div className="flex justify-between items-center mb-2">
+    <span className="text-gray-500 text-xs lg:text-sm truncate max-w-[60%]">{course.title}</span>
+    {course.level && (
+      <span className="bg-red-400 text-white py-1 px-2 rounded-xl text-xs">
+        {course.level} Level
+      </span>
+    )}
+  </div>
+  <h3 className="mt-0 mb-2 text-sm lg:text-lg font-semibold text-black line-clamp-2 flex-1">
+    {course.description}
+  </h3>
+  <div className="flex items-center justify-between mt-auto">
+    <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">
+      {course.categoryName}
+    </span>
+    <span className="text-base lg:text-xl font-bold text-black">${course.price}</span>
+  </div>
+</div>
               </div>
             </Link>
           )) : (
