@@ -603,6 +603,17 @@ const TeacherCourseDetails = () => {
                                           </div>
                                         </div>
                                         <div className="flex items-center gap-2">
+                                          {material.data && (
+                                            <a
+                                              href={material.data}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="text-blue-500 hover:text-blue-600 flex items-center gap-1"
+                                            >
+                                              <FaFileAlt className="text-sm" />
+                                              View
+                                            </a>
+                                          )}
                                           <button
                                             onClick={() => handleEditClick(material)}
                                             className="text-gray-500 hover:text-gray-600"
@@ -625,6 +636,15 @@ const TeacherCourseDetails = () => {
                               <p className="text-gray-500 text-sm">No materials uploaded yet</p>
                             )}
                           </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleDeleteLesson(lesson.id)}
+                            className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition-colors duration-200"
+                            title="Delete Lesson"
+                          >
+                            <FaTrash className="text-lg" />
+                          </button>
                         </div>
                       </div>
                     </div>

@@ -5,7 +5,6 @@ import Loader from '../Loader/Loader';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
-import axiosInstance from '../../services/axiosInstance';
 import { useSelector } from 'react-redux';
 
 const TeacherCourses = ({ setActiveTab }) => {
@@ -14,25 +13,9 @@ const TeacherCourses = ({ setActiveTab }) => {
   const teacherId = user?.id;
   const [courses, setCourses] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All Category');
   const [sortBy, setSortBy] = useState('Latest');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [categories, setCategories] = useState([]);
-  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
-
-  // Categories for the dropdown
-  const categoriesForDropdown = [
-    'All Category',
-    'Programming',
-    'Design',
-    'Business',
-    'Marketing',
-    'Science',
-    'Mathematics',
-    'Languages',
-    'Arts'
-  ];
 
   useEffect(() => {
     console.log('TeacherCourses mounted with teacherId:', teacherId);
@@ -41,13 +24,8 @@ const TeacherCourses = ({ setActiveTab }) => {
       setError('Teacher ID is required');
       return;
     }
-    fetchCategories();
-    if (selectedCategory === 'All Category') {
-      fetchCourses();
-    } else {
-      fetchCoursesByCategory();
-    }
-  }, [teacherId, selectedCategory]);
+    fetchCourses();
+  }, [teacherId]);
 
   const fetchCourses = async () => {
     try {
@@ -71,50 +49,6 @@ const TeacherCourses = ({ setActiveTab }) => {
       setError('Failed to load courses');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchCoursesByCategory = async () => {
-    try {
-      setLoading(true);
-      const response = await axiosInstance.get(`/Course/GetAllByCategory?categoryName=${selectedCategory}`);
-      console.log('Courses by category response:', response);
-      
-      if (response.data && response.data.succeeded) {
-        const coursesData = response.data.data || [];
-        setCourses(Array.isArray(coursesData) ? coursesData : []);
-      } else {
-        console.error('Unexpected response structure:', response.data);
-        setCourses([]);
-      }
-    } catch (err) {
-      console.error('Error fetching courses by category:', err);
-      setError('Failed to load courses for this category');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchCategories = async () => {
-    try {
-      setIsLoadingCategories(true);
-      const response = await axiosInstance.get('/api/Category/GetAll');
-      console.log('Categories API Response:', response);
-      
-      // Check if response has data property
-      if (response.data && response.data.data) {
-        setCategories(response.data.data);
-      } else if (response.data && Array.isArray(response.data)) {
-        setCategories(response.data);
-      } else {
-        console.error('Unexpected categories data structure:', response.data);
-        setCategories([]);
-      }
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      setError('Failed to load categories');
-    } finally {
-      setIsLoadingCategories(false);
     }
   };
 
@@ -145,11 +79,6 @@ const TeacherCourses = ({ setActiveTab }) => {
   // Handle search input change
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
-  };
-
-  // Handle category selection change
-  const handleCategoryChange = (e) => {
-    setSelectedCategory(e.target.value);
   };
 
   // Handle sort selection change
@@ -205,39 +134,14 @@ const TeacherCourses = ({ setActiveTab }) => {
                     type="text"
                     placeholder="Search courses..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={handleSearchChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div className="flex gap-4">
-                  <div className="relative">
-                    <select
-                      value={selectedCategory}
-                      onChange={handleCategoryChange}
-                      className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-[200px] appearance-none"
-                      disabled={isLoadingCategories}
-                    >
-                      <option value="All Category">All Categories</option>
-                      {categories.map((category) => (
-                        <option key={category.id} value={category.name}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </select>
-                    {isLoadingCategories && (
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                        <div className="animate-spin h-5 w-5 text-gray-400">
-                          <svg className="h-5 w-5" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                          </svg>
-                        </div>
-                      </div>
-                    )}
-                  </div>
                   <select
                     value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
+                    onChange={handleSortChange}
                     className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="Latest">Latest</option>
@@ -281,19 +185,27 @@ const TeacherCourses = ({ setActiveTab }) => {
                           {course?.description || 'No description available'}
                         </p>
                         <div className="flex justify-between items-center">
-                            <div className="flex items-center">
+                          <div className="flex items-center">
                             <FaStar className="text-yellow-500 text-xs sm:text-sm" />
                             <span className="ml-1 text-xs sm:text-sm text-black">{course?.rating || 0}</span>
                             <span className="text-gray-500 text-xs sm:text-sm ps-1">({course?.students || 0})</span>
                           </div>
                           <span className="text-lg sm:text-xl font-bold text-black">${course?.price || 0}</span>
                         </div>
-                        <button 
+                        <div className="flex gap-2 mt-3">
+                          <button 
                             onClick={() => navigate(`/teacher/course/${course.id}`)}
-                          className="w-full mt-3 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 text-sm"
-                        >
-                          View Details
-                        </button>
+                            className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 text-sm"
+                          >
+                            View Details
+                          </button>
+                          <button 
+                            onClick={() => navigate(`/teacher/course/edit/${course.id}`)}
+                            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200 text-sm"
+                          >
+                            Edit
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}

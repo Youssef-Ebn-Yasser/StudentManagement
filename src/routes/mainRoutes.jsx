@@ -28,8 +28,9 @@ import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
 import StudentAssignments from '@/component/TeacherProfile/StudentAssignments'
 import LessonDetails from '@/component/StudentDashboard/LessonDetails'
 import AddMaterial from '@/component/TeacherProfile/AddMaterial'
-import StudentAssignments from '@/component/TeacherProfile/StudentAssignments'
 import TeacherProfileView from '@/component/StudentDashboard/TeacherProfileView'
+import TeacherRequest from '@/component/Register/TeacherRequest'
+import TeacherDashboard from '@/component/TeacherDashboard/TeacherDashboard'
 
 const isAuth = true // Replace with actual authentication logic
 
@@ -200,6 +201,18 @@ const routesConfig = [
     {
         path: 'teacher/course/:courseId/lesson/:lessonId/material/new',
         element: <AddMaterial />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'become-teacher',
+        element: <TeacherRequest />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'teacher/dashboard',
+        element: <TeacherDashboard />,
         isProtected: false,
         accessRole: 'all',
     },
