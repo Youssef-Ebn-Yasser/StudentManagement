@@ -1,5 +1,4 @@
 using Backend.DTOs.AuthDTOs;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 
 namespace Backend.Controllers;
@@ -11,11 +10,15 @@ public class AuthController : AppControllerBase
 {
     private readonly IAuthenticationService _authService;
     private readonly IAuthGoogleService _authGoogleService;
+    private readonly IEmailSender _emailSender;
 
-    public AuthController(IAuthenticationService authService, IAuthGoogleService authGoogleService)
+    public AuthController(IAuthenticationService authService,
+                          IAuthGoogleService authGoogleService,
+                          IEmailSender emailSender)
     {
         _authService = authService;
         _authGoogleService = authGoogleService;
+        _emailSender = emailSender;
     }
 
     [HttpPost("login")]
@@ -47,7 +50,15 @@ public class AuthController : AppControllerBase
         var result = await _authService.RegisterTeacherAsync(model);
         return NewResult(result);
     }
-
+    [HttpPost("Teacher-request")]
+    public async Task<IActionResult> TeacherRequest(string name, string email)
+    {
+        string subject = "Ask for Uploading a teacher";
+        string body = $"I am a teacher and want to applay to upload my courses here this is my name :- {name}  , and this is my email :- {email}";
+        string mailTo = "Admin123@gmail.com";
+        var result = await _emailSender.SendEmailAsync(mailTo, subject, body);
+        return Ok(result);
+    }
 
     [HttpPost("confirm-email")]
     public async Task<IActionResult> Verify([FromQuery] int userId, [FromQuery] string token)

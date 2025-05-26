@@ -52,7 +52,7 @@ public class CourseController : AppControllerBase
         return NewResult(result);
     }
 
-    [HttpPut("Course/Update/{id}")]
+    [HttpPut("Course/Update")]
     public async Task<IActionResult> Update([FromBody] UpdateCourseDto updateCourseDto)
     {
 

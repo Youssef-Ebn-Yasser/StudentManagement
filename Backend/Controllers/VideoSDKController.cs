@@ -7,17 +7,13 @@ namespace Backend.Controllers;
 [ApiController]
 public class VideoSDKController : ControllerBase
 {
-    private readonly IConfiguration _configuration;
-
+    private IConfiguration _configuration;
+    string VIDEOSDK_API_ENDPOINT = "https://api.videosdk.live/v2";
     public VideoSDKController(IConfiguration configuration)
     {
         _configuration = configuration;
     }
 
-    /// <summary>
-    /// Endpoint for the frontend to securely request a VideoSDK authentication token.
-    /// </summary>
-    /// <returns>A JSON object containing the VideoSDK token.</returns>
     [HttpPost("generateVideoSDKToken")] // The specific route for this action
     public IActionResult GenerateVideoSDKToken()
     {
@@ -41,8 +37,7 @@ public class VideoSDKController : ControllerBase
                 new Claim("permissions", "allow_join,allow_create_room,allow_streaming,allow_recording"),
                 new Claim("iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()), // Issued At (Unix timestamp)
                 new Claim("exp", DateTimeOffset.UtcNow.AddMinutes(10000).ToUnixTimeSeconds().ToString()), // Expiration (Unix timestamp)
-                new Claim("ttl", "10000"), // Time To Live in minutes
-                new Claim("version", "2") // VideoSDK API version
+
             };
 
             // 3. Create a JWT token handler
@@ -73,5 +68,9 @@ public class VideoSDKController : ControllerBase
             Console.WriteLine($"Error generating VideoSDK token: {ex.Message}");
             return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to generate VideoSDK token due to a server error." });
         }
+    }
+    public class GetBody
+    {
+        public string token { get; set; }
     }
 }
