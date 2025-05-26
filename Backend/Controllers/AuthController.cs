@@ -47,7 +47,15 @@ public class AuthController : AppControllerBase
         var result = await _authService.RegisterTeacherAsync(model);
         return NewResult(result);
     }
-
+    [HttpPost("Teacher-request")]
+    public async Task<IActionResult> TeacherRequest(string name, string email)
+    {
+        string subject = "Ask for Uploading a teacher";
+        string body = $"I am a teacher and want to applay to upload my courses here this is my name :- {name}  , and this is my email :- {email}";
+        string mailTo = "yh29152@gmail.com";
+        var result = await _emailSender.SendEmailAsync(mailTo, subject, body);
+        return Ok(result);
+    }
 
     [HttpPost("confirm-email")]
     public async Task<IActionResult> Verify([FromQuery] int userId, [FromQuery] string token)

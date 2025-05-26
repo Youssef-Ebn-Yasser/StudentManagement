@@ -18,6 +18,4 @@ public class Course : BaseEntity
     public Category Category { get; set; }
     public bool? IsDeleted { get; set; } = false;
     public DateTime? CreatedAt { get; set; } = DateTime.Now;
-    [NotMapped]
-    public List<Message>? Messages { get; set; }
 }

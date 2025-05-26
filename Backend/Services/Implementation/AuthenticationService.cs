@@ -134,7 +134,24 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<Response<TokenDto>> RegisterTeacherAsync(RegisterDto model)
     {
-        return await RegisterUserAsync(model, "Teacher");
+        var result = await RegisterUserAsync(model, "Teacher");
+        bool response = false;
+        // send email to teacher he can login now 
+        if (result.Succeeded)
+        {
+            string mailTo = model.Email;
+            string subject = "Congratulation you added";
+            string message = $"welcome in our sit you can now login to your account update your data or upload courses with email := {model.Email} and password := {model.Password} keep your password secret";
+            response = await _emailSender.SendEmailAsync(mailTo, subject, message);
+        }
+
+        if (result.Succeeded && !response)
+        {
+            result.Succeeded = false;
+            result.Massage = "can not send email but user added";
+        }
+
+        return result;
     }
 
     public async Task<Response<TokenDto>> RegisterAdminAsync(RegisterDto model)
