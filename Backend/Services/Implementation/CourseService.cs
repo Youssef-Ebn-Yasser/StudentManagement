@@ -193,7 +193,18 @@ public class CourseService : ResponseHandler, ICourseService
                 return BadRequest<string>($"Failed to delete image: {deleteResult.Message}");
         }
 
-        _unitOfWork.Repository<Course>().Delete(course);
+        //soft delete using IsDeleted flag and checking if the course is already deleted and there is lessons in the course make them Isdeleted true
+        if (course.lessons != null && course.lessons.Any())
+        {
+            foreach (var lesson in course.lessons)
+            {
+                lesson.IsDeleted = true;
+            }
+        }
+        course.IsDeleted = true;
+
+
+        _unitOfWork.Repository<Course>().Update(course);
         _unitOfWork.Complete();
 
         return Success("Course deleted successfully");
