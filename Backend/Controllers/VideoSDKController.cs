@@ -41,8 +41,6 @@ public class VideoSDKController : ControllerBase
                 new Claim("permissions", "allow_join,allow_create_room,allow_streaming,allow_recording"),
                 new Claim("iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()), // Issued At (Unix timestamp)
                 new Claim("exp", DateTimeOffset.UtcNow.AddMinutes(10000).ToUnixTimeSeconds().ToString()), // Expiration (Unix timestamp)
-                new Claim("ttl", "10000"), // Time To Live in minutes
-                new Claim("version", "2") // VideoSDK API version
             };
 
             // 3. Create a JWT token handler

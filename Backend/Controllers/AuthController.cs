@@ -1,5 +1,4 @@
 using Backend.DTOs.AuthDTOs;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 
 namespace Backend.Controllers;
@@ -11,11 +10,13 @@ public class AuthController : AppControllerBase
 {
     private readonly IAuthenticationService _authService;
     private readonly IAuthGoogleService _authGoogleService;
+    private readonly IEmailSender _emailSender;
 
-    public AuthController(IAuthenticationService authService, IAuthGoogleService authGoogleService)
+    public AuthController(IAuthenticationService authService, IAuthGoogleService authGoogleService, IEmailSender emailSender)
     {
         _authService = authService;
         _authGoogleService = authGoogleService;
+        _emailSender = emailSender;
     }
 
     [HttpPost("login")]
