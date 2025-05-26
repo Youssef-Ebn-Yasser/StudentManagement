@@ -1,4 +1,3 @@
-using Backend.ChatHubs;
 using Backend.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Stripe;
@@ -79,6 +78,5 @@ app.UseAuthorization();
 
 
 app.MapControllers();
-app.MapHub<ChatHub>("/chatHub");
 
 app.Run();
