@@ -14,7 +14,6 @@ const TeacherCourseDetails = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [isDeleting, setIsDeleting] = useState(false);
-  const [lessons, setLessons] = useState([]);
   const [lessonMaterials, setLessonMaterials] = useState({});
   const [editingMaterial, setEditingMaterial] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -33,7 +32,6 @@ const TeacherCourseDetails = () => {
         if (response.succeeded) {
           setCourse(response.data);
           const courseLessons = response.data.lessons || response.data.lessonInfo || [];
-          setLessons(courseLessons);
           
           // Fetch materials for each lesson
           const materialsPromises = courseLessons.map(lesson => 
@@ -105,7 +103,6 @@ const TeacherCourseDetails = () => {
       try {
         const response = await courseService.deleteLesson(lessonId);
         if (response.succeeded) {
-          setLessons(prevLessons => prevLessons.filter(lesson => lesson.id !== lessonId));
           setCourse(prevCourse => ({
             ...prevCourse,
             lessonInfo: prevCourse.lessonInfo.filter(lesson => lesson.id !== lessonId)
@@ -299,7 +296,13 @@ const TeacherCourseDetails = () => {
             </div>
             <div className="w-full md:w-2/3">
               <div className="flex justify-between items-start">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{course.title}</h1>
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2">{course.title}</h1>
+                  <div className="bg-gray-50 p-3 rounded-lg mb-4 inline-block">
+                    <p className="text-sm text-gray-500">Course ID</p>
+                    <p className="font-semibold">{course.id || 'Not available'}</p>
+                  </div>
+                </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => navigate(`/teacher/course/edit/${course.id}`)}
