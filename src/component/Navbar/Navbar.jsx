@@ -6,8 +6,6 @@ import img from '../../assets/avatar.png'; // Import the logo image
 import Button from './Button';
 import styles from './Navbar.module.css'; // Import the CSS module
 import SearchBar from './SearchBar';
-// import { useAuth } from '@/contexts/AuthContext';
-
 
 function Navbar() {
     const dispatch = useDispatch();
@@ -28,6 +26,13 @@ function Navbar() {
 
     const handleSearch = (query) => {
         navigate(`/courses?q=${encodeURIComponent(query)}`);
+    };
+
+    // Logout handler that clears localStorage
+    const handleLogout = () => {
+        localStorage.clear();
+        dispatch(logout());
+        navigate('/auth/login');
     };
 
     return (
@@ -84,12 +89,13 @@ function Navbar() {
                   <div className="relative">
                     <SearchBar onSearch={handleSearch} />
                   </div>
+                  {/* Notification icon commented out for now */}
+                  {/*
                   {isLoggedIn && (userRole === 'Student' || userRole === 'Teacher') && (
                     <div className="relative">
                       <div className={`w-[24px] h-[24px] text-neutral-700 cursor-pointer ${styles.bellIcon}`} onClick={toggleNotification}>
                         <i className="fa-solid fa-bell"></i>
                       </div>
-                      {/* Notification Dropdown */}
                       {isNotificationVisible && (
                         <div className={`absolute right-0 mt-2 w-[200px] bg-white shadow-lg rounded-md p-4 ${styles.notificationDropdown}`}>
                           <p className="text-sm text-neutral-700">No new notifications</p>
@@ -97,6 +103,7 @@ function Navbar() {
                       )}
                     </div>
                   )}
+                  */}
                   <Link to={
                     userRole === 'Teacher' ? "/teacher/profile" : 
                     userRole === 'Admin' ? "/admin/profile" : 
@@ -112,10 +119,7 @@ function Navbar() {
                 <div className={`hidden lg:block ml-4 ${styles.button}`}>
                   {isLoggedIn ? (
                     <button 
-                      onClick={() => {
-                        dispatch(logout());
-                        navigate('/auth/login');
-                      }} 
+                      onClick={handleLogout}
                       className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors duration-200"
                     >
                       Logout
@@ -340,6 +344,8 @@ function Navbar() {
                         
                         {isLoggedIn ? (
                             <div className="flex items-center justify-between px-4">
+                                {/* Notification icon commented out for now */}
+                                {/*
                                 {userRole === 'Student' || userRole === 'Teacher' ? (
                                     <div className="relative">
                                         <div className="w-[32px] h-[32px] text-gray-700 cursor-pointer hover:text-indigo-600 transition-colors duration-200" onClick={toggleNotification}>
@@ -352,6 +358,7 @@ function Navbar() {
                                         )}
                                     </div>
                                 ) : <div></div>}
+                                */}
                                 <Link to={
                                     userRole === 'Teacher' ? "/teacher/profile" : 
                                     userRole === 'Admin' ? "/admin/profile" : 
@@ -362,10 +369,7 @@ function Navbar() {
                                     </div>
                                 </Link>
                                 <button 
-                                    onClick={() => {
-                                        dispatch(logout());
-                                        navigate('/auth/login');
-                                    }} 
+                                    onClick={handleLogout}
                                     className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md transition-colors duration-200"
                                 >
                                     Logout

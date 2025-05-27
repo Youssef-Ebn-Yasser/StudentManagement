@@ -150,29 +150,27 @@ export const courseService = {
       if (!courseData.level?.trim()) throw new Error('Course level is required');
       if (!courseData.hours?.trim()) throw new Error('Course hours is required');
 
-      // Build the JSON body with camelCase keys to match server DTO exactly
-      const body = {
-        id: courseId.toString(),
-        title: courseData.title.trim(),
-        description: courseData.description?.trim() || '',
-        price: Number(courseData.price),
-        teacherId: Number(courseData.teacherId),
-        categoryId: Number(courseData.categoryId),
-        level: courseData.level.trim(),
-        hours: courseData.hours.trim(),
-        image: courseData.image || ''
-      };
+      // Create FormData object for multipart/form-data
+      const formData = new FormData();
+      formData.append('id', courseId.toString());
+      formData.append('title', courseData.title.trim());
+      formData.append('description', courseData.description?.trim() || '');
+      formData.append('price', courseData.price);
+      formData.append('teacherId', courseData.teacherId);
+      formData.append('categoryId', courseData.categoryId);
+      formData.append('level', courseData.level.trim());
+      formData.append('hours', courseData.hours.trim());
+      
+      if (courseData.image) {
+        formData.append('image', courseData.image);
+      }
 
-      console.log('Course update JSON body:', JSON.stringify(body, null, 2));
-
-      const response = await axios.put(
-        'https://e-learn-v1.runasp.net/Course/Update',
-        body,
+      const response = await axiosInstance.put(
+        `/Course/Update/${courseId}`,
+        formData,
         {
           headers: {
-            'Content-Type': 'application/json',
-            'Accept': '*/*',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            'Content-Type': 'multipart/form-data',
           },
           timeout: 30000
         }
@@ -180,7 +178,6 @@ export const courseService = {
 
       return response.data;
     } catch (error) {
-      // Enhanced error logging
       if (error.response) {
         console.error('Server Error Response:', {
           status: error.response.status,
@@ -442,44 +439,31 @@ export const courseService = {
   // Update teacher profile
   updateTeacher: async (teacherData) => {
     try {
-      // Validate required fields and their constraints
+      // Validate required fields
       if (!teacherData.Id) throw new Error('Teacher ID is required');
       if (!teacherData.Name?.trim()) throw new Error('Name is required');
-      if (!teacherData.Email?.trim()) throw new Error('Email is required');
-      if (!teacherData.Email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) throw new Error('Invalid email format');
-      if (!teacherData.Age || teacherData.Age < 20 || teacherData.Age > 255) throw new Error('Age must be between 20 and 255');
       if (!teacherData.Specialization?.trim()) throw new Error('Specialization is required');
-      if (teacherData.Specialization.length > 100) throw new Error('Specialization cannot exceed 100 characters');
-      if (teacherData.AdditionalInfo && teacherData.AdditionalInfo.length > 500) throw new Error('Additional Info cannot exceed 500 characters');
-      if (!teacherData.PhoneNumber?.trim()) throw new Error('Phone number is required');
-      if (!teacherData.PhoneNumber.match(/^\+?[1-9]\d{1,14}$/)) throw new Error('Invalid phone number format');
+      if (!teacherData.Phone?.trim()) throw new Error('Phone number is required');
+      if (!teacherData.Phone.match(/^\+?[1-9]\d{1,14}$/)) throw new Error('Invalid phone number format');
 
-      // Format request data to match backend DTO exactly
-      const params = {
-        Id: parseInt(teacherData.Id),
-        Name: teacherData.Name.trim(),
-        Email: teacherData.Email.trim(),
-        Age: parseInt(teacherData.Age),
-        AdditionalInfo: teacherData.AdditionalInfo?.trim() || '',
-        Specialization: teacherData.Specialization.trim(),
-        Phone: teacherData.PhoneNumber.trim(),
-        Password: teacherData.Password?.trim() || '',
-        Image: teacherData.Image || null
-      };
-
-      // Log the exact request data being sent (excluding password for security)
-      console.log('Raw teacher data received:', teacherData);
-      console.log('Formatted request data:', {
-        ...params,
-        Password: params.Password ? '[REDACTED]' : ''
-      });
-
-      const response = await axiosInstance.put('/api/Teacher/Teacher/Update', null, {
-        params: params
-      });
+      // Create FormData object
+      const formData = new FormData();
+      formData.append('Id', teacherData.Id);
+      formData.append('Name', teacherData.Name.trim());
+      formData.append('Age', teacherData.Age || '');
+      formData.append('Specialization', teacherData.Specialization.trim());
+      formData.append('Phone', teacherData.Phone.trim());
       
-      // Log the response for debugging
-      console.log('Update response:', response);
+      // Add image if provided
+      if (teacherData.Image) {
+        formData.append('Image', teacherData.Image);
+      }
+
+      const response = await axiosInstance.put('/api/Teacher/Teacher/Update', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
       
       return response.data;
     } catch (error) {
@@ -487,11 +471,9 @@ export const courseService = {
         console.error('Update failed:', {
           status: error.response.status,
           data: error.response.data,
-          requestData: error.config?.params,
-          headers: error.config?.headers
+          headers: error.response.headers
         });
         
-        // Extract the error message from the response
         const errorMessage = error.response.data?.message || 
                            error.response.data?.error || 
                            error.response.data?.errors?.join(', ') || 
@@ -536,4 +518,4 @@ export const getPaginatedCourses = async (page = 1, enOrderBy = 0) => {
     console.error('Error fetching paginated courses:', error);
     throw error;
   }
-};
+}; 

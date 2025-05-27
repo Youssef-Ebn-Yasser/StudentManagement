@@ -64,8 +64,26 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
+        path: 'createquiz',
+        element: <CreateQuiz />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+    path: '/studentdashboard/course/:courseId/lesson/:lessonId',
+    element: <LessonDetails />,
+    isProtected: false,
+    accessRole: 'all',
+    },
+    {
         path: 'studentprofile',
         element: <StudentProfile />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'studentdashboard/quiz/:lessonId',
+        element: <Quiz />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -102,6 +120,12 @@ const routesConfig = [
     {
         path: 'courses/course/:id',
         element: <CoursesDetails />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'courses/teacher/:teacherName',
+        element: <TeacherProfileView />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -195,6 +219,18 @@ const routesConfig = [
       {
         path: 'teacher/course/:courseId/lesson/:lessonId/material/new',
         element: <AddMaterial />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'become-teacher',
+        element: <TeacherRequest />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'teacher/dashboard',
+        element: <TeacherDashboard />,
         isProtected: false,
         accessRole: 'all',
     },

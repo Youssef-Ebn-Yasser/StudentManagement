@@ -21,23 +21,22 @@ const CourseCard = ({ course }) => (
         }}
       />
     </div>
-    <div className="p-2 sm:p-3">
-      <div className="flex justify-between items-center mb-1">
-        <span className="text-gray-500 text-xs sm:text-sm">{course.level || 'All Levels'}</span>
-      </div>
-      <h3 className="mt-0 mb-1 text-base sm:text-lg font-semibold text-black line-clamp-2">
-        {course.title}
-      </h3>
-      <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-2">{course.description}</p>
-      <div className="flex justify-between items-center">
-        <div className="flex items-center">
-          <i className="fas fa-star text-yellow-500 text-xs sm:text-sm" aria-hidden="true"></i>
-          <span className="ml-1 text-xs sm:text-sm text-black">4.5</span>
-          <span className="text-gray-500 text-xs sm:text-sm ps-1">(1253)</span>
-        </div>
-        <span className="text-lg sm:text-xl font-bold text-black">${course.price}</span>
-      </div>
-    </div>
+   <div className='p-3 lg:p-4 flex-1 flex flex-col'>
+  <div className="flex justify-between items-center mb-2">
+    <span className="text-gray-500 text-xs lg:text-sm truncate max-w-[60%]">{course.title}</span>
+    {course.level && (
+      <span className="bg-red-400 text-white py-1 px-2 rounded-xl text-xs">
+        {course.level} Level
+      </span>
+    )}
+  </div>
+  <h3 className="mt-0 mb-2 text-sm lg:text-lg font-semibold text-black line-clamp-2 flex-1">
+    {course.description}
+  </h3>
+  <div className="flex items-center justify-between mt-auto">
+    <span className="text-base lg:text-xl font-bold text-black">${course.price}</span>
+  </div>
+</div>
   </Link>
 );
 

@@ -32,7 +32,12 @@ function TeacherProfile() {
           throw new Error('Teacher ID not found');
         }
         const response = await courseService.getTeacherStats(user.id);
-        setTeacherData(response.data);
+        console.log('Teacher data response:', response);
+        if (response.succeeded) {
+          setTeacherData(response.data);
+        } else {
+          throw new Error(response.message || 'Failed to load teacher data');
+        }
       } catch (error) {
         console.error('Error in fetchTeacherData:', error);
         setError(error.message || 'Failed to load teacher data');
@@ -75,7 +80,7 @@ function TeacherProfile() {
   };
 
   const renderContent = () => {
-    console.log('Rendering content with user:', user);
+    console.log('Rendering content with teacherData:', teacherData);
     switch (activeTab) {
       case 'dashboard':
         return <TeacherDashboard />;
@@ -93,7 +98,7 @@ function TeacherProfile() {
               <div className="container px-4">
                 <div className="flex flex-wrap px-4 gap-5">
                   <div className="w-full mt-10">
-                    <MainInfo teacherId={user?.id} teacherData={teacherData} />
+                    <MainInfo teacherData={teacherData} />
                   </div>
                   <div className="w-full">
                     <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">

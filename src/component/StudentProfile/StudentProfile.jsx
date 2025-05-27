@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import {
-  FaGithub,
-  FaLinkedin,
-  FaTelegram,
   FaPhone,
   FaChevronLeft,
   FaChevronRight,
   FaTachometerAlt,
 } from 'react-icons/fa';
+import axios from 'axios';
 
 export default function StudentProfile() {
   const navigate = useNavigate();
@@ -19,10 +16,7 @@ export default function StudentProfile() {
     name: '',
     email: '',
     phone: '',
-    github: '',
-    linkedin: '',
-    telegram: '',
-    image: '',
+    imageUrl: '',
     enrolledCourses: [],
   });
   const [currentCourseIndex, setCurrentCourseIndex] = useState(0);
@@ -56,10 +50,7 @@ export default function StudentProfile() {
             name: student.name || 'Not provided',
             email: student.email || 'Not provided',
             phone: student.phone || 'Not provided',
-            github: student.github || '',
-            linkedin: student.linkedin || '',
-            telegram: student.telegram || '',
-            image: student.imagePath || 'https://via.placeholder.com/150',
+            imageUrl: student.imageUrl || 'https://via.placeholder.com/150',
             enrolledCourses: enrolledCourses,
           });
           setCurrentCourseIndex(0); // Reset slider to first course
@@ -127,7 +118,7 @@ export default function StudentProfile() {
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
             <div className="relative group">
               <img
-                src={studentData.image}
+                src={studentData.imageUrl}
                 alt={studentData.name}
                 className="w-36 h-36 rounded-full object-cover border-4 border-indigo-200 shadow-md transition-transform duration-300 group-hover:scale-105"
               />
@@ -173,44 +164,6 @@ export default function StudentProfile() {
                 <p className="text-gray-700 flex items-center gap-2">
                   <FaPhone className="text-indigo-600" /> {studentData.phone}
                 </p>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-gray-500">Contact</h3>
-                <div className="flex items-center gap-4 mt-2">
-                  {studentData.github && (
-                    <a
-                      href={studentData.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-500 hover:text-white hover:bg-gray-800 p-2 rounded-full transition-colors duration-200"
-                      title="GitHub"
-                    >
-                      <FaGithub size={20} />
-                    </a>
-                  )}
-                  {studentData.linkedin && (
-                    <a
-                      href={studentData.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-500 hover:text-white hover:bg-blue-700 p-2 rounded-full transition-colors duration-200"
-                      title="LinkedIn"
-                    >
-                      <FaLinkedin size={20} />
-                    </a>
-                  )}
-                  {studentData.telegram && (
-                    <a
-                      href={studentData.telegram}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-500 hover:text-white hover:bg-blue-400 p-2 rounded-full transition-colors duration-200"
-                      title="Telegram"
-                    >
-                      <FaTelegram size={20} />
-                    </a>
-                  )}
-                </div>
               </div>
             </div>
           </div>

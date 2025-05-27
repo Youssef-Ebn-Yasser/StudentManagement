@@ -1,7 +1,7 @@
 import { registerUser } from '@/Redux/auth/registerActions'
 import { useFormik } from 'formik'
 import { useDispatch, useSelector } from 'react-redux'
-import { data, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 
 const useRegister = (userType) => {

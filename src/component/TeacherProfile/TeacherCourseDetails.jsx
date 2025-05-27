@@ -64,7 +64,22 @@ const TeacherCourseDetails = () => {
   }, [id]);
 
   const handleDeleteCourse = async () => {
-    if (window.confirm('Are you sure you want to delete this course? This action cannot be undone.')) {
+    if (window.confirm(`
+      Are you sure you want to delete this course?
+      
+      Course Details:
+      Title: ${course.title}
+      Category: ${course.category}
+      Level: ${course.level}
+      
+      ⚠️ Warning: This action will permanently delete:
+      - The course itself
+      - All lessons in this course
+      - All materials and assignments associated with these lessons
+      - All uploaded files and resources
+      
+      This action cannot be undone.
+    `)) {
       try {
         setIsDeleting(true);
         console.log('Starting course deletion for ID:', id);
@@ -72,7 +87,7 @@ const TeacherCourseDetails = () => {
         console.log('Delete response:', response);
         
         if (response?.succeeded) {
-          toast.success('Course deleted successfully');
+          toast.success('Course and all associated content deleted successfully');
           navigate('/teacher/courses'); // Navigate back to courses list
         } else {
           throw new Error(response?.message || 'Failed to delete course');
@@ -588,6 +603,17 @@ const TeacherCourseDetails = () => {
                                           </div>
                                         </div>
                                         <div className="flex items-center gap-2">
+                                          {material.data && (
+                                            <a
+                                              href={material.data}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="text-blue-500 hover:text-blue-600 flex items-center gap-1"
+                                            >
+                                              <FaFileAlt className="text-sm" />
+                                              View
+                                            </a>
+                                          )}
                                           <button
                                             onClick={() => handleEditClick(material)}
                                             className="text-gray-500 hover:text-gray-600"
@@ -610,6 +636,15 @@ const TeacherCourseDetails = () => {
                               <p className="text-gray-500 text-sm">No materials uploaded yet</p>
                             )}
                           </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleDeleteLesson(lesson.id)}
+                            className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition-colors duration-200"
+                            title="Delete Lesson"
+                          >
+                            <FaTrash className="text-lg" />
+                          </button>
                         </div>
                       </div>
                     </div>

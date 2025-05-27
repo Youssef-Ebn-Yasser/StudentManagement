@@ -393,14 +393,24 @@ const CreateCourse = () => {
 
         <div className="form-group">
           <label className="required-field">Level</label>
-          <input
-            type="text"
+          <select
             name="level"
             required
             defaultValue={course?.level}
-            placeholder="Enter course level (e.g., 'Beginner', 'Intermediate', 'Advanced')"
-            className={errors.level ? 'error' : ''}
-          />
+            className={`
+              w-full px-4 py-2.5 rounded-lg border
+              ${errors.level ? 'border-red-500' : 'border-gray-300'}
+              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+              transition-all duration-200 ease-in-out
+              appearance-none cursor-pointer
+              hover:border-blue-400
+            `}
+          >
+            <option value="">Select Level</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+          </select>
           {errors.level && <span className="error-message">{errors.level}</span>}
         </div>
 

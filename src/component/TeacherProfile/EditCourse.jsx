@@ -21,7 +21,7 @@ const EditCourse = () => {
     categoryId: '',
     level: '',
     hours: '',
-    image: null,
+    image: course?.imagePath || '',
     id: ''
   });
 

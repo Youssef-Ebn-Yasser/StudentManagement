@@ -1,6 +1,8 @@
 import img from '@/assets/studentReg.png'
 import useRegister from '@/hooks/auth/useRegister'
 import { Link } from 'react-router-dom'
+import { FaChalkboardTeacher } from 'react-icons/fa'
+
 export default function RegisterForm({ userType }) {
     const { handleGoBack, formik, loading } = useRegister(userType)
     return (
@@ -30,8 +32,7 @@ export default function RegisterForm({ userType }) {
                                     required
                                 />
                             </div>
-
-                            <div className=" mb-3">
+                            <div className="mb-3">
                                 <input
                                     type="email"
                                     className="border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"
@@ -39,13 +40,12 @@ export default function RegisterForm({ userType }) {
                                     name="email"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    id="email"
-                                    placeholder="name@example.com"
+                                    id="Email"
+                                    placeholder="Email"
                                     required
                                 />
                             </div>
-
-                            <div className=" mb-3">
+                            <div className="mb-3">
                                 <input
                                     type="password"
                                     className="border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"
@@ -53,13 +53,12 @@ export default function RegisterForm({ userType }) {
                                     name="password"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    id="password"
+                                    id="Password"
                                     placeholder="Password"
                                     required
                                 />
                             </div>
-
-                            <div className=" mb-3">
+                            <div className="mb-3">
                                 <input
                                     type="password"
                                     className="border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"
@@ -67,28 +66,37 @@ export default function RegisterForm({ userType }) {
                                     name="confirmPassword"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    id="confirmPassword"
-                                    placeholder="confirmPassword"
+                                    id="ConfirmPassword"
+                                    placeholder="Confirm Password"
                                     required
                                 />
                             </div>
-
-                            <div className=" flex justify-center my-3">
+                            <div className="mb-3">
                                 <button
-                                    className="bg-blue-600 text-white px-6 py-2 rounded text-xl  hover:cursor-pointer hover:shadow-sm hover:shadow-blue-500 transition-all duration-300 ease"
                                     type="submit"
+                                    className="bg-blue-700 text-white w-full p-2 rounded hover:bg-blue-500 transition-all duration-300 ease"
+                                    disabled={loading}
                                 >
-                                    Register
+                                    {loading ? 'Loading...' : 'Register'}
                                 </button>
                             </div>
-
+                            {userType === 'student' && (
+                                <div className="mb-3">
+                                    <Link
+                                        to="/become-teacher"
+                                        className="flex items-center justify-center gap-2 bg-green-600 text-white w-full p-2 rounded hover:bg-green-500 transition-all duration-300 ease"
+                                    >
+                                        <FaChalkboardTeacher />
+                                        Become a Teacher
+                                    </Link>
+                                </div>
+                            )}
                             <div className="">
                                 <p className="m-0 text-secondary text-center">
                                     Already have an account?{' '}
                                     <Link
                                         to={'/auth/login'}
-                                        href="#!"
-                                        class="text-blue-600 hover:underline transition-all duration-300 ease"
+                                        className="text-blue-600 hover:underline transition-all duration-300 ease"
                                     >
                                         Sign in
                                     </Link>
