@@ -33,7 +33,7 @@ import CreateQuiz from '@/component/CreateQuiz/CreateQuiz'
 import Quiz from '@/component/StudentDashboard/Quiz'
 import TeacherRequest from '@/component/Register/TeacherRequest'
 import TeacherDashboard from '@/component/TeacherDashboard/TeacherDashboard'
-
+import LessonDetails from '@/component/StudentDashboard/LessonDetails'
 
 
 const routesConfig = [
