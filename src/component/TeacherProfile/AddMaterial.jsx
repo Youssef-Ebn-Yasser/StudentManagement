@@ -3,7 +3,7 @@ import { courseService } from '../../services/courseService';
 import { toast } from 'react-toastify';
 import Loader from '../Loader/Loader';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FaBook, FaFileUpload, FaCheck, FaTimes, FaClipboardList, FaHeading, FaAlignLeft, FaFileAlt } from 'react-icons/fa';
+import { FaFileUpload } from 'react-icons/fa';
 import "./CreateCourse.css";
 import { useSelector } from 'react-redux';
 import axios from 'axios';
