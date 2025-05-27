@@ -87,8 +87,7 @@ export default function RegisterForm({ userType }) {
                                     Already have an account?{' '}
                                     <Link
                                         to={'/auth/login'}
-                                        href="#!"
-                                        class="text-blue-600 hover:underline transition-all duration-300 ease"
+                                        className="text-blue-600 hover:underline transition-all duration-300 ease"
                                     >
                                         Sign in
                                     </Link>

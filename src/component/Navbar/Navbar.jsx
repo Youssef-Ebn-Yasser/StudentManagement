@@ -29,13 +29,11 @@ function Navbar() {
     };
 
     // Logout handler that clears localStorage
-const handleLogout = () => {
-    localStorage.removeItem('studentId');
-    localStorage.removeItem('isTeacher');
-    localStorage.removeItem('pendingEnrollCourseId'); // <-- Add this line
-    dispatch(logout());
-    navigate('/auth/login');
-};
+    const handleLogout = () => {
+        localStorage.clear();
+        dispatch(logout());
+        navigate('/auth/login');
+    };
 
     return (
         <div className='h-[56px]'>
@@ -91,12 +89,13 @@ const handleLogout = () => {
                   <div className="relative">
                     <SearchBar onSearch={handleSearch} />
                   </div>
+                  {/* Notification icon commented out for now */}
+                  {/*
                   {isLoggedIn && (userRole === 'Student' || userRole === 'Teacher') && (
                     <div className="relative">
                       <div className={`w-[24px] h-[24px] text-neutral-700 cursor-pointer ${styles.bellIcon}`} onClick={toggleNotification}>
                         <i className="fa-solid fa-bell"></i>
                       </div>
-                      {/* Notification Dropdown */}
                       {isNotificationVisible && (
                         <div className={`absolute right-0 mt-2 w-[200px] bg-white shadow-lg rounded-md p-4 ${styles.notificationDropdown}`}>
                           <p className="text-sm text-neutral-700">No new notifications</p>
@@ -104,6 +103,7 @@ const handleLogout = () => {
                       )}
                     </div>
                   )}
+                  */}
                   <Link to={
                     userRole === 'Teacher' ? "/teacher/profile" : 
                     userRole === 'Admin' ? "/admin/profile" : 
@@ -344,6 +344,8 @@ const handleLogout = () => {
                         
                         {isLoggedIn ? (
                             <div className="flex items-center justify-between px-4">
+                                {/* Notification icon commented out for now */}
+                                {/*
                                 {userRole === 'Student' || userRole === 'Teacher' ? (
                                     <div className="relative">
                                         <div className="w-[32px] h-[32px] text-gray-700 cursor-pointer hover:text-indigo-600 transition-colors duration-200" onClick={toggleNotification}>
@@ -356,6 +358,7 @@ const handleLogout = () => {
                                         )}
                                     </div>
                                 ) : <div></div>}
+                                */}
                                 <Link to={
                                     userRole === 'Teacher' ? "/teacher/profile" : 
                                     userRole === 'Admin' ? "/admin/profile" : 

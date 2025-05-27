@@ -1,18 +1,20 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import {
-    registerAdmin,
     registerStudent,
-    registerTeacher,
+    // registerAdmin,
+    // registerTeacher,
 } from '@/services/auth'
 
+// Only allow student registration for now
 const registerFunc = (userType) => {
     switch (userType) {
-        case 'admin':
-            return registerAdmin
         case 'student':
             return registerStudent
-        case 'teacher':
-            return registerTeacher
+        // Uncomment below if you implement admin/teacher registration
+        // case 'admin':
+        //     return registerAdmin
+        // case 'teacher':
+        //     return registerTeacher
         default:
             throw new Error('Invalid user type')
     }
@@ -20,13 +22,14 @@ const registerFunc = (userType) => {
 
 export const registerUser = createAsyncThunk(
     'auth/register',
-    async ({data, userType}, { rejectWithValue }) => {
+    async ({ data, userType }, { rejectWithValue }) => {
         try {
             const register = registerFunc(userType)
             const response = await register(data)
-            return response.data
+            // response is already res.data from the service
+            return response
         } catch (error) {
-            return rejectWithValue(error.response.data)
+            return rejectWithValue(error.response?.data || error.message || 'Registration failed')
         }
     }
 )
@@ -39,8 +42,9 @@ export const registerBuilder = (builder) => {
         })
         .addCase(registerUser.fulfilled, (state, action) => {
             state.loading = false
-            // state.user = action.payload.user
-            // state.token = action.payload.token
+            // You can store user/token here if needed:
+            // state.user = action.payload.data.userId
+            // state.token = action.payload.data.token
         })
         .addCase(registerUser.rejected, (state, action) => {
             state.loading = false

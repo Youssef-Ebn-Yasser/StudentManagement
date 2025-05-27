@@ -138,11 +138,15 @@ export default function StudentDashboard() {
         ))}
       </div>
 
-      {/* Content based on active tab */}
+      {/* Teachers Tab: All teachers */}
       {activeTab === 'teachers' && (
         <div className="grid md:grid-cols-2 gap-4">
           {dashboardData.teachers.map((teacherName, idx) => (
-            <div key={teacherName + idx} className="bg-white border rounded-xl p-5 flex items-center shadow-sm">
+            <div
+              key={teacherName + idx}
+              className="bg-white border rounded-xl p-5 flex items-center shadow-sm cursor-pointer hover:bg-indigo-100"
+              onClick={() => navigate(`/courses/teacher/${teacherName}`)}
+            >
               <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-lg mr-4">
                 {teacherName
                   .split(' ')
@@ -155,9 +159,13 @@ export default function StudentDashboard() {
               </div>
             </div>
           ))}
+          {dashboardData.teachers.length === 0 && (
+            <div className="text-gray-500">No teachers found.</div>
+          )}
         </div>
       )}
 
+      {/* Courses Tab: All courses */}
       {activeTab === 'courses' && (
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           {dashboardData.courses.map((course) => (
@@ -193,6 +201,7 @@ export default function StudentDashboard() {
         </div>
       )}
 
+      {/* Overview Tab: Courses (4) and Teachers (2) */}
       {activeTab === 'overview' && (
         <>
           {/* Courses Overview */}
@@ -248,8 +257,12 @@ export default function StudentDashboard() {
             </button>
           </div>
           <div className="grid md:grid-cols-2 gap-4 mb-8">
-            {dashboardData.teachers.slice(0, 4).map((teacherName, idx) => (
-              <div key={teacherName + idx} className="bg-white border rounded-xl p-5 flex items-center shadow-sm">
+            {dashboardData.teachers.slice(0, 2).map((teacherName, idx) => (
+              <div
+                key={teacherName + idx}
+                className="bg-white border rounded-xl p-5 flex items-center shadow-sm cursor-pointer hover:bg-indigo-100"
+                onClick={() => navigate(`/courses/teacher/${teacherName}`)}
+              >
                 <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-lg mr-4">
                   {teacherName
                     .split(' ')
@@ -262,6 +275,9 @@ export default function StudentDashboard() {
                 </div>
               </div>
             ))}
+            {dashboardData.teachers.length === 0 && (
+              <div className="text-gray-500">No teachers found.</div>
+            )}
           </div>
         </>
       )}

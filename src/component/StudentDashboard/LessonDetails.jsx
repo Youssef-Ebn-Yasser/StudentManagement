@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 export default function LessonDetails() {
-  // Get both courseId and lessonId from the URL
   const { courseId, lessonId } = useParams();
-  const location = useLocation();
+  const navigate = useNavigate();
   const [materials, setMaterials] = useState([]);
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +21,17 @@ export default function LessonDetails() {
   const [commentError, setCommentError] = useState('');
   const [commentSuccess, setCommentSuccess] = useState('');
 
+  // Quiz
+  const [quiz, setQuiz] = useState(null);
+  const [quizLoading, setQuizLoading] = useState(true);
+
   const studentId = localStorage.getItem('studentId');
+
+  // Quiz submission state (persisted)
+  const quizSubmissionKey = `quiz_submitted_${studentId}_${lessonId}`;
+  const [isQuizSubmitted, setIsQuizSubmitted] = useState(
+    !!localStorage.getItem(quizSubmissionKey)
+  );
 
   // Save courseId to localStorage for consistency (optional)
   useEffect(() => {
@@ -99,6 +108,38 @@ export default function LessonDetails() {
   useEffect(() => {
     fetchComments();
   }, [lessonId]);
+
+  // Fetch quiz for this lesson
+  useEffect(() => {
+    const fetchQuiz = async () => {
+      setQuizLoading(true);
+      try {
+        const res = await axios.get(
+          `https://e-learn-v1.runasp.net/api/Quize/GetQuizeByLessoinId?lessonId=${lessonId}`
+        );
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setQuiz(res.data[0]);
+        } else {
+          setQuiz(null);
+        }
+      } catch (err) {
+        setQuiz(null);
+      }
+      setQuizLoading(false);
+    };
+    fetchQuiz();
+  }, [lessonId]);
+
+  // Watch for quiz submission in localStorage (in case it changes after quiz page submit)
+  useEffect(() => {
+    const checkQuizSubmission = () => {
+      setIsQuizSubmitted(!!localStorage.getItem(quizSubmissionKey));
+    };
+    window.addEventListener('storage', checkQuizSubmission);
+    // Also check on mount
+    checkQuizSubmission();
+    return () => window.removeEventListener('storage', checkQuizSubmission);
+  }, [quizSubmissionKey]);
 
   // Handle file input change for each assignment
   const handleFileChange = (assignmentId, file) => {
@@ -197,6 +238,13 @@ export default function LessonDetails() {
     setCommentLoading(false);
   };
 
+  // Go to quiz page
+  const handleStartQuiz = () => {
+    if (lessonId) {
+      navigate(`/studentdashboard/quiz/${lessonId}`);
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto py-10 px-4">
       <h1 className="text-3xl font-bold mb-8 text-indigo-700 text-center">Lesson Materials & Assignments</h1>
@@ -291,6 +339,40 @@ export default function LessonDetails() {
                   </div>
                 ))}
               </div>
+            )}
+          </section>
+
+          {/* Quiz Section */}
+          <section className="bg-white border rounded-xl p-6 shadow-sm">
+            <h2 className="text-2xl font-semibold mb-4 text-indigo-600 flex items-center">
+              <i className="fa fa-question-circle mr-2" /> Quiz
+            </h2>
+            {quizLoading ? (
+              <div className="text-gray-500">Loading quiz...</div>
+            ) : quiz ? (
+              <div>
+                <div className="mb-2">
+                  <span className="font-semibold">Title:</span> {quiz.title}
+                </div>
+                <div className="mb-2">
+                  <span className="font-semibold">Description:</span> {quiz.description}
+                </div>
+                <div className="mb-2">
+                  <span className="font-semibold">Duration:</span> {quiz.durationMinutes} minutes
+                </div>
+                {isQuizSubmitted ? (
+                  <span className="text-green-600 font-semibold">Submitted</span>
+                ) : (
+                  <button
+                    className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition mt-2"
+                    onClick={handleStartQuiz}
+                  >
+                    Start Quiz
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="text-gray-500">There is no quiz at the moment.</div>
             )}
           </section>
 

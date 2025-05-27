@@ -28,8 +28,9 @@ import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
 import StudentAssignments from '@/component/TeacherProfile/StudentAssignments'
 import LessonDetails from '@/component/StudentDashboard/LessonDetails'
 import AddMaterial from '@/component/TeacherProfile/AddMaterial'
-import StudentAssignments from '@/component/TeacherProfile/StudentAssignments'
 import TeacherProfileView from '@/component/StudentDashboard/TeacherProfileView'
+import CreateQuiz from '@/component/CreateQuiz/CreateQuiz'
+import Quiz from '@/component/StudentDashboard/Quiz'
 
 const isAuth = true // Replace with actual authentication logic
 
@@ -66,14 +67,26 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
+        path: 'createquiz',
+        element: <CreateQuiz />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
     path: '/studentdashboard/course/:courseId/lesson/:lessonId',
     element: <LessonDetails />,
     isProtected: false,
     accessRole: 'all',
-   },
+    },
     {
         path: 'studentprofile',
         element: <StudentProfile />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'studentdashboard/quiz/:lessonId',
+        element: <Quiz />,
         isProtected: false,
         accessRole: 'all',
     },
