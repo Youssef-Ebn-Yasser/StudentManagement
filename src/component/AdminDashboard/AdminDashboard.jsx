@@ -70,7 +70,6 @@ function AdminDashboard() {
                             { id: "students", title: "Students", count: students?.length, icon: stuImg, alt: "Students overview icon" },
                             { id: "teachers", title: "Teachers", count: teachers?.length, icon: teaImg, alt: "Teachers overview icon" },
                             { id: "courses", title: "Courses", count: courses?.length, icon: courseImg, alt: "Courses overview icon" },
-                            { id: "lesson", title: "Lessons", count: lessons?.length, icon: lessonImg, alt: "Lessons overview icon" },
                             { id: "gategory", title: "Categories", count: gategory?.length, icon: gateImg, alt: "Categories overview icon" },
                         ].map(item => (
                             <a key={item.id} href={`#${item.id}`} className={overviewCardBaseClasses}>
@@ -180,34 +179,6 @@ function AdminDashboard() {
                 </div>
             </section>
 
-            <section id='lesson' className={sectionBaseClasses}>
-            <h2 className={sectionTitleClasses}>Our Lessons</h2>
-                <div  className={sectionGridClasses}>
-                {!loading?
-                (
-                    <>
-                    {lessons && lessons.length >0 ?
-                    (
-                        lessons.map((lesson)=>{
-                            return(
-                                <div key={lesson.id} className={`${itemCardBaseClasses} hover:bg-sky-500`}>
-                                     <img className={itemCardIconClasses} src={lessonImg} alt="Lesson icon" />
-                                    <h3 className={itemCardTitleClasses}>{lesson.title}</h3>
-                                    <p className={itemCardIdClasses}>Id: {lesson.id}</p>
-                                </div>
-                            )
-                        })
-                    ): <p className="col-span-full text-gray-500 py-10">No Lessons Found</p>
-                    }
-                    </>
-                ): <div className="col-span-full flex justify-center py-10"><Loader /></div>}
-                </div>
-                <div className='flex flex-row justify-center items-center mt-6'>
-                <Link to={'/admin/addlesson'}>
-                    <button className={viewMoreButtonClasses}>View More Lessons</button>
-                </Link>
-                </div>
-            </section>
 
             <section id='gategory' className={sectionBaseClasses}>
             <h2 className={sectionTitleClasses}>Our Categories</h2>
