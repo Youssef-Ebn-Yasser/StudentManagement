@@ -53,7 +53,7 @@ function AddCourse() {
     }
 
     async function handleRemoveCourse(id) {
-        axios.delete(`https://e-learn-v1.runasp.net/Course/Delete/${id}`)
+        axios.delete(`https://e-learn-v1.runasp.net/Course/Delete?id=${id}`)
         .then((response)=>{
             console.log("Course deleted");
             toast.success('Course Deleted')
@@ -197,7 +197,7 @@ function AddCourse() {
                             {courses && courses.length > 0 ? (
                                 courses.map((course) => (
                                     <div key={course.id} className="relative bg-white border border-gray-200 shadow-lg rounded-xl overflow-hidden flex flex-col transform transition-all duration-300 ease-in-out hover:shadow-violet-200 hover:scale-105">
-                                        <Link to={`/admin/courseDetails/${course.id}`} className="block">
+                                        <Link to={`/admin/controlCourse/${course.id}`} className="block">
                                             <img 
                                                 src={course.imagePath || courseImg} // Use actual imagePath or fallback
                                                 alt={course.title || 'Course Image'} 

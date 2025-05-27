@@ -9,7 +9,7 @@ import toast from 'react-hot-toast'
 
 
 
-function CourseDetails() {
+function ControlCourse() {
     let {id}= useParams()
     let dispatch= useDispatch()
 
@@ -98,4 +98,4 @@ function CourseDetails() {
     </>)
 
             }
-export default CourseDetails;
+export default ControlCourse;

@@ -21,20 +21,23 @@ import AddGategory from '@/component/AdminProfile/AddGategory'
 import AddCourse from '@/component/AdminProfile/AddCourse'
 import Students from '@/component/AdminProfile/Students'
 import AdminDashboard from '@/component/AdminDashboard/AdminDashboard'
-import CourseDashDetails from '@/component/StudentDashboard/CourseDashDetailes'
-import CourseDetails from '@/component/AdminProfile/CourseDetails'
+import ControlCourse from '@/component/AdminProfile/ControlCourse'
 import StudentDetails from '@/component/AdminProfile/StudentDetails'
 import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
+import MeetingRoom from '@/component/Meeting/MeetingRoom/MeetingRoom'
 import StudentAssignments from '@/component/TeacherProfile/StudentAssignments'
-import LessonDetails from '@/component/StudentDashboard/LessonDetails'
+import CourseDashDetails from '@/component/StudentDashboard/CourseDashDetailes'
 import AddMaterial from '@/component/TeacherProfile/AddMaterial'
+<<<<<<< HEAD
 import TeacherProfileView from '@/component/StudentDashboard/TeacherProfileView'
 import CreateQuiz from '@/component/CreateQuiz/CreateQuiz'
 import Quiz from '@/component/StudentDashboard/Quiz'
 import TeacherRequest from '@/component/Register/TeacherRequest'
 import TeacherDashboard from '@/component/TeacherDashboard/TeacherDashboard'
+=======
+>>>>>>> 38ff3ebe6aeaedbed0d256714be3d83a297bc219
 
-const isAuth = true // Replace with actual authentication logic
+
 
 const routesConfig = [
     { path: '', element: <Home />, isProtected: false, accessRole: 'all' },
@@ -137,6 +140,7 @@ const routesConfig = [
     {
         path: 'studentdashboard/course/:id',
         element: <CourseDashDetails />,
+        // element: <CoursesDetails />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -183,8 +187,8 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
-        path: 'admin/courseDetails/:id',
-        element: <CourseDetails/>,
+        path: 'admin/controlCourse/:id',
+        element: <ControlCourse/>,
         isProtected: false,
         accessRole: 'all',
     },
@@ -213,6 +217,14 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
+        path: "video-call",
+        element: (
+          <MeetingRoom/>
+        ),
+        isProtected: false,
+        accessRole: "all",
+      },
+      {
         path: 'teacher/course/:courseId/lesson/:lessonId/material/new',
         element: <AddMaterial />,
         isProtected: false,
