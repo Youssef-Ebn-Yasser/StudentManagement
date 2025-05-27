@@ -58,18 +58,23 @@ function Navbar() {
                     <ul className="flex items-center gap-4">
                         {/* Common links for all users */}
                         <li><NavLink to="/" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Home</NavLink></li>
-                        <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
                         <li><NavLink to="/about" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>About</NavLink></li>
 
                         {/* Role-specific links */}
                         {isLoggedIn && userRole === 'Student' && (
                           <>
                             <li><NavLink to="/studentdashboard" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Dashboard</NavLink></li>
+                            <li><NavLink to="/video-call" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Meeting</NavLink></li>
+                            <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
+
                           </>
                         )}
                         {isLoggedIn && userRole === 'Teacher' && (
                           <>
                             <li><NavLink to="/teacher/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>My Courses</NavLink></li>
+                            <li><NavLink to="/video-call" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Meeting</NavLink></li>
+                            <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
+
                           </>
                         )}
                         {isLoggedIn && userRole === 'Admin' && (
@@ -194,44 +199,84 @@ function Navbar() {
 
                         {/* Role-specific links */}
                         {isLoggedIn && userRole === 'Student' && (
-                            <li className="w-full text-center">
-                                <NavLink 
-                                    to="/studentdashboard" 
-                                    className={({ isActive }) => 
-                                        `block py-2 px-4 text-lg font-medium relative
-                                        ${isActive 
-                                            ? 'text-indigo-600 after:scale-x-100' 
-                                            : 'text-gray-700 hover:text-indigo-600'
+                            <>
+                                <li className="w-full text-center">
+                                    <NavLink 
+                                        to="/studentdashboard" 
+                                        className={({ isActive }) => 
+                                            `block py-2 px-4 text-lg font-medium relative
+                                            ${isActive 
+                                                ? 'text-indigo-600 after:scale-x-100' 
+                                                : 'text-gray-700 hover:text-indigo-600'
+                                            }
+                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
+                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
+                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
+                                            hover:after:scale-x-100`
                                         }
-                                        after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
-                                        after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
-                                        after:origin-center after:transition-transform after:duration-300 after:ease-in-out
-                                        hover:after:scale-x-100`
-                                    }
-                                >
-                                    Dashboard
-                                </NavLink>
-                            </li>
+                                    >
+                                        Dashboard
+                                    </NavLink>
+                                </li>
+                                <li className="w-full text-center">
+                                    <NavLink 
+                                        to="/video-call" 
+                                        className={({ isActive }) => 
+                                            `block py-2 px-4 text-lg font-medium relative
+                                            ${isActive 
+                                                ? 'text-indigo-600 after:scale-x-100' 
+                                                : 'text-gray-700 hover:text-indigo-600'
+                                            }
+                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
+                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
+                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
+                                            hover:after:scale-x-100`
+                                        }
+                                    >
+                                        Meeting
+                                    </NavLink>
+                                </li>
+                            </>
                         )}
                         {isLoggedIn && userRole === 'Teacher' && (
-                            <li className="w-full text-center">
-                                <NavLink 
-                                    to="/teacher/courses" 
-                                    className={({ isActive }) => 
-                                        `block py-2 px-4 text-lg font-medium relative
-                                        ${isActive 
-                                            ? 'text-indigo-600 after:scale-x-100' 
-                                            : 'text-gray-700 hover:text-indigo-600'
+                            <>
+                                <li className="w-full text-center">
+                                    <NavLink 
+                                        to="/teacher/courses" 
+                                        className={({ isActive }) => 
+                                            `block py-2 px-4 text-lg font-medium relative
+                                            ${isActive 
+                                                ? 'text-indigo-600 after:scale-x-100' 
+                                                : 'text-gray-700 hover:text-indigo-600'
+                                            }
+                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
+                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
+                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
+                                            hover:after:scale-x-100`
                                         }
-                                        after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
-                                        after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
-                                        after:origin-center after:transition-transform after:duration-300 after:ease-in-out
-                                        hover:after:scale-x-100`
-                                    }
-                                >
-                                    My Courses
-                                </NavLink>
-                            </li>
+                                    >
+                                        My Courses
+                                    </NavLink>
+                                </li>
+                                <li className="w-full text-center">
+                                    <NavLink 
+                                        to="/video-call" 
+                                        className={({ isActive }) => 
+                                            `block py-2 px-4 text-lg font-medium relative
+                                            ${isActive 
+                                                ? 'text-indigo-600 after:scale-x-100' 
+                                                : 'text-gray-700 hover:text-indigo-600'
+                                            }
+                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
+                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
+                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
+                                            hover:after:scale-x-100`
+                                        }
+                                    >
+                                        Meeting
+                                    </NavLink>
+                                </li>
+                            </>
                         )}
                         {isLoggedIn && userRole === 'Admin' && (
                           <>

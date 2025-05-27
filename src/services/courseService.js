@@ -150,27 +150,12 @@ export const courseService = {
       if (!courseData.level?.trim()) throw new Error('Course level is required');
       if (!courseData.hours?.trim()) throw new Error('Course hours is required');
 
-      // Create FormData object for multipart/form-data
-      const formData = new FormData();
-      formData.append('id', courseId.toString());
-      formData.append('title', courseData.title.trim());
-      formData.append('description', courseData.description?.trim() || '');
-      formData.append('price', courseData.price);
-      formData.append('teacherId', courseData.teacherId);
-      formData.append('categoryId', courseData.categoryId);
-      formData.append('level', courseData.level.trim());
-      formData.append('hours', courseData.hours.trim());
-      
-      if (courseData.image) {
-        formData.append('image', courseData.image);
-      }
-
       const response = await axiosInstance.put(
         `/Course/Update/${courseId}`,
-        formData,
+        courseData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            'Content-Type': 'application/json',
           },
           timeout: 30000
         }

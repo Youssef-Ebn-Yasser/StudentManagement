@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function CreateQuiz() {
+  const navigate = useNavigate();
   const [lessonId, setLessonId] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -92,7 +94,18 @@ export default function CreateQuiz() {
 
   return (
     <div className="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow mt-8">
-      <h2 className="text-2xl font-bold mb-4">Create a Quiz</h2>
+      <div className="flex items-center justify-between mb-6">
+        <button
+          onClick={() => navigate('/teacher/profile')}
+          className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Profile
+        </button>
+        <h2 className="text-2xl font-bold">Create a Quiz</h2>
+      </div>
       <form onSubmit={handleSubmit}>
         <label className="block mt-2">Lesson ID</label>
         <input

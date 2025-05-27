@@ -85,16 +85,23 @@ const EditCourse = () => {
     try {
       setIsLoading(true);
       const updateData = {
+        id: id.toString(),
         title: form.title.trim(),
         description: form.description.trim(),
         price: parseFloat(form.price),
         teacherId: parseInt(form.teacherId),
         categoryId: parseInt(form.categoryId),
         level: form.level.trim(),
-        hours: form.hours.trim(),
-        image: form.image,
-        id: form.id
+        hours: form.hours.trim()
       };
+
+      // If there's a new image, handle it separately
+      if (form.image) {
+        const imageFormData = new FormData();
+        imageFormData.append('image', form.image);
+        // You might need to implement a separate endpoint for image upload
+        // await courseService.uploadCourseImage(id, imageFormData);
+      }
 
       const response = await courseService.updateCourse(id, updateData);
       if (response.succeeded) {
