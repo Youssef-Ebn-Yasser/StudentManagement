@@ -52,7 +52,7 @@ function AddTeacher() {
     }
     
     let validationSchema=Yup.object({
-        name:Yup.string().required('name is required').min(3,'min length is 3'). max(15,'max lenght is 10'),
+        name:Yup.string().required('name is required'),
         email:Yup.string().required('email is required').email('invalid email'),
         password:Yup.string().required('password is required').matches(/^.{6,}$/),
         confirmPassword:Yup.string().required('rePassword is required').oneOf([Yup.ref('password')],'password not match')

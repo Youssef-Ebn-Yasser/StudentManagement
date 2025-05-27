@@ -335,7 +335,7 @@ function Home() {
 
           {/* Popular Courses Section */}
           <CourseSection
-            title="Popular courses"
+            title="Some of the first couses"
             courses={popularCourses.courses}
             loading={popularCourses.loading}
             error={popularCourses.error}
@@ -349,7 +349,7 @@ function Home() {
           <div className="py-6 sm:py-8">
             {/* Trending Courses Section */}
             <CourseSection
-              title="Trending courses"
+              title="Affordable to Premium Courses"
               courses={trendingCourses.courses}
               loading={trendingCourses.loading}
               error={trendingCourses.error}
