@@ -28,8 +28,12 @@ import MeetingRoom from '@/component/Meeting/MeetingRoom/MeetingRoom'
 import StudentAssignments from '@/component/TeacherProfile/StudentAssignments'
 import CourseDashDetails from '@/component/StudentDashboard/CourseDashDetailes'
 import AddMaterial from '@/component/TeacherProfile/AddMaterial'
-
-
+import CreateQuiz from '@/component/CreateQuiz/CreateQuiz'
+import Quiz from '@/component/StudentDashboard/Quiz'
+import TeacherProfileView from '@/component/StudentDashboard/TeacherProfileView'
+import TeacherRequest from '@/component/Register/TeacherRequest'
+import TeacherDashboard from '@/component/TeacherDashboard/TeacherDashboard'
+import LessonDetails from '@/component/StudentDashboard/LessonDetails'
 
 const routesConfig = [
     { path: '', element: <Home />, isProtected: false, accessRole: 'all' },
