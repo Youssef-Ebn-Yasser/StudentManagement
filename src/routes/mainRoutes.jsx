@@ -83,8 +83,8 @@ const routesConfig = [
     {
         path: 'studentprofile',
         element: <StudentProfile />,
-        isProtected: false,
-        accessRole: 'all',
+        isProtected: true,
+        accessRole: 'student',
     },
     {
         path: 'studentdashboard/quiz/:lessonId',
