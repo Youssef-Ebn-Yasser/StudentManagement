@@ -17,7 +17,7 @@ public class CommentService : ResponseHandler, ICommentService
     {
         // Check if student and lesson exist
         var student = await _unitOfWork.Repository<Student>().GetByIdAsync(createCommentDto.StudentId);
-        var lesson = await _unitOfWork.Repository<Student>().GetByIdAsync(createCommentDto.LessonId);
+        var lesson = await _unitOfWork.Repository<Lesson>().GetByIdAsync(createCommentDto.LessonId);
 
         if (student == null || lesson == null)
             return NotFound<string>("Student or Lesson not found.");
@@ -32,9 +32,10 @@ public class CommentService : ResponseHandler, ICommentService
         };
 
         await _unitOfWork.Repository<Comment>().AddAsync(comment);
-        _unitOfWork.Complete();
-
-        return Success("Comment created successfully.");
+        var response = _unitOfWork.Complete();
+        if (response > 0)
+            return Success("Comment created successfully.");
+        return BadRequest<string>("Faild");
     }
 
     public async Task<Response<string>> DeleteAsync(int commentId)

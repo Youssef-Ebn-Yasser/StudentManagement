@@ -4,6 +4,7 @@ using Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250527013617_Quiz02")]
+    partial class Quiz02
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -266,7 +269,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("QuizId");
 
-                    b.ToTable("Questions");
+                    b.ToTable("Question");
                 });
 
             modelBuilder.Entity("Backend.Entities.QuizeEntities.QuestionOption", b =>
@@ -294,7 +297,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("QuestionId1");
 
-                    b.ToTable("QuestionOptions");
+                    b.ToTable("QuestionOption");
                 });
 
             modelBuilder.Entity("Backend.Entities.QuizeEntities.Quiz", b =>
@@ -335,39 +338,7 @@ namespace Backend.Migrations
                     b.HasIndex("LessonId")
                         .IsUnique();
 
-                    b.ToTable("Quizzes");
-                });
-
-            modelBuilder.Entity("Backend.Entities.QuizeEntities.StudentQuizeAnswer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("GradingRating")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsPassed")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("NumberOfAswered")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuizId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuizId");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("studentQuizeAnswers");
+                    b.ToTable("Quiz");
                 });
 
             modelBuilder.Entity("Backend.Entities.RefreshToken", b =>
@@ -856,25 +827,6 @@ namespace Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Lesson");
-                });
-
-            modelBuilder.Entity("Backend.Entities.QuizeEntities.StudentQuizeAnswer", b =>
-                {
-                    b.HasOne("Backend.Entities.QuizeEntities.Quiz", "Quiz")
-                        .WithMany()
-                        .HasForeignKey("QuizId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Backend.Entities.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Quiz");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("Backend.Entities.RefreshToken", b =>
