@@ -27,6 +27,8 @@ import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
 import MeetingRoom from '@/component/Meeting/MeetingRoom/MeetingRoom'
 import StudentAssignments from '@/component/TeacherProfile/StudentAssignments'
 import CourseDashDetails from '@/component/StudentDashboard/CourseDashDetailes'
+import AddMaterial from '@/component/TeacherProfile/AddMaterial'
+
 
 
 const routesConfig = [
@@ -190,6 +192,12 @@ const routesConfig = [
         isProtected: false,
         accessRole: "all",
       },
+      {
+        path: 'teacher/course/:courseId/lesson/:lessonId/material/new',
+        element: <AddMaterial />,
+        isProtected: false,
+        accessRole: 'all',
+    },
 ]
 
 const mainRoutes = [

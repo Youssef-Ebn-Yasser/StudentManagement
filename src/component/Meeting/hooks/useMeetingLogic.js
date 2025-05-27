@@ -1,5 +1,6 @@
+// src/hooks/useMeetingLogic.js
 import { useState, useEffect, useCallback } from 'react';
-import { createMeetingId, fetchAuthToken } from '@/api/meetingService';
+import { createMeetingId, fetchAuthToken } from '../../../api/meetingService'; // Ensure correct relative path to the NON-MOCKED service
 
 function useMeetingLogic(){
     const [token, setToken] = useState(null);
@@ -12,63 +13,59 @@ function useMeetingLogic(){
     useEffect(()=>{
         const getToken= async()=>{
             try{
-                setIsLoadingToken(true)
-                setError(null)
-                const fetchedTokenResult = await fetchAuthToken() // Call the imported function
-                setToken(fetchedTokenResult) // Set the state with the result
-
-            }catch(error){
-                console.error("Error in useMeetingLogic fetching token:", error);
-                setError(error.message || "Failed to fetch meeting token.");
+                setIsLoadingToken(true);
+                setError(null);
+                const fetchedTokenResult = await fetchAuthToken(); // Call the actual function
+                setToken(fetchedTokenResult); // Set the state with the result
+            }catch(err){
+                console.error("Error in useMeetingLogic fetching token:", err);
+                setError(err.message || "Failed to fetch meeting token.");
             } finally {
                 setIsLoadingToken(false);
             }
-        }
-        getToken()
+        };
+        getToken();
+    },[]); // Empty dependency array means this runs once on mount
 
-    },[])
-
-      // Callback to handle creating a new meeting
+    // Callback to handle creating a new meeting
     const handleCreateMeeting= useCallback(async(userRole)=>{
         if(!token || !userName.trim()){
             setError("Token not loaded or name is empty.");
-            return;
+            return null;
         }
         try{
-            const newMeetingId = await createMeetingId(token)
-            setMeetingId(newMeetingId)
-            setRole(userRole)
-            setError(null)// Clear any previous errors
+            const newMeetingId = await createMeetingId(token); // Call the actual function
+            setMeetingId(newMeetingId);
+            setRole(userRole);
+            setError(null); // Clear any previous errors
             return newMeetingId;
         }
-        catch(error){
-            console.error("Error creating meeting:", error);
-      setError(error.message || "Failed to create meeting.");
-      return null;
+        catch(err){
+            console.error("Error creating meeting:", err);
+            setError(err.message || "Failed to create meeting.");
+            return null;
         }
-    },[token, userName]) // Re-create if token or userName changes
+    },[token, userName]); // Re-create if token or userName changes
 
 
-      // Callback to handle joining an existing meeting
+    // Callback to handle joining an existing meeting
     const handleJoinMeeting= useCallback((idToJoin, userRole)=>{
         if (!userName.trim()) {
             setError("Please enter your name to join.");
             return;
-          }
-          setMeetingId(idToJoin)
-          setRole(userRole)
-          setError(null)
+        }
+        setMeetingId(idToJoin);
+        setRole(userRole);
+        setError(null);
+    },[userName]);
 
-    },[userName])
 
-
-      // Callback to reset meeting state when leaving
+    // Callback to reset meeting state when leaving
     const handleMeetingLeave= useCallback(()=>{
-        setMeetingId(null)
-        setRole('')
-            // Do NOT reset userName here, user might want to join another meeting with same name
-        setError(null)
-    },[])
+        setMeetingId(null);
+        setRole('');
+        setError(null);
+    },[]);
 
     return {
         token,
@@ -81,7 +78,7 @@ function useMeetingLogic(){
         handleCreateMeeting,
         handleJoinMeeting,
         handleMeetingLeave,
-      };
+    };
 }
 
-export default useMeetingLogic
+export default useMeetingLogic;

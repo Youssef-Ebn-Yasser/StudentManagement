@@ -18,12 +18,11 @@
     "@reduxjs/toolkit": "^2.7.0",
     "@stripe/stripe-js": "^7.3.0",
     "@tailwindcss/vite": "^4.1.4",
-    "@videosdk.live/js-sdk": "0.1.72",
-    "@videosdk.live/react-sdk": "^0.1.72",
     "axios": "^1.8.4",
     "formik": "^2.4.6",
     "generate-react-cli": "^8.4.9",
     "lucide-react": "^0.503.0",
+    "nodemon": "^3.1.10",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
@@ -38,6 +37,7 @@
     "slick-carousel": "^1.8.1",
     "styled-components": "^6.1.17",
     "tailwindcss": "^4.1.4",
+    "ws": "^8.18.2",
     "yup": "^1.6.1"
   },
   "devDependencies": {

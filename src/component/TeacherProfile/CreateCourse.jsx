@@ -6,8 +6,12 @@ import Loader from '../Loader/Loader';
 import "./CreateCourse.css";
 import axiosInstance from '../../services/axiosInstance';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const CreateCourse = () => {
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
+  const teacherId = user?.id;
   const [activeTab, setActiveTab] = useState('courses');
   const [courses, setCourses] = useState([]);
   const [editingCourse, setEditingCourse] = useState(null);
@@ -16,7 +20,6 @@ const CreateCourse = () => {
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
-  const navigate = useNavigate();
 
   const courseCategories = {
     PROGRAMMING: 'Programming',
@@ -117,7 +120,7 @@ const CreateCourse = () => {
         title: formData.get('title')?.trim(),
         description: formData.get('description')?.trim(),
         price: parseFloat(formData.get('price')),
-        teacherId: 36, // This should be dynamically set based on the logged-in teacher
+        teacherId: teacherId, // Use the teacherId from Redux
         categoryId: parseInt(formData.get('categoryId')),
         level: formData.get('level'),
         hours: formData.get('hours'),
@@ -126,6 +129,10 @@ const CreateCourse = () => {
 
       // Log the data being sent
       console.log('Sending course data:', courseData);
+
+      if (!teacherId) {
+        throw new Error('Teacher ID is required');
+      }
 
       const response = await courseService.createCourse(courseData);
       console.log('Course created successfully:', response);

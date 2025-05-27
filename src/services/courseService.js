@@ -109,6 +109,17 @@ export const courseService = {
     }
   },
 
+  // Get teacher's courses
+  getTeacherCourses: async (teacherId) => {
+    try {
+      const response = await axiosInstance.get(`/Course/GetAllCoursesOfTeacher/${teacherId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error in getTeacherCourses:', error);
+      throw error;
+    }
+  },
+
   // Get paginated courses for home page
   getPaginatedCourses: async (page = 1, pageSize = 10) => {
     try {
@@ -132,9 +143,51 @@ export const courseService = {
   // Update a course
   updateCourse: async (courseId, courseData) => {
     try {
-      const response = await axiosInstance.put(`/Course/Update/${courseId}`, courseData);
+      if (!courseData.title?.trim()) throw new Error('Course title is required');
+      if (!courseData.price || courseData.price <= 0) throw new Error('Course price must be greater than 0');
+      if (!courseData.teacherId || courseData.teacherId <= 0) throw new Error('Valid teacher ID is required');
+      if (!courseData.categoryId || courseData.categoryId <= 0) throw new Error('Valid category ID is required');
+      if (!courseData.level?.trim()) throw new Error('Course level is required');
+      if (!courseData.hours?.trim()) throw new Error('Course hours is required');
+
+      // Build the JSON body with camelCase keys to match server DTO exactly
+      const body = {
+        id: courseId.toString(),
+        title: courseData.title.trim(),
+        description: courseData.description?.trim() || '',
+        price: Number(courseData.price),
+        teacherId: Number(courseData.teacherId),
+        categoryId: Number(courseData.categoryId),
+        level: courseData.level.trim(),
+        hours: courseData.hours.trim(),
+        image: courseData.image || ''
+      };
+
+      console.log('Course update JSON body:', JSON.stringify(body, null, 2));
+
+      const response = await axios.put(
+        'https://e-learn-v1.runasp.net/Course/Update',
+        body,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': '*/*',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          timeout: 30000
+        }
+      );
+
       return response.data;
     } catch (error) {
+      // Enhanced error logging
+      if (error.response) {
+        console.error('Server Error Response:', {
+          status: error.response.status,
+          data: error.response.data,
+          headers: error.response.headers
+        });
+      }
       throw error;
     }
   },
@@ -264,11 +317,28 @@ export const courseService = {
   },
 
   // Update material
-  updateMaterial: async (materialData) => {
+  updateMaterial: async (materialId, materialData) => {
     try {
-      const response = await axiosInstance.put('/api/Material/UpdateMaterial/UpdateMaterial', materialData);
+      const formData = new FormData();
+      formData.append('Id', materialId);
+      formData.append('Title', materialData.title);
+      formData.append('Content', materialData.content);
+      formData.append('LessonId', materialData.lessonId);
+      formData.append('Type', materialData.type || 1);
+      
+      if (materialData.file) {
+        formData.append('Data', materialData.file);
+      }
+
+      const response = await axiosInstance.put('/api/Material/UpdateMaterial/UpdateMaterial', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+
       return response.data;
     } catch (error) {
+      console.error('Error updating material:', error);
       throw error;
     }
   },
@@ -354,54 +424,18 @@ export const courseService = {
     }
   },
 
-  uploadLessonMaterial: async (materialData) => {
+  // Upload lesson material
+  uploadLessonMaterial: async (formData) => {
     try {
-      // Validate required fields
-      if (!materialData.title?.trim()) throw new Error('Title is required');
-      if (!materialData.content?.trim()) throw new Error('Content is required');
-      if (!materialData.lessonId) throw new Error('LessonId is required');
-      if (!materialData.data) throw new Error('File is required');
-
-      // Create FormData object
-      const formData = new FormData();
-      formData.append('title', materialData.title.trim());
-      formData.append('content', materialData.content.trim());
-      formData.append('lessonId', materialData.lessonId);
-      formData.append('data', materialData.data);
-      formData.append('type', materialData.type);
-
-      console.log('Sending request with FormData:', {
-        title: materialData.title.trim(),
-        content: materialData.content.trim(),
-        lessonId: materialData.lessonId,
-        type: materialData.type,
-        hasFile: !!materialData.data,
-        fileName: materialData.data.name,
-        fileType: materialData.data.type
-      });
-
-      const response = await axiosInstance.post(
-        '/api/Material/CreateMaterial/CreateMaterial',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+      const response = await axiosInstance.post('/api/Material/CreateMaterial/CreateMaterial', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
         }
-      );
-
+      });
       return response.data;
-    } catch (err) {
-      if (err.response) {
-        console.error('Upload failed:',
-          '\nStatus:', err.response.status,
-          '\nMessage:', err.response.data?.message || 'Unknown error',
-          '\nValidation Errors:', err.response.data?.errors || 'No validation errors'
-        );
-      } else {
-        console.error('Upload failed:', err.message);
-      }
-      throw err;
+    } catch (error) {
+      console.error('Error uploading material:', error);
+      throw error;
     }
   },
 
@@ -502,4 +536,4 @@ export const getPaginatedCourses = async (page = 1, enOrderBy = 0) => {
     console.error('Error fetching paginated courses:', error);
     throw error;
   }
-}; 
+};

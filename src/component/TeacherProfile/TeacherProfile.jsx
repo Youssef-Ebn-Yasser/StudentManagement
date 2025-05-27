@@ -26,12 +26,15 @@ function TeacherProfile() {
     const fetchTeacherData = async () => {
       try {
         setIsLoading(true);
+        console.log('Current user object:', user);
         if (!user?.id) {
+          console.error('Teacher ID not found in user object');
           throw new Error('Teacher ID not found');
         }
         const response = await courseService.getTeacherStats(user.id);
         setTeacherData(response.data);
       } catch (error) {
+        console.error('Error in fetchTeacherData:', error);
         setError(error.message || 'Failed to load teacher data');
       } finally {
         setIsLoading(false);
@@ -72,6 +75,7 @@ function TeacherProfile() {
   };
 
   const renderContent = () => {
+    console.log('Rendering content with user:', user);
     switch (activeTab) {
       case 'dashboard':
         return <TeacherDashboard />;
@@ -110,7 +114,8 @@ function TeacherProfile() {
           </>
         );
       case 'courses':
-        return <TeacherCourses teacherId={user?.id} setActiveTab={setActiveTab} />;
+        console.log('Rendering TeacherCourses with teacherId:', user?.id);
+        return <TeacherCourses setActiveTab={setActiveTab} />;
       case 'create-course':
         return <CreateCourse teacherId={user?.id} />;
       case 'lessons':

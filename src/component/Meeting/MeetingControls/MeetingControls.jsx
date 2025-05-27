@@ -1,113 +1,175 @@
-//│   ├── MeetingControls.jsx
-// Contains buttons for mic, webcam, leave, (teacher-specific: end, record)
-// Step 5: Implement src/components/MeetingControls.jsx
-// This component will house the interactive controls for the meeting, such as toggling the microphone, webcam, and leaving the meeting.
-import { useMeeting } from '@videosdk.live/react-sdk'
-import React from 'react'
+// src/components/MeetingControls/MeetingControls.jsx
+import React from 'react';
+// No need to import useMeeting here, all necessary props are passed from MeetingView
+// import { useMeeting } from '@videosdk.live/react-sdk'; // No longer imported, as props are passed
 
-function MeetingControls({ role }) {
-    const {
-        leave,           // Leaves the current meeting
-        toggleMic,       // Toggles microphone on/off
-        toggleWebcam,    // Toggles webcam on/off
-        endMeeting,      // Ends the meeting for all participants (teacher only)
-        // You can also get mic/webcam status here if you want to change button text/icon
-        startRecording,     // <-- Added
-        stopRecording,      // <-- Added
-        toggleScreenShare,  // <-- Added
-        isRecording,        // <-- Added (boolean: true if recording is active)
-        localScreenShareOn, // <-- Added (boolean: true if the local user is screen sharing)
-        micOn,              // Added for visual feedback
-        webcamOn            // Added for visual feedback
-        }= useMeeting()
+function MeetingControls({ role, toggleMic, toggleWebcam, leave, micOn, webcamOn, endMeeting, startRecording, stopRecording, toggleScreenShare, isRecording, localScreenShareOn }) {
+    // All functions (toggleMic, toggleWebcam, leave, etc.) are received as props
+    // from MeetingView, which gets them from the actual useMeeting hook.
+    // No need to call useMeeting() directly in this component.
 
-    
-    return <>
+    const handleStartRecording = () => {
+        console.log("Attempting to start recording.");
+        startRecording();
+    };
 
-        <div style={{
-            marginTop: '20px',
-            padding: '15px',
-            backgroundColor: '#e9ecef',
-            borderRadius: '10px',
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '10px',
-            justifyContent: 'center'
+    const handleStopRecording = () => {
+        console.log("Attempting to stop recording.");
+        stopRecording();
+    };
+
+    const handleEndMeeting = () => {
+        console.log("Attempting to end meeting for all.");
+        endMeeting();
+    };
+
+    return (
+        <>
+            <div style={{
+                marginTop: '20px',
+                padding: '15px',
+                backgroundColor: '#e9ecef',
+                borderRadius: '10px',
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '10px',
+                justifyContent: 'center',
+                fontFamily: 'Inter, sans-serif'
             }}>
-            <button
-                onClick={() => toggleMic()}
-                style={{ padding: '10px 20px', fontSize: '1em', cursor: 'pointer', borderRadius: '5px', border: '1px solid #6c757d', backgroundColor: micOn ? '#28a745' : '#6c757d', color: 'white' }}
-            >
-                {micOn ? "Mic On" : "Mic Off"}
-            </button>
-            <button
-                onClick={() => toggleWebcam()}
-                style={{ padding: '10px 20px', fontSize: '1em', cursor: 'pointer', borderRadius: '5px', border: '1px solid #6c757d', backgroundColor: webcamOn ? '#28a745' : '#6c757d', color: 'white' }}
-            >
-                {webcamOn ? "Webcam On" : "Webcam Off"}
-            </button>
-            <button
-                onClick={() => leave()}
-                style={{ padding: '10px 20px', fontSize: '1em', cursor: 'pointer', borderRadius: '5px', border: '1px solid #dc3545', backgroundColor: '#dc3545', color: 'white' }}
-            >
-                Leave Meeting
-            </button>
-
-            {/* Screen Share Button */}
-            {/* Any participant can initiate screen share by default */}
-            <button
-                onClick={() => toggleScreenShare()}
-                style={{ padding: '10px 20px', fontSize: '1em', cursor: 'pointer', borderRadius: '5px', border: '1px solid #28a745', backgroundColor: localScreenShareOn ? '#ffc107' : '#28a745', color: 'white' }}
-            >
-                {localScreenShareOn ? "Stop Screen Share" : "Start Screen Share"}
-            </button>
-
-
-            {/* Recording Controls (Teacher-specific) */}
-            {role === 'teacher' && (
-                <>
-                {isRecording ? (
-                    <button
-                    onClick={() => {
-                        if (window.confirm("Are you sure you want to stop recording?")) {
-                        stopRecording();
-                        }
+                <button
+                    onClick={toggleMic}
+                    style={{
+                        backgroundColor: micOn ? '#28a745' : '#6c757d', // Green for on, gray for off
+                        color: 'white',
+                        padding: '10px 15px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontWeight: '500',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                        transition: 'background-color 0.3s ease'
                     }}
-                    style={{ padding: '10px 20px', fontSize: '1em', cursor: 'pointer', borderRadius: '5px', border: '1px solid #007bff', backgroundColor: '#dc3545', color: 'white' }}
-                    >
-                    Stop Recording
-                    </button>
-                ) : (
-                    <button
-                    onClick={() => {
-                        if (window.confirm("Are you sure you want to start recording?")) {
-                        startRecording();
-                        }
+                >
+                    Mic {micOn ? 'On' : 'Off'}
+                </button>
+                <button
+                    onClick={toggleWebcam}
+                    style={{
+                        backgroundColor: webcamOn ? '#28a745' : '#6c757d', // Green for on, gray for off
+                        color: 'white',
+                        padding: '10px 15px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontWeight: '500',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                        transition: 'background-color 0.3s ease'
                     }}
-                    style={{ padding: '10px 20px', fontSize: '1em', cursor: 'pointer', borderRadius: '5px', border: '1px solid #007bff', backgroundColor: '#007bff', color: 'white' }}
+                >
+                    Webcam {webcamOn ? 'On' : 'Off'}
+                </button>
+                <button
+                    onClick={leave}
+                    style={{
+                        backgroundColor: '#dc3545', // Red for leave
+                        color: 'white',
+                        padding: '10px 15px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontWeight: '500',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                        transition: 'background-color 0.3s ease'
+                    }}
+                >
+                    Leave Meeting
+                </button>
+
+                {/* Screen Share Button */}
+                <button
+                    onClick={toggleScreenShare}
+                    style={{
+                        padding: '10px 20px',
+                        fontSize: '1em',
+                        cursor: 'pointer',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: localScreenShareOn ? '#ffc107' : '#007bff', // Orange when sharing, blue otherwise
+                        color: localScreenShareOn ? '#343a40' : 'white',
+                        fontWeight: '500',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                        transition: 'background-color 0.3s ease'
+                    }}
+                >
+                    {localScreenShareOn ? "Stop Screen Share" : "Start Screen Share"}
+                </button>
+
+                {/* Recording Controls (Teacher-specific) */}
+                {role === 'teacher' && (
+                    <>
+                        {isRecording ? (
+                            <button
+                                onClick={handleStopRecording}
+                                style={{
+                                    padding: '10px 20px',
+                                    fontSize: '1em',
+                                    cursor: 'pointer',
+                                    borderRadius: '8px',
+                                    border: 'none',
+                                    backgroundColor: '#dc3545', // Red for stop recording
+                                    color: 'white',
+                                    fontWeight: '500',
+                                    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                                    transition: 'background-color 0.3s ease'
+                                }}
+                            >
+                                Stop Recording
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handleStartRecording}
+                                style={{
+                                    padding: '10px 20px',
+                                    fontSize: '1em',
+                                    cursor: 'pointer',
+                                    borderRadius: '8px',
+                                    border: 'none',
+                                    backgroundColor: '#007bff', // Blue for start recording
+                                    color: 'white',
+                                    fontWeight: '500',
+                                    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                                    transition: 'background-color 0.3s ease'
+                                }}
+                            >
+                                Start Recording
+                            </button>
+                        )}
+                    </>
+                )}
+
+                {/* Teacher-specific: End Meeting for All */}
+                {role === 'teacher' && (
+                    <button
+                        onClick={handleEndMeeting}
+                        style={{
+                            padding: '10px 20px',
+                            fontSize: '1em',
+                            cursor: 'pointer',
+                            borderRadius: '8px',
+                            border: 'none',
+                            backgroundColor: '#ffc107', // Orange for end meeting
+                            color: '#343a40',
+                            fontWeight: '500',
+                            boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                            transition: 'background-color 0.3s ease'
+                        }}
                     >
-                    Start Recording
+                        End Meeting for All
                     </button>
                 )}
-                </>
-            )}
-
-            {/* Teacher-specific: End Meeting for All */}
-            {role === 'teacher' && (
-                <button
-                onClick={() => {
-                    if (window.confirm("Are you sure you want to end the meeting for all participants?")) {
-                    endMeeting();
-                    }
-                }}
-                style={{ padding: '10px 20px', fontSize: '1em', cursor: 'pointer', borderRadius: '5px', border: '1px solid #ffc107', backgroundColor: '#ffc107', color: 'black' }}
-                >
-                End Meeting for All
-                </button>
-            )}
-        </div>
-
-    </>
+            </div>
+        </>
+    );
 }
 
-export default MeetingControls
+export default MeetingControls;

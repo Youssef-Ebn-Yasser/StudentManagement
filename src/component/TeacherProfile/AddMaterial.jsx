@@ -2,14 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { courseService } from '../../services/courseService';
 import { toast } from 'react-toastify';
 import Loader from '../Loader/Loader';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FaBook, FaFileUpload, FaCheck, FaTimes, FaClipboardList, FaHeading, FaAlignLeft, FaFileAlt } from 'react-icons/fa';
 import "./CreateCourse.css";
+import { useSelector } from 'react-redux';
+import axios from 'axios';
 
-const AddMaterial = ({ teacherId }) => {
+const AddMaterial = () => {
   const navigate = useNavigate();
+  const { courseId, lessonId } = useParams();
+  const { user } = useSelector((state) => state.auth);
+  const teacherId = user?.id;
+  const [courses, setCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState(courseId || '');
+  const [selectedLesson, setSelectedLesson] = useState(lessonId || '');
   const [lessons, setLessons] = useState([]);
-  const [selectedLesson, setSelectedLesson] = useState('');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [data, setData] = useState(null);
@@ -17,13 +24,43 @@ const AddMaterial = ({ teacherId }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Fetch teacher's courses
   useEffect(() => {
-    const fetchLessons = async () => {
+    const fetchCourses = async () => {
       try {
         setLoading(true);
-        const response = await courseService.getAllLessons();
+        if (!teacherId) {
+          throw new Error('Teacher ID is required');
+        }
+        const response = await courseService.getTeacherCourses(teacherId);
         if (response.succeeded) {
-          setLessons(response.data);
+          setCourses(response.data || []);
+        } else {
+          throw new Error(response.messages?.[0] || 'Failed to load courses');
+        }
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+        setError(error.message || 'Failed to load courses');
+        toast.error(error.message || 'Failed to load courses');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, [teacherId]);
+
+  // Fetch lessons when course is selected
+  useEffect(() => {
+    const fetchLessons = async () => {
+      if (!selectedCourse) return;
+      
+      try {
+        setLoading(true);
+        const response = await courseService.getCourseDetails(selectedCourse);
+        if (response.succeeded) {
+          const courseLessons = response.data.lessons || response.data.lessonInfo || [];
+          setLessons(courseLessons);
         } else {
           throw new Error(response.messages?.[0] || 'Failed to load lessons');
         }
@@ -37,11 +74,16 @@ const AddMaterial = ({ teacherId }) => {
     };
 
     fetchLessons();
-  }, []);
+  }, [selectedCourse]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    if (!selectedCourse) {
+      toast.error('Please select a course');
+      return;
+    }
+
     if (!selectedLesson) {
       toast.error('Please select a lesson');
       return;
@@ -64,32 +106,66 @@ const AddMaterial = ({ teacherId }) => {
 
     try {
       setLoading(true);
-      const materialData = {
-        title: title.trim(),
-        content: content.trim(),
-        lessonId: parseInt(selectedLesson),
-        data: data,
-        type: type
-      };
+      const formData = new FormData();
+      formData.append('Title', title.trim());
+      formData.append('Content', content.trim());
+      formData.append('LessonId', selectedLesson);
+      formData.append('Data', data);
+      formData.append('Type', type);
 
-      const response = await courseService.uploadLessonMaterial(materialData);
+      console.log('Sending material data:', {
+        Title: title.trim(),
+        Content: content.trim(),
+        LessonId: selectedLesson,
+        Type: type,
+        FileName: data.name
+      });
+
+      const response = await axios.post(
+        'https://e-learn-v1.runasp.net/api/Material/CreateMaterial/CreateMaterial',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          }
+        }
+      );
+
+      console.log('Upload response:', response);
       
-      if (response.succeeded) {
-        toast.success('Material uploaded successfully');
+      if (response.data.succeeded) {
+        toast.success('Material uploaded successfully!', {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        
+        setError(null);
+        
         // Reset form
         setTitle('');
         setContent('');
         setData(null);
-        setSelectedLesson('');
-        setType(1);
-        // Navigate back to course details
-        navigate(-1);
+        
+        // Wait for 2 seconds to show the success message before navigating
+        setTimeout(() => {
+          // Navigate back to course details
+          navigate(`/teacher/course/${selectedCourse}`);
+        }, 2000);
       } else {
-        throw new Error(response.messages?.[0] || 'Failed to upload material');
+        throw new Error(response.data.messages?.[0] || 'Failed to upload material');
       }
     } catch (error) {
       console.error('Error uploading material:', error);
-      toast.error(error.message || 'Failed to upload material');
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        toast.error('Upload timed out. Please try again with a smaller file or check your internet connection.');
+      } else {
+        toast.error(error.response?.data?.message || error.message || 'Failed to upload material');
+      }
     } finally {
       setLoading(false);
     }
@@ -98,6 +174,13 @@ const AddMaterial = ({ teacherId }) => {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
+      // Check file size (e.g., 10MB limit)
+      const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+      if (selectedFile.size > maxSize) {
+        toast.error('File size exceeds 10MB limit. Please choose a smaller file.');
+        e.target.value = ''; // Clear the file input
+        return;
+      }
       setData(selectedFile);
     }
   };
@@ -117,9 +200,43 @@ const AddMaterial = ({ teacherId }) => {
       <div className="w-full min-h-screen bg-white p-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Upload Course Material</h1>
+          <button
+            onClick={() => navigate(`/teacher/course/${selectedCourse}`)}
+            className="text-gray-600 hover:text-gray-900"
+          >
+            Back to Course
+          </button>
         </div>
         
+        {error && (
+          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="form-group">
+            <label htmlFor="course" className="form-label">Select Course</label>
+            <select
+              id="course"
+              value={selectedCourse}
+              onChange={(e) => {
+                console.log('Selected course:', e.target.value);
+                setSelectedCourse(e.target.value);
+                setSelectedLesson(''); // Reset lesson selection when course changes
+              }}
+              className="form-select block w-full px-4 py-3 text-base text-gray-800 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition-all duration-200 appearance-none hover:border-[var(--primary-dark)] cursor-pointer"
+              required
+            >
+              <option value="">Select a course</option>
+              {courses.map((course) => (
+                <option key={course.id} value={course.id}>
+                  {course.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="form-group">
             <label htmlFor="lesson" className="form-label">Select Lesson</label>
             <select
@@ -139,91 +256,72 @@ const AddMaterial = ({ teacherId }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="title" className="form-label">Title</label>
-            <div className="relative">
-              <input
-                type="text"
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="form-input pl-10"
-                placeholder="Enter material title"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="content" className="form-label">Content</label>
-            <textarea
-              id="content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={4}
-              className="form-textarea pl-10"
-              placeholder="Enter material content"
+            <label htmlFor="title" className="form-label">Material Title</label>
+            <input
+              type="text"
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="form-input block w-full px-4 py-3 text-base text-gray-800 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition-all duration-200"
+              placeholder="Enter material title"
               required
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="data" className="form-label">File</label>
-            <div className="file-input-container group">
-              <input
-                type="file"
-                id="data"
-                onChange={handleFileChange}
-                className="file-input"
-                required
-              />
-              <div className="file-input-label group-hover:bg-blue-50 transition-colors duration-200">
-                <span className="text-gray-700">{data ? data.name : 'Choose a file'}</span>
-              </div>
-            </div>
+            <label htmlFor="content" className="form-label">Material Content</label>
+            <textarea
+              id="content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="form-textarea block w-full px-4 py-3 text-base text-gray-800 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition-all duration-200"
+              placeholder="Enter material content"
+              rows="4"
+              required
+            />
           </div>
 
           <div className="form-group">
-            <label className="form-label">Material Type</label>
-            <div className="flex items-center space-x-4">
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  value={1}
-                  checked={type === 1}
-                  onChange={(e) => setType(parseInt(e.target.value))}
-                  className="form-radio"
-                />
-                <span className="ml-2">Regular Material</span>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  value={2}
-                  checked={type === 2}
-                  onChange={(e) => setType(parseInt(e.target.value))}
-                  className="form-radio"
-                />
-                <span className="ml-2">Assignment</span>
-              </label>
-            </div>
+            <label htmlFor="type" className="form-label">Material Type</label>
+            <select
+              id="type"
+              value={type}
+              onChange={(e) => setType(parseInt(e.target.value))}
+              className="form-select block w-full px-4 py-3 text-base text-gray-800 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition-all duration-200 appearance-none hover:border-[var(--primary-dark)] cursor-pointer"
+            >
+              <option value={1}>Regular Material</option>
+              <option value={2}>Assignment</option>
+            </select>
           </div>
 
-          <div className="form-actions pt-4">
+          <div className="form-group">
+            <label htmlFor="file" className="form-label">Upload File</label>
+            <input
+              type="file"
+              id="file"
+              onChange={handleFileChange}
+              className="form-input block w-full px-4 py-3 text-base text-gray-800 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition-all duration-200"
+              required
+            />
+            <p className="mt-1 text-sm text-gray-500">Maximum file size: 10MB</p>
+          </div>
+
+          <div className="flex justify-end">
             <button
               type="submit"
+              className="bg-[var(--primary-color)] text-white px-6 py-3 rounded-lg hover:bg-[var(--primary-dark)] transition-colors duration-200 flex items-center gap-2"
               disabled={loading}
-              className="ml-auto flex items-center py-2 px-6 rounded-lg font-bold text-white bg-gradient-to-r from-[var(--primary-dark)] to-[var(--primary-color)] shadow-md hover:opacity-90 hover:shadow-lg transition-all duration-200 ease-in-out disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loading ? (
-                <div className="flex items-center">
-                  <Loader className="w-5 h-5 mr-2" />
+                <>
+                  <Loader />
                   Uploading...
-                </div>
+                </>
               ) : (
-                <div className="flex items-center">
-                  <FaCheck className="mr-2 group-hover:scale-110 transition-transform duration-200" />
+                <>
+                  <FaFileUpload />
                   Upload Material
-                </div>
+                </>
               )}
             </button>
           </div>

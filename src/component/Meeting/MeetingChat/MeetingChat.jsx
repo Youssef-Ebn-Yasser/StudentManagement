@@ -1,119 +1,122 @@
-//│   ├── MeetingChat.jsx               // Handles the chat input and message display
-//This component will provide the text-based communication within your meeting. Participants will be able to type comments and see messages sent by others.
+// src/components/MeetingChat/MeetingChat.jsx
+import React, { useEffect, useRef, useState } from 'react';
 
-
-import { useMeeting } from '@videosdk.live/react-sdk';
-import React, { useEffect, useRef, useState } from 'react'
-
-function MeetingChat() {
-
+function MeetingChat({ messages: receivedMessages, publish }) {
     const [currentMessage, setCurrentMessage] = useState('');
-    // The 'messages' array from useMeeting contains all data messages received on the meeting.
-    //  // By default, it will include messages sent via `publish('CHAT', ...)`
-    const { publish, messages: receivedMessages } = useMeeting(); // 'publish' sends messages, 'messages' array holds received ones.
+    const chatContainerRef = useRef(null);
 
-    const chatContainerRef = useRef(null); //// Ref to scroll chat to bottom
-
-     // Effect to scroll to the bottom of the chat when new messages send
-     useEffect(()=>{
-        if(chatContainerRef.current){
-            chatContainerRef.current.scrollTop= chatContainerRef.current.scrollHeight;
+    // Effect to scroll to the bottom of the chat when new messages arrive
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
-     },[receivedMessages]) // Trigger when receivedMessages array changes
+    }, [receivedMessages]); // Trigger when receivedMessages array changes
 
-     const sendMessage=()=>{
-        if( currentMessage.trim()){
-            // 'publish' method sends a data message to all participants in the meeting.
-            // "CHAT" is a custom topic name you define.
-            // The second argument is the message content.
-            // { persist: true } ensures the message is available to participants who join later.
-            publish("CHAT", currentMessage,{persist:true})
+    const sendMessage = () => {
+        if (currentMessage.trim()) {
+            publish("CHAT", currentMessage, { persist: true });
             setCurrentMessage('');
         }
-     }
+    };
 
-    const handleKeyPress = (e)=>{
-        if(e.key==="Enter"){
+    const handleKeyPress = (e) => {
+        if (e.key === "Enter") {
             sendMessage();
         }
-    }
+    };
 
-    return <>
+    return (
+        <>
             <div style={{
                 marginTop: '20px',
                 width: '100%',
-                maxWidth: '400px', // Limit chat width
-                border: '1px solid #ccc',
-                borderRadius: '8px',
-                padding: '15px',
-                backgroundColor: '#fff',
-                boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
+                maxWidth: '450px', // Slightly wider chat
+                border: '1px solid #e0e0e0', // Lighter border
+                borderRadius: '12px', // More rounded
+                padding: '20px',
+                backgroundColor: '#ffffff', // White background
+                boxShadow: '0 4px 15px rgba(0,0,0,0.08)', // Subtle shadow
                 display: 'flex',
                 flexDirection: 'column',
-                boxSizing: 'border-box' // Include padding in width calculation
-                }}>
-                <h4 style={{ margin: '0 0 10px', color: '#333' }}>Meeting Chat</h4>
+                boxSizing: 'border-box',
+                fontFamily: 'Inter, sans-serif'
+            }}>
+                <h4 style={{ margin: '0 0 15px', color: '#202124', fontSize: '1.4em', fontWeight: '600' }}>Meeting Chat</h4>
                 <div
                     ref={chatContainerRef}
                     style={{
-                    height: '250px', // Fixed height for chat messages
-                    overflowY: 'auto', // Enable vertical scrolling
-                    border: '1px solid #eee',
-                    borderRadius: '5px',
-                    padding: '10px',
-                    backgroundColor: '#f9f9f9',
-                    marginBottom: '10px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '8px'
+                        height: '300px', // Taller chat window
+                        overflowY: 'auto', // Enable vertical scrolling
+                        border: '1px solid #f0f0f0', // Very light border
+                        borderRadius: '8px',
+                        padding: '15px',
+                        backgroundColor: '#f8fafd', // Very light blue background
+                        marginBottom: '15px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '10px'
                     }}
                 >
-                    {/* Map over the received messages and display them */}
                     {receivedMessages.map((msg, index) => {
-                    // Each message object has 'senderName', 'message', 'id', 'timestamp'
-                    return (
-                        <div key={index} style={{
-                        backgroundColor: '#e6f7ff',
-                        padding: '8px 12px',
-                        borderRadius: '5px',
-                        wordBreak: 'break-word' // Handle long words
-                        }}>
-                        <strong style={{ color: '#0056b3' }}>{msg.senderName || "Unknown"}:</strong> {msg.message}
-                        </div>
-                    );
+                        const senderName = msg.senderName;
+                        const messageContent = msg.message;
+                        const messageType = msg.type;
+
+                        if (messageType === 'CHAT' && messageContent) {
+                            return (
+                                <div key={index} style={{
+                                    backgroundColor: '#e8f0fe', // Light blue for messages
+                                    padding: '10px 15px',
+                                    borderRadius: '8px',
+                                    wordBreak: 'break-word', // Handle long words
+                                    fontSize: '0.95em',
+                                    color: '#3c4043',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                                }}>
+                                    <strong style={{ color: '#1a73e8' }}>{senderName || "Unknown"}:</strong> {messageContent}
+                                </div>
+                            );
+                        }
+                        return null;
                     })}
                 </div>
-                <div style={{ display: 'flex', gap: '5px' }}>
+                <div style={{ display: 'flex', gap: '10px' }}>
                     <input
-                    type="text"
-                    value={currentMessage}
-                    onChange={(e) => setCurrentMessage(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Type your comment..."
-                    style={{
-                        flexGrow: 1, // Allow input to take available space
-                        padding: '10px',
-                        fontSize: '1em',
-                        border: '1px solid #ddd',
-                        borderRadius: '5px'
-                    }}
+                        type="text"
+                        value={currentMessage}
+                        onChange={(e) => setCurrentMessage(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="Type your message..."
+                        style={{
+                            flexGrow: 1, // Allow input to take available space
+                            padding: '12px 15px',
+                            fontSize: '1em',
+                            border: '1px solid #dadce0',
+                            borderRadius: '8px',
+                            outline: 'none',
+                            boxSizing: 'border-box',
+                            transition: 'border-color 0.3s ease, box-shadow 0.3s ease'
+                        }}
                     />
                     <button
-                    onClick={sendMessage}
-                    style={{
-                        padding: '10px 15px',
-                        fontSize: '1em',
-                        cursor: 'pointer',
-                        borderRadius: '5px',
-                        border: 'none',
-                        backgroundColor: '#007bff',
-                        color: 'white'
-                    }}
+                        onClick={sendMessage}
+                        style={{
+                            padding: '12px 20px',
+                            fontSize: '1em',
+                            cursor: 'pointer',
+                            borderRadius: '8px',
+                            border: 'none',
+                            backgroundColor: '#4285f4', // Google Blue
+                            color: 'white',
+                            boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                            transition: 'background-color 0.3s ease'
+                        }}
                     >
-                    Send
+                        Send
                     </button>
                 </div>
             </div>
-    </>
+        </>
+    );
 }
-export default MeetingChat
+export default MeetingChat;
