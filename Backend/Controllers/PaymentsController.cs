@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Backend.Settings;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Stripe;
 using Stripe.Checkout;
-using Backend.Settings;
-using Microsoft.Extensions.Options;
 
 namespace Backend.Controllers;
 
@@ -12,17 +12,19 @@ public class PaymentsController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly StripeSettings _stripeSettings;
+    private readonly IConfiguration _config;
 
-    public PaymentsController(IUnitOfWork unitOfWork, IOptions<StripeSettings> stripeSettings)
+    public PaymentsController(IUnitOfWork unitOfWork, IOptions<StripeSettings> stripeSettings, IConfiguration config)
     {
         _unitOfWork = unitOfWork;
         _stripeSettings = stripeSettings?.Value ?? throw new ArgumentNullException(nameof(stripeSettings));
-        
+
         // Set the API key
         if (string.IsNullOrEmpty(_stripeSettings.SecretKey))
             throw new InvalidOperationException("Stripe SecretKey is not configured");
-            
+
         StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
+        _config = config;
     }
 
     [HttpPost("create-payment-intent")]
@@ -103,17 +105,17 @@ public class PaymentsController : ControllerBase
             if (stripeEvent.Type == EventTypes.CheckoutSessionCompleted)
             {
                 var session = stripeEvent.Data.Object as Session;
-                
+
                 if (session == null)
                 {
                     return BadRequest(new { error = "Invalid session data" });
                 }
 
                 // Extract metadata from the session
-                if (!session.Metadata.ContainsKey("amount") || 
-                    !session.Metadata.ContainsKey("paymentDate") || 
-                    !session.Metadata.ContainsKey("currency") || 
-                    !session.Metadata.ContainsKey("studentId") || 
+                if (!session.Metadata.ContainsKey("amount") ||
+                    !session.Metadata.ContainsKey("paymentDate") ||
+                    !session.Metadata.ContainsKey("currency") ||
+                    !session.Metadata.ContainsKey("studentId") ||
                     !session.Metadata.ContainsKey("courseId"))
                 {
                     return BadRequest(new { error = "Missing required metadata in session" });

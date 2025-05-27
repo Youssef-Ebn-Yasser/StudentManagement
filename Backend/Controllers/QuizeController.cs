@@ -66,7 +66,7 @@ public class QuizeController : ControllerBase
             return NotFound("Quiz not found for the given lesson.");
 
         // Check if quiz has started
-        if (quiz.StartsAt > DateTime.UtcNow)
+        if (quiz.StartsAt > DateTime.Now)
             return NotFound("Quiz has not started yet.");
 
 
@@ -76,6 +76,7 @@ public class QuizeController : ControllerBase
             .GetTableNoTracking()
             .Include(q => q.questions)!
                 .ThenInclude(q => q.Options)
+                 .Where(q => q.LessonId == lessonId)
             .ToListAsync(); // Force EF to fetch all data first (move to memory)
 
         var mapped = quizeDtos.Select(quiz => new GetQuizeDto
