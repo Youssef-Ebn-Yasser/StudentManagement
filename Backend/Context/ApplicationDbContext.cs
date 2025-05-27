@@ -1,3 +1,4 @@
+using Backend.Entities.QuizeEntities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Backend.Context;
@@ -20,6 +21,12 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
     public DbSet<StudentCourse> studentCourses { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Category> Categories { get; set; }
+    public DbSet<Quiz> Quizzes { get; set; }
+    public DbSet<Question> Questions { get; set; }
+    public DbSet<StudentQuizeAnswer> studentQuizeAnswers { get; set; }
+    public DbSet<QuestionOption> QuestionOptions { get; set; }
+
+
 
 
 

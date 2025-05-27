@@ -1,4 +1,6 @@
-﻿namespace Backend.Entities;
+﻿using Backend.Entities.QuizeEntities;
+
+namespace Backend.Entities;
 
 public class Lesson : BaseEntity
 {
@@ -9,5 +11,5 @@ public class Lesson : BaseEntity
     public int? CourseId { get; set; }
     [ForeignKey("CourseId")]
     public Course? Course { get; set; }
-    
+    public Quiz Quiz { get; set; }
 }
