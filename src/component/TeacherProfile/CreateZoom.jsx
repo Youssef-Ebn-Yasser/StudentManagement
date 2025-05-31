@@ -720,6 +720,10 @@ function CreateZoom() {
           </div>
         )}
       </div>
+      <br />
+      <br />
+      <br />
+      <br />
     </div>
   );
 }
