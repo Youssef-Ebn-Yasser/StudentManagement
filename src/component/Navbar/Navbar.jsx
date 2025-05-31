@@ -71,9 +71,9 @@ function Navbar() {
                         )}
                         {isLoggedIn && userRole === 'Teacher' && (
                           <>
+                            <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
                             <li><NavLink to="/teacher/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>My Courses</NavLink></li>
                             <li><NavLink to="/video-call" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Meeting</NavLink></li>
-                            <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
 
                           </>
                         )}
