@@ -35,7 +35,6 @@ function AdminDashboard() {
 
             } catch (error) {
                 console.error("Failed to dispatch actions:", error);
-                toast.error('Failed to load dashboard data.');
             }},[dispatch])
            
     

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { courseService } from '../../services/courseService';
-import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook, FaTrash, FaEdit, FaChartLine, FaCalendarAlt, FaTag, FaFileAlt } from 'react-icons/fa';
+import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook, FaClipboardList, FaTrash, FaEdit, FaChartLine, FaCalendarAlt, FaTag, FaFileAlt, FaVideo } from 'react-icons/fa';
 import Loader from '../Loader/Loader';
 import { toast } from 'react-toastify';
 import axios from 'axios';
@@ -19,40 +19,29 @@ const TeacherCourseDetails = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [materialFile, setMaterialFile] = useState(null);
 
-  // Debug log for id param
-  console.log('Course ID from params:', id);
-
   useEffect(() => {
-    console.log('useEffect running, id:', id);
     const fetchCourseDetails = async () => {
       try {
         setLoading(true);
         const response = await courseService.getCourseDetails(id);
-        console.log('Response from getCourseDetails:', response);
         if (response.succeeded) {
           setCourse(response.data);
           const courseLessons = response.data.lessons || response.data.lessonInfo || [];
-          
-          // Fetch materials for each lesson
-          const materialsPromises = courseLessons.map(lesson => 
+          const materialsPromises = courseLessons.map(lesson =>
             axios.get(`https://e-learn-v1.runasp.net/api/Material/GetMaterialsByLessonId/GetMaterialsByLessonId/${lesson.id}`)
           );
-          
           const materialsResponses = await Promise.all(materialsPromises);
           const materialsMap = {};
-          
           materialsResponses.forEach((response, index) => {
             if (response.data.succeeded) {
               materialsMap[courseLessons[index].id] = response.data.data || [];
             }
           });
-          
           setLessonMaterials(materialsMap);
         } else {
           throw new Error(response.messages?.[0] || 'Failed to load course details');
         }
       } catch (error) {
-        console.error('Error fetching course details:', error);
         setError(error.message || 'Failed to load course details');
         toast.error(error.message || 'Failed to load course details');
       } finally {
@@ -82,30 +71,20 @@ const TeacherCourseDetails = () => {
     `)) {
       try {
         setIsDeleting(true);
-        console.log('Starting course deletion for ID:', id);
         const response = await courseService.deleteCourse(id);
-        console.log('Delete response:', response);
-        
         if (response?.succeeded) {
           toast.success('Course and all associated content deleted successfully');
-          navigate('/teacher/courses'); // Navigate back to courses list
+          navigate('/teacher/courses');
         } else {
           throw new Error(response?.message || 'Failed to delete course');
         }
       } catch (err) {
-        console.error('Error deleting course:', {
-          error: err,
-          response: err.response,
-          message: err.message
-        });
-        
         let errorMessage = 'Failed to delete course';
         if (err.response?.data?.message) {
           errorMessage = err.response.data.message;
         } else if (err.message) {
           errorMessage = err.message;
         }
-        
         toast.error(errorMessage);
       } finally {
         setIsDeleting(false);
@@ -127,7 +106,6 @@ const TeacherCourseDetails = () => {
           throw new Error(response.messages?.[0] || 'Failed to delete lesson');
         }
       } catch (error) {
-        console.error('Error deleting lesson:', error);
         toast.error(error.message || 'Failed to delete lesson');
       }
     }
@@ -137,9 +115,7 @@ const TeacherCourseDetails = () => {
     if (window.confirm('Are you sure you want to delete this material?')) {
       try {
         const response = await axios.delete(`https://e-learn-v1.runasp.net/api/Material/DeleteMaterial/DeleteMaterial/${materialId}`);
-        
         if (response.data.succeeded) {
-          // Update the materials state by removing the deleted material
           setLessonMaterials(prevMaterials => {
             const updatedMaterials = { ...prevMaterials };
             Object.keys(updatedMaterials).forEach(lessonId => {
@@ -149,13 +125,11 @@ const TeacherCourseDetails = () => {
             });
             return updatedMaterials;
           });
-          
           toast.success('Material deleted successfully');
         } else {
           throw new Error(response.data.messages?.[0] || 'Failed to delete material');
         }
       } catch (error) {
-        console.error('Error deleting material:', error);
         toast.error(error.response?.data?.message || error.message || 'Failed to delete material');
       }
     }
@@ -164,20 +138,15 @@ const TeacherCourseDetails = () => {
   const handleUpdateMaterial = async (materialId, updatedData) => {
     try {
       setIsUpdating(true);
-      
-      // Create FormData to handle file upload
       const formData = new FormData();
       formData.append('Id', materialId);
       formData.append('Title', updatedData.title);
       formData.append('Content', updatedData.content);
       formData.append('LessonId', updatedData.lessonId);
       formData.append('Type', updatedData.type || 1);
-      
-      // Only append file if a new one is selected
       if (materialFile) {
         formData.append('Data', materialFile);
       }
-
       const response = await axios.put(
         'https://e-learn-v1.runasp.net/api/Material/UpdateMaterial/UpdateMaterial',
         formData,
@@ -187,19 +156,16 @@ const TeacherCourseDetails = () => {
           }
         }
       );
-
       if (response.data.succeeded) {
-        // Update the materials state with the updated material
         setLessonMaterials(prevMaterials => {
           const updatedMaterials = { ...prevMaterials };
           Object.keys(updatedMaterials).forEach(lessonId => {
-            updatedMaterials[lessonId] = updatedMaterials[lessonId].map(material => 
+            updatedMaterials[lessonId] = updatedMaterials[lessonId].map(material =>
               material.id === materialId ? { ...material, ...updatedData } : material
             );
           });
           return updatedMaterials;
         });
-
         toast.success('Material updated successfully');
         setEditingMaterial(null);
         setMaterialFile(null);
@@ -207,7 +173,6 @@ const TeacherCourseDetails = () => {
         throw new Error(response.data.messages?.[0] || 'Failed to update material');
       }
     } catch (error) {
-      console.error('Error updating material:', error);
       toast.error(error.response?.data?.message || error.message || 'Failed to update material');
     } finally {
       setIsUpdating(false);
@@ -222,7 +187,6 @@ const TeacherCourseDetails = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     if (!editingMaterial) return;
-
     const updatedData = {
       id: editingMaterial.id,
       title: editingMaterial.title,
@@ -230,7 +194,6 @@ const TeacherCourseDetails = () => {
       lessonId: editingMaterial.lessonId,
       type: editingMaterial.type || 1
     };
-
     await handleUpdateMaterial(editingMaterial.id, updatedData);
   };
 
@@ -245,7 +208,7 @@ const TeacherCourseDetails = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="scale-[2.5]">
-        <Loader />
+          <Loader />
         </div>
       </div>
     );
@@ -256,7 +219,7 @@ const TeacherCourseDetails = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-500 text-xl mb-4">{error}</p>
-          <button 
+          <button
             onClick={() => navigate(-1)}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
@@ -272,7 +235,7 @@ const TeacherCourseDetails = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-600 text-xl mb-4">Course not found</p>
-          <button 
+          <button
             onClick={() => navigate(-1)}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
@@ -286,8 +249,8 @@ const TeacherCourseDetails = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back Button */}
-        <div className="mb-6">
+        {/* Back Button and Create Zoom Meeting Button */}
+        <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <button
             onClick={() => navigate('/teacher/courses')}
             className="flex items-center text-gray-600 hover:text-gray-900 transition-colors duration-200"
@@ -297,6 +260,21 @@ const TeacherCourseDetails = () => {
             </svg>
             Back to Courses
           </button>
+          <div className="flex flex-col md:flex-row gap-2">
+            <Link
+              to={`/teacher/create-zoom/${course.id}`}
+              className="inline-block bg-indigo-600 text-white px-6 py-2 rounded-lg shadow hover:bg-indigo-700 transition font-semibold"
+            >
+              Create Zoom Meeting
+            </Link>
+            <Link
+              to={`/teacher/course/${course.id}/meetings`}
+              className="inline-flex items-center bg-purple-600 text-white px-6 py-2 rounded-lg shadow hover:bg-purple-700 transition font-semibold"
+            >
+              <FaVideo className="mr-2 text-lg" />
+              View Zoom Meetings
+            </Link>
+          </div>
         </div>
 
         {/* Course Header */}
@@ -349,7 +327,6 @@ const TeacherCourseDetails = () => {
                 </div>
               </div>
               <p className="text-gray-600 mb-4">{course.description}</p>
-              
               {/* Course Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                
@@ -373,7 +350,6 @@ const TeacherCourseDetails = () => {
                   </div>
                 </div>
               </div>
-
               {/* Course Details */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div className="bg-gray-50 p-3 rounded-lg">
@@ -454,8 +430,8 @@ const TeacherCourseDetails = () => {
               {course.lessonInfo?.length > 0 ? (
                 <div className="space-y-6">
                   {course.lessonInfo.map((lesson, index) => (
-                    <div 
-                      key={lesson.id} 
+                    <div
+                      key={lesson.id}
                       className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200"
                     >
                       <div className="flex justify-between items-start">
@@ -477,7 +453,7 @@ const TeacherCourseDetails = () => {
                               {lesson.difficulty}
                             </div>
                           )}
-                          
+
                           {/* Materials Section */}
                           <div className="ml-11 mt-4">
                             <div className="flex items-center justify-between mb-3">
@@ -493,11 +469,11 @@ const TeacherCourseDetails = () => {
                                 Add Material
                               </button>
                             </div>
-                            
+
                             {lessonMaterials[lesson.id]?.length > 0 ? (
                               <div className="space-y-3">
                                 {lessonMaterials[lesson.id].map((material) => (
-                                  <div 
+                                  <div
                                     key={material.id}
                                     className="bg-gray-50 p-3 rounded-lg flex items-center justify-between"
                                   >

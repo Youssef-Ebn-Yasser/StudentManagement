@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loader from '../Loader/Loader';
+import { FaVideo } from 'react-icons/fa';
 
 export default function CourseDashDetails() {
   const { id } = useParams();
@@ -31,8 +32,6 @@ export default function CourseDashDetails() {
     fetchCourseDetails();
   }, [id]);
 
-
-  const price = course?.price || 49;
   const lessonsCount = course?.lessonInfo?.length || 0;
 
   // Helper to format date
@@ -126,6 +125,16 @@ export default function CourseDashDetails() {
                   </span>
                 </div>
               </div>
+              {/* View Meetings Button */}
+              <div className="mt-4">
+                <button
+                  onClick={() => navigate(`/studentdashboard/course/${course.id}/stmeetings`)}
+                  className="inline-flex items-center bg-purple-600 text-white px-6 py-2 rounded-lg shadow hover:bg-purple-700 transition font-semibold"
+                >
+                  <FaVideo className="mr-2 text-lg" />
+                  View Zoom Meetings
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -188,7 +197,7 @@ export default function CourseDashDetails() {
           </div>
         </div>
 
-              {/* Comments Section */}
+        {/* Comments Section */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Student Comments</h2>
           {course.commentInfo && course.commentInfo.length > 0 ? (

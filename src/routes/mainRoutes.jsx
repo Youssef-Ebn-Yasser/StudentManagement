@@ -34,6 +34,10 @@ import Quiz from '@/component/StudentDashboard/Quiz'
 import TeacherRequest from '@/component/Register/TeacherRequest'
 import TeacherDashboard from '@/component/TeacherDashboard/TeacherDashboard'
 import LessonDetails from '@/component/StudentDashboard/LessonDetails'
+import CreateZoom from '@/component/TeacherProfile/CreateZoom'
+import MeetingData from '@/component/TeacherProfile/MeetingData'
+import MeetingSdata from './../component/StudentDashboard/MeetingSdata';
+
 
 
 
@@ -116,6 +120,42 @@ const routesConfig = [
         element: <TeacherCourseDetails />,
         isProtected: false,
         accessRole: 'all',
+    },
+    {
+        path: 'teacher/create-zoom/:courseId',
+        element: <CreateZoom />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+    path: 'teacher/course/:courseId/meetings',
+    element: <MeetingData />,
+    isProtected: false,
+    accessRole: 'all',
+    },
+    {
+    path: 'studentdashboard/course/:courseId/stmeetings',
+    element: <MeetingSdata />,
+    isProtected: false,
+    accessRole: 'all',
+    },
+    {
+        path: 'teacher/create-zoom/:courseId',
+        element: <CreateZoom />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+    path: 'teacher/course/:courseId/meetings',
+    element: <MeetingData />,
+    isProtected: false,
+    accessRole: 'all',
+    },
+    {
+    path: 'studentdashboard/course/:courseId/stmeetings',
+    element: <MeetingSdata />,
+    isProtected: false,
+    accessRole: 'all',
     },
     {
         path: 'teacher/course/:courseId/lesson/new',
