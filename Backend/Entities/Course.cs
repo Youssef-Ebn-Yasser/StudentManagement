@@ -1,4 +1,6 @@
-﻿namespace Backend.Entities;
+﻿using Backend.Entities.Meetings;
+
+namespace Backend.Entities;
 
 public class Course : BaseEntity
 {
@@ -18,4 +20,6 @@ public class Course : BaseEntity
     public Category Category { get; set; }
     public bool? IsDeleted { get; set; } = false;
     public DateTime? CreatedAt { get; set; } = DateTime.Now;
+
+    public List<Meeting> Meetings { get; set; }
 }

@@ -1,72 +1,88 @@
-﻿//using System.Net.Http.Headers;
-//using System.Text.Json;
+﻿using Backend.DTOs.MeetingDTOs;
 
-//namespace Backend.Controllers;
+namespace Backend.Controllers;
 
-//public class ZoomController : ControllerBase
-//{
-//    private readonly IConfiguration _config;
-//    private readonly IHttpClientFactory _httpClientFactory;
+[ApiController]
+[Route("api/zoom")] // Base route (must be lowercase) to match my redirect Url
+public class ZoomController : AppControllerBase
+{
+    private readonly IMeetingService _meetService;
 
-//    public ZoomController(IConfiguration config, IHttpClientFactory httpClientFactory)
-//    {
-//        _config = config;
-//        _httpClientFactory = httpClientFactory;
-//    }
+    public ZoomController(IMeetingService meetService)
+    {
+        _meetService = meetService;
+    }
 
-//    [HttpGet("authorize")]
-//    public IActionResult Authorize()
-//    {
-//        var clientId = _config["Zoom:ClientId"];
-//        var redirectUri = _config["Zoom:RedirectUri"];
-//        var url = $"https://zoom.us/oauth/authorize?response_type=code&client_id={clientId}&redirect_uri={redirectUri}";
-//        return Redirect(url);
-//    }
+    [HttpGet("authorize")]
+    public IActionResult Authorize()
+    {
 
-//    [HttpGet("callback")]
-//    public async Task<IActionResult> Callback([FromQuery] string code)
-//    {
-//        var client = _httpClientFactory.CreateClient();
-//        var clientId = _config["Zoom:ClientId"];
-//        var clientSecret = _config["Zoom:ClientSecret"];
-//        var redirectUri = _config["Zoom:RedirectUri"];
+        try
+        {
+            var result = _meetService.Authorize();
+            return Redirect(result);
+        }
+        catch
+        {
+            return BadRequest("error happen");
+        }
+    }
 
-//        var byteArray = Encoding.ASCII.GetBytes($"{clientId}:{clientSecret}");
-//        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+    [HttpGet("callback")] // must match redirect bUrl in zoom marktplace api/zoom/callback
+    public async Task<IActionResult> Callback([FromQuery] string code)
+    {
+        try
+        {
+            var result = await _meetService.Callback(code);
+            return Redirect(result);
+        }
+        catch
+        {
+            return BadRequest("error happen");
+        }
+    }
 
-//        var requestBody = new Dictionary<string, string>
-//        {
-//        { "grant_type", "authorization_code" },
-//        { "code", code },
-//        { "redirect_uri", redirectUri }
-//        };
 
-//        var response = await client.PostAsync("https://zoom.us/oauth/token", new FormUrlEncodedContent(requestBody));
-//        var content = await response.Content.ReadAsStringAsync();
-//        return Ok(content);
-//    }
+    [HttpPost("create-meeting")]
+    public async Task<IActionResult> CreateMeeting([FromBody] MeetingRequestDto request)
+    {
+        try
+        {
+            var result = await _meetService.CreateMeeting(request);
 
-//    [HttpPost("create-meeting")]
-//    public async Task<IActionResult> CreateMeeting([FromBody] string accessToken)
-//    {
-//        var client = _httpClientFactory.CreateClient();
-//        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            return NewResult(result);
+        }
+        catch
+        {
+            return BadRequest("error happen");
+        }
+    }
 
-//        var meetingDetails = new
-//        {
-//            topic = "Test Meeting",
-//            type = 1
-//        };
+    [HttpGet("check-auth")]
+    public IActionResult CheckAuth()
+    {
+        var result = _meetService.CheckAuth();
+        return Ok(new
+        {
+            is_authenticated = result.Item1,
+            token_status = result.Item2,
+        });
+    }
 
-//        var json = JsonSerializer.Serialize(meetingDetails);
-//        var response = await client.PostAsync("https://api.zoom.us/v2/users/me/meetings", new StringContent(json, Encoding.UTF8, "application/json"));
-//        var content = await response.Content.ReadAsStringAsync();
-//        return Ok(content);
-//    }
-//    public class ZoomOptions
-//    {
-//        public string ClientId { get; set; }
-//        public string ClientSecret { get; set; }
-//        public string RedirectUri { get; set; }
-//    }
-//}
+
+    [HttpGet("meetings")]
+    public async Task<IActionResult> GetMeetings(int courseId)
+    {
+
+        try
+        {
+            var result = await _meetService.GetMeetingsForCourse(courseId);
+
+            return NewResult(result);
+        }
+        catch
+        {
+            return BadRequest("error happen");
+        }
+    }
+}
