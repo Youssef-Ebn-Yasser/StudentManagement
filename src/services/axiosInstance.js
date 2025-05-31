@@ -5,7 +5,7 @@ const baseURL = isDevelopment ? 'https://e-learn-v1.runasp.net' : 'https://e-lea
 
 const axiosInstance = axios.create({
     baseURL,
-    timeout: 10000, // Set a timeout for requests
+    timeout: 30000, // Increased timeout to 30 seconds
     headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',

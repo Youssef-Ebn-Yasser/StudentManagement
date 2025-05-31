@@ -1,12 +1,36 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import img from '../../assets/error.png'
+import axios from 'axios'
+import toast from 'react-hot-toast'
 
 function ForgetPassword() {
+    const navigate = useNavigate()
+    const [email, setEmail] = useState('')
+    const [loading, setLoading] = useState(false)
 
-    const navigate= useNavigate()
-    const handleGoBack=()=>{
+    const handleGoBack = () => {
         navigate(-1)
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        setLoading(true)
+
+        try {
+            const response = await axios.post(`https://e-learn-v1.runasp.net/api/Auth/forgot-password?email=${email}`)
+            if (response.data.succeeded) {
+                toast.success('Password reset instructions sent to your email')
+                // Optionally navigate to a confirmation page
+                // navigate('/reset-password-confirmation')
+            } else {
+                toast.error(response.data.message || 'Failed to send reset instructions')
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'An error occurred. Please try again.')
+        } finally {
+            setLoading(false)
+        }
     }
 
     return <>
@@ -21,29 +45,38 @@ function ForgetPassword() {
                         <h1 className='font-bold text-2xl'>Reset Your Password</h1>
                         <p className='text-gray-400'>Please enter Your email we will send to you an code</p>
                     </div>
-                        <form action="#!">
+                        <form onSubmit={handleSubmit}>
                             <div className="flex flex-col gap-2 ">
-                               
-
                                 <div className=" mb-3">
-                                    <input type="email" className='border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease' name="email"  id="email" placeholder="name@example.com" required/>     
+                                    <input 
+                                        type="email" 
+                                        className='border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease' 
+                                        name="email"  
+                                        id="email" 
+                                        placeholder="name@example.com" 
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                    />     
                                 </div>
-
 
                                 <div className=" flex justify-center my-3">
-                                    <button className="bg-blue-600 text-white px-6 py-2 rounded text-xl  hover:cursor-pointer hover:shadow-sm hover:shadow-blue-500 transition-all duration-300 ease" type="submit">Send</button>
+                                    <button 
+                                        className="bg-blue-600 text-white px-6 py-2 rounded text-xl hover:cursor-pointer hover:shadow-sm hover:shadow-blue-500 transition-all duration-300 ease disabled:opacity-50 disabled:cursor-not-allowed" 
+                                        type="submit"
+                                        disabled={loading}
+                                    >
+                                        {loading ? 'Sending...' : 'Send'}
+                                    </button>
                                 </div>
-
-                    </div>
-                    </form>
-
+                            </div>
+                        </form>
                 </div>
                 
                 <div className="flex justify-center items-center  Img h-[100vh] p-2" > 
                     <img src={img} alt="studentImg" className='max-h-lvh  ' width={'500px'}/>
                 </div>
             </div>
-            
         </div>
     </>
 }

@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import MainInfo from "./MainInfo";
 import './TeacherProfile.css'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faVideo, faCheck, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
-import { faSellcast } from '@fortawesome/free-brands-svg-icons';
+
 import Sidebar from "./Sidebar";
 import TeacherCourses from "./TeacherCourses";
 import CreateCourse from "./CreateCourse";
@@ -49,29 +47,6 @@ function TeacherProfile() {
     fetchTeacherData();
   }, [user?.id]);
 
-  const stats = [
-    {
-      name: 'Enrolled Courses',
-      number: teacherData?.enrolledCourses || 0,
-      iconType: faVideo,
-    },
-    {
-      name: 'Active Courses',
-      number: teacherData?.activeCourses || 0,
-      iconType: faCheck,
-    },
-    {
-      name: 'Students',
-      number: teacherData?.students || 0,
-      iconType: faGraduationCap,
-    },
-    {
-      name: 'Course Sold',
-      number: teacherData?.courseSold || 0,
-      iconType: faSellcast,
-    },
-  ];
-
   const handleProfileUpdate = (updatedData) => {
     setTeacherData(prev => ({
       ...prev,
@@ -99,19 +74,6 @@ function TeacherProfile() {
                 <div className="flex flex-wrap px-4 gap-5">
                   <div className="w-full mt-10">
                     <MainInfo teacherData={teacherData} />
-                  </div>
-                  <div className="w-full">
-                    <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-                      {stats.map((stat) => (
-                        <div key={stat.name} className="box grid grid-flow-col grid-rows-3 gap-4 bg-[#EBEBFF] flex rounded-md hover:bg-[#e9e9f5]">
-                          <div className="row-span-3 flex">
-                            <FontAwesomeIcon icon={stat.iconType} className="text-[#564FFD] text-3xl w-24 self-center" />
-                          </div>
-                          <div className="col-span-2 self-center pt-2 text-black text-2xl">{stat.number}</div>
-                          <div className="col-span-2 row-span-2 self-center text-[#4E5566] text-2xl">{stat.name}</div>
-                        </div>
-                      ))}
-                    </div>
                   </div>
                 </div>
               </div>

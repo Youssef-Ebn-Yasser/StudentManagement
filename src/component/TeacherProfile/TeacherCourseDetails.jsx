@@ -329,24 +329,8 @@ const TeacherCourseDetails = () => {
               <p className="text-gray-600 mb-4">{course.description}</p>
               {/* Course Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <div className="flex items-center">
-                    <FaStar className="text-yellow-500 mr-2" />
-                    <div>
-                      <p className="text-sm text-gray-500">Rating</p>
-                      <p className="font-semibold">{course.rating || 'N/A'}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <div className="flex items-center">
-                    <FaUsers className="text-blue-500 mr-2" />
-                    <div>
-                      <p className="text-sm text-gray-500">Students</p>
-                      <p className="font-semibold">{course.students?.length || 0}</p>
-                    </div>
-                  </div>
-                </div>
+               
+                
                 <div className="bg-gray-50 p-3 rounded-lg">
                   <div className="flex items-center">
                     <FaClock className="text-green-500 mr-2" />
@@ -377,24 +361,8 @@ const TeacherCourseDetails = () => {
                     </div>
                   </div>
                 </div>
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <div className="flex items-center">
-                    <FaGraduationCap className="text-orange-500 mr-2" />
-                    <div>
-                      <p className="text-sm text-gray-500">Level</p>
-                      <p className="font-semibold">{course.level || 'Not specified'}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <div className="flex items-center">
-                    <FaCalendarAlt className="text-red-500 mr-2" />
-                    <div>
-                      <p className="text-sm text-gray-500">Created</p>
-                      <p className="font-semibold">{new Date(course.createdAt).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                </div>
+                
+                
                 <div className="bg-gray-50 p-3 rounded-lg">
                   <div className="flex items-center">
                     <FaChartLine className="text-green-500 mr-2" />
