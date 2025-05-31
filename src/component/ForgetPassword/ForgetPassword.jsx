@@ -1,8 +1,39 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import img from '../../assets/error.png'
+import axios from 'axios'
+import { useFormik } from 'formik'
+import toast from 'react-hot-toast'
+import * as Yup from 'yup';
+
 
 function ForgetPassword() {
+
+    async function handleForgetPassword(formsData){
+        await axios.post(`https://e-learn-v1.runasp.net/api/Auth/forgot-password?email=${formsData}`)
+        .then((response)=>{
+            console.log(response.data);
+            toast.success('Email Sends does successfully')
+            
+        }).catch((error)=>{
+            console.log(error);
+            toast.error('Invalid Email')
+            
+        })
+    }
+
+    let validationSchema=Yup.object({
+        email:Yup.string().required('email is required').email('invalid email'),
+       
+    })
+    
+    let formik = useFormik({
+        initialValues:{
+            email:'',
+        },
+        validationSchema: validationSchema,
+        onSubmit:handleForgetPassword
+    })
 
     const navigate= useNavigate()
     const handleGoBack=()=>{
@@ -21,12 +52,13 @@ function ForgetPassword() {
                         <h1 className='font-bold text-2xl'>Reset Your Password</h1>
                         <p className='text-gray-400'>Please enter Your email we will send to you an code</p>
                     </div>
-                        <form action="#!">
+                        <form onSubmit={formik.handleSubmit}>
                             <div className="flex flex-col gap-2 ">
                                
 
                                 <div className=" mb-3">
-                                    <input type="email" className='border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease' name="email"  id="email" placeholder="name@example.com" required/>     
+                                    <input type="email" className='border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease' name="email"  id="email" value={formik.values.email} onChange={formik.handleChange} onBlur={formik.handleBlur} placeholder="name@example.com" required/>    
+                                    {formik.errors.email && formik.touched.email && <p className='text-red-500'>{formik.errors.email}</p>} 
                                 </div>
 
 
