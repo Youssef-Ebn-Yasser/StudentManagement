@@ -107,33 +107,55 @@ function CreateZoom() {
 
     // Prepare payload with correct types and only required fields
     const payload = {
-      topic: formData.topic || "string",
-      type: Number(formData.meetingType) || 0,
-      startTime: formData.startTime ? new Date(formData.startTime).toISOString() : new Date().toISOString(),
-      duration: Number(formData.duration) || 0,
-      password: formData.enablePassword ? formData.password : "string",
+      topic: formData.topic,
+      type: Number(formData.meetingType),
+      courseId: Number(courseId),
       muteParticipantsUponEntry: !!formData.muteParticipants,
-      autoRecording: formData.enableAutoRecording ? formData.recordingLocation : "string",
-      courseId: Number(courseId)
     };
 
-    // Add recurrence if it's a recurring meeting
+    // Scheduled or recurring meetings require startTime and duration
+    if (payload.type === 2 || payload.type === 8) {
+      if (!formData.startTime) {
+        showError('Start time is required for scheduled or recurring meetings.');
+        return;
+      }
+      payload.startTime = new Date(formData.startTime).toISOString();
+      payload.duration = Number(formData.duration);
+    }
+
+    // Password
+    if (formData.enablePassword && formData.password) {
+      payload.password = formData.password;
+    }
+
+    // Auto recording
+    if (formData.enableAutoRecording && formData.recordingLocation) {
+      payload.autoRecording = formData.recordingLocation;
+    }
+
+    // Recurrence for recurring meetings
     if (payload.type === 8) {
-      payload.recurrence = {
-        type: Number(formData.recurrenceType) || 0,
-        repeatInterval: Number(formData.repeatInterval) || 0,
-        endTimes: formData.endCondition === 'endTimes' ? Number(formData.endTimes) : 0,
-        endDate: formData.endCondition === 'endDate' ? formData.endDate : "string",
-        weeklyDays: formData.recurrenceType === '2' ? formData.weeklyDays.map(Number) : [0],
-        weeklyDaysWithDate: {
-          additionalProp1: "string",
-          additionalProp2: "string",
-          additionalProp3: "string"
-        },
-        monthlyDay: formData.recurrenceType === '3' && formData.monthlyRepeatBy === 'dayOfMonth' ? Number(formData.monthlyDay) : 0,
-        monthlyWeek: formData.recurrenceType === '3' && formData.monthlyRepeatBy === 'weekOfMonth' ? Number(formData.monthlyWeek) : 0,
-        monthlyWeekDay: formData.recurrenceType === '3' && formData.monthlyRepeatBy === 'weekOfMonth' ? Number(formData.monthlyWeekDay) : 0
+      const recurrence = {
+        type: Number(formData.recurrenceType),
+        repeatInterval: Number(formData.repeatInterval),
+        endTimes: formData.endCondition === 'endTimes' ? Number(formData.endTimes) : undefined,
+        endDate: formData.endCondition === 'endDate' ? formData.endDate : undefined,
+        weeklyDays: formData.recurrenceType === '2'
+          ? formData.weeklyDays.map(Number)
+          : undefined,
+        monthlyDay: formData.recurrenceType === '3' && formData.monthlyRepeatBy === 'dayOfMonth'
+          ? Number(formData.monthlyDay)
+          : undefined,
+        monthlyWeek: formData.recurrenceType === '3' && formData.monthlyRepeatBy === 'weekOfMonth'
+          ? Number(formData.monthlyWeek)
+          : undefined,
+        monthlyWeekDay: formData.recurrenceType === '3' && formData.monthlyRepeatBy === 'weekOfMonth'
+          ? Number(formData.monthlyWeekDay)
+          : undefined,
       };
+      // Remove undefined fields
+      Object.keys(recurrence).forEach(key => recurrence[key] === undefined && delete recurrence[key]);
+      payload.recurrence = recurrence;
     }
 
     try {
@@ -698,6 +720,10 @@ function CreateZoom() {
           </div>
         )}
       </div>
+      <br />
+      <br />
+      <br />
+      <br />
     </div>
   );
 }
