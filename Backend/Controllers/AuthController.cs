@@ -53,7 +53,7 @@ public class AuthController : AppControllerBase
     {
         string subject = "Ask for Uploading a teacher";
         string body = $"I am a teacher and want to applay to upload my courses here this is my name :- {name}  , and this is my email :- {email}";
-        string mailTo = "yh29152@gmail.com";
+        string mailTo = "hadeer.abdelgawad44@gmail.com";
         var result = await _emailSender.SendEmailAsync(mailTo, subject, body);
         return Ok(result);
     }

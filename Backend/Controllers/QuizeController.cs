@@ -66,8 +66,8 @@ public class QuizeController : ControllerBase
             return NotFound("Quiz not found for the given lesson.");
 
         // Check if quiz has started
-        if (quiz.StartsAt > DateTime.Now)
-            return NotFound("Quiz has not started yet.");
+        //if (quiz.StartsAt > DateTime.Now)
+        //    return NotFound("Quiz has not started yet.");
 
 
 

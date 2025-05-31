@@ -1,3 +1,4 @@
+using Backend.Entities.Meetings;
 using Backend.Entities.QuizeEntities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
@@ -25,9 +26,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
     public DbSet<Question> Questions { get; set; }
     public DbSet<StudentQuizeAnswer> studentQuizeAnswers { get; set; }
     public DbSet<QuestionOption> QuestionOptions { get; set; }
-
-
-
+    public DbSet<Meeting> Meetings { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
