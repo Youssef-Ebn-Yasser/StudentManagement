@@ -36,13 +36,7 @@ import TeacherDashboard from '@/component/TeacherDashboard/TeacherDashboard'
 import LessonDetails from '@/component/StudentDashboard/LessonDetails'
 import CreateZoom from '@/component/TeacherProfile/CreateZoom'
 import MeetingData from '@/component/TeacherProfile/MeetingData'
-import MeetingSdata from './../component/StudentDashboard/MeetingSdata';
-import TeacherProfileView from '@/component/StudentDashboard/TeacherProfileView.jsx'
-import CreateQuiz from '../component/CreateQuiz/CreateQuiz'
-import LessonDetails from '../component/StudentDashboard/LessonDetails'
-
-
-
+import MeetingSdata from './../component/StudentDashboard/MeetingSdata'
 
 const routesConfig = [
     { path: '', element: <Home />, isProtected: false, accessRole: 'all' },
