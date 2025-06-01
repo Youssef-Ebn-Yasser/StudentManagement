@@ -7,7 +7,7 @@ import styles from '../Courses/Courses.module.css';
 import { loadStripe } from '@stripe/stripe-js';
 
 // Initialize Stripe with your publishable key
-const stripePromise = loadStripe('your_publishable_key_here');
+const stripePromise = loadStripe('pk_test_51RQUrPPvFWprxsdQEzZeC02EVBdbrFpeEeg12WteirJS2O6E4vShxYn6mejMdRsQItdS4p2uQCNwKznka3TKHtoM00OAEt28tT');
 
 const mockBenefits = [
   { icon: <FaClock />, text: '14 hours on-demand video' },

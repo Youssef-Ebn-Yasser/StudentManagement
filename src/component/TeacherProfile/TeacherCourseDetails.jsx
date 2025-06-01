@@ -329,8 +329,6 @@ const TeacherCourseDetails = () => {
               <p className="text-gray-600 mb-4">{course.description}</p>
               {/* Course Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-               
-                
                 <div className="bg-gray-50 p-3 rounded-lg">
                   <div className="flex items-center">
                     <FaClock className="text-green-500 mr-2" />
@@ -361,8 +359,6 @@ const TeacherCourseDetails = () => {
                     </div>
                   </div>
                 </div>
-                
-                
                 <div className="bg-gray-50 p-3 rounded-lg">
                   <div className="flex items-center">
                     <FaChartLine className="text-green-500 mr-2" />
@@ -453,6 +449,17 @@ const TeacherCourseDetails = () => {
                               {lesson.difficulty}
                             </div>
                           )}
+
+                          {/* Create Quiz Button */}
+                          <div className="ml-11 mb-2">
+                            <button
+                              onClick={() => navigate(`/createquiz?lessonId=${lesson.id}`)}
+                              className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 flex items-center gap-2"
+                            >
+                              <FaClipboardList className="text-lg" />
+                              Create Quiz
+                            </button>
+                          </div>
 
                           {/* Materials Section */}
                           <div className="ml-11 mt-4">
@@ -581,7 +588,15 @@ const TeacherCourseDetails = () => {
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-col items-center gap-2">
+                          {/* Create Quiz Button */}
+                          {/* <button
+                            onClick={() => navigate(`/createquiz?lessonId=${lesson.id}`)}
+                            className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 flex items-center gap-2 mb-2"
+                          >
+                            <FaClipboardList className="text-lg" />
+                            Create Quiz
+                          </button> */}
                           <button
                             onClick={() => handleDeleteLesson(lesson.id)}
                             className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition-colors duration-200"
