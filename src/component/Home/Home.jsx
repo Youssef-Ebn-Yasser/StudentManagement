@@ -335,7 +335,7 @@ function Home() {
 
           {/* Popular Courses Section */}
           <CourseSection
-            title="Some of the first couses"
+            title="Some of the first courses"
             courses={popularCourses.courses}
             loading={popularCourses.loading}
             error={popularCourses.error}

@@ -52,22 +52,7 @@ function Register() {
                                     As a Student
                                 </button>
                             </Link>
-                            <Link
-                                to={'/auth/teacherRegister'}
-                                className="bg-blue-700 shadow-lg shadow-blue-300 rounded-3xl py-2 px-3 text-white hover:bg-blue-500 transition-all duration-300 ease"
-                            >
-                                <button className="hover:cursor-pointer transition-all duration-300 ease">
-                                    As a Teacher
-                                </button>
-                            </Link>
-                            <Link
-                                to={'/auth/adminRegister'}
-                                className="bg-blue-700 shadow-lg shadow-blue-300 rounded-3xl py-2 px-3 text-white hover:bg-blue-500 transition-all duration-300 ease"
-                            >
-                                <button className="hover:cursor-pointer transition-all duration-300 ease">
-                                    As an Admin
-                                </button>
-                            </Link>
+                           
                         </div>
                     </div>
 

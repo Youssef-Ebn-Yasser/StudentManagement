@@ -24,7 +24,6 @@ import AdminDashboard from '@/component/AdminDashboard/AdminDashboard'
 import ControlCourse from '@/component/AdminProfile/ControlCourse'
 import StudentDetails from '@/component/AdminProfile/StudentDetails'
 import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
-import MeetingRoom from '@/component/Meeting/MeetingRoom/MeetingRoom'
 import StudentAssignments from '@/component/TeacherProfile/StudentAssignments'
 import CourseDashDetails from '@/component/StudentDashboard/CourseDashDetailes'
 import AddMaterial from '@/component/TeacherProfile/AddMaterial'
@@ -251,14 +250,6 @@ const routesConfig = [
         isProtected: false,
         accessRole: 'all',
     },
-    {
-        path: "video-call",
-        element: (
-          <MeetingRoom/>
-        ),
-        isProtected: false,
-        accessRole: "all",
-      },
       {
         path: 'teacher/course/:courseId/lesson/:lessonId/material/new',
         element: <AddMaterial />,
