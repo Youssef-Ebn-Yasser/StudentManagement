@@ -4,28 +4,25 @@ import { useParams, useLocation } from 'react-router-dom';
 const API_BASE_URL = 'https://e-learn-v1.runasp.net/api/zoom';
 
 function CreateZoom() {
-  // Get courseId from route param or query string
   const { courseId: paramCourseId } = useParams();
   const location = useLocation();
   const queryCourseId = new URLSearchParams(location.search).get('courseId');
-  const courseId = paramCourseId || queryCourseId || 27; // fallback to 27 for demo
+  const courseId = paramCourseId || queryCourseId || 27;
 
-  // Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Meeting creation form state
   const [formData, setFormData] = useState({
-    topic: 'My Awesome Meeting',
+    topic: '',
     duration: 30,
-    meetingType: '1', // 1: Instant, 2: Scheduled, 8: Recurring
+    meetingType: '1',
     startTime: '',
     enablePassword: false,
     password: '',
     muteParticipants: false,
     enableAutoRecording: false,
     recordingLocation: 'cloud',
-    recurrenceType: '1', // 1: Daily, 2: Weekly, 3: Monthly
+    recurrenceType: '1',
     repeatInterval: 1,
     endCondition: 'endTimes',
     endTimes: 5,
@@ -37,13 +34,11 @@ function CreateZoom() {
     monthlyWeekDay: 1
   });
 
-  // UI state
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [createdMeeting, setCreatedMeeting] = useState(null);
   const [savedMeetings, setSavedMeetings] = useState([]);
 
-  // Helper functions
   const showMessage = (msg) => {
     setMessage(msg);
     setError('');
@@ -61,10 +56,9 @@ function CreateZoom() {
 
   const getDayName = (dayNum) => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    return days[dayNum - 1]; // Zoom uses 1-7 for Sun-Sat
+    return days[dayNum - 1];
   };
 
-  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -73,13 +67,11 @@ function CreateZoom() {
     }));
   };
 
-  // Handle radio button changes
   const handleRadioChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Handle checkbox group changes (weekly days)
   const handleWeeklyDayChange = (dayValue) => {
     setFormData(prev => {
       const newWeeklyDays = prev.weeklyDays.includes(dayValue)
@@ -89,12 +81,10 @@ function CreateZoom() {
     });
   };
 
-  // Connect to Zoom
   const connectWithZoom = () => {
     window.location.href = `${API_BASE_URL}/authorize`;
   };
 
-  // Create meeting
   const createMeeting = async (e) => {
     e.preventDefault();
     hideMessages();
@@ -105,7 +95,30 @@ function CreateZoom() {
       return;
     }
 
-    // Prepare payload with correct types and only required fields
+    // Validate topic
+    if (!formData.topic.trim()) {
+      showError('Meeting topic is required.');
+      return;
+    }
+
+    // Validate courseId
+    if (!courseId || isNaN(Number(courseId)) || Number(courseId) <= 0) {
+      showError('Invalid course ID.');
+      return;
+    }
+
+    // Validate duration for scheduled/recurring
+    if ((formData.meetingType === '2' || formData.meetingType === '8')) {
+      if (!formData.startTime) {
+        showError('Start time is required for scheduled or recurring meetings.');
+        return;
+      }
+      if (!formData.duration || Number(formData.duration) <= 0) {
+        showError('Duration must be greater than 0.');
+        return;
+      }
+    }
+
     const payload = {
       topic: formData.topic,
       type: Number(formData.meetingType),
@@ -113,49 +126,64 @@ function CreateZoom() {
       muteParticipantsUponEntry: !!formData.muteParticipants,
     };
 
-    // Scheduled or recurring meetings require startTime and duration
     if (payload.type === 2 || payload.type === 8) {
-      if (!formData.startTime) {
-        showError('Start time is required for scheduled or recurring meetings.');
-        return;
-      }
       payload.startTime = new Date(formData.startTime).toISOString();
-      payload.duration = Number(formData.duration);
+      payload.duration = Math.max(1, Number(formData.duration) || 30);
     }
 
-    // Password
     if (formData.enablePassword && formData.password) {
       payload.password = formData.password;
+    } else {
+      payload.password = '';
     }
 
-    // Auto recording
     if (formData.enableAutoRecording && formData.recordingLocation) {
       payload.autoRecording = formData.recordingLocation;
+    } else {
+      payload.autoRecording = '';
     }
 
-    // Recurrence for recurring meetings
     if (payload.type === 8) {
       const recurrence = {
         type: Number(formData.recurrenceType),
         repeatInterval: Number(formData.repeatInterval),
-        endTimes: formData.endCondition === 'endTimes' ? Number(formData.endTimes) : undefined,
-        endDate: formData.endCondition === 'endDate' ? formData.endDate : undefined,
+        endTimes: formData.endCondition === 'endTimes' ? Number(formData.endTimes) : 0,
+        endDate: formData.endCondition === 'endDate' ? formData.endDate : "",
         weeklyDays: formData.recurrenceType === '2'
           ? formData.weeklyDays.map(Number)
-          : undefined,
+          : [0],
+        weeklyDaysWithDate: {
+          additionalProp1: "",
+          additionalProp2: "",
+          additionalProp3: ""
+        },
         monthlyDay: formData.recurrenceType === '3' && formData.monthlyRepeatBy === 'dayOfMonth'
           ? Number(formData.monthlyDay)
-          : undefined,
+          : 0,
         monthlyWeek: formData.recurrenceType === '3' && formData.monthlyRepeatBy === 'weekOfMonth'
           ? Number(formData.monthlyWeek)
-          : undefined,
+          : 0,
         monthlyWeekDay: formData.recurrenceType === '3' && formData.monthlyRepeatBy === 'weekOfMonth'
           ? Number(formData.monthlyWeekDay)
-          : undefined,
+          : 0
       };
-      // Remove undefined fields
-      Object.keys(recurrence).forEach(key => recurrence[key] === undefined && delete recurrence[key]);
       payload.recurrence = recurrence;
+    } else {
+      payload.recurrence = {
+        type: 0,
+        repeatInterval: 0,
+        endTimes: 0,
+        endDate: "",
+        weeklyDays: [0],
+        weeklyDaysWithDate: {
+          additionalProp1: "",
+          additionalProp2: "",
+          additionalProp3: ""
+        },
+        monthlyDay: 0,
+        monthlyWeek: 0,
+        monthlyWeekDay: 0
+      };
     }
 
     try {
@@ -183,7 +211,6 @@ function CreateZoom() {
     }
   };
 
-  // Fetch saved meetings
   const fetchSavedMeetings = async () => {
     try {
       const url = courseId
@@ -204,7 +231,6 @@ function CreateZoom() {
     }
   };
 
-  // Check authentication status on component mount and handle OAuth callback
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
@@ -212,15 +238,12 @@ function CreateZoom() {
         const data = await response.json();
         setIsAuthenticated(data.succeeded ? data.data === true : !!data.is_authenticated);
 
-        // Handle the redirect after Zoom authorization
         const params = new URLSearchParams(window.location.search);
         const code = params.get('code');
         if (code) {
-          // Call backend callback
           await fetch(`${API_BASE_URL}/callback?code=${code}`);
           setIsAuthenticated(true);
           showMessage('Successfully connected with Zoom!');
-          // Remove code param from URL
           window.history.replaceState({}, document.title, window.location.pathname + window.location.search.replace(/(\?|&)code=[^&]+/, ''));
         }
       } catch (err) {

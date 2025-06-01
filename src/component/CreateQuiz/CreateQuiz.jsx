@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function CreateQuiz() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [lessonId, setLessonId] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [startsAt, setStartsAt] = useState('');
   const [durationMinutes, setDurationMinutes] = useState('');
   const [questions, setQuestions] = useState([]);
+
+  // Automatically set lessonId from URL query param if present
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const lessonIdFromUrl = params.get('lessonId');
+    if (lessonIdFromUrl) {
+      setLessonId(lessonIdFromUrl);
+    }
+  }, [location.search]);
 
   const addQuestion = () => {
     setQuestions([
@@ -84,7 +94,7 @@ export default function CreateQuiz() {
         body: JSON.stringify(quizDto),
       });
       if (!res.ok) throw new Error('Failed to submit quiz');
-      await res.text(); // <-- Use text() instead of json()
+      await res.text();
       alert('Quiz created successfully!');
       // Optionally reset form here
     } catch (err) {
@@ -107,14 +117,7 @@ export default function CreateQuiz() {
         <h2 className="text-2xl font-bold">Create a Quiz</h2>
       </div>
       <form onSubmit={handleSubmit}>
-        <label className="block mt-2">Lesson ID</label>
-        <input
-          type="number"
-          className="border rounded p-2 w-full"
-          value={lessonId}
-          onChange={(e) => setLessonId(e.target.value)}
-          required
-        />
+        {/* Lesson ID is handled in state and sent in the request, but not shown to the user */}
 
         <label className="block mt-2">Title</label>
         <input
