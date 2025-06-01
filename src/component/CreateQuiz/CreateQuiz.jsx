@@ -52,6 +52,16 @@ export default function CreateQuiz() {
     setQuestions(updated);
   };
 
+  // Make options radio (only one correct answer per MCQ)
+  const handleOptionRadioChange = (qIdx, selectedIdx) => {
+    const updated = [...questions];
+    updated[qIdx].options = updated[qIdx].options.map((opt, oIdx) => ({
+      ...opt,
+      value: oIdx === selectedIdx,
+    }));
+    setQuestions(updated);
+  };
+
   const addOption = (qIdx) => {
     const updated = [...questions];
     updated[qIdx].options.push({ key: '', value: false });
@@ -197,7 +207,7 @@ export default function CreateQuiz() {
               <div className="mt-2">
                 <label>Options</label>
                 {q.options.map((opt, oIdx) => (
-                  <div key={oIdx} className="flex gap-2 mt-1">
+                  <div key={oIdx} className="flex gap-2 mt-1 items-center">
                     <input
                       type="text"
                       className="border rounded p-2 flex-1"
@@ -208,11 +218,12 @@ export default function CreateQuiz() {
                     />
                     <label className="flex items-center gap-1">
                       <input
-                        type="checkbox"
+                        type="radio"
+                        name={`question-${idx}-option`}
                         checked={opt.value}
-                        onChange={(e) => handleOptionChange(idx, oIdx, 'value', e.target.checked)}
+                        onChange={() => handleOptionRadioChange(idx, oIdx)}
                       />
-                      Is Correct
+                      Correct Answer
                     </label>
                   </div>
                 ))}
