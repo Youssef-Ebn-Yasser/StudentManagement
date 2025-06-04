@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250527094225_Quiz04")]
-    partial class Quiz04
+    [Migration("20250603224132_quiz01")]
+    partial class quiz01
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -203,6 +203,66 @@ namespace Backend.Migrations
                     b.ToTable("Materials");
                 });
 
+            modelBuilder.Entity("Backend.Entities.Meetings.Meeting", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AutoRecording")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CourseID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DaysThatRepeat")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Duration")
+                        .HasColumnType("int");
+
+                    b.Property<string>("JoinUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("MuteParticipantsUponEntry")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("Occurrences")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecurrenceDetailsJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("StartTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Topic")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<string>("WeeklyDaysWithDateSerialized")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ZoomMeetingId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseID");
+
+                    b.ToTable("Meetings");
+                });
+
             modelBuilder.Entity("Backend.Entities.Payment", b =>
                 {
                     b.Property<int>("Id")
@@ -245,14 +305,31 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Entities.QuizeEntities.Question", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CorrectAnswer")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsMultiAnswer")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsQuestionBank")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsQuestionBankUsed")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Points")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuestionNumber")
                         .HasColumnType("int");
 
                     b.Property<string>("QuestionText")
@@ -262,10 +339,12 @@ namespace Backend.Migrations
                     b.Property<int>("QuestionTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("QuizId")
+                    b.Property<int?>("QuizId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
 
                     b.HasIndex("QuizId");
 
@@ -290,12 +369,9 @@ namespace Backend.Migrations
                     b.Property<int>("QuestionId")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("QuestionId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("QuestionId1");
+                    b.HasIndex("QuestionId");
 
                     b.ToTable("QuestionOptions");
                 });
@@ -317,6 +393,12 @@ namespace Backend.Migrations
                     b.Property<int>("DurationMinutes")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("EndAtAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsAutoCorrect")
+                        .HasColumnType("bit");
+
                     b.Property<int>("LessonId")
                         .HasColumnType("int");
 
@@ -335,10 +417,61 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LessonId")
-                        .IsUnique();
+                    b.HasIndex("LessonId");
 
                     b.ToTable("Quizzes");
+                });
+
+            modelBuilder.Entity("Backend.Entities.QuizeEntities.StudentQuestionAnswer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool?>("IsCorrect")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("studentQuizeAnswerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("studentQuizeAnswerId");
+
+                    b.ToTable("StudentQuestionAnswers");
+                });
+
+            modelBuilder.Entity("Backend.Entities.QuizeEntities.StudentQuestionOption", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool?>("IsCorrect")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("QuestionOptionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentQuestionAnswerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionOptionId");
+
+                    b.HasIndex("StudentQuestionAnswerId");
+
+                    b.ToTable("StudentQuestionOptions");
                 });
 
             modelBuilder.Entity("Backend.Entities.QuizeEntities.StudentQuizeAnswer", b =>
@@ -349,13 +482,13 @@ namespace Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("GradingRating")
-                        .HasColumnType("int");
+                    b.Property<decimal?>("GradingRating")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<bool>("IsPassed")
+                    b.Property<bool?>("IsPassed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("NumberOfAswered")
+                    b.Property<int?>("NumberOfAswered")
                         .HasColumnType("int");
 
                     b.Property<int>("QuizId")
@@ -813,6 +946,17 @@ namespace Backend.Migrations
                     b.Navigation("Lesson");
                 });
 
+            modelBuilder.Entity("Backend.Entities.Meetings.Meeting", b =>
+                {
+                    b.HasOne("Backend.Entities.Course", "Course")
+                        .WithMany("Meetings")
+                        .HasForeignKey("CourseID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+                });
+
             modelBuilder.Entity("Backend.Entities.Payment", b =>
                 {
                     b.HasOne("Backend.Entities.Course", "Course")
@@ -830,11 +974,15 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Entities.QuizeEntities.Question", b =>
                 {
+                    b.HasOne("Backend.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId");
+
                     b.HasOne("Backend.Entities.QuizeEntities.Quiz", "Quiz")
                         .WithMany("questions")
-                        .HasForeignKey("QuizId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("QuizId");
+
+                    b.Navigation("Course");
 
                     b.Navigation("Quiz");
                 });
@@ -843,7 +991,7 @@ namespace Backend.Migrations
                 {
                     b.HasOne("Backend.Entities.QuizeEntities.Question", "Question")
                         .WithMany("Options")
-                        .HasForeignKey("QuestionId1")
+                        .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -853,12 +1001,50 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Entities.QuizeEntities.Quiz", b =>
                 {
                     b.HasOne("Backend.Entities.Lesson", "Lesson")
-                        .WithOne("Quiz")
-                        .HasForeignKey("Backend.Entities.QuizeEntities.Quiz", "LessonId")
+                        .WithMany("Quizs")
+                        .HasForeignKey("LessonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Lesson");
+                });
+
+            modelBuilder.Entity("Backend.Entities.QuizeEntities.StudentQuestionAnswer", b =>
+                {
+                    b.HasOne("Backend.Entities.QuizeEntities.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Entities.QuizeEntities.StudentQuizeAnswer", "studentQuizeAnswer")
+                        .WithMany()
+                        .HasForeignKey("studentQuizeAnswerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+
+                    b.Navigation("studentQuizeAnswer");
+                });
+
+            modelBuilder.Entity("Backend.Entities.QuizeEntities.StudentQuestionOption", b =>
+                {
+                    b.HasOne("Backend.Entities.QuizeEntities.QuestionOption", "QuestionOption")
+                        .WithMany()
+                        .HasForeignKey("QuestionOptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Entities.QuizeEntities.StudentQuestionAnswer", "StudentQuestionAnswer")
+                        .WithMany("studentQuestionOptions")
+                        .HasForeignKey("StudentQuestionAnswerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("QuestionOption");
+
+                    b.Navigation("StudentQuestionAnswer");
                 });
 
             modelBuilder.Entity("Backend.Entities.QuizeEntities.StudentQuizeAnswer", b =>
@@ -983,6 +1169,8 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Entities.Course", b =>
                 {
+                    b.Navigation("Meetings");
+
                     b.Navigation("StudentCourses");
 
                     b.Navigation("lessons");
@@ -990,8 +1178,7 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Entities.Lesson", b =>
                 {
-                    b.Navigation("Quiz")
-                        .IsRequired();
+                    b.Navigation("Quizs");
 
                     b.Navigation("materials");
                 });
@@ -1004,6 +1191,11 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Entities.QuizeEntities.Quiz", b =>
                 {
                     b.Navigation("questions");
+                });
+
+            modelBuilder.Entity("Backend.Entities.QuizeEntities.StudentQuestionAnswer", b =>
+                {
+                    b.Navigation("studentQuestionOptions");
                 });
 
             modelBuilder.Entity("Backend.Entities.Student", b =>
