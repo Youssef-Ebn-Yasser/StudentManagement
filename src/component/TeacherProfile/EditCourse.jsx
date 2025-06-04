@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { courseService } from '../../services/courseService';
 import Loader from '../Loader/Loader';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 
 const EditCourse = () => {
-  const { id } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
+  const courseId = location.state?.courseId;
   const [course, setCourse] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -41,10 +42,16 @@ const EditCourse = () => {
   }, []);
 
   useEffect(() => {
+    if (!courseId) {
+      setError('Course ID is required');
+      setLoading(false);
+      return;
+    }
+
     const fetchCourse = async () => {
       try {
         setIsLoading(true);
-        const response = await courseService.getCourseDetails(id);
+        const response = await courseService.getCourseDetails(courseId);
         if (response.succeeded) {
           setCourse(response.data);
           setForm({
@@ -69,7 +76,7 @@ const EditCourse = () => {
       }
     };
     fetchCourse();
-  }, [id, user?.id]);
+  }, [courseId, user?.id]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -85,7 +92,7 @@ const EditCourse = () => {
     try {
       setIsLoading(true);
       const updateData = {
-        id: id.toString(),
+        id: courseId.toString(),
         title: form.title.trim(),
         description: form.description.trim(),
         price: parseFloat(form.price),
@@ -100,13 +107,13 @@ const EditCourse = () => {
         const imageFormData = new FormData();
         imageFormData.append('image', form.image);
         // You might need to implement a separate endpoint for image upload
-        // await courseService.uploadCourseImage(id, imageFormData);
+        // await courseService.uploadCourseImage(courseId, imageFormData);
       }
 
-      const response = await courseService.updateCourse(id, updateData);
+      const response = await courseService.updateCourse(courseId, updateData);
       if (response.succeeded) {
         toast.success('Course updated successfully!');
-        navigate(`/teacher/course/${id}`);
+        navigate('/teacher/course/details', { state: { courseId } });
       } else {
         throw new Error(response.messages?.[0] || 'Failed to update course');
       }

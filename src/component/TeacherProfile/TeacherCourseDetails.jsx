@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { courseService } from '../../services/courseService';
 import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook, FaClipboardList, FaTrash, FaEdit, FaChartLine, FaCalendarAlt, FaTag, FaFileAlt, FaVideo } from 'react-icons/fa';
 import Loader from '../Loader/Loader';
@@ -7,8 +7,9 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 
 const TeacherCourseDetails = () => {
-  const { id } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
+  const courseId = location.state?.courseId;
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,10 +21,16 @@ const TeacherCourseDetails = () => {
   const [materialFile, setMaterialFile] = useState(null);
 
   useEffect(() => {
+    if (!courseId) {
+      setError('Course ID is required');
+      setLoading(false);
+      return;
+    }
+
     const fetchCourseDetails = async () => {
       try {
         setLoading(true);
-        const response = await courseService.getCourseDetails(id);
+        const response = await courseService.getCourseDetails(courseId);
         if (response.succeeded) {
           setCourse(response.data);
           const courseLessons = response.data.lessons || response.data.lessonInfo || [];
@@ -50,7 +57,7 @@ const TeacherCourseDetails = () => {
     };
 
     fetchCourseDetails();
-  }, [id]);
+  }, [courseId]);
 
   const handleDeleteCourse = async () => {
     if (window.confirm(`
@@ -71,7 +78,7 @@ const TeacherCourseDetails = () => {
     `)) {
       try {
         setIsDeleting(true);
-        const response = await courseService.deleteCourse(id);
+        const response = await courseService.deleteCourse(courseId);
         if (response?.succeeded) {
           toast.success('Course and all associated content deleted successfully');
           navigate('/teacher/courses');
@@ -262,13 +269,15 @@ const TeacherCourseDetails = () => {
           </button>
           <div className="flex flex-col md:flex-row gap-2">
             <Link
-              to={`/teacher/create-zoom/${course.id}`}
+              to="/teacher/create-zoom"
+              state={{ courseId: course.id }}
               className="inline-block bg-indigo-600 text-white px-6 py-2 rounded-lg shadow hover:bg-indigo-700 transition font-semibold"
             >
               Create Zoom Meeting
             </Link>
             <Link
-              to={`/teacher/course/${course.id}/meetings`}
+              to="/teacher/course/meetings"
+              state={{ courseId: course.id }}
               className="inline-flex items-center bg-purple-600 text-white px-6 py-2 rounded-lg shadow hover:bg-purple-700 transition font-semibold"
             >
               <FaVideo className="mr-2 text-lg" />
@@ -298,7 +307,7 @@ const TeacherCourseDetails = () => {
                 </div>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => navigate(`/teacher/course/edit/${course.id}`)}
+                    onClick={() => navigate('/teacher/course/edit', { state: { courseId: course.id } })}
                     className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                   >
                     <FaEdit className="inline-block mr-2" />
@@ -415,7 +424,7 @@ const TeacherCourseDetails = () => {
                   <p className="text-gray-600 mt-1">Total {course.lessonInfo?.length || 0} lessons</p>
                 </div>
                 <button
-                  onClick={() => navigate(`/teacher/course/${course.id}/lesson/new`)}
+                  onClick={() => navigate('/teacher/course/lesson/new', { state: { courseId: course.id } })}
                   className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 flex items-center gap-2"
                 >
                   <FaBook className="text-lg" />
@@ -469,7 +478,7 @@ const TeacherCourseDetails = () => {
                                 Materials
                               </h4>
                               <button
-                                onClick={() => navigate(`/teacher/course/${course.id}/lesson/${lesson.id}/material/new`)}
+                                onClick={() => navigate('/teacher/course/lesson/material/new', { state: { courseId: course.id, lessonId: lesson.id } })}
                                 className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 flex items-center gap-2"
                               >
                                 <FaFileAlt className="text-sm" />

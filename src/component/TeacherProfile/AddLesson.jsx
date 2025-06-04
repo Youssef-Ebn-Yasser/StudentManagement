@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { courseService } from '../../services/courseService';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Loader from '../Loader/Loader';
 import "./CreateCourse.css";
 import { useSelector } from 'react-redux';
 
 const AddLesson = () => {
-  const { courseId } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
   const teacherId = user?.id;
+  const courseId = location.state?.courseId;
   const [courses, setCourses] = useState([]);
   const [lessons, setLessons] = useState([]);
   const [editingLesson, setEditingLesson] = useState(null);
@@ -83,7 +84,7 @@ const AddLesson = () => {
         setLessons(updatedCourse.data?.lessons || []);
         e.target.reset();
         // Navigate back to course details after successful creation
-        navigate(`/teacher/course/${editingCourseId}`);
+        navigate('/teacher/course/details', { state: { courseId: editingCourseId } });
       } else {
         throw new Error(response.messages?.[0] || 'Failed to create lesson');
       }
@@ -191,122 +192,133 @@ const AddLesson = () => {
           {errors.description && <span className="error-message">{errors.description}</span>}
         </div>
 
-        <div className="form-actions">
+        <div className="form-actions flex justify-end space-x-4">
           {onCancel && (
-            <button type="button" className="cancel-button" onClick={onCancel}>Cancel</button>
+            <button 
+              type="button" 
+              onClick={onCancel}
+              className="px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all duration-200 ease-in-out shadow-sm hover:shadow-md"
+            >
+              Cancel
+            </button>
           )}
-          <button type="submit" className="save-button">{submitText}</button>
+          <button 
+            type="submit" 
+            className="px-6 py-2 text-white bg-gradient-to-r from-[var(--primary-dark)] to-[var(--primary-color)] rounded-lg hover:opacity-90 transition-all duration-200 ease-in-out shadow-md hover:shadow-lg"
+          >
+            {submitText}
+          </button>
         </div>
       </form>
     );
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50">
       <div className="w-full min-h-screen bg-white p-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Add New Lesson</h1>
         </div>
 
-      {error && (
-        <div className="error-message" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', zIndex: 2000, background: '#fee2e2', color: '#b91c1c', padding: '16px', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-          <p style={{ margin: 0 }}>{error}</p>
-          <button onClick={() => setError(null)} style={{ marginLeft: 16, background: '#b91c1c', color: 'white', border: 'none', borderRadius: 4, padding: '4px 12px', cursor: 'pointer' }}>Dismiss</button>
-        </div>
-      )}
-
-      {isLoading ? (
-        <div className="flex items-center justify-center h-[calc(100vh-300px)]">
-          <div className="scale-[2.5]">
-            <Loader />
+        {error && (
+          <div className="error-message" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', zIndex: 2000, background: '#fee2e2', color: '#b91c1c', padding: '16px', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+            <p style={{ margin: 0 }}>{error}</p>
+            <button onClick={() => setError(null)} style={{ marginLeft: 16, background: '#b91c1c', color: 'white', border: 'none', borderRadius: 4, padding: '4px 12px', cursor: 'pointer' }}>Dismiss</button>
           </div>
-        </div>
-      ) : (
-        <>
-          <h2>Add New Lesson</h2>
-          {!courseId && (
-            <div className="form-group">
-              <label className="required-field">Select Course</label>
-              <select 
-                name="courseId" 
-                required 
-                className="category-select"
-                value={editingCourseId || ''}
-                onChange={(e) => setEditingCourseId(e.target.value)}
-              >
-                <option value="">Choose a course</option>
-                {courses.map(course => (
-                  <option key={course.id} value={course.id}>
-                    {course.title}
-                  </option>
-                ))}
-              </select>
+        )}
+
+        {isLoading ? (
+          <div className="flex items-center justify-center h-[calc(100vh-300px)]">
+            <div className="scale-[2.5]">
+              <Loader />
             </div>
-          )}
-
-          {editingCourseId && (
-            <>
-              {editingLesson ? (
-                <>
-                  <h2>Edit Lesson</h2>
-                  <LessonForm
-                    lesson={editingLesson}
-                    onSubmit={handleUpdateLesson}
-                    onCancel={handleCancelEdit}
-                    submitText="Update Lesson"
-                  />
-                </>
-              ) : (
-                <>
-                  <LessonForm
-                    onSubmit={handleCreateLesson}
-                    submitText="Create Lesson"
-                  />
-                </>
-              )}
-
-              <div className="items-list">
-                {lessons.length > 0 ? (
-                  lessons.map(lesson => (
-                    <div key={lesson.id} className="lesson-card">
-                      <div className="card-header">
-                        <h5>{lesson.title}</h5>
-                        <span className="lesson-type">{lesson.type}</span>
-                      </div>
-                      <p>{lesson.description}</p>
-                      <div className="lesson-content">
-                        {lesson.content}
-                      </div>
-                      <div className="card-stats">
-                        <span>Duration: {lesson.duration} minutes</span>
-                        <span>Order: {lesson.order}</span>
-                      </div>
-                      <div className="card-actions">
-                        <button
-                          className="edit-btn"
-                          onClick={() => handleEditLesson(lesson)}
-                          title="Edit Lesson"
-                        >
-                          ✎
-                        </button>
-                        <button
-                          className="delete-btn"
-                          onClick={() => handleDeleteLesson(lesson.id)}
-                          title="Delete Lesson"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                    <></>
-                )}
+          </div>
+        ) : (
+          <>
+            {!courseId && (
+              <div className="form-group">
+                <label className="required-field">Select Course</label>
+                <select 
+                  name="courseId" 
+                  required 
+                  className="category-select"
+                  value={editingCourseId || ''}
+                  onChange={(e) => setEditingCourseId(e.target.value)}
+                >
+                  <option value="">Choose a course</option>
+                  {courses.map(course => (
+                    <option key={course.id} value={course.id}>
+                      {course.title}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </>
-          )}
-        </>
-      )}
+            )}
+
+            {editingCourseId && (
+              <>
+                {editingLesson ? (
+                  <>
+                    <h2>Edit Lesson</h2>
+                    <LessonForm
+                      lesson={editingLesson}
+                      onSubmit={handleUpdateLesson}
+                      onCancel={handleCancelEdit}
+                      submitText="Update Lesson"
+                    />
+                  </>
+                ) : (
+                  <>
+                    <LessonForm
+                      onSubmit={handleCreateLesson}
+                      onCancel={() => navigate(-1)}
+                      submitText="Create Lesson"
+                    />
+                  </>
+                )}
+
+                <div className="items-list">
+                  {lessons.length > 0 ? (
+                    lessons.map(lesson => (
+                      <div key={lesson.id} className="lesson-card">
+                        <div className="card-header">
+                          <h5>{lesson.title}</h5>
+                          <span className="lesson-type">{lesson.type}</span>
+                        </div>
+                        <p>{lesson.description}</p>
+                        <div className="lesson-content">
+                          {lesson.content}
+                        </div>
+                        <div className="card-stats">
+                          <span>Duration: {lesson.duration} minutes</span>
+                          <span>Order: {lesson.order}</span>
+                        </div>
+                        <div className="card-actions">
+                          <button
+                            className="edit-btn"
+                            onClick={() => handleEditLesson(lesson)}
+                            title="Edit Lesson"
+                          >
+                            ✎
+                          </button>
+                          <button
+                            className="delete-btn"
+                            onClick={() => handleDeleteLesson(lesson.id)}
+                            title="Delete Lesson"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              </>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
