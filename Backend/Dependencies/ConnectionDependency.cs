@@ -8,9 +8,9 @@ public static class ConnectionDependency
     {
         services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-        // services.AddIdentity<User, IdentityRole<int>>()
-        //     .AddEntityFrameworkStores<ApplicationDbContext>()
-        //     .AddDefaultTokenProviders();
+        //        services.AddIdentity<User, IdentityRole<int>>()
+        //            .AddEntityFrameworkStores<ApplicationDbContext>()
+        //            .AddDefaultTokenProviders();
         //        services.AddDbContext<ApplicationDbContext>(options =>
         //        options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
         //sqlOptions => sqlOptions.EnableRetryOnFailure()));

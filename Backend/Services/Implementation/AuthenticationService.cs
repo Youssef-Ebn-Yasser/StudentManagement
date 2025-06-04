@@ -36,7 +36,7 @@ public class AuthenticationService : IAuthenticationService
         _logger = logger;
         _context = context;
         _emailSender = emailSender;
-        _baseUrl = configuration["ApplicationSettings:BaseUrl"] ?? "https://localhost:7099";
+        _baseUrl = configuration["ApplicationSettings:BaseUrl"] ?? "https://localhost:5175";
         _responseHandler = responseHandler;
         _unitOfWork = unitOfWork;
     }
@@ -44,10 +44,10 @@ public class AuthenticationService : IAuthenticationService
     public async Task<Response<TokenDto>> LoginAsync(LoginDto model)
     {
         //var user = await _userManager.FindByEmailAsync(model.Email);
-        var user = await _unitOfWork.Repository<User>().GetTableNoTracking().FirstOrDefaultAsync(u => u.Email == model.Email);
+        var user = await _unitOfWork.Repository<User>().GetTableNoTracking().FirstOrDefaultAsync(u => u.Email == model.Email && u.IsDeleted == false);
         if (user == null)
         {
-            return _responseHandler.BadRequest<TokenDto>("Invalid credentials");
+            return _responseHandler.BadRequest<TokenDto>("Invalid credentials this student not exist");
         }
 
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, model.Password);
@@ -244,10 +244,10 @@ public class AuthenticationService : IAuthenticationService
     public async Task<Response<string>> ForgotPasswordAsync(string email)
     {
         var user = await _userManager.FindByEmailAsync(email);
-        if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)) || user.Email == null)
-        {
-            return _responseHandler.Success("Password reset link has been sent if the email exists");
-        }
+        //if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)) || user.Email == null)
+        //{
+        //    return _responseHandler.Success("Password reset link has been sent if the email exists");
+        //}
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
