@@ -27,6 +27,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
     public DbSet<StudentQuizeAnswer> studentQuizeAnswers { get; set; }
     public DbSet<QuestionOption> QuestionOptions { get; set; }
     public DbSet<Meeting> Meetings { get; set; }
+    public DbSet<ManualPayment> ManualPayments { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
