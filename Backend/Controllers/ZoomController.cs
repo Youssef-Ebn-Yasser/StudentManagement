@@ -95,39 +95,39 @@ public class ZoomController : AppControllerBase
 
 
 
-    [HttpGet("attendance/{meetingUUID}")]
-    public async Task<IActionResult> GetAttendance(string meetingUUID)
-    {
-        try
-        {
-            var participants = await GetMeetingParticipantsAsync(meetingUUID);
-            return Ok(participants);
-        }
-        catch (HttpRequestException ex)
-        {
-            return StatusCode(502, $"Zoom API Error: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Internal Error: {ex.Message}");
-        }
-    }
-    private async Task<string> GetAccessTokenAsync()
-    {
-        var clientId = _configuration["Zoom:ClientId"];
-        var clientSecret = _configuration["Zoom:ClientSecret"];
-        var accountId = "5095749697";
+    //[HttpGet("attendance/{meetingUUID}")]
+    //public async Task<IActionResult> GetAttendance(string meetingUUID)
+    //{
+    //    try
+    //    {
+    //        var participants = await GetMeetingParticipantsAsync(meetingUUID);
+    //        return Ok(participants);
+    //    }
+    //    catch (HttpRequestException ex)
+    //    {
+    //        return StatusCode(502, $"Zoom API Error: {ex.Message}");
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(500, $"Internal Error: {ex.Message}");
+    //    }
+    //}
+    //private async Task<string> GetAccessTokenAsync()
+    //{
+    //    var clientId = _configuration["Zoom:ClientId"];
+    //    var clientSecret = _configuration["Zoom:ClientSecret"];
+    //    var accountId = "5095749697";
 
-        var client = new HttpClient();
-        var request = new HttpRequestMessage(HttpMethod.Post, "https://zoom.us/oauth/token");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}")));
-        request.Content = new StringContent($"grant_type=account_credentials&account_id={accountId}", Encoding.UTF8, "application/x-www-form-urlencoded");
+    //    var client = new HttpClient();
+    //    var request = new HttpRequestMessage(HttpMethod.Post, "https://zoom.us/oauth/token");
+    //    request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}")));
+    //    request.Content = new StringContent($"grant_type=account_credentials&account_id={accountId}", Encoding.UTF8, "application/x-www-form-urlencoded");
 
-        var response = await client.SendAsync(request);
-        var content = await response.Content.ReadAsStringAsync();
-        var json = JsonDocument.Parse(content);
-        return json.RootElement.GetProperty("access_token").GetString();
-    }
+    //    var response = await client.SendAsync(request);
+    //    var content = await response.Content.ReadAsStringAsync();
+    //    var json = JsonDocument.Parse(content);
+    //    return json.RootElement.GetProperty("access_token").GetString();
+    //}
 
     private async Task<List<ZoomParticipant>> GetMeetingParticipantsAsync(string meetingUUID)
     {
@@ -174,59 +174,73 @@ public class ZoomController : AppControllerBase
 
 
 
-    [HttpPost("create-meeting/{userEmail}")]
-    public async Task<IActionResult> CreateMeeting(string userEmail)
+    [HttpPost("zoom/create-meeting")]
+    public async Task<IActionResult> CreateMeeting()
     {
-        var accessToken = await GetZoomAccessTokenAsync();
+        var zoomEmail = "yh29152@gmail.com"; // host user
+        var authService = new ZoomAuthService();
+        var accessToken = await GetAccessTokenAsync();
 
-        var client = _httpClientFactory.CreateClient();
+        using var client = new HttpClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-        var meeting = new
+        var body = new
         {
             topic = "Test Meeting",
             type = 2,
-            start_time = DateTime.UtcNow.AddHours(1).ToString("yyyy-MM-ddTHH:mm:ssZ"),
-            duration = 60,
+            start_time = DateTime.UtcNow.AddMinutes(5).ToString("yyyy-MM-ddTHH:mm:ssZ"),
+            duration = 30,
             timezone = "UTC",
+            agenda = "Test Meeting via API",
             settings = new
             {
-                host_video = true,
+                join_before_host = true,
+                jbh_time = 10, // Optional: minutes before host users can join (0–15, only works for type 2)
                 participant_video = true,
-                join_before_host = true
+                host_video = true
             }
         };
 
-        var json = JsonSerializer.Serialize(meeting);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-        var response = await client.PostAsync($"https://api.zoom.us/v2/users/{userEmail}/meetings", content);
+        var response = await client.PostAsJsonAsync($"https://api.zoom.us/v2/users/{zoomEmail}/meetings", body);
         var result = await response.Content.ReadAsStringAsync();
-
         return Content(result, "application/json");
     }
-
-    private async Task<string> GetZoomAccessTokenAsync()
+    private async Task<string> GetAccessTokenAsync()
     {
         var clientId = "kv9ZQ1IaTHGGNXIqpvUoIg";
         var clientSecret = "8mcmkUivhbiHXaZBq0WT1aFUn3cQbfR3";
         var accountId = "4nxWdzJjQfWNVpaC2RTLKQ";
 
-        var handler = new HttpClientHandler
-        {
-            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-        };
-        var client = new HttpClient(handler);
+        using var client = new HttpClient();
 
         var byteArray = Encoding.ASCII.GetBytes($"{clientId}:{clientSecret}");
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
-        var content = new StringContent($"grant_type=account_credentials&account_id={accountId}", Encoding.UTF8, "application/x-www-form-urlencoded");
-        var response = await client.PostAsync("https://zoom.us/oauth/token", content);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        var data = new Dictionary<string, string>
+        {
+            {"grant_type", "account_credentials"},
+            {"account_id", accountId}
+        };
 
-        using var doc = JsonDocument.Parse(responseBody);
-        return doc.RootElement.GetProperty("access_token").GetString();
+        var response = await client.PostAsync("https://zoom.us/oauth/token", new FormUrlEncodedContent(data));
+        var content = await response.Content.ReadAsStringAsync();
+        var token = JsonSerializer.Deserialize<JsonElement>(content).GetProperty("access_token").GetString();
+        return token!;
+    }
+
+    [HttpGet("zoom/attendance/{meetingId}")]
+    public async Task<IActionResult> GetAttendance(string meetingId)
+    {
+        var authService = new ZoomAuthService();
+        var accessToken = await GetAccessTokenAsync();
+
+        using var client = new HttpClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+        var response = await client.GetAsync($"https://api.zoom.us/v2/report/meetings/{meetingId}/participants?page_size=30");
+        var content = await response.Content.ReadAsStringAsync();
+
+        return Content(content, "application/json");
     }
 
 }
