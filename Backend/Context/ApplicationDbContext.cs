@@ -28,9 +28,10 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
     public DbSet<QuestionOption> QuestionOptions { get; set; }
     public DbSet<StudentQuestionAnswer> StudentQuestionAnswers { get; set; }
     public DbSet<StudentQuestionOption> StudentQuestionOptions { get; set; }
-
-
     public DbSet<Meeting> Meetings { get; set; }
+
+    public DbSet<ChatRoom> ChatRooms { get; set; }
+    public DbSet<ChatMessage> ChatMessages { get; set; }
     public DbSet<ManualPayment> ManualPayments { get; set; }
     public DbSet<PaymentSettings> PaymentSettings { get; set; }
 
@@ -63,5 +64,39 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
         modelBuilder.Entity<IdentityUserLogin<int>>().ToTable("UserLogins");
         modelBuilder.Entity<IdentityRoleClaim<int>>().ToTable("RoleClaims");
         modelBuilder.Entity<IdentityUserToken<int>>().ToTable("UserTokens");
+
+
+        #region chat 
+        // Configure ChatRoom relationships
+        modelBuilder.Entity<ChatRoom>()
+            .HasOne(cr => cr.Teacher)
+            .WithMany() // Assuming ApplicationUser doesn't have a direct collection of ChatRooms (as teacher)
+            .HasForeignKey(cr => cr.TeacherId)
+            .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete if user is deleted
+
+        modelBuilder.Entity<ChatRoom>()
+            .HasOne(cr => cr.Student)
+            .WithMany() // Assuming ApplicationUser doesn't have a direct collection of ChatRooms (as student)
+            .HasForeignKey(cr => cr.StudentId)
+            .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete if user is deleted
+
+        // Ensure unique combination of TeacherId and StudentId for a chat room
+        modelBuilder.Entity<ChatRoom>()
+            .HasIndex(cr => new { cr.TeacherId, cr.StudentId })
+            .IsUnique();
+
+        // Configure ChatMessage relationships
+        modelBuilder.Entity<ChatMessage>()
+            .HasOne(cm => cm.ChatRoom)
+            .WithMany(cr => cr.Messages)
+            .HasForeignKey(cm => cm.ChatRoomId)
+            .OnDelete(DeleteBehavior.Cascade); // If a chat room is deleted, delete its messages
+
+        modelBuilder.Entity<ChatMessage>()
+            .HasOne(cm => cm.Sender)
+            .WithMany() // Assuming ApplicationUser doesn't have a direct collection of ChatMessages (as sender)
+            .HasForeignKey(cm => cm.SenderId)
+            .OnDelete(DeleteBehavior.Restrict);
+        #endregion
     }
 }

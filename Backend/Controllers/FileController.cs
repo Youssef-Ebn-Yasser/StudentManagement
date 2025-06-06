@@ -6,10 +6,12 @@
 public class FileController : ControllerBase
 {
     private readonly IFileService _cloudinaryService;
+    private readonly PhysicalFileUpload physicalFileUpload;
 
-    public FileController(IFileService cloudinaryService)
+    public FileController(IFileService cloudinaryService, PhysicalFileUpload physicalFileUpload)
     {
         _cloudinaryService = cloudinaryService;
+        this.physicalFileUpload = physicalFileUpload;
     }
 
     //Endpoint 1: Upload file
@@ -20,6 +22,17 @@ public class FileController : ControllerBase
             return BadRequest("No file uploaded");
 
         var url = await _cloudinaryService.UploadFileAsync(file);
+        if (url == null)
+            return StatusCode(500, "Failed to upload file");
+
+        return Ok(new { Url = url });
+    }
+    //Endpoint 1: Upload file
+    [HttpPost("upload/physical/file")]
+    public async Task<IActionResult> UploadPhysicalFile(IFormFile file)
+    {
+
+        var url = await physicalFileUpload.UploadFile("teacher", file);
         if (url == null)
             return StatusCode(500, "Failed to upload file");
 
