@@ -8,10 +8,9 @@ public class StudentQuestionAnswer
     public int QuestionId { get; set; }
     public int studentQuizeAnswerId { get; set; }
 
-
     // Navigational properties
     public Question Question { get; set; }
     public StudentQuizeAnswer studentQuizeAnswer { get; set; }
 
-    public List<StudentQuestionOption> studentQuestionOptions { get; set; }
+    public List<StudentQuestionOption>? studentQuestionOptions { get; set; }
 }

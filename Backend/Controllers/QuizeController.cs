@@ -1,4 +1,7 @@
-﻿namespace Backend.Controllers;
+﻿using Backend.DTOs.QuizeDTOs;
+using Stripe;
+
+namespace Backend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -8,15 +11,38 @@ public class QuizeController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IEmailSender _emailSender;
     private readonly GeminiService _geminiService;
+    private readonly IQuizService _service;
 
-    public QuizeController(IUnitOfWork unitOfWork, IMapper mapper, IEmailSender emailSender, GeminiService geminiService)
+    public QuizeController(IUnitOfWork unitOfWork, IMapper mapper, IEmailSender emailSender, GeminiService geminiService, IQuizService service)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _emailSender = emailSender;
         _geminiService = geminiService;
+        _service = service;
     }
 
+
+    [HttpPost("CorrectAnswer")]
+    public IActionResult CorrectAnswer([FromBody] CorrectQuizDto dto)
+    {
+        _service.CorrectQuiz(dto.AnswerId  ,dto.IsCorrect);
+        return Ok();
+    }
+
+    [HttpGet("ToCorrect")]
+    public IActionResult GetQuizzesToCorrect([FromQuery] int lessonId)
+    {
+        var result = _service.GetQuizzesToCorrectByLessonId(lessonId);
+        return Ok(result);
+    }
+
+    [HttpGet("StudentAnswers")]
+    public IActionResult GetStudentAnswers([FromQuery] int studentQuizAnswerId)
+    {
+        var result = _service.GetStudentQuizAnswer(studentQuizAnswerId);
+        return Ok(result);
+    }
 
 
 
