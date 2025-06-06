@@ -178,7 +178,6 @@ public class ZoomController : AppControllerBase
     public async Task<IActionResult> CreateMeeting()
     {
         var zoomEmail = "yh29152@gmail.com"; // host user
-        var authService = new ZoomAuthService();
         var accessToken = await GetAccessTokenAsync();
 
         using var client = new HttpClient();
@@ -231,7 +230,6 @@ public class ZoomController : AppControllerBase
     [HttpGet("zoom/attendance/{meetingId}")]
     public async Task<IActionResult> GetAttendance(string meetingId)
     {
-        var authService = new ZoomAuthService();
         var accessToken = await GetAccessTokenAsync();
 
         using var client = new HttpClient();
