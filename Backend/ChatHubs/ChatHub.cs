@@ -1,39 +1,50 @@
-﻿using Backend.DTOs.MessageDTOs;
-using Microsoft.AspNetCore.SignalR;
-
-namespace Backend.ChatHubs;
+﻿namespace Backend.ChatHubs;
 
 public class ChatHub : Hub
 {
-    #region    Fields
-    private readonly IChatHelper _chatHelper;
+    #region   Fields
+    private readonly ApplicationDbContext _context;
     #endregion
 
-    #region    Constructor
-    public ChatHub(IChatHelper chatHelper)
+    #region   Constructor
+    public ChatHub(ApplicationDbContext context)
     {
-        _chatHelper = chatHelper;
+        _context = context;
     }
     #endregion
 
-    #region    Handle Methods
-    public async Task SendMessage(MessageDto message, string groupName)
+    #region    Methods
+    public async Task JoinRoom(int chatRoomId)
     {
-        // save message
-        var result = await _chatHelper.SaveMessage(message);
-        if (result < 0) return;
-
-        // send to all subscriber in chat group
-        await Clients.Group(groupName).SendAsync("ReceiveMessage", message);
+        // Add the connection to a group based on chatRoomId
+        await Groups.AddToGroupAsync(Context.ConnectionId, chatRoomId.ToString());
     }
-    public async Task JoinGroup(MessageDto message, string groupName)
+    public async Task SendMessage(int chatRoomId, int senderId, string message)
     {
-        // check if in not group add if exist say he is exist
-        var result = await _chatHelper.SaveMessage(message);
-        if (result < 0) return;
+        var chatMessage = new ChatMessage
+        {
+            ChatRoomId = chatRoomId,
+            SenderId = senderId,
+            Content = message,
+            Timestamp = DateTime.UtcNow,
+            IsRead = false
+        };
 
-        // send to all subscriber in chat group that new on is join
-        await Clients.Group(groupName).SendAsync("NotifyGoinToGroup", message);
+        _context.ChatMessages.Add(chatMessage);
+
+        // update last message can be good in tracking
+        var room = await _context.ChatRooms.FindAsync(chatRoomId);
+        if (room != null)
+            room.LastMessageAt = chatMessage.Timestamp;
+
+        await _context.SaveChangesAsync();
+
+        await Clients.Group(chatRoomId.ToString()).SendAsync("ReceiveMessage", new
+        {
+            SenderId = senderId,
+            Content = message,
+            Timestamp = DateTime.UtcNow
+        });
     }
     #endregion
 }
