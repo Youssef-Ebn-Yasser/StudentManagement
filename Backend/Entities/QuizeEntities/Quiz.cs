@@ -13,8 +13,6 @@ public class Quiz
     public int NumberOfQuestions { get; set; }
     public int PossiblePoints { get; set; } = 0;
     public bool IsAutoCorrect { get; set; }
-
-
     public List<Question>? questions { get; set; }
     public Lesson Lesson { get; set; }
 }

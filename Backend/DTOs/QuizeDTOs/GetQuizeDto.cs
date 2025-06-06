@@ -15,3 +15,24 @@ public class SendQuizeQuestion : QuestionListDto
 {
     public string? StudentAnswer { get; set; }
 }
+
+public class QuizToCorrectDto
+{
+    public int Id { get; set; }
+    public string QuizName { get; set; }
+    public string StudentName { get; set; }
+    public int StudentQuizAnswerId { get; set; }
+}
+
+public class StudentQuizAnswerDto
+{
+    public string Answer { get; set; }
+    public bool? IsCorrect { get; set; }
+}
+
+public class CorrectQuizDto
+{
+    public int AnswerId { get; set; }
+    public bool IsCorrect { get; set; }
+    public int Degree { get; set; }
+}
