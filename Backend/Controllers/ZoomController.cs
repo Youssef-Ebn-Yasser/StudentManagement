@@ -93,42 +93,6 @@ public class ZoomController : AppControllerBase
         }
     }
 
-
-
-    //[HttpGet("attendance/{meetingUUID}")]
-    //public async Task<IActionResult> GetAttendance(string meetingUUID)
-    //{
-    //    try
-    //    {
-    //        var participants = await GetMeetingParticipantsAsync(meetingUUID);
-    //        return Ok(participants);
-    //    }
-    //    catch (HttpRequestException ex)
-    //    {
-    //        return StatusCode(502, $"Zoom API Error: {ex.Message}");
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return StatusCode(500, $"Internal Error: {ex.Message}");
-    //    }
-    //}
-    //private async Task<string> GetAccessTokenAsync()
-    //{
-    //    var clientId = _configuration["Zoom:ClientId"];
-    //    var clientSecret = _configuration["Zoom:ClientSecret"];
-    //    var accountId = "5095749697";
-
-    //    var client = new HttpClient();
-    //    var request = new HttpRequestMessage(HttpMethod.Post, "https://zoom.us/oauth/token");
-    //    request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}")));
-    //    request.Content = new StringContent($"grant_type=account_credentials&account_id={accountId}", Encoding.UTF8, "application/x-www-form-urlencoded");
-
-    //    var response = await client.SendAsync(request);
-    //    var content = await response.Content.ReadAsStringAsync();
-    //    var json = JsonDocument.Parse(content);
-    //    return json.RootElement.GetProperty("access_token").GetString();
-    //}
-
     private async Task<List<ZoomParticipant>> GetMeetingParticipantsAsync(string meetingUUID)
     {
         var accessToken = await GetAccessTokenAsync();
