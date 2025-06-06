@@ -8,15 +8,15 @@ public class StudentService : ResponseHandler, IStudentService
     #region   Fields
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    private readonly IFileService _fileService;
+    private readonly IPhysicalFileUpload _physicalFileUpload;
     #endregion
 
     #region Constructor
-    public StudentService(IUnitOfWork unitOfWork, IMapper mapper, IFileService fileService)
+    public StudentService(IUnitOfWork unitOfWork, IMapper mapper, IPhysicalFileUpload physicalFileUpload)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
-        _fileService = fileService;
+        _physicalFileUpload = physicalFileUpload;
     }
     #endregion
 
@@ -212,7 +212,7 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (updateStudentDto.Image != null)
         {
-            var path = await _fileService.UploadFileAsync(updateStudentDto.Image);
+            var path = await _physicalFileUpload.UploadFileAsync("Students", updateStudentDto.Image);
             student.ImageUrl = path;
         }
         _unitOfWork.Repository<Student>().Update(student);

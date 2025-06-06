@@ -6,12 +6,12 @@ namespace Backend.Services.Implementation
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public IFileService _fileService;
-        public MaterialService(IUnitOfWork unitOfWork, IMapper mapper , IFileService fileService)
+        private readonly IPhysicalFileUpload _physicalFileUpload;
+        public MaterialService(IUnitOfWork unitOfWork, IMapper mapper, IPhysicalFileUpload physicalFileUpload)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _fileService = fileService;
+            _physicalFileUpload = physicalFileUpload;
         }
 
         public async Task<Response<List<ShowMaterialDto>>> GetAllMaterialByLessonIdAsync(int lessonId)
@@ -27,8 +27,7 @@ namespace Backend.Services.Implementation
 
         public async Task<Response<string>> CreateAsync(CreateMaterialDto createMaterialDto)
         {
-
-            var path = await _fileService.UploadFileAsync(createMaterialDto.Data);
+            var path = await _physicalFileUpload.UploadFileAsync("Material", createMaterialDto.Data);
 
             var material = new Material
             {
@@ -40,8 +39,8 @@ namespace Backend.Services.Implementation
                 CreatedAt = DateTime.UtcNow,
                 IsDeleted = false,
             };
-           
-           // var material = _mapper.Map<Material>(createMaterialDto);
+
+            // var material = _mapper.Map<Material>(createMaterialDto);
             await _unitOfWork.Repository<Material>().AddAsync(material);
             _unitOfWork.Complete();
             return Success("Material Created Successfully");
@@ -53,7 +52,7 @@ namespace Backend.Services.Implementation
             if (existingMaterial == null)
                 return NotFound<string>("Material Not Found");
 
-            var path = await _fileService.UploadFileAsync(updateMaterialDto.Data);
+            var path = await _physicalFileUpload.UploadFileAsync("Material", updateMaterialDto.Data);
 
             existingMaterial.Title = updateMaterialDto.Title;
             existingMaterial.Content = updateMaterialDto.Content;

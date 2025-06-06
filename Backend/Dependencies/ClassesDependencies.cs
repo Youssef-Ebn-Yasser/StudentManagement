@@ -29,7 +29,7 @@ public static class ClassesDependencies
         services.AddTransient<IStudentAssignmentService, StudentAssignmentService>();
         services.AddTransient<IMeetingService, MeetingService>();
         services.AddTransient<IChatService, ChatService>();
-        services.AddScoped<PhysicalFileUpload>();
+        services.AddScoped<IPhysicalFileUpload, PhysicalFileUpload>();
 
 
         services.AddTransient<GeminiService>();
