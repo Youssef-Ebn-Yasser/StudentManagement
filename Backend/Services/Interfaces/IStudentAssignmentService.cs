@@ -11,4 +11,6 @@ public interface IStudentAssignmentService
     public Task<Response<List<AssignmentOfLessonDto>>> GetAllAssignmentOfCourse(String CourseName, string StudentName);
 
 
+
+
 }

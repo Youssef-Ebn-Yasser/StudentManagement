@@ -1,4 +1,6 @@
-﻿namespace Backend.Dependencies;
+﻿using Microsoft.Extensions.Localization;
+
+namespace Backend.Dependencies;
 
 public static class ClassesDependencies
 {
@@ -31,6 +33,7 @@ public static class ClassesDependencies
         services.AddTransient<IChatService, ChatService>();
         services.AddScoped<IPhysicalFileUpload, PhysicalFileUpload>();
 
+        services.AddSingleton(typeof(IStringLocalizer<>), typeof(StringLocalizer<>));
 
         services.AddTransient<GeminiService>();
 

@@ -133,9 +133,7 @@ public class TeacherService : ResponseHandler, ITeacherService
 
         if (updateTeacherDto.Image is not null)
         {
-            var ImageUrl = await _fileService.DeleteImageByUrlAsync(teacher!.ProfileImagePath!);
-
-            var newImageUrl = await _fileService.UploadFileAsync(updateTeacherDto.Image);
+            var newImageUrl = await _physicalFileUpload.UploadFileAsync("Teachers", updateTeacherDto.Image);
 
             newTeacher!.ProfileImagePath = newImageUrl;
         }

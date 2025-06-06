@@ -41,32 +41,32 @@ public class FileController : ControllerBase
     }
 
 
-    [HttpPost("view")]
-    public IActionResult ViewFile([FromBody] string relativePath)
-    {
-        var filePath = physicalFileUpload.GetPhysicalPath(relativePath);
+    //[HttpPost("view")]
+    //public IActionResult ViewFile([FromBody] string relativePath)
+    //{
+    //    var filePath = physicalFileUpload.GetPhysicalPath(relativePath);
 
-        if (!System.IO.File.Exists(filePath))
-            return NotFound();
+    //    if (!System.IO.File.Exists(filePath))
+    //        return NotFound();
 
-        var ext = Path.GetExtension(filePath).ToLowerInvariant();
-        var contentType = ext switch
-        {
-            ".pdf" => "application/pdf",
-            ".jpg" or ".jpeg" => "image/jpeg",
-            ".png" => "image/png",
-            ".gif" => "image/gif",
-            ".webp" => "image/webp",
-            _ => "application/octet-stream"
-        };
+    //    var ext = Path.GetExtension(filePath).ToLowerInvariant();
+    //    var contentType = ext switch
+    //    {
+    //        ".pdf" => "application/pdf",
+    //        ".jpg" or ".jpeg" => "image/jpeg",
+    //        ".png" => "image/png",
+    //        ".gif" => "image/gif",
+    //        ".webp" => "image/webp",
+    //        _ => "application/octet-stream"
+    //    };
 
-        var fileStream = System.IO.File.OpenRead(filePath);
+    //    var fileStream = System.IO.File.OpenRead(filePath);
 
-        Response.Headers["Content-Disposition"] = $"inline; filename=\"{Path.GetFileName(filePath)}\"";
+    //    Response.Headers["Content-Disposition"] = $"inline; filename=\"{Path.GetFileName(filePath)}\"";
 
 
-        return File(fileStream, contentType);
-    }
+    //    return File(fileStream, contentType);
+    //}
 
     [HttpDelete("delete")]
     public async Task<IActionResult> DeleteImage([FromQuery] string url)

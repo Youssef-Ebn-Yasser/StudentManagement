@@ -66,6 +66,27 @@ builder.Services.AddSignalR();
 #endregion
 
 
+#region   Localization
+//builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+//builder.Configuration
+//.AddJsonFile("Resources/Resources.en.json", optional: false, reloadOnChange: true)
+//.AddJsonFile("Resources/Resources.ar.json", optional: true, reloadOnChange: true);
+
+//builder.Services.Configure<RequestLocalizationOptions>(options =>
+//{
+//    var supportedCultures = new[]
+//    {
+//        new CultureInfo("en"),
+//        new CultureInfo("ar")
+//    };
+
+//    options.DefaultRequestCulture = new RequestCulture("en");
+//    options.SupportedCultures = supportedCultures;
+//    options.SupportedUICultures = supportedCultures;
+//});
+
+#endregion
+
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 
@@ -123,6 +144,12 @@ app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 
+#region   localization
+//app.UseRequestLocalization();
+//var localizationOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value;
+//app.UseRequestLocalization(localizationOptions);
+
+#endregion
 
 // Map SignalR Hub
 app.MapHub<ChatHub>("/chatHub"); // The path clients will connect to
