@@ -1,5 +1,4 @@
 ﻿using Backend.DTOs.AssignmentDTO;
-using Backend.Entities;
 
 namespace Backend.Services.Implementation;
 
@@ -7,16 +6,16 @@ public class StudentAssignmentService : ResponseHandler, IStudentAssignmentServi
 {
     #region    Fields
     public IUnitOfWork _unitOfWork { get; }
-    public IFileService _fileService { get; }
+    private readonly IPhysicalFileUpload _physicalFileUpload;
     public IMapper _mapper { get; }
     #endregion
 
     #region    Constructor
-    public StudentAssignmentService(IUnitOfWork unitOfWork, IFileService fileService, IMapper Mapper)
+    public StudentAssignmentService(IUnitOfWork unitOfWork, IMapper Mapper, IPhysicalFileUpload physicalFileUpload)
     {
         _unitOfWork = unitOfWork;
-        _fileService = fileService;
         _mapper = Mapper;
+        _physicalFileUpload = physicalFileUpload;
     }
     #endregion
 
@@ -31,7 +30,7 @@ public class StudentAssignmentService : ResponseHandler, IStudentAssignmentServi
             return NotFound<string>("Student or Lesson not found.");
 
 
-        var path = await _fileService.UploadFileAsync(assignment.File);
+        var path = await _physicalFileUpload.UploadFileAsync("StudentAssignment", assignment.File);
 
         var newassignment = new StudentAssignment
         {
@@ -91,7 +90,7 @@ public class StudentAssignmentService : ResponseHandler, IStudentAssignmentServi
         var student = await _unitOfWork.Repository<Student>()
                                        .GetTableNoTracking()
                                        .Include(s => s.StudentCourses)
-                                       .FirstOrDefaultAsync(x => x.Name == StudentName && x.StudentCourses.Any(c=> c.CourseId == course.Id));
+                                       .FirstOrDefaultAsync(x => x.Name == StudentName && x.StudentCourses.Any(c => c.CourseId == course.Id));
         if (student == null)
             return NotFound<List<AssignmentOfLessonDto>>("Student not found.");
         var result = await _unitOfWork.Repository<StudentAssignment>()
@@ -105,7 +104,6 @@ public class StudentAssignmentService : ResponseHandler, IStudentAssignmentServi
     public class StudentAssignmentCourseDto
     {
         public string Path { get; set; }
-
     }
     #endregion
 }

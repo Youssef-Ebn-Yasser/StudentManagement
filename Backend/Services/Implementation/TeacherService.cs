@@ -7,19 +7,19 @@ public class TeacherService : ResponseHandler, ITeacherService
 {
     #region   Fields
     public IUnitOfWork _unitOfWork { get; }
-    public IFileService _fileService { get; }
+    private readonly IPhysicalFileUpload _physicalFileUpload;
     public IMapper _mapper { get; }
     public IAuthenticationService _authenticationService { get; }
     #endregion
 
     #region   Constructor
     public TeacherService(IUnitOfWork unitOfWork,
-                          IFileService fileService,
+                          IPhysicalFileUpload physicalFileUpload,
                           IMapper mapper,
                           IAuthenticationService authenticationService)
     {
         _unitOfWork = unitOfWork;
-        _fileService = fileService;
+        _physicalFileUpload = physicalFileUpload;
         _mapper = mapper;
         _authenticationService = authenticationService;
     }
@@ -105,7 +105,7 @@ public class TeacherService : ResponseHandler, ITeacherService
 
         if (createTeacherDto.Image is not null)
         {
-            var ImageUrl = await _fileService.UploadFileAsync(createTeacherDto.Image);
+            var ImageUrl = await _physicalFileUpload.UploadFileAsync("Teachers", createTeacherDto.Image);
             teacher.ProfileImagePath = ImageUrl;
         }
 
@@ -133,9 +133,7 @@ public class TeacherService : ResponseHandler, ITeacherService
 
         if (updateTeacherDto.Image is not null)
         {
-            var ImageUrl = await _fileService.DeleteImageByUrlAsync(teacher!.ProfileImagePath!);
-
-            var newImageUrl = await _fileService.UploadFileAsync(updateTeacherDto.Image);
+            var newImageUrl = await _physicalFileUpload.UploadFileAsync("Teachers", updateTeacherDto.Image);
 
             newTeacher!.ProfileImagePath = newImageUrl;
         }
