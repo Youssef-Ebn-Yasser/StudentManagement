@@ -8,18 +8,16 @@ public class CourseService : ResponseHandler, ICourseService
     #region   Fields
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    private readonly IFileService _fileService;
+    private readonly IPhysicalFileUpload _physicalFileUpload;
     #endregion
 
     #region   Counstructor
-    public CourseService(IUnitOfWork unitOfWork, IMapper mapper, IFileService fileService)
+    public CourseService(IUnitOfWork unitOfWork, IMapper mapper, IPhysicalFileUpload physicalFileUpload)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
-        _fileService = fileService;
+        _physicalFileUpload = physicalFileUpload;
     }
-
-
     #endregion
 
     #region   Handle Methods
@@ -125,7 +123,7 @@ public class CourseService : ResponseHandler, ICourseService
 
         if (createCourseDto.Image != null)
         {
-            imageUrl = await _fileService.UploadFileAsync(createCourseDto.Image);
+            imageUrl = await _physicalFileUpload.UploadFileAsync("Courses", createCourseDto.Image);
 
             if (imageUrl == null)
                 return BadRequest<string>("Image upload failed");
@@ -186,13 +184,6 @@ public class CourseService : ResponseHandler, ICourseService
         if (course == null)
             return NotFound<string>("Course not found");
 
-        if (!string.IsNullOrWhiteSpace(course.ImagePath))
-        {
-            var deleteResult = await _fileService.DeleteImageByUrlAsync(course.ImagePath);
-            if (!deleteResult.Success)
-                return BadRequest<string>($"Failed to delete image: {deleteResult.Message}");
-        }
-
         //soft delete using IsDeleted flag and checking if the course is already deleted and there is lessons in the course make them Isdeleted true
         if (course.lessons != null && course.lessons.Any())
         {
@@ -239,7 +230,5 @@ public class CourseService : ResponseHandler, ICourseService
         var result = _mapper.Map<List<ShowCourseDto>>(courses);
         return Success(result);
     }
-
-
     #endregion
 }

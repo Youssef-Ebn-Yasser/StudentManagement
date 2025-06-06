@@ -7,6 +7,7 @@ public class StudentAssignment : BaseEntity
     [ForeignKey("LessonId")]
     public Lesson? Lesson { get; set; }
     public int? LessonId { get; set; }
+    public int DegreePercentage { get; set; }
 
     [ForeignKey("StudentId")]
     public Student? Student { get; set; }
