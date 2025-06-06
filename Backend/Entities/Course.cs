@@ -12,4 +12,5 @@ public class Course : BaseEntity
     public Teacher? Teacher { get; set; }
     public int? TecherId { get; set; }
     public List<StudentCourse>? StudentCourses { get; set; }
+    public string Name { get; internal set; }
 }

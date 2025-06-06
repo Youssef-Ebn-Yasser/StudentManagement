@@ -10,4 +10,5 @@ public class Lesson : BaseEntity
     [ForeignKey("CourseId")]
     public Course? Course { get; set; }
     public int? CourseId { get; set; }
+    public string Name { get; internal set; }
 }
