@@ -2,9 +2,13 @@ import img from '@/assets/studentReg.png'
 import useRegister from '@/hooks/auth/useRegister'
 import { Link } from 'react-router-dom'
 import { FaChalkboardTeacher } from 'react-icons/fa'
+import { useState } from 'react'
 
 export default function RegisterForm({ userType }) {
     const { handleGoBack, formik, loading } = useRegister(userType)
+    const [passwordVisible, setPasswordVisible] = useState(false)
+
+
     return (
         <div className="mx-auto flex flex-row flex-wrap justify-center items-center">
             <div className="basis-[100%]">
@@ -31,6 +35,11 @@ export default function RegisterForm({ userType }) {
                                     placeholder="UserName"
                                     required
                                 />
+                                {formik.touched.name && formik.errors.name ? (
+                                    <div className="text-red-500">{formik.errors.name}</div>
+                                ) : (
+                                    ''
+                                )}
                             </div>
                             <div className="mb-3">
                                 <input
@@ -44,32 +53,67 @@ export default function RegisterForm({ userType }) {
                                     placeholder="Email"
                                     required
                                 />
+                                {formik.touched.email && formik.errors.email ? (
+                                    <div className="text-red-500">{formik.errors.email}</div>
+                                ) : (
+                                    ''
+                                )}
                             </div>
                             <div className="mb-3">
-                                <input
-                                    type="password"
-                                    className="border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"
-                                    value={formik.values.password}
-                                    name="password"
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    id="Password"
-                                    placeholder="Password"
-                                    required
-                                />
+                                <div className='relative'>
+
+                                    <input
+                                        type={passwordVisible ? 'text' : 'password'}
+                                        className="border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"
+                                        value={formik.values.password}
+                                        name="password"
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        id="Password"
+                                        placeholder="Password"
+                                        required
+                                    />
+                                    <i
+                                    id="showPass"
+                                    className={`fas ${
+                                        passwordVisible ? 'fa-eye-slash' : 'fa-eye'
+                                    } absolute text-2xl right-3 bottom-1/2 transform -translate-y-1 text-gray-500 cursor-pointer`}
+                                    onClick={() => setPasswordVisible(!passwordVisible)}
+                                    ></i>
+                                </div>
+                                    {formik.touched.password && formik.errors.password ? (
+                                        <div className="text-red-500">{formik.errors.password}</div>
+                                    ) : (
+                                        ''
+                                    )}
                             </div>
+                            
                             <div className="mb-3">
-                                <input
-                                    type="password"
-                                    className="border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"
-                                    value={formik.values.confirmPassword}
-                                    name="confirmPassword"
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    id="ConfirmPassword"
-                                    placeholder="Confirm Password"
-                                    required
-                                />
+                                <div className='relative'>
+                                    <input
+                                        type={passwordVisible ? 'text' : 'password'}
+                                        className="border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"
+                                        value={formik.values.confirmPassword}
+                                        name="confirmPassword"
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        id="ConfirmPassword"
+                                        placeholder="Confirm Password"
+                                        required
+                                    />
+                                    <i
+                                    id="showPass"
+                                    className={`fas ${
+                                        passwordVisible ? 'fa-eye-slash' : 'fa-eye'
+                                    } absolute text-2xl right-3 bottom-1/2 transform -translate-y-1 text-gray-500 cursor-pointer`}
+                                    onClick={() => setPasswordVisible(!passwordVisible)}
+                                    ></i>
+                                </div>
+                               {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
+                                    <div className="text-red-500">{formik.errors.confirmPassword}</div>
+                                ) : (
+                                    ''
+                                )}
                             </div>
                             <div className="mb-3">
                                 <button

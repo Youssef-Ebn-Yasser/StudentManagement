@@ -19,6 +19,8 @@ function AddTeacher() {
     const [imagePreview, setImagePreview]= useState(img)
     const [addedTeacher, setAddedTeacher]= useState([])
     const {teachers,loading}= useSelector((state)=>state.allTeachers)
+    const [passwordVisible, setPasswordVisible] = useState(false)
+    const [confirmPassVisible, setConfirmPassVisible] = useState(false)
     let [searchItem, setSearchItem]=useState('')
     const [searchType, setSearchType] = useState('name');
     
@@ -71,19 +73,8 @@ function AddTeacher() {
 
     async function handleAddTeacher(formsData){
         console.log('Added',formsData);
-
-        // const params = new URLSearchParams({
-        //     Name: formsData.name,
-        //     Email: formsData.email,
-        //     Age: formsData.age,
-        //     Specialization: formsData.specialization,
-        //     Phone: formsData.phone,
-        //     Password: formsData.password
-        // });
-
-        // 2. Create FormData for the image
-        // const formData = new FormData();
-        // formData.append("image", formsData.image);
+        // Reset previous field errors before a new submission
+        formik.setErrors({});
         
         axios.post(`https://e-learn-v1.runasp.net/api/Auth/register/teacher`,formsData 
         ).then((response)=>{
@@ -91,10 +82,20 @@ function AddTeacher() {
             console.log(response);
             setAddedTeacher(response.data.data)
             dispatch(allTeachers())
+            formik.resetForm();
             
         }).catch((error)=>{
-            toast.error(error.response.data.massage)
             console.log(error);
+            if (error.response && error.response.data) {
+                const errorMessage = error.response.data.massage || error.response.data.message; // Common backend error message properties
+                if (errorMessage && typeof errorMessage === 'string' && errorMessage.toLowerCase().includes('name already exist')) {
+                    formik.setFieldError('name', 'Name is already exist');
+                } else {
+                    toast.error(errorMessage || 'Failed to add teacher. Please try again.');
+                }
+            } else {
+                toast.error('An unexpected error occurred. Please try again.');
+            }
             
         })
     }
@@ -131,17 +132,35 @@ function AddTeacher() {
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div>
+                            <div className='relative'>
                                 <label htmlFor="password" className='block text-sm font-medium text-gray-700 mb-1'>Password <span className='text-red-500'>*</span></label>
-                                <input type="password" name="password" id="password" value={formik.values.password} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                <input type={passwordVisible ? 'text' : 'password'} name="password" id="password" value={formik.values.password} onChange={formik.handleChange} onBlur={formik.handleBlur}
                                 placeholder='Enter Password'
                                 className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
+                                <i
+                                    id="showPass"
+                                    className={`fas ${
+                                        passwordVisible ? 'fa-eye-slash' : 'fa-eye'
+                                    } absolute bottom-2 right-3 transform -translate-y-1/2 text-gray-500 cursor-pointer`}
+                                    onClick={() => setPasswordVisible(!passwordVisible)}
+                                ></i>
+                            </div>
                                 <div>{formik.errors.password && formik.touched.password && <p className='text-red-500'>{formik.errors.password}</p>}</div>
                             </div>
                             <div>
+                            <div className='relative'>
                                 <label htmlFor="confirmPassword" className='block text-sm font-medium text-gray-700 mb-1'>Confirm Password <span className='text-red-500'>*</span></label>
-                                <input type="password" name="confirmPassword" id="confirmPassword" value={formik.values.confirmPassword} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                <input type={confirmPassVisible ? 'text' : 'password'} name="confirmPassword" id="confirmPassword" value={formik.values.confirmPassword} onChange={formik.handleChange} onBlur={formik.handleBlur}
                                 placeholder='Enter confirmPassword'
                                 className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
+                                <i
+                                    id="showPass"
+                                    className={`fas ${
+                                        confirmPassVisible ? 'fa-eye-slash' : 'fa-eye'
+                                    } absolute bottom-2 right-3 transform -translate-y-1/2 text-gray-500 cursor-pointer`}
+                                    onClick={() => setConfirmPassVisible(!confirmPassVisible)}
+                                ></i>
+                            </div>
                                 <div>{formik.errors.confirmPassword && formik.touched.confirmPassword && <p className='text-red-500'>{formik.errors.confirmPassword}</p>}</div>
                             </div>
                         </div>

@@ -2,9 +2,12 @@ import img from '@/assets/studentReg.png'
 import useLogin from '@/hooks/auth/useLogin'
 import { Link } from 'react-router-dom'
 import Loader from '../Loader/Loader'
+import { useState } from 'react'
 
 function Login() {
     const { loading, formik, error, handleGoBack } = useLogin()
+    const [passwordVisible, setPasswordVisible] = useState(false)
+
 
     return (
         <>
@@ -33,32 +36,42 @@ function Login() {
                                         placeholder="Enter your email"
                                         required
                                     />
-                                    {formik.touched.email &&
-                                    formik.errors.email ? (
+                                    {formik.touched.Email &&
+                                    formik.errors.Email ? (
                                         <div className="text-red-500">
-                                            {formik.errors.email}
+                                            {formik.errors.Email}
                                         </div>
                                     ) : (
                                         ''
                                     )}
                                 </div>
 
-                                <div className=" mb-3">
-                                    <input
-                                        type="password"
-                                        className="border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"
-                                        value={formik.values.Password}
-                                        name="Password"
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        id="Password"
-                                        placeholder="Password"
-                                        required
-                                    />
+                                <div className="mb-3">
+                                    <div className='relative'>
+                                        <input
+                                             type={passwordVisible ? 'text' : 'password'}
+                                             className="border-1 border-gray-400 rounded p-2 pr-10 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"
+                                             value={formik.values.Password}
+                                            name="Password"
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            id="Password"
+                                            placeholder="Password"
+                                            required
+                                        />
+                                        <i
+                                            id="showPass"
+                                            className={`fas ${
+                                                passwordVisible ? 'fa-eye-slash' : 'fa-eye'
+                                            } absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 cursor-pointer`}
+                                            onClick={() => setPasswordVisible(!passwordVisible)}
+                                        ></i>
+                                    </div>
+                                    
                                     {formik.touched.Password &&
-                                    formik.errors.password ? (
+                                    formik.errors.Password ? (
                                         <div className="text-red-500">
-                                            {formik.errors.password}
+                                            {formik.errors.Password}
                                         </div>
                                     ) : (
                                         ''
