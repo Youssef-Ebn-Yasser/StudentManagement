@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import MainInfo from "./MainInfo";
 import './TeacherProfile.css'
+import { useLocation } from 'react-router-dom';
 
-import Sidebar from "./Sidebar";
 import TeacherCourses from "./TeacherCourses";
 import CreateCourse from "./CreateCourse";
 import AddLesson from "./AddLesson";
@@ -14,11 +14,21 @@ import TeacherDashboard from '../TeacherDashboard/TeacherDashboard';
 import { useSelector } from 'react-redux';
 
 function TeacherProfile() {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('profile');
   const [teacherData, setTeacherData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    // Check for tab parameter in URL
+    const params = new URLSearchParams(location.search);
+    const tabParam = params.get('tab');
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [location.search]);
 
   useEffect(() => {
     const fetchTeacherData = async () => {
@@ -111,11 +121,10 @@ function TeacherProfile() {
   }
 
   return (
-    <div className="app-container">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-      <main className="main-content">
+    <div className="min-h-screen bg-gray-50">
+      <div className="w-full min-h-screen bg-white">
         {renderContent()}
-      </main>
+      </div>
     </div>
   );
 }

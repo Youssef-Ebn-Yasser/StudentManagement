@@ -432,14 +432,14 @@ const CreateCourse = () => {
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
+              className="px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all duration-200 ease-in-out shadow-sm hover:shadow-md"
             >
               Cancel
             </button>
           )}
           <button
             type="submit"
-            className="px-4 py-2 text-white bg-gradient-to-r from-[var(--primary-dark)] to-[var(--primary-color)] rounded hover:opacity-90 transition-all duration-200 ease-in-out shadow-md hover:shadow-lg"
+            className="px-6 py-2 text-white bg-gradient-to-r from-[var(--primary-dark)] to-[var(--primary-color)] rounded-lg hover:opacity-90 transition-all duration-200 ease-in-out shadow-md hover:shadow-lg"
           >
             {submitText}
           </button>
@@ -491,6 +491,7 @@ const CreateCourse = () => {
         ) : (
           <CourseForm
             onSubmit={handleCreateCourse}
+            onCancel={() => navigate(-1)}
             submitText="Create Course"
           />
         )}

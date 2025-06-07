@@ -2,13 +2,14 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { courseService } from '../../services/courseService';
 import { FaStar, FaUsers } from 'react-icons/fa';
 import Loader from '../Loader/Loader';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { useSelector } from 'react-redux';
 
 const TeacherCourses = ({ setActiveTab }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useSelector((state) => state.auth);
   const teacherId = user?.id;
   const [courses, setCourses] = useState([]);
@@ -16,6 +17,11 @@ const TeacherCourses = ({ setActiveTab }) => {
   const [sortBy, setSortBy] = useState('Latest');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Check if we're in course selection mode for adding a lesson or material
+  const isAddLessonMode = location.pathname === '/teacher/add-lesson';
+  const isAddMaterialMode = location.pathname === '/teacher/add-material';
+  const isSelectionMode = isAddLessonMode || isAddMaterialMode;
 
   useEffect(() => {
     console.log('TeacherCourses mounted with teacherId:', teacherId);
@@ -86,10 +92,24 @@ const TeacherCourses = ({ setActiveTab }) => {
     setSortBy(e.target.value);
   };
 
+  const getPageTitle = () => {
+    if (isAddLessonMode) return 'Select Course for New Lesson';
+    if (isAddMaterialMode) return 'Select Course for New Material';
+    return 'My Courses';
+  };
+
+  const handleCourseAction = (courseId) => {
+    if (isAddLessonMode) {
+      navigate('/teacher/course/lesson/new', { state: { courseId } });
+    } else if (isAddMaterialMode) {
+      navigate('/teacher/course/lesson/material/new', { state: { courseId } });
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50">
       <div className="w-full min-h-screen bg-white p-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
           {/* Back to Profile Button */}
           <div className="mb-6">
             <button
@@ -104,16 +124,20 @@ const TeacherCourses = ({ setActiveTab }) => {
           </div>
 
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">My Courses</h1>
-            <button 
-              onClick={() => navigate('/teacher/createcourse')}
-              className="bg-gradient-to-r from-[var(--primary-dark)] to-[var(--primary-color)] text-white px-6 py-3 rounded-lg hover:opacity-90 transition-all duration-200 ease-in-out shadow-md hover:shadow-lg flex items-center gap-2"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Create New Course
-            </button>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {getPageTitle()}
+            </h1>
+            {!isSelectionMode && (
+              <button 
+                onClick={() => navigate('/teacher/createcourse')}
+                className="bg-gradient-to-r from-[var(--primary-dark)] to-[var(--primary-color)] text-white px-6 py-3 rounded-lg hover:opacity-90 transition-all duration-200 ease-in-out shadow-md hover:shadow-lg flex items-center gap-2"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Create New Course
+              </button>
+            )}
           </div>
 
           {!teacherId ? (
@@ -168,43 +192,57 @@ const TeacherCourses = ({ setActiveTab }) => {
                   {filteredAndSortedCourses.map((course) => (
                     <div 
                       key={course?.id || Math.random()} 
-                      className="w-full border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group hover:shadow-lg transition duration-300"
+                      className="w-full border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group hover:shadow-lg transition duration-300 h-[300px] lg:h-[330px] flex flex-col"
                     >
                       <div className="relative overflow-hidden">
-                      <img
-                        src={course?.imagePath || 'https://via.placeholder.com/300x200'}
-                        alt={course?.title || 'Course'}
-                          className="block w-full h-32 sm:h-36 md:h-40 object-cover transition-transform duration-300 group-hover:scale-110"
-                      />
+                        <img
+                          src={course?.imagePath || 'https://via.placeholder.com/300x200'}
+                          alt={course?.title || 'Course'}
+                          className="block w-full h-[140px] lg:h-[180px] object-cover transition-transform duration-300 group-hover:scale-110"
+                        />
                       </div>
-                      <div className="p-2 sm:p-3">
-                        <h3 className="mt-0 mb-1 text-base sm:text-lg font-semibold text-black line-clamp-2">
-                          {course?.title || 'Untitled Course'}
-                        </h3>
-                        <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-2">
+                      <div className="p-3 lg:p-4 flex-1 flex flex-col">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-gray-500 text-xs lg:text-sm truncate max-w-[60%]">{course?.title || 'Untitled Course'}</span>
+                          {course?.level && (
+                            <span className="bg-red-400 text-white py-1 px-2 rounded-xl text-xs">
+                              {course.level} Level
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="mt-0 mb-2 text-sm lg:text-lg font-semibold text-black line-clamp-2 flex-1">
                           {course?.description || 'No description available'}
-                        </p>
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center">
-                            <FaStar className="text-yellow-500 text-xs sm:text-sm" />
-                            <span className="ml-1 text-xs sm:text-sm text-black">{course?.rating || 0}</span>
-                            <span className="text-gray-500 text-xs sm:text-sm ps-1">({course?.students || 0})</span>
-                          </div>
-                          <span className="text-lg sm:text-xl font-bold text-black">${course?.price || 0}</span>
+                        </h3>
+                        <div className="flex items-center justify-between mt-auto">
+                          <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">
+                            {course?.categoryName || 'Uncategorized'}
+                          </span>
+                          <span className="text-base lg:text-xl font-bold text-black">${course?.price || 0}</span>
                         </div>
                         <div className="flex gap-2 mt-3">
-                          <button 
-                            onClick={() => navigate(`/teacher/course/${course.id}`)}
-                            className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 text-sm"
-                          >
-                            View Details
-                          </button>
-                          <button 
-                            onClick={() => navigate(`/teacher/course/edit/${course.id}`)}
-                            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200 text-sm"
-                          >
-                            Edit
-                          </button>
+                          {isSelectionMode ? (
+                            <button 
+                              onClick={() => handleCourseAction(course.id)}
+                              className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 text-sm"
+                            >
+                              {isAddLessonMode ? 'Add Lesson' : 'Upload Material'}
+                            </button>
+                          ) : (
+                            <>
+                              <button 
+                                onClick={() => navigate('/teacher/course/details', { state: { courseId: course.id } })}
+                                className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 text-sm"
+                              >
+                                View Details
+                              </button>
+                              <button 
+                                onClick={() => navigate('/teacher/course/edit', { state: { courseId: course.id } })}
+                                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200 text-sm"
+                              >
+                                Edit
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
