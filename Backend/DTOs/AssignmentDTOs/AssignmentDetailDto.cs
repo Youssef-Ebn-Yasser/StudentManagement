@@ -3,10 +3,10 @@
     public class AssignmentDetailDto
     {
         public int StudentAssignmentId { get; set; }
-        public string StudentName { get; set; } = null!;
-        public string LessonName { get; set; } = null!;
-        public string CourseName { get; set; } = null!;
-        public int Degree { get; set; } = 0;
-        public string FilePath { get; set; } = null!;
+        public string StudentName { get; set; }
+        public string LessonName { get; set; }
+        public string CourseName { get; set; }
+        public string AssignmentFilePath { get; set; }
+        public int? Degree { get; set; }
     }
 }
