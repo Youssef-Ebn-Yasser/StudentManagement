@@ -4,14 +4,18 @@ public class ChatService : ResponseHandler, IChatService
 {
     #region   Fields
     private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly UserManager<User> _userManager;
     #endregion
 
     #region    Constructor
-    public ChatService(ApplicationDbContext context, UserManager<User> userManager)
+    public ChatService(ApplicationDbContext context,
+                       UserManager<User> userManager,
+                       IUnitOfWork unitOfWork)
     {
         _context = context;
         _userManager = userManager;
+        _unitOfWork = unitOfWork;
     }
     #endregion
 
@@ -95,6 +99,38 @@ public class ChatService : ResponseHandler, IChatService
         await _context.SaveChangesAsync();
 
         return Success(newChatRoom.Id);
+    }
+
+    public async Task<Response<List<StudntChatForTeacherDto>>> GetStudentForTeacher(int teacherId)
+    {
+        var courseStudentData =
+                                                                       await _unitOfWork.Repository<Course>()
+                                                                                        .GetTableNoTracking()
+                                                                                        .Where(c => c.TecherId == teacherId)
+                                                                                        .Select(c => new
+                                                                                        {
+                                                                                            CourseTitle = c.Title,
+                                                                                            Students = c.StudentCourses.Select(sc => new
+                                                                                            {
+                                                                                                sc.Student.Id,
+                                                                                                sc.Student.Name
+                                                                                            })
+                                                                                        })
+                                                                                        .ToListAsync();
+
+        var students = courseStudentData.GroupBy(c => c.CourseTitle)
+                                                         .Select(g => new StudntChatForTeacherDto
+                                                         {
+                                                             courseName = g.Key,
+                                                             keyValuePairs = g
+                                                                 .SelectMany(c => c.Students)
+                                                                 .GroupBy(s => s.Id)
+                                                                 .ToDictionary(s => s.Key, s => s.First().Name)
+                                                         })
+                                                         .ToList();
+
+
+        return Success(students);
     }
     #endregion
 }

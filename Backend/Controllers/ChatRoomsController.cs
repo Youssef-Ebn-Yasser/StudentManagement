@@ -42,5 +42,18 @@ public class ChatRoomsController : AppControllerBase
             return BadRequest("error happen");
         }
     }
+    [HttpGet("student/EnroolWithTeacher")]
+    public async Task<ActionResult<IEnumerable<MessageDto>>> StudentWithTeacher(int id)
+    {
+        try
+        {
+            var result = await _chatService.GetStudentForTeacher(id);
+            return NewResult(result);
+        }
+        catch
+        {
+            return BadRequest("error happen");
+        }
+    }
     #endregion
 }
