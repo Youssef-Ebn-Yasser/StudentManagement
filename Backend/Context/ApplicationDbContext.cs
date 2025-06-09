@@ -1,4 +1,3 @@
-using Backend.Entities.Meetings;
 using Backend.Entities.QuizeEntities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
@@ -29,6 +28,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
     public DbSet<StudentQuestionAnswer> StudentQuestionAnswers { get; set; }
     public DbSet<StudentQuestionOption> StudentQuestionOptions { get; set; }
     public DbSet<Meeting> Meetings { get; set; }
+    public DbSet<ZoomParticipant> ZoomParticipants { get; set; }
 
     public DbSet<ChatRoom> ChatRooms { get; set; }
     public DbSet<ChatMessage> ChatMessages { get; set; }

@@ -31,7 +31,7 @@ public class GeminiService
         }
         };
 
-        var json = JsonSerializer.Serialize(requestBody);
+        var json = System.Text.Json.JsonSerializer.Serialize(requestBody);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         var response = await _httpClient.PostAsync($"{_endpoint}?key={_apiKey}", content);

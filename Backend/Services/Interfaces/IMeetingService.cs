@@ -1,14 +1,11 @@
-﻿using Backend.DTOs.MeetingDTOs;
-using Backend.Entities.Meetings;
-
-namespace Backend.Services.Interfaces;
+﻿namespace Backend.Services.Interfaces;
 
 public interface IMeetingService
 {
-    public string Authorize();
-    public Task<string> Callback(string code);
+    //public string Authorize();
+    //public Task<string> Callback(string code);
+    //public (bool, string) CheckAuth();
     public Task<Response<string>> CreateMeeting(MeetingRequestDto request);
-    public (bool, string) CheckAuth();
     public Task<Response<List<MeetingDetailsResponse>>> GetMeetingsForCourse(int courseId);
 
 }
