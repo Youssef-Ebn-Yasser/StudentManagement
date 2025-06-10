@@ -297,56 +297,56 @@ public class QuizeController : ControllerBase
         return quiz;
     }
 
-    //[HttpGet("GetLessonQuizzes/{lessonId}")]
-    //public async Task<ActionResult<Response<List<LessonQuizListDto>>>> GetLessonQuizzes(int lessonId)
-    //{
-    //    try
-    //    {
-    //        // Verify lesson exists
-    //        var lesson = await _context.Lessons.FindAsync(lessonId);
-    //        if (lesson == null)
-    //        {
-    //            return NotFound(new Response<List<LessonQuizListDto>>
-    //            {
-    //                httpStatusCode = HttpStatusCode.NotFound,
-    //                Succeeded = false,
-    //                Massage = "Lesson not found",
-    //                Errors = new List<string> { "The specified lesson does not exist" }
-    //            });
-    //        }
+    [HttpGet("GetLessonQuizzes/{lessonId}")]
+    public async Task<ActionResult<Response<List<LessonQuizListDto>>>> GetLessonQuizzes(int lessonId)
+    {
+        try
+        {
+            // Verify lesson exists
+            var lesson = await _context.Lessons.FindAsync(lessonId);
+            if (lesson == null)
+            {
+                return NotFound(new Response<List<LessonQuizListDto>>
+                {
+                    httpStatusCode = HttpStatusCode.NotFound,
+                    Succeeded = false,
+                    Massage = "Lesson not found",
+                    Errors = new List<string> { "The specified lesson does not exist" }
+                });
+            }
 
-    //        // Get all quizzes for the lesson
-    //        var quizzes = await _context.Quizzes
-    //            .Where(q => q.LessonId == lessonId)
-    //            .Select(q => new LessonQuizListDto
-    //            {
-    //                QuizId = q.Id,
-    //                QuizName = q.Title,
-    //                CreatedAt = q.CreatedAt,
-    //                TotalQuestions = q.questions != null ? q.questions.Count : 0,
-    //                TotalPoints = q.questions != null ? q.questions.Sum(question => question.Points) : 0
-    //            })
-    //            .ToListAsync();
+            // Get all quizzes for the lesson
+            var quizzes = await _context.Quizzes
+                .Where(q => q.LessonId == lessonId)
+                .Select(q => new LessonQuizListDto
+                {
+                    QuizId = q.Id,
+                    QuizName = q.Title,
+                    CreatedAt = q.CreatedAt,
+                    TotalQuestions = q.questions != null ? q.questions.Count : 0,
+                    TotalPoints = q.questions != null ? q.questions.Sum(question => question.Points) : 0
+                })
+                .ToListAsync();
 
-    //        return Ok(new Response<List<LessonQuizListDto>>
-    //        {
-    //            httpStatusCode = HttpStatusCode.OK,
-    //            Succeeded = true,
-    //            Massage = "Quizzes retrieved successfully",
-    //            Data = quizzes
-    //        });
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return StatusCode(500, new Response<List<LessonQuizListDto>>
-    //        {
-    //            httpStatusCode = HttpStatusCode.InternalServerError,
-    //            Succeeded = false,
-    //            Massage = "Failed to retrieve quizzes",
-    //            Errors = new List<string> { ex.Message }
-    //        });
-    //    }
-    //}
+            return Ok(new Response<List<LessonQuizListDto>>
+            {
+                httpStatusCode = HttpStatusCode.OK,
+                Succeeded = true,
+                Massage = "Quizzes retrieved successfully",
+                Data = quizzes
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new Response<List<LessonQuizListDto>>
+            {
+                httpStatusCode = HttpStatusCode.InternalServerError,
+                Succeeded = false,
+                Massage = "Failed to retrieve quizzes",
+                Errors = new List<string> { ex.Message }
+            });
+        }
+    }
 
     [HttpGet("GetQuizById/{quizId}")]
     public async Task<ActionResult<Response<GetQuizeDto>>> GetQuizById(int quizId)
