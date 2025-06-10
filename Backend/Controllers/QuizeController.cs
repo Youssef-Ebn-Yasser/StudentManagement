@@ -25,12 +25,12 @@ public class QuizeController : ControllerBase
     }
 
 
-    //[HttpPost("CorrectAnswer")]
-    //public IActionResult CorrectAnswer([FromBody] CorrectQuizDto dto)
-    //{
-    //    _service.CorrectQuiz(dto.AnswerId  ,dto.IsCorrect);
-    //    return Ok();
-    //}
+    [HttpPost("CorrectAnswer")]
+    public IActionResult CorrectAnswer([FromBody] CorrectQuizDto dto)
+    {
+        _service.CorrectQuiz(dto.AnswerId, dto.IsCorrect);
+        return Ok();
+    }
 
     [HttpGet("ToCorrect")]
     public IActionResult GetQuizzesToCorrect([FromQuery] int lessonId)
