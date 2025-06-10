@@ -6,6 +6,6 @@ public interface IQuizService
 {
     List<QuizToCorrectDto> GetQuizzesToCorrectByLessonId(int lessonId);
     StudentQuizAnswerDto GetStudentQuizAnswer(int answerId);
-    void CorrectQuiz(CorrectQuizDto dto);
+    void CorrectQuiz(int AnswerId, bool isCorrect);
 
 }
