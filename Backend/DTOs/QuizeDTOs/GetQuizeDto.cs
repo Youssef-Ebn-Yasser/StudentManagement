@@ -28,7 +28,7 @@ public class QuizToCorrectDto
 
 public class StudentQuizAnswerDto
 {
-    public string Answer { get; set; }
+    public List<string>? Answer { get; set; }
     public bool? IsCorrect { get; set; }
 }
 

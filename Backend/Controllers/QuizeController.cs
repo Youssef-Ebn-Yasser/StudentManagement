@@ -43,6 +43,7 @@ public class QuizeController : ControllerBase
     public IActionResult GetStudentAnswers([FromQuery] int studentQuizAnswerId)
     {
         var result = _service.GetStudentQuizAnswer(studentQuizAnswerId);
+
         return Ok(result);
     }
 
