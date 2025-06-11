@@ -9,6 +9,7 @@ public class CreateQuizeWithQuestionDto
     public string? Description { get; set; }
     public DateTime StartsAt { get; set; }
     public int DurationMinutes { get; set; }
+    public bool IsAutoCorrect { get; set; }
     public List<QuestionListDto> questionListDtos { get; set; }
 }
 

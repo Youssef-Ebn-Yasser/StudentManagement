@@ -105,5 +105,69 @@ public class StudentAssignmentService : ResponseHandler, IStudentAssignmentServi
     {
         public string Path { get; set; }
     }
+
+    public async Task<Response<List<AssignmentIconTocorrectDto>>> GetAssignmentByLessonId(int lessonId)
+    {
+        var existLesson = await _unitOfWork.Repository<Lesson>().GetTableNoTracking().AnyAsync(l => l.Id == lessonId && !l.IsDeleted);
+
+        if (!existLesson) return BadRequest<List<AssignmentIconTocorrectDto>>("no lesson with this id");
+
+        var result = await _unitOfWork.Repository<StudentAssignment>()
+                                                                .GetTableNoTracking()
+                                                                .Include(x => x.Student)
+                                                                .Where(x => x.LessonId == lessonId)
+                                                                .Select(a => new AssignmentIconTocorrectDto
+                                                                {
+                                                                    Id = a.Id,
+                                                                    Name = a.Student!.Name,
+                                                                }).ToListAsync();
+
+        if (result == null) return BadRequest<List<AssignmentIconTocorrectDto>>("no Uploaded assignment in this lesson");
+
+        return Success(result);
+    }
+    public async Task<Response<StudentAssignmentDetailsDto>> GetAssignmentForStudentToCorrect(int studentAssignmentId)
+    {
+        var existLesson = await _unitOfWork.Repository<StudentAssignment>().GetTableNoTracking().AnyAsync(sa => sa.Id == studentAssignmentId);
+
+        if (!existLesson) return BadRequest<StudentAssignmentDetailsDto>("no AssignmentId with this id for this Student");
+
+        var result = await _unitOfWork.Repository<StudentAssignment>()
+                                                            .GetTableNoTracking()
+                                                            .Include(x => x.Student)
+                                                            .Include(x => x.Lesson)
+                                                            .ThenInclude(l => l.Course)
+                                                            .Where(x => x.Id == studentAssignmentId)
+                                                            .Select(a => new StudentAssignmentDetailsDto
+                                                            {
+                                                                CourseName = a.Lesson!.Course!.Title,
+                                                                LessonName = a.Lesson.Title,
+                                                                Path = a.Path,
+                                                                StudentAssignmentId = a.Id,
+                                                                DegreePercentage = a.DegreePercentage,
+                                                                StudentName = a.Student!.Name,
+                                                            }).FirstOrDefaultAsync();
+
+        if (result == null) return BadRequest<StudentAssignmentDetailsDto>("no Uploaded assignment this student not provide any");
+
+        return Success(result);
+    }
+    public async Task<Response<string>> SaveStudentDegreeInAssignment(StudentAssignmentDegreeDto dto)
+    {
+        if (dto.DegreePercentage > 100 || dto.DegreePercentage < 0)
+            return BadRequest<string>("the degree must be in range 0 to 100");
+
+        var existLesson = await _unitOfWork.Repository<StudentAssignment>()
+                                                          .GetTableAsTracking()
+                                                          .FirstOrDefaultAsync(sa => sa.Id == dto.Id);
+
+        if (existLesson == null) return BadRequest<string>("this Assignment not exist");
+
+        existLesson.DegreePercentage = dto.DegreePercentage;
+
+        var result = _unitOfWork.Complete();
+
+        return result > 0 ? Success("Updated degree success") : BadRequest<string>("error happen when try to save try letter");
+    }
     #endregion
 }
