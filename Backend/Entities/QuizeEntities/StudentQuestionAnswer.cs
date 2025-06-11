@@ -4,6 +4,7 @@ public class StudentQuestionAnswer
 {
     public int Id { get; set; }
     public bool? IsCorrect { get; set; }
+    public string? StudentAnswerText { get; set; }
 
     public int QuestionId { get; set; }
     public int studentQuizeAnswerId { get; set; }
