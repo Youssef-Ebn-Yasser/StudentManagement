@@ -237,37 +237,7 @@ public class QuizService : ResponseHandler, IQuizService
         };
     }
        
-    public List<StudentQuizAnswerDto> GetStudentQuizAnswer(int answerId)
-    {
-
-        return _unitOfWork.Repository<StudentQuestionAnswer>()
-         .GetTableNoTracking()
-         .Where(a => a.studentQuizeAnswerId == answerId && a.IsCorrect == null)
-         .Include(a => a.studentQuestionOptions)
-         .ThenInclude(opt => opt.QuestionOption)
-         .Select(a => new StudentQuizAnswerDto
-         {
-             Answer = a.studentQuestionOptions.Select(opt => opt.QuestionOption.OptionText).ToList(),
-             IsCorrect = null
-
-         })
-         .ToList();
-    }
-    public void CorrectQuiz(int AnswerId, bool isCorrect)
-    {
-        var answer = _unitOfWork.Repository<StudentQuestionAnswer>()
-            .GetTableAsTracking()
-            .Where(a => a.Id == AnswerId).FirstOrDefault();
-
-
-        if (answer == null)
-            throw new Exception("Answer not found");
-
-        answer.IsCorrect = isCorrect;
-
-        _unitOfWork.Repository<StudentQuestionAnswer>().Update(answer);
-        _unitOfWork.Complete();
-    }
+   
 
 
     public async Task<Response<GetQuizeDto>> GetQuizById(int quizId)
