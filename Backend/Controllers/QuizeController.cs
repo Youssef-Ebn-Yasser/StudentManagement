@@ -1,4 +1,7 @@
-﻿namespace Backend.Controllers;
+﻿using Backend.DTOs.QuizeDTOs;
+using Backend.Entities.QuizeEntities;
+
+namespace Backend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
