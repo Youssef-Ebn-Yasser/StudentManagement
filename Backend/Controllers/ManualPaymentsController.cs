@@ -11,11 +11,13 @@ namespace Backend.Controllers
     {
         private readonly IManualPaymentService _manualPaymentService;
         private readonly ApplicationDbContext _db;
+        private readonly IEmailSender _emailSender;
 
-        public ManualPaymentsController(IManualPaymentService manualPaymentService, ApplicationDbContext db)
+        public ManualPaymentsController(IManualPaymentService manualPaymentService, ApplicationDbContext db, IEmailSender emailSender)
         {
             _manualPaymentService = manualPaymentService;
             _db = db;
+            _emailSender = emailSender;
         }
 
         [HttpPost]
@@ -55,6 +57,26 @@ namespace Backend.Controllers
             return Ok();
         }
 
+        [HttpPost("manual-payments/{id}/reject")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RejectPayment(int id, [FromBody] string reason)
+        {
+            var payment = await _db.ManualPayments.FindAsync(id);
+            if (payment == null) return NotFound();
 
+            payment.Status = PaymentStatus.Rejected;
+            payment.RejectionReason = reason;
+            _db.ManualPayments.Update(payment);
+            await _db.SaveChangesAsync();
+
+            // Send email
+            await _emailSender.SendEmailAsync(
+                payment.Email,
+                "Payment Submission Rejected",
+                $"Your manual payment (Transaction #{payment.TransactionId}) was rejected. Reason: {reason}"
+            );
+
+            return Ok();
+        }
     }
 }
