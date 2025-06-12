@@ -26,6 +26,8 @@ builder.Services.AddHttpClient();
 builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
+builder.Services.AddScoped<IManualPaymentService, ManualPaymentService>();
+
 #endregion
 
 #region   Google Authentication
