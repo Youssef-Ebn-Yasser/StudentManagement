@@ -15,4 +15,5 @@ public class Quiz
     public bool IsAutoCorrect { get; set; }
     public List<Question>? questions { get; set; }
     public Lesson Lesson { get; set; }
+    public decimal? GradingRating { get; set; }
 }
