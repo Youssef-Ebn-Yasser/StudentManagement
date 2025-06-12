@@ -1,7 +1,4 @@
-﻿using Backend.DTOs.QuizeDTOs;
-using Backend.Entities.QuizeEntities;
-
-namespace Backend.Services.Implementation;
+﻿namespace Backend.Services.Implementation;
 
 public class QuizService : ResponseHandler, IQuizService
 {
@@ -17,7 +14,7 @@ public class QuizService : ResponseHandler, IQuizService
         _emailSender = emailSender;
     }
 
-   
+
 
     public List<QuizToCorrectDto> GetQuizzesToCorrectByLessonId(int lessonId)
     {

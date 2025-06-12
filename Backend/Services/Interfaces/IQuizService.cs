@@ -1,6 +1,4 @@
-﻿using Backend.DTOs.QuizeDTOs;
-
-namespace Backend.Services.Interfaces;
+﻿namespace Backend.Services.Interfaces;
 
 public interface IQuizService
 {
