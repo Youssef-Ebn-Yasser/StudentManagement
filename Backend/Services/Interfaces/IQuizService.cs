@@ -9,4 +9,11 @@ public interface IQuizService
     void CorrectQuiz(int AnswerId, bool isCorrect);
     List<CourseStudentQuizStatsDto> GetCourseStudentQuizStats(int courseId);
     StudentCourseQuizStatsDto GetStudentCourseQuizStats(int studentId, int courseId);
+
+
+    public Task<Response<GetQuizeDto>> GetQuizById(int quizId);
+    public Task<Response<List<LessonQuizListDto>>> GetLessonQuizzes(int lessonId);
+    public Task<Response<string>> CreateQuizWithCourse(CreateQuizQuestionBankDto dto);
+    public Task<Response<string>> CreateQuizWithLesson(CreateQuizeWithQuestionDto dto);
+
 }
