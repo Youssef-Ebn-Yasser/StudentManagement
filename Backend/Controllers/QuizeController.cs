@@ -912,4 +912,20 @@ public class QuizeController : ControllerBase
     //    public int QuestionTypeId { get; set; }  // <-- added question type
     //    public string? StudentAnswer { get; set; }
     //}
+
+    [HttpGet("CourseStudentStats")]
+    public IActionResult GetCourseStudentStats([FromQuery] int courseId)
+    {
+        var result = _service.GetCourseStudentQuizStats(courseId);
+        return Ok(result);
+    }
+
+    [HttpGet("StudentCourseStats")]
+    public IActionResult GetStudentCourseStats([FromQuery] int studentId, [FromQuery] int courseId)
+    {
+        var result = _service.GetStudentCourseQuizStats(studentId, courseId);
+        if (result == null)
+            return NotFound();
+        return Ok(result);
+    }
 }
