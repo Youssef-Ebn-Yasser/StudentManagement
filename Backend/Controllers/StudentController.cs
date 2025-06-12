@@ -103,5 +103,11 @@ namespace Backend.Controllers
             var result = await _studentService.DeleteStudentFromCourseAsync(deleteStudentFromCourseDto);
             return NewResult(result);
         }
+        [HttpGet("profile/{studentId}")]
+        public async Task<IActionResult> GetStudentProfile(int studentId)
+        {
+            var result = await _studentService.GetStudentProfileAsync(studentId);
+            return NewResult(result);
+        }
     }
 }
