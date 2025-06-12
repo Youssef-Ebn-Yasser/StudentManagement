@@ -1,4 +1,7 @@
-﻿namespace Backend.Services.Implementation;
+﻿using Backend.DTOs.QuizeDTOs;
+using Backend.Entities.QuizeEntities;
+
+namespace Backend.Services.Implementation;
 
 public class QuizService : ResponseHandler, IQuizService
 {
@@ -233,8 +236,8 @@ public class QuizService : ResponseHandler, IQuizService
             Lessons = lessonStats
         };
     }
-       
-   
+
+
 
 
     public async Task<Response<GetQuizeDto>> GetQuizById(int quizId)
