@@ -38,7 +38,7 @@ public class ChatService : ResponseHandler, IChatService
                 Id = cm.Id,
                 ChatRoomId = cm.ChatRoomId,
                 SenderId = cm.SenderId,
-                SenderName = cm.Sender.UserName!,
+                SenderName = cm.Sender.Name!,
                 Content = cm.Content,
                 Timestamp = cm.Timestamp
             })
