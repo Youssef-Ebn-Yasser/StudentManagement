@@ -266,34 +266,75 @@ await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync
         // Get student basic info
         var studentInfo = _mapper.Map<ShowStudentDto>(student);
 
+        //var listOfAssignment = _unitOfWork.Repository<Lesson>()
+        //    .GetTableNoTracking()
+        //    .Include(sa => sa.StudentAssignments)
+        //    .Include(l => l.Quizs)
+        //.Select(l => new
+        // {
+        //     AssignmentDetails = l.StudentAssignments.Where(sa => sa.LessonId == l.Id)
+        //                           .Select(sa => new
+        //                           {
+        //                               StudentDegreePercentage = sa.DegreePercentage,
+        //                               StudentAssignmentId = sa.Id,
+        //                               AssignmentName = l.materials.Where(m => m.LessonId == l.Id)
+        //                                                           .Select(m => m.Title)
+        //                                                           .FirstOrDefault(),
+        //                           }).FirstOrDefault(),
+
+        //     numberOfQuizesInLesson = l.Quizs.Where(q => q.LessonId == l.Id).Count(),
+        //     TotalQuizesDegreeInLessons = l.Quizs.Where(q => q.LessonId == l.Id).Sum(q => q.PossiblePoints),
+        //     StudentDegreeOfQuizesInLessons = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Sum(qa => qa.GradingRating),
+        //     quizLestDetails = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Select(qa => new
+        //     {
+        //         studentQuizAnswerId = qa.Id,
+        //         quizPercentageDegree = qa.GradingRating,
+        //         IsPass = qa.IsPassed,
+        //         PossiblePoints = qa.Quiz.PossiblePoints,
+        //         NumberOfAswered = qa.NumberOfAswered,
+        //         quizName = qa.Quiz.Title,
+
+        //     })
+        // });
+
+
+
+
+
+
+
+
         // Get assignments
         var assignments = await _unitOfWork.Repository<StudentAssignment>()
             .GetTableNoTracking()
             .Include(sa => sa.Lesson)
             .ThenInclude(l => l.Course)
             .Where(sa => sa.StudentId == studentId)
-            .Select(sa => new  DTOs.StudentProfileDto.StudentAssignmentDto
+            .Select(sa => new DTOs.StudentProfileDto.StudentAssignmentDto
             {
                 Id = sa.Id,
                 CourseName = sa.Lesson.Course.Title,
                 LessonName = sa.Lesson.Title,
                 Path = sa.Path,
                 DegreePercentage = sa.DegreePercentage
-                
+
             })
             .ToListAsync();
+
+
+
         var quizzes = await _unitOfWork.Repository<StudentQuizeAnswer>()
          .GetTableNoTracking()
          .Include(sqa => sqa.Quiz)
         .Where(sqa => sqa.StudentId == studentId)
         .Select(sqa => new StudentQuizDto
-      {
+        {
             QuizId = sqa.Id,
-          QuizTitle = sqa.Quiz.Title,
-          GradingRating = sqa.GradingRating,
-          IsPassed = sqa.IsPassed,
-         
-      })
+            QuizTitle = sqa.Quiz.Title,
+            GradingRating = sqa.GradingRating,
+            IsPassed = sqa.IsPassed,
+
+        })
       .ToListAsync();
         var attendance = await GetStudentAttendance(studentId);
 
@@ -326,4 +367,4 @@ await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync
             .ToListAsync();
     }
 }
-    #endregion
+#endregion
