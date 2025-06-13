@@ -12,4 +12,6 @@ public class Lesson : BaseEntity
     [ForeignKey("CourseId")]
     public Course? Course { get; set; }
     public List<Quiz> Quizs { get; set; }
+    public List<StudentAssignment>? StudentAssignments { get; set; }
+
 }

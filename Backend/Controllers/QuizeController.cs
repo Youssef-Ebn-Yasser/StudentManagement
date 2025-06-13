@@ -111,6 +111,10 @@ public class QuizeController : AppControllerBase
         }
     }
 
+
+
+
+
     [HttpGet("GetQuizById/{quizId}")]
     public async Task<ActionResult<Response<GetQuizeDto>>> GetQuizById(int quizId)
     {
@@ -137,13 +141,23 @@ public class QuizeController : AppControllerBase
     {
         try
         {
-            // 1. Verify Quiz and Student exist and load related data
-            var quiz = await _context.Quizzes
-                .Include(q => q.questions)!
-                    .ThenInclude(q => q.Options)
-            .FirstOrDefaultAsync(q => q.Id == submission.QuizId);
+            // 1. Get student & quiz
+            var student = await _context.Users.FindAsync(submission.StudentId);
+            if (student == null)
+            {
+                return NotFound(new Response<SubmitQuizResponseDto>
+                {
+                    httpStatusCode = HttpStatusCode.NotFound,
+                    Succeeded = false,
+                    Massage = "Student not found"
+                });
+            }
 
-            var student = await _context.Users.OfType<Student>().FirstOrDefaultAsync(s => s.Id == submission.StudentId);
+            // 1. Get the quiz including its questions and options
+            var quiz = await _context.Quizzes
+                .Include(q => q.questions)
+                    .ThenInclude(q => q.Options)
+                .FirstOrDefaultAsync(q => q.Id == submission.QuizId);
 
             if (quiz == null)
             {
@@ -151,152 +165,98 @@ public class QuizeController : AppControllerBase
                 {
                     httpStatusCode = HttpStatusCode.NotFound,
                     Succeeded = false,
-                    Massage = "Quiz not found",
-                    Errors = new List<string> { "The specified quiz does not exist." }
+                    Massage = "Quiz not found"
                 });
             }
 
-            if (student == null)
-            {
-                return NotFound(new Response<SubmitQuizResponseDto>
-                {
-                    httpStatusCode = HttpStatusCode.NotFound,
-                    Succeeded = false,
-                    Massage = "Student not found",
-                    Errors = new List<string> { "The specified student does not exist." }
-                });
-            }
-
-            // 2. Check if quiz is still active for submission (considering potential auto-submit on end time)
-            // Note: A more robust solution might involve checking server time vs quiz end time more strictly,
-            // or having a background job handle true auto-submission after a grace period.
-            // For this implementation, we allow submission up to the EndAtAt time.
-            if (DateTime.Now > quiz.EndAtAt.AddMinutes(1)) // Allow a small buffer
-            {
-                return BadRequest(new Response<SubmitQuizResponseDto>
-                {
-                    httpStatusCode = HttpStatusCode.BadRequest,
-                    Succeeded = false,
-                    Massage = "Quiz submission window has closed",
-                    Errors = new List<string> { $"The quiz ended at {quiz.EndAtAt:MMMM d, yyyy 'at' h:mm tt}." }
-                });
-            }
-
-            // 3. Check if student has already submitted for this quiz
-            var existingSubmission = await _context.studentQuizeAnswers
-                .FirstOrDefaultAsync(sa => sa.StudentId == submission.StudentId && sa.QuizId == submission.QuizId);
-
-            if (existingSubmission != null)
-            {
-                return BadRequest(new Response<SubmitQuizResponseDto>
-                {
-                    httpStatusCode = HttpStatusCode.BadRequest,
-                    Succeeded = false,
-                    Massage = "Quiz already submitted",
-                    Errors = new List<string> { "You have already submitted this quiz." }
-                });
-            }
-
-            // 4. Create a new StudentQuizeAnswer entry
+            // 2. Create root entity
             var studentQuizAnswer = new StudentQuizeAnswer
             {
                 StudentId = submission.StudentId,
                 QuizId = submission.QuizId,
-                // Grading will be calculated later if IsAutoCorrect is true
-                GradingRating = null,
-                NumberOfAswered = submission.Answers.Count,
-                IsPassed = null
+                StudentQuestionAnswer = new List<StudentQuestionAnswer>()
             };
 
-            await _context.studentQuizeAnswers.AddAsync(studentQuizAnswer);
-            await _context.SaveChangesAsync(); // Save to get the studentQuizAnswer ID
-
-            // 5. Save student's answers for each question
-            var studentQuestionAnswers = new List<StudentQuestionAnswer>();
+            // 3. Loop through answers and build the tree
             foreach (var submittedAnswer in submission.Answers)
             {
-                var question = quiz.questions?.FirstOrDefault(q => q.Id == submittedAnswer.QuestionId);
-                if (question == null) continue; // Skip if question not found (shouldn't happen with valid submission)
+                var question = quiz.questions.FirstOrDefault(q => q.Id == submittedAnswer.QuestionId);
+                if (question == null) continue;
 
-                var studentQuestionAnswer = new StudentQuestionAnswer
+                var studentAnswer = new StudentQuestionAnswer
                 {
                     QuestionId = submittedAnswer.QuestionId,
-                    studentQuizeAnswerId = studentQuizAnswer.Id,
-                    IsCorrect = false, // Default to false, update if auto-corrected
+                    IsCorrect = false,
+                    StudentAnswerText = question.QuestionTypeId == QuestionType.Text ? submittedAnswer.StudentAnswerText : null,
+                    studentQuestionOptions = new List<StudentQuestionOption>()
                 };
 
-                if (question.QuestionTypeId == QuestionType.Text)
+                // Handle MCQ options
+                if (question.QuestionTypeId == QuestionType.MCQ && submittedAnswer.SelectedOptionIds != null)
                 {
-                    // For Text questions, save the text answer
-                    studentQuestionAnswer.StudentAnswerText = submittedAnswer.StudentAnswerText;
-                    // Auto-correction for text answers would require external service integration (like Gemini)
-                    // For now, IsCorrect remains false unless manual grading happens later.
-                }
-                else if (question.QuestionTypeId == QuestionType.MCQ)
-                {
-                    // For MCQ questions, save selected option(s)
-                    if (submittedAnswer.SelectedOptionIds != null && submittedAnswer.SelectedOptionIds.Any())
+                    foreach (var optionId in submittedAnswer.SelectedOptionIds)
                     {
-                        studentQuestionAnswer.studentQuestionOptions = submittedAnswer.SelectedOptionIds.Select(optionId => new StudentQuestionOption
+                        studentAnswer.studentQuestionOptions.Add(new StudentQuestionOption
                         {
                             QuestionOptionId = optionId
-                        }).ToList();
-
-                        // If auto-correct is enabled, check if the selected options are correct
-                        if (quiz.IsAutoCorrect)
-                        {
-                            // Assuming single correct option for simplicity for now
-                            var correctOption = question.Options?.FirstOrDefault(o => o.IsCorrect);
-                            studentQuestionAnswer.IsCorrect = submittedAnswer.SelectedOptionIds.Count == 1 && submittedAnswer.SelectedOptionIds.Contains(correctOption?.Id ?? 0);
-                        }
+                        });
                     }
                 }
-                studentQuestionAnswers.Add(studentQuestionAnswer);
+
+                studentQuizAnswer.StudentQuestionAnswer.Add(studentAnswer);
             }
 
-            if (studentQuestionAnswers.Any())
-            {
-                await _context.StudentQuestionAnswers.AddRangeAsync(studentQuestionAnswers);
-                await _context.SaveChangesAsync();
-            }
+            // 4. Save the full object graph in one go
+            _context.studentQuizeAnswers.Add(studentQuizAnswer);
+            await _context.SaveChangesAsync();
 
-            // 6. Auto-correct if enabled
+
+
+            // 5. Auto-correct if enabled
             if (quiz.IsAutoCorrect)
             {
-                int correctAnswersCount = studentQuestionAnswers.Count(sa => sa.IsCorrect == true);
-                int totalPointsEarned = studentQuestionAnswers
-                    .Where(sa => sa.IsCorrect == true)
-                    .Sum(sa => quiz.questions.FirstOrDefault(q => q.Id == sa.QuestionId)?.Points ?? 0);
+                int correctAnswersCount = 0;
+                int totalPointsEarned = 0;
 
-                decimal gradingRating = quiz.PossiblePoints > 0 ? (decimal)totalPointsEarned * 100 / quiz.PossiblePoints : 0;
-                bool isPassed = gradingRating >= 50; // Assuming a pass threshold of 50%
+                foreach (var studentAnswer in studentQuizAnswer.StudentQuestionAnswer)
+                {
+                    var question = quiz.questions.FirstOrDefault(q => q.Id == studentAnswer.QuestionId);
+                    if (question == null || question.QuestionTypeId != QuestionType.MCQ) continue;
+
+                    var correctOption = question.Options.FirstOrDefault(o => o.IsCorrect);
+                    var selectedOptionIds = studentAnswer.studentQuestionOptions
+                        .Select(o => o.QuestionOptionId)
+                        .ToList();
+
+                    bool isCorrect = correctOption != null &&
+                                     selectedOptionIds.Count == 1 &&
+                                     selectedOptionIds.Contains(correctOption.Id);
+
+                    studentAnswer.IsCorrect = isCorrect;
+
+                    if (isCorrect)
+                    {
+                        correctAnswersCount++;
+                        totalPointsEarned += question.Points;
+                    }
+                }
+
+                decimal gradingRating = quiz.PossiblePoints > 0
+                    ? (decimal)totalPointsEarned * 100 / quiz.PossiblePoints
+                    : 0;
+                bool isPassed = gradingRating >= 50;
 
                 studentQuizAnswer.GradingRating = gradingRating;
                 studentQuizAnswer.NumberOfAswered = correctAnswersCount;
                 studentQuizAnswer.IsPassed = isPassed;
-
-                _context.studentQuizeAnswers.Update(studentQuizAnswer);
-                await _context.SaveChangesAsync();
             }
 
-            // 7. Prepare response
-            var responseDto = new SubmitQuizResponseDto
-            {
-                QuizId = quiz.Id,
-                StudentId = student.Id,
-                IsAutoCorrected = quiz.IsAutoCorrect,
-                GradingRating = studentQuizAnswer.GradingRating,
-                NumberOfAnsweredCorrectly = studentQuizAnswer.NumberOfAswered,
-                IsPassed = studentQuizAnswer.IsPassed,
-                Message = quiz.IsAutoCorrect ? "Quiz submitted and graded successfully" : "Quiz submitted successfully. Grading will be done manually."
-            };
 
             return Ok(new Response<SubmitQuizResponseDto>
             {
                 httpStatusCode = HttpStatusCode.OK,
                 Succeeded = true,
-                Massage = responseDto.Message,
-                Data = responseDto
+                Massage = "Quiz submitted successfully"
             });
         }
         catch (Exception ex)
@@ -314,21 +274,85 @@ public class QuizeController : AppControllerBase
 
 
 
-
-
     [HttpGet("CourseStudentStats")]
     public IActionResult GetCourseStudentStats([FromQuery] int courseId)
     {
-        var result = _service.GetCourseStudentQuizStats(courseId);
-        return Ok(result);
+        try
+        {
+            var result = _service.GetCourseStudentQuizStats(courseId);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new Response<List<CourseStudentQuizStatsDto>>
+            {
+                httpStatusCode = HttpStatusCode.InternalServerError,
+                Succeeded = false,
+                Massage = "Failed to retrieve course student stats",
+                Errors = new List<string> { ex.Message }
+            });
+        }
     }
 
     [HttpGet("StudentCourseStats")]
     public IActionResult GetStudentCourseStats([FromQuery] int studentId, [FromQuery] int courseId)
     {
-        var result = _service.GetStudentCourseQuizStats(studentId, courseId);
-        if (result == null)
-            return NotFound();
-        return Ok(result);
+        try
+        {
+            var result = _service.GetStudentCourseQuizStats(studentId, courseId);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new Response<StudentCourseQuizStatsDto>
+            {
+                httpStatusCode = HttpStatusCode.InternalServerError,
+                Succeeded = false,
+                Massage = "Failed to retrieve student course stats",
+                Errors = new List<string> { ex.Message }
+            });
+        }
+    }
+
+    [HttpGet("LessonQuizStats/{lessonId}")]
+    public async Task<IActionResult> GetLessonQuizStats(int lessonId)
+    {
+        try
+        {
+            var result = await _service.GetLessonQuizStats(lessonId);
+            return NewResult(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new Response<LessonQuizStatsDto>
+            {
+                httpStatusCode = HttpStatusCode.InternalServerError,
+                Succeeded = false,
+                Massage = "Failed to retrieve lesson quiz stats",
+                Errors = new List<string> { ex.Message }
+            });
+        }
+    }
+
+    [HttpGet("CourseLessonQuizStats/{courseId}")]
+    public async Task<IActionResult> GetCourseLessonQuizStats(int courseId)
+    {
+        try
+        {
+            var result = await _service.GetCourseLessonQuizStats(courseId);
+            return NewResult(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new Response<List<LessonQuizStatsDto>>
+            {
+                httpStatusCode = HttpStatusCode.InternalServerError,
+                Succeeded = false,
+                Massage = "Failed to retrieve course lesson quiz stats",
+                Errors = new List<string> { ex.Message }
+            });
+        }
     }
 }
