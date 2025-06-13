@@ -17,26 +17,21 @@ public class QuizService : ResponseHandler, IQuizService
         _emailSender = emailSender;
     }
 
-
-
-    //public List<QuizToCorrectDto> GetQuizzesToCorrectByLessonId(int lessonId)
-    //{
-
-    //    var quizzes = _unitOfWork.Repository<StudentQuizeAnswer>()
-    //    .GetTableNoTracking()
-    //    .Where(q => q.Quiz.LessonId == lessonId)
-    //    .Where(sqa => sqa.StudentQuestionAnswer.IsCorrect == null)
-    //    .Select(sqa => new QuizToCorrectDto
-    //    {
-    //        StudentQuizAnswerId = sqa.Id,
-    //        QuizName = sqa.Quiz.Title,
-    //        StudentName = sqa.Student.Name,
-
-    //    })
-    //    .ToList();
-
-    //    return quizzes;
-    //}
+    public List<QuizToCorrectDto> GetQuizzesToCorrectByLessonId(int lessonId)
+    {
+        var quizzesToCorrect = _unitOfWork.Repository<StudentQuizeAnswer>()
+            .GetTableNoTracking()
+            .Where(sqa => sqa.Quiz.LessonId == lessonId)
+            .Where(sqa => sqa.StudentQuestionAnswer.Any(sqaQ => sqaQ.IsCorrect == null))
+            .Select(sqa => new QuizToCorrectDto
+            {
+                StudentQuizAnswerId = sqa.Id,
+                QuizName = sqa.Quiz.Title,
+                StudentName = sqa.Student.Name
+            })
+            .ToList();
+        return quizzesToCorrect;
+    }
 
     public List<StudentQuizAnswerDto> GetStudentQuizAnswer(int answerId)
     {
@@ -501,8 +496,126 @@ public class QuizService : ResponseHandler, IQuizService
         return true;
     }
 
-    public List<QuizToCorrectDto> GetQuizzesToCorrectByLessonId(int lessonId)
+   
+    public async Task<Response<LessonQuizesStatsDto>> GetLessonQuizStats(int lessonId)
     {
-        throw new NotImplementedException();
+        var lesson = await _unitOfWork.Repository<Lesson>()
+            .GetTableNoTracking()
+            .Include(l => l.Quizs)
+            .ThenInclude(q => q.StudentQuizeAnswers)
+            .ThenInclude(sqa => sqa.Student)
+            .FirstOrDefaultAsync(l => l.Id == lessonId);
+        if (lesson == null) return NotFound<LessonQuizesStatsDto>("Lesson not found");
+
+        var quizzes = lesson.Quizs;
+        int totalQuizzes = quizzes.Count;
+        var quizAnalyticsList = new List<QuizAnalyticsDto>();
+        int totalStudents = await _unitOfWork.Repository<StudentCourse>()
+            .GetTableNoTracking()
+            .Where(sc => sc.CourseId == lesson.CourseId && !sc.IsDeleted)
+            .CountAsync();
+
+        foreach (var quiz in quizzes)
+        {
+            var studentAnswers = quiz.StudentQuizeAnswers ?? new List<StudentQuizeAnswer>();
+            int numSubmitted = studentAnswers.Count;
+            double percentageOfSubmit = totalStudents > 0 ? (double)numSubmitted / totalStudents * 100 : 0;
+            double percentageWithDegree = quiz.PossiblePoints > 0 && numSubmitted > 0
+                ? studentAnswers.Sum(a => (double?)a.GradingRating ?? 0) / (quiz.PossiblePoints * numSubmitted) * 100
+                : 0;
+            int numUnder50 = studentAnswers.Count(a => (double)(a.GradingRating ?? 0) < (quiz.PossiblePoints * 0.5));
+            int numOver70 = studentAnswers.Count(a => (double)(a.GradingRating ?? 0) >= (quiz.PossiblePoints * 0.7));
+            int numWith100 = studentAnswers.Count(a => (a.GradingRating ?? 0) == quiz.PossiblePoints);
+
+            var studentSubmissions = studentAnswers.Select(a => new StudentQuizSubmissionDto
+            {
+                StudentName = a.Student?.Name,
+                StudentDegree = (double)(a.GradingRating ?? 0),
+                NumberOfSubmittedQuestions = a.StudentQuestionAnswer?.Count ?? 0
+            }).ToList();
+
+            quizAnalyticsList.Add(new QuizAnalyticsDto
+            {
+                QuizName = quiz.Title,
+                PercentageWithDegree = percentageWithDegree,
+                NumberOfStudentSubmit = numSubmitted,
+                PercentageOfSubmit = percentageOfSubmit,
+                NumberOfStudentUnder50 = numUnder50,
+                NumberOfStudentOver70 = numOver70,
+                NumberOfStudentWith100 = numWith100,
+                StudentSubmissions = studentSubmissions
+            });
+        }
+
+        var result = new LessonQuizesStatsDto
+        {
+            LessonName = lesson.Title,
+            NumberOfQuizzes = totalQuizzes,
+            PercentageOfAllQuizzes = 100, // For a single lesson, always 100%
+            Quizzes = quizAnalyticsList
+        };
+        return Success(result);
+    }
+
+    public async Task<Response<List<LessonQuizesStatsDto>>> GetCourseLessonQuizStats(int courseId)
+    {
+        var lessons = await _unitOfWork.Repository<Lesson>()
+            .GetTableNoTracking()
+            .Where(l => l.CourseId == courseId && !l.IsDeleted)
+            .Include(l => l.Quizs)
+            .ThenInclude(q => q.StudentQuizeAnswers)
+            .ThenInclude(sqa => sqa.Student)
+            .ToListAsync();
+        int totalQuizzesInCourse = lessons.SelectMany(l => l.Quizs).Count();
+        var result = new List<LessonQuizesStatsDto>();
+        foreach (var lesson in lessons)
+        {
+            int totalQuizzes = lesson.Quizs.Count;
+            double percentageOfAllQuizzes = totalQuizzesInCourse > 0 ? (double)totalQuizzes / totalQuizzesInCourse * 100 : 0;
+            var quizAnalyticsList = new List<QuizAnalyticsDto>();
+            int totalStudents = await _unitOfWork.Repository<StudentCourse>()
+                .GetTableNoTracking()
+                .Where(sc => sc.CourseId == lesson.CourseId && !sc.IsDeleted)
+                .CountAsync();
+            foreach (var quiz in lesson.Quizs)
+            {
+                var studentAnswers = quiz.StudentQuizeAnswers ?? new List<StudentQuizeAnswer>();
+                int numSubmitted = studentAnswers.Count;
+                double percentageOfSubmit = totalStudents > 0 ? (double)numSubmitted / totalStudents * 100 : 0;
+                double percentageWithDegree = quiz.PossiblePoints > 0 && numSubmitted > 0
+                    ? studentAnswers.Sum(a => (double?)a.GradingRating ?? 0) / (quiz.PossiblePoints * numSubmitted) * 100
+                    : 0;
+                int numUnder50 = studentAnswers.Count(a => (double)(a.GradingRating ?? 0) < (quiz.PossiblePoints * 0.5));
+                int numOver70 = studentAnswers.Count(a => (double)(a.GradingRating ?? 0) >= (quiz.PossiblePoints * 0.7));
+                int numWith100 = studentAnswers.Count(a => (a.GradingRating ?? 0) == quiz.PossiblePoints);
+
+                var studentSubmissions = studentAnswers.Select(a => new StudentQuizSubmissionDto
+                {
+                    StudentName = a.Student?.Name,
+                    StudentDegree = (double)(a.GradingRating ?? 0),
+                    NumberOfSubmittedQuestions = a.StudentQuestionAnswer?.Count ?? 0
+                }).ToList();
+
+                quizAnalyticsList.Add(new QuizAnalyticsDto
+                {
+                    QuizName = quiz.Title,
+                    PercentageWithDegree = percentageWithDegree,
+                    NumberOfStudentSubmit = numSubmitted,
+                    PercentageOfSubmit = percentageOfSubmit,
+                    NumberOfStudentUnder50 = numUnder50,
+                    NumberOfStudentOver70 = numOver70,
+                    NumberOfStudentWith100 = numWith100,
+                    StudentSubmissions = studentSubmissions
+                });
+            }
+            result.Add(new LessonQuizesStatsDto
+            {
+                LessonName = lesson.Title,
+                NumberOfQuizzes = totalQuizzes,
+                PercentageOfAllQuizzes = percentageOfAllQuizzes,
+                Quizzes = quizAnalyticsList
+            });
+        }
+        return Success(result);
     }
 }
