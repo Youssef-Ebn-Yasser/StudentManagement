@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaCog, FaBook, FaPlus, FaChalkboardTeacher, FaFileUpload, FaClipboardList, FaChartBar, FaQuestionCircle, FaTasks } from "react-icons/fa";
+import { Users } from "lucide-react";
 
 const MainInfo = ({ teacherData }) => {
   const navigate = useNavigate();
