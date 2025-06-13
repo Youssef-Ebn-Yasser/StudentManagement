@@ -48,10 +48,6 @@ public class QuizeController : AppControllerBase
     }
 
 
-
-
-
-
     [HttpPost("CreateQuizWithLesson")]
     public async Task<IActionResult> CreateQuizWithLesson([FromBody] CreateQuizeWithQuestionDto dto)
     {
@@ -281,16 +277,82 @@ public class QuizeController : AppControllerBase
     [HttpGet("CourseStudentStats")]
     public IActionResult GetCourseStudentStats([FromQuery] int courseId)
     {
-        var result = _service.GetCourseStudentQuizStats(courseId);
-        return Ok(result);
+        try
+        {
+            var result = _service.GetCourseStudentQuizStats(courseId);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new Response<List<CourseStudentQuizStatsDto>>
+            {
+                httpStatusCode = HttpStatusCode.InternalServerError,
+                Succeeded = false,
+                Massage = "Failed to retrieve course student stats",
+                Errors = new List<string> { ex.Message }
+            });
+        }
     }
 
     [HttpGet("StudentCourseStats")]
     public IActionResult GetStudentCourseStats([FromQuery] int studentId, [FromQuery] int courseId)
     {
-        var result = _service.GetStudentCourseQuizStats(studentId, courseId);
-        if (result == null)
-            return NotFound();
-        return Ok(result);
+        try
+        {
+            var result = _service.GetStudentCourseQuizStats(studentId, courseId);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new Response<StudentCourseQuizStatsDto>
+            {
+                httpStatusCode = HttpStatusCode.InternalServerError,
+                Succeeded = false,
+                Massage = "Failed to retrieve student course stats",
+                Errors = new List<string> { ex.Message }
+            });
+        }
+    }
+
+    [HttpGet("LessonQuizStats/{lessonId}")]
+    public async Task<IActionResult> GetLessonQuizStats(int lessonId)
+    {
+        try
+        {
+            var result = await _service.GetLessonQuizStats(lessonId);
+            return NewResult(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new Response<LessonQuizStatsDto>
+            {
+                httpStatusCode = HttpStatusCode.InternalServerError,
+                Succeeded = false,
+                Massage = "Failed to retrieve lesson quiz stats",
+                Errors = new List<string> { ex.Message }
+            });
+        }
+    }
+
+    [HttpGet("CourseLessonQuizStats/{courseId}")]
+    public async Task<IActionResult> GetCourseLessonQuizStats(int courseId)
+    {
+        try
+        {
+            var result = await _service.GetCourseLessonQuizStats(courseId);
+            return NewResult(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new Response<List<LessonQuizStatsDto>>
+            {
+                httpStatusCode = HttpStatusCode.InternalServerError,
+                Succeeded = false,
+                Massage = "Failed to retrieve course lesson quiz stats",
+                Errors = new List<string> { ex.Message }
+            });
+        }
     }
 }
