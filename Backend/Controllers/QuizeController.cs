@@ -42,9 +42,21 @@ public class QuizeController : AppControllerBase
     [HttpGet("StudentAnswers")]
     public IActionResult GetStudentAnswers([FromQuery] int studentQuizAnswerId)
     {
-        var result = _service.GetStudentQuizAnswer(studentQuizAnswerId);
-
-        return Ok(result);
+        try
+        {
+            var result = _service.GetStudentQuizAnswer(studentQuizAnswerId);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new Response<List<StudentQuizAnswerDto>>
+            {
+                httpStatusCode = HttpStatusCode.InternalServerError,
+                Succeeded = false,
+                Massage = "Failed to retrieve student answers",
+                Errors = new List<string> { ex.Message }
+            });
+        }
     }
 
 
@@ -250,13 +262,55 @@ public class QuizeController : AppControllerBase
                 studentQuizAnswer.NumberOfAswered = correctAnswersCount;
                 studentQuizAnswer.IsPassed = isPassed;
             }
+            // 6. Save the grading results
+            _context.studentQuizeAnswers.Update(studentQuizAnswer);
+            await _context.SaveChangesAsync();
+          
+
+            var responseDto = new SubmitQuizResponseDto
+            {
+                QuizId = quiz.Id,
+                StudentId = student.Id,
+                IsAutoCorrected = quiz.IsAutoCorrect,
+                GradingRating = studentQuizAnswer.GradingRating,
+                NumberOfAnsweredCorrectly = studentQuizAnswer.NumberOfAswered,
+                IsPassed = studentQuizAnswer.IsPassed,
+                Message = "Quiz submitted successfully"
+            };
+
+            //// 8. Send email notification
+            //var emailSubject = "Quiz Submission Confirmation";
+            //var emailBody = $"Dear {student.UserName},<br/><br/>" +
+            //                $"You have successfully submitted the quiz '{quiz.Name}'.<br/>" +
+            //                $"Your grading rating is: {responseDto.GradingRating}%<br/>" +
+            //                $"You have answered {responseDto.NumberOfAnsweredCorrectly} questions correctly.<br/>" +
+            //                $"Thank you for participating!<br/><br/>" +
+            //                "Best regards,<br/>Your Course Team";
+            //_emailSender.SendEmailAsync(student.Email, emailSubject, emailBody);
+            //// 9. Return the response
+            //if (responseDto.GradingRating >= 50)
+            //{
+            //    _emailSender.SendEmailAsync(student.Email, "Congratulations on Passing the Quiz",
+            //        $"Dear {student.UserName},<br/><br/>" +
+            //        $"Congratulations! You have passed the quiz with a score of {responseDto.GradingRating}%.<br/>" +
+            //        "Keep up the great work!<br/><br/>" +
+            //        "Best regards,<br/>Your Course Team");
+            //}
+            //else {
+            //    _emailSender.SendEmailAsync(student.Email, "Quiz Submission Result",
+            //        $"Dear {student.UserName},<br/><br/>" +
+            //        $"You have submitted the quiz with a score of {responseDto.GradingRating}%.<br/>" +
+            //        "Unfortunately, you did not pass this time. Please review the material and try again.<br/><br/>" +
+            //        "Best regards,<br/>Your Course Team");
+            //}
 
 
             return Ok(new Response<SubmitQuizResponseDto>
             {
                 httpStatusCode = HttpStatusCode.OK,
                 Succeeded = true,
-                Massage = "Quiz submitted successfully"
+                Massage = "Quiz submitted successfully",
+                Data = responseDto
             });
         }
         catch (Exception ex)
