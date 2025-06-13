@@ -17,6 +17,9 @@ public class Question
     public Course? Course { get; set; }
     public Quiz? Quiz { get; set; }
     public List<QuestionOption>? Options { get; set; }
+    public List<StudentQuestionAnswer>? StudentQuestionAnswers { get; set; }
+
+
 }
 
 
