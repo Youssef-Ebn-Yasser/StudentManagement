@@ -11,13 +11,15 @@ public class ZoomController : AppControllerBase
     private readonly IConfiguration _configuration;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ZoomController(IMeetingService meetService, IConfiguration configuration, IHttpClientFactory httpClientFactory, ApplicationDbContext context)
+    public ZoomController(IMeetingService meetService, IConfiguration configuration, IHttpClientFactory httpClientFactory, ApplicationDbContext context, IUnitOfWork unitOfWork)
     {
         _meetService = meetService;
         _configuration = configuration;
         _httpClientFactory = httpClientFactory;
         _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     //[HttpGet("authorize")]
@@ -127,119 +129,6 @@ public class ZoomController : AppControllerBase
         public decimal? AttendedPercentage { get; set; }
         public bool IsAttendedEnough { get; set; }
     }
-
-    [HttpGet("forTest")]
-    public async Task<IActionResult> get(int studentId, int courseId, string studentEmails)
-    {
-        string studentEmail = await _context.Users
-            .Where(s => s.Id == studentId)
-            .Select(s => s.Email)
-            .FirstOrDefaultAsync();
-
-
-
-        var selectedQuiz = await _context.Courses
-                                                  .Include(c => c.lessons)
-                                                  .ThenInclude(l => l.Quizs)
-                                                  .Where(c => c.Id == courseId)
-                                                  .Select(c => new
-                                                  {
-                                                      CourseTitle = c.Title,
-                                                      lessonDetails = c.lessons.Select(l => new
-                                                      {
-                                                          lessonId = l.Id,
-                                                          lessonName = l.Title,
-                                                          qizeDetails = l.Quizs.Select(q => new
-                                                          {
-                                                              QuizDetails = q.Title,
-                                                              possiblePoint = q.PossiblePoints,
-                                                              studentDegree = q.StudentQuizeAnswers.Where(sq => sq.StudentId == studentId)
-                                                                                                  .Select(sa => new
-                                                                                                  {
-                                                                                                      sa.IsPassed,
-                                                                                                      sa.GradingRating,
-                                                                                                  }).FirstOrDefault()
-                                                          }),
-                                                      })
-                                                  }).ToListAsync();
-        return Ok(selectedQuiz);
-
-        //// Quizzes
-        //var studentQuizData = await _context.Quizzes
-        //    .Where(q => q.Lesson.CourseId == courseId)
-        //    .Select(q => new QuizDto
-        //    {
-        //        QuizTitle = q.Title,
-        //        QuizId = q.Id,
-        //        TotalPoints = q.PossiblePoints,
-        //        StudentAnswer = q.questions
-        //            .SelectMany(qq => qq.StudentQuestionAnswers)
-        //            .FirstOrDefault(a => a.studentQuizeAnswer.StudentId == studentId),
-        //        GradingRating = _context.studentQuizeAnswers
-        //            .Where(a => a.StudentId == studentId && a.QuizId == q.Id)
-        //            .Select(a => a.GradingRating)
-        //            .FirstOrDefault(),
-        //        Percentage = _context.studentQuizeAnswers
-        //            .Where(a => a.StudentId == studentId && a.QuizId == q.Id)
-        //            .Select(a => a.GradingRating != null && q.PossiblePoints > 0
-        //                ? (decimal?)((a.GradingRating.Value / q.PossiblePoints) * 100)
-        //                : null)
-        //            .FirstOrDefault()
-        //    })
-        //    .ToListAsync();
-
-        //// Assignments
-        //var studentAssignments = await _context.StudentAssignments
-        //    .Where(sa => sa.StudentId == studentId && sa.Lesson.CourseId == courseId)
-        //    .Select(sa => new AssignmentDto
-        //    {
-        //        LessonTitle = sa.Lesson.Description,
-        //        AssignmentPath = sa.Path,
-        //        DegreePercentage = sa.DegreePercentage
-        //    })
-        //    .ToListAsync();
-
-        //// Meetings
-        //var meetingAttendance = await _context.Meetings
-        //    .Where(m => m.CourseID == courseId)
-        //    .Select(m => new MeetingAttendanceDto
-        //    {
-        //        MeetingId = m.Id,
-        //        Topic = m.Topic,
-        //        Duration = m.Duration,
-        //        StudentDuration = m.ZoomParticipants
-        //            .Where(zp => zp.Email == studentEmail)
-        //            .Select(zp => zp.Duration)
-        //            .FirstOrDefault(),
-        //        AttendedPercentage = m.ZoomParticipants
-        //            .Where(zp => zp.Email == studentEmail)
-        //            .Select(zp => m.Duration != null && m.Duration > 0
-        //                ? (decimal?)((decimal)zp.Duration / m.Duration.Value * 100)
-        //                : null)
-        //            .FirstOrDefault(),
-        //        IsAttendedEnough = m.ZoomParticipants
-        //            .Where(zp => zp.Email == studentEmail)
-        //            .Select(zp => m.Duration != null && m.Duration > 0
-        //                ? (decimal)zp.Duration / m.Duration.Value >= 0.7m
-        //                : false)
-        //            .FirstOrDefault()
-        //    })
-        //    .ToListAsync();
-
-        //// Combine all in one variable
-        //var studentCoursePerformance = new StudentCoursePerformanceDto
-        //{
-        //    Quizzes = studentQuizData,
-        //    Assignments = studentAssignments,
-        //    Meetings = meetingAttendance
-        //};
-
-    }
-
-
-
-
-
 
     [HttpPost("create-meeting")]
     public async Task<IActionResult> CreateMeeting([FromBody] MeetingRequestDto request)

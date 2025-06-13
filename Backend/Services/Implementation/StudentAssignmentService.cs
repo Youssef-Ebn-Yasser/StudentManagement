@@ -25,6 +25,10 @@ public class StudentAssignmentService : ResponseHandler, IStudentAssignmentServi
         // check lesson id and student id is exist
         var student = await _unitOfWork.Repository<Student>().GetByIdAsync(assignment.StudentId);
         var lesson = await _unitOfWork.Repository<Lesson>().GetByIdAsync(assignment.LessonId);
+        var isUploaded = await _unitOfWork.Repository<StudentAssignment>().GetTableNoTracking().AnyAsync(sa => sa.StudentId == assignment.StudentId && sa.LessonId == assignment.LessonId);
+
+        if (isUploaded)
+            return NotFound<string>("Student already Upload this Assignment.");
 
         if (student == null || lesson == null)
             return NotFound<string>("Student or Lesson not found.");

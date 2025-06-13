@@ -1,3 +1,359 @@
 {
+  "studentInfo": {
+    "imageUrl": "https://res.cloudinary.com/dq0djfvad/image/upload/v1748347755/fdf14ffc-9eb2-4cd0-91bc-45c601bef3d7.jpg",
+    "phone": "01221534968",
+    "id": 133,
+    "name": "Ahmed Tamer sameer",
+    "email": "ahmdmstf3417@gmail.com",
 
-}
+    "quizPercentage": "% for all quizes",
+    "AssignmentsPercentage": "% for all assignments",
+    "meetingPercentage": "% for all meetings",
+    "MaxMeetingPercentage": "% for max percentage",
+    "lesson 01 Details": [
+      {
+        "studentQuizAnswerId": 88,
+        "quizName": "",
+        "quizDegree": "",
+        "StudentDegree": "",
+        "studentPercentage": "",
+        "isPass": ""
+      }
+    ],
+    {
+      "StudentAssignmentId": 33,
+      "Assignment  name": "",
+      "StudentDegreePercentage": ""
+    },
+    [
+      {
+        "meetingType": "1or2",
+        "check in participant if duration more than 80% of total duration",
+        "meeting attendance": "true",
+
+        "meeting type 8": "occurance daysRepeat "
+      }
+    ]
+
+
+  },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  {
+    "x": [
+      {
+        "courseName": "MVC",
+        "courseId": 18,
+        "assignmentCountInCourse": 1,
+        "totalPercentageDegreeInCourse": 0,
+        "numberOfDeliverAssignment": 0,
+        "totalPercentage": 0,
+        "totalDegreeQuizInCourse": 15,
+        "totalStudentDegreeInCourse": 0,
+        "totalQuizPercentage": 0,
+        "x": [
+          {
+            "lessonId": 4,
+            "assignmentDetails": {
+              "studentDegreePercentage": 0,
+              "studentAssignmentId": 1,
+              "assignmentName": "end mvc assignment"
+            },
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 5,
+            "assignmentDetails": {
+              "studentDegreePercentage": 0,
+              "studentAssignmentId": 2,
+              "assignmentName": null
+            },
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 20,
+            "assignmentDetails": {
+              "studentDegreePercentage": 0,
+              "studentAssignmentId": 3,
+              "assignmentName": null
+            },
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 22,
+            "assignmentDetails": {
+              "studentDegreePercentage": 0,
+              "studentAssignmentId": 8,
+              "assignmentName": null
+            },
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 23,
+            "assignmentDetails": {
+              "studentDegreePercentage": 0,
+              "studentAssignmentId": 6,
+              "assignmentName": null
+            },
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 27,
+            "assignmentDetails": {
+              "studentDegreePercentage": 0,
+              "studentAssignmentId": 11,
+              "assignmentName": "string"
+            },
+            "numberOfQuizesInLesson": 1,
+            "totalQuizesDegreeInLessons": 15,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 35,
+            "assignmentDetails": null,
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          }
+        ]
+      },
+      {
+        "courseName": "course 1",
+        "courseId": 68,
+        "assignmentCountInCourse": 0,
+        "totalPercentageDegreeInCourse": 0,
+        "numberOfDeliverAssignment": 0,
+        "totalPercentage": 0,
+        "totalDegreeQuizInCourse": 0,
+        "totalStudentDegreeInCourse": 0,
+        "totalQuizPercentage": 0,
+        "x": [
+          {
+            "lessonId": 10,
+            "assignmentDetails": null,
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 11,
+            "assignmentDetails": null,
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 19,
+            "assignmentDetails": null,
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 21,
+            "assignmentDetails": null,
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 24,
+            "assignmentDetails": null,
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 31,
+            "assignmentDetails": null,
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          }
+        ]
+      },
+      {
+        "courseName": "course 02",
+        "courseId": 111,
+        "assignmentCountInCourse": 0,
+        "totalPercentageDegreeInCourse": 0,
+        "numberOfDeliverAssignment": 0,
+        "totalPercentage": 0,
+        "totalDegreeQuizInCourse": 0,
+        "totalStudentDegreeInCourse": 0,
+        "totalQuizPercentage": 0,
+        "x": [
+          {
+            "lessonId": 36,
+            "assignmentDetails": null,
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 37,
+            "assignmentDetails": null,
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 38,
+            "assignmentDetails": null,
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          }
+        ]
+      },
+      {
+        "courseName": "Flutter",
+        "courseId": 27,
+        "assignmentCountInCourse": 0,
+        "totalPercentageDegreeInCourse": 0,
+        "numberOfDeliverAssignment": 0,
+        "totalPercentage": 0,
+        "totalDegreeQuizInCourse": 0,
+        "totalStudentDegreeInCourse": 0,
+        "totalQuizPercentage": 0,
+        "x": [
+          {
+            "lessonId": 12,
+            "assignmentDetails": null,
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 13,
+            "assignmentDetails": null,
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 28,
+            "assignmentDetails": null,
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 30,
+            "assignmentDetails": null,
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 55,
+            "assignmentDetails": null,
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          }
+        ]
+      },
+      {
+        "courseName": "course_testtt",
+        "courseId": 127,
+        "assignmentCountInCourse": 0,
+        "totalPercentageDegreeInCourse": 0,
+        "numberOfDeliverAssignment": 0,
+        "totalPercentage": 0,
+        "totalDegreeQuizInCourse": 0,
+        "totalStudentDegreeInCourse": 0,
+        "totalQuizPercentage": 0,
+        "x": []
+      },
+      {
+        "courseName": "course 1",
+        "courseId": 129,
+        "assignmentCountInCourse": 0,
+        "totalPercentageDegreeInCourse": 0,
+        "numberOfDeliverAssignment": 0,
+        "totalPercentage": 0,
+        "totalDegreeQuizInCourse": 0,
+        "totalStudentDegreeInCourse": 0,
+        "totalQuizPercentage": 0,
+        "x": []
+      },
+      {
+        "courseName": "course 02",
+        "courseId": 134,
+        "assignmentCountInCourse": 2,
+        "totalPercentageDegreeInCourse": 0,
+        "numberOfDeliverAssignment": 0,
+        "totalPercentage": 0,
+        "totalDegreeQuizInCourse": 0,
+        "totalStudentDegreeInCourse": 0,
+        "totalQuizPercentage": 0,
+        "x": [
+          {
+            "lessonId": 43,
+            "assignmentDetails": {
+              "studentDegreePercentage": 0,
+              "studentAssignmentId": 17,
+              "assignmentName": "traditional"
+            },
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          },
+          {
+            "lessonId": 57,
+            "assignmentDetails": null,
+            "numberOfQuizesInLesson": 0,
+            "totalQuizesDegreeInLessons": 0,
+            "studentDegreeOfQuizesInLessons": 0,
+            "quizLestDetails": []
+          }
+        ]
+      }
+    ]
+  },
+  ]
