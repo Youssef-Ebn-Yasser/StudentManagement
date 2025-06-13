@@ -1,4 +1,5 @@
 ﻿using Backend.DTOs.CategoryDTOOS;
+using Microsoft.Extensions.Localization;
 
 namespace Backend.Services.Implementation
 {
@@ -6,11 +7,12 @@ namespace Backend.Services.Implementation
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
-        public CategoryService(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly IStringLocalizer _localizer;
+        public CategoryService(IUnitOfWork unitOfWork, IMapper mapper, IStringLocalizer stringLocalizer)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _localizer = stringLocalizer;
         }
         private async Task<bool> _isNameExist(string name)
         {

@@ -1,0 +1,16 @@
+[
+  {
+    "Key": "Error_NotFound",
+    "Value": {
+      "en": "Not found",
+      "ar": "غير موجود"
+    }
+  },
+  {
+    "Key": "Error_Unauthorized",
+    "Value": {
+      "en": "Unauthorized",
+      "ar": "غير مصرح"
+    }
+  }
+]
