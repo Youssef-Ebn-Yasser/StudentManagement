@@ -25,7 +25,7 @@ export default function LessonDetails() {
   const [quiz, setQuiz] = useState(null);
   const [quizLoading, setQuizLoading] = useState(true);
 
-  const studentId = localStorage.getItem('studentId');
+  const studentId = localStorage.getItem('guestId');
 
   // Quiz submission state (persisted)
   const quizSubmissionKey = `quiz_submitted_${studentId}_${lessonId}`;

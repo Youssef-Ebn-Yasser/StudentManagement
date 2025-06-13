@@ -36,6 +36,11 @@ import LessonDetails from '@/component/StudentDashboard/LessonDetails'
 import CreateZoom from '@/component/TeacherProfile/CreateZoom'
 import MeetingData from '@/component/TeacherProfile/MeetingData'
 import MeetingSdata from './../component/StudentDashboard/MeetingSdata'
+import ChatRoom from '@/component/StudentDashboard/ChatRoom'
+import TeacherStudents from '@/component/TeacherProfile/TeacherStudents'
+import TChatRoom from '@/component/TeacherProfile/TChatRoom'
+import StudentProfile2 from '@/component/StudentProfile/StudentProfile2'
+
 
 const routesConfig = [
     { path: '', element: <Home />, isProtected: false, accessRole: 'all' },
@@ -88,6 +93,12 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
+        path: 'studentprofilee',
+        element: <StudentProfile2 />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
         path: 'studentdashboard/quiz/:lessonId',
         element: <Quiz />,
         isProtected: false,
@@ -96,6 +107,12 @@ const routesConfig = [
     {
         path: 'teacher/profile',
         element: <TeacherProfile />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'teacher/profile/students',
+        element: <TeacherStudents />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -148,26 +165,38 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
-        path: 'studentdashboard/course/meetings',
+        path: 'studentdashboard/course/:courseId/stmeetings',
         element: <MeetingSdata />,
         isProtected: false,
         accessRole: 'all',
     },
     {
-        path: 'courses/details',
+        path: '/courses/course/:id',
         element: <CoursesDetails />,
         isProtected: false,
         accessRole: 'all',
     },
     {
-        path: 'courses/teacher',
+        path: 'courses/teacher/:teacherName',
         element: <TeacherProfileView />,
         isProtected: false,
         accessRole: 'all',
     },
     {
-        path: 'studentdashboard/course',
+        path: '/studentdashboard/course/:id',
         element: <CourseDashDetails />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: '/chat/:teacherId',
+        element: <ChatRoom />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: '/chatt/:studentId',
+        element: <TChatRoom />,
         isProtected: false,
         accessRole: 'all',
     },

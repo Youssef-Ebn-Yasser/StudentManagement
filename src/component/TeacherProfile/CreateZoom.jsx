@@ -81,19 +81,19 @@ function CreateZoom() {
     });
   };
 
-  const connectWithZoom = () => {
-    window.location.href = `${API_BASE_URL}/authorize`;
-  };
+  // const connectWithZoom = () => {
+  //   window.location.href = `${API_BASE_URL}/authorize`;
+  // };
 
   const createMeeting = async (e) => {
     e.preventDefault();
     hideMessages();
     setCreatedMeeting(null);
 
-    if (!isAuthenticated) {
-      showError('Please connect with Zoom first.');
-      return;
-    }
+    // if (!isAuthenticated) {
+    //   showError('Please connect with Zoom first.');
+    //   return;
+    // }
 
     // Validate topic
     if (!formData.topic.trim()) {
@@ -127,7 +127,7 @@ function CreateZoom() {
     };
 
     if (payload.type === 2 || payload.type === 8) {
-      payload.startTime = new Date(formData.startTime).toISOString();
+      payload.startTime = formData.startTime;
       payload.duration = Math.max(1, Number(formData.duration) || 30);
     }
 
@@ -270,7 +270,7 @@ function CreateZoom() {
           Zoom Meeting Integrator
         </h1>
 
-        <div className="mb-6 p-4 bg-indigo-50 rounded-lg border border-indigo-200 flex items-center justify-between">
+        {/* <div className="mb-6 p-4 bg-indigo-50 rounded-lg border border-indigo-200 flex items-center justify-between">
           <span className="text-lg font-semibold text-indigo-800">
             Zoom Status: {isAuthenticated ? 'Connected' : 'Not Connected'}
           </span>
@@ -282,7 +282,7 @@ function CreateZoom() {
               Connect with Zoom
             </button>
           )}
-        </div>
+        </div> */}
 
         {message && (
           <div className="mb-4 p-3 bg-green-100 text-green-800 rounded-md border border-green-200">
@@ -646,7 +646,7 @@ function CreateZoom() {
           <button
             type="submit"
             className="w-full px-6 py-3 bg-green-600 text-white font-bold rounded-full shadow-lg hover:bg-green-700 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!isAuthenticated}
+           
           >
             Create Zoom Meeting
           </button>
