@@ -20,6 +20,7 @@ builder.Services.AddConnectionDependency(builder.Configuration)
                 .AddClassesDependencies();
 
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<IPaymobService,PaymobService>();
 
 #region Payment stripe
 
@@ -119,6 +120,7 @@ builder.Services.AddSwaggerGen(c =>
 
 
 #endregion
+
 
 var app = builder.Build();
 
