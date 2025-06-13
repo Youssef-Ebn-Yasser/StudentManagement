@@ -11,13 +11,15 @@ public class ZoomController : AppControllerBase
     private readonly IConfiguration _configuration;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ZoomController(IMeetingService meetService, IConfiguration configuration, IHttpClientFactory httpClientFactory, ApplicationDbContext context)
+    public ZoomController(IMeetingService meetService, IConfiguration configuration, IHttpClientFactory httpClientFactory, ApplicationDbContext context, IUnitOfWork unitOfWork)
     {
         _meetService = meetService;
         _configuration = configuration;
         _httpClientFactory = httpClientFactory;
         _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     //[HttpGet("authorize")]
@@ -94,13 +96,39 @@ public class ZoomController : AppControllerBase
         }
     }
 
+    public class StudentCoursePerformanceDto
+    {
+        public List<QuizDto> Quizzes { get; set; }
+        public List<AssignmentDto> Assignments { get; set; }
+        public List<MeetingAttendanceDto> Meetings { get; set; }
+    }
 
+    public class QuizDto
+    {
+        public string QuizTitle { get; set; }
+        public int QuizId { get; set; }
+        public decimal TotalPoints { get; set; }
+        public object StudentAnswer { get; set; } // Adjust type as needed
+        public decimal? GradingRating { get; set; }
+        public decimal? Percentage { get; set; }
+    }
 
+    public class AssignmentDto
+    {
+        public string LessonTitle { get; set; }
+        public string AssignmentPath { get; set; }
+        public decimal DegreePercentage { get; set; }
+    }
 
-
-
-
-
+    public class MeetingAttendanceDto
+    {
+        public string MeetingId { get; set; }
+        public string Topic { get; set; }
+        public int? Duration { get; set; }
+        public int StudentDuration { get; set; }
+        public decimal? AttendedPercentage { get; set; }
+        public bool IsAttendedEnough { get; set; }
+    }
 
     [HttpPost("create-meeting")]
     public async Task<IActionResult> CreateMeeting([FromBody] MeetingRequestDto request)

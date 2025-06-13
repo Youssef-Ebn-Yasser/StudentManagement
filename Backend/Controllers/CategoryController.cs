@@ -1,4 +1,6 @@
 ﻿using Backend.DTOs.CategoryDTOOS;
+using Backend.Resources;
+using Microsoft.Extensions.Localization;
 
 namespace Backend.Controllers;
 
@@ -6,12 +8,21 @@ namespace Backend.Controllers;
 [ApiController]
 public class CategoryController : ControllerBase
 {
+    private readonly IStringLocalizer<Messages> _localizer;
     private readonly ICategoryService _categoryService;
-
-    public CategoryController(ICategoryService categoryService)
+    public CategoryController(ICategoryService service, IStringLocalizer<Messages> localizer)
     {
-        _categoryService = categoryService;
+        _categoryService = service;
+        _localizer = localizer;
     }
+
+    [HttpGet("testLocaLization")]
+    public async Task<IActionResult> testLoca()
+    {
+        var val = GeneralLocalizableEntity.Localized("سيد سيد", "Said Said");
+        return Ok(new { e = _localizer["Error_NotFound:Value"], x = val });
+    }
+
 
 
     [HttpGet("GetAll")]
