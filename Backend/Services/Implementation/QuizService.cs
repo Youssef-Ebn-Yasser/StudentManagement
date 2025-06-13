@@ -19,24 +19,24 @@ public class QuizService : ResponseHandler, IQuizService
 
 
 
-    public List<QuizToCorrectDto> GetQuizzesToCorrectByLessonId(int lessonId)
-    {
+    //public List<QuizToCorrectDto> GetQuizzesToCorrectByLessonId(int lessonId)
+    //{
 
-        var quizzes = _unitOfWork.Repository<StudentQuizeAnswer>()
-        .GetTableNoTracking()
-        .Where(q => q.Quiz.LessonId == lessonId)
-        .Where(sqa => sqa.StudentQuestionAnswer.IsCorrect == null)
-        .Select(sqa => new QuizToCorrectDto
-        {
-            StudentQuizAnswerId = sqa.Id,
-            QuizName = sqa.Quiz.Title,
-            StudentName = sqa.Student.Name,
+    //    var quizzes = _unitOfWork.Repository<StudentQuizeAnswer>()
+    //    .GetTableNoTracking()
+    //    .Where(q => q.Quiz.LessonId == lessonId)
+    //    .Where(sqa => sqa.StudentQuestionAnswer.IsCorrect == null)
+    //    .Select(sqa => new QuizToCorrectDto
+    //    {
+    //        StudentQuizAnswerId = sqa.Id,
+    //        QuizName = sqa.Quiz.Title,
+    //        StudentName = sqa.Student.Name,
 
-        })
-        .ToList();
+    //    })
+    //    .ToList();
 
-        return quizzes;
-    }
+    //    return quizzes;
+    //}
 
     public List<StudentQuizAnswerDto> GetStudentQuizAnswer(int answerId)
     {
@@ -396,15 +396,15 @@ public class QuizService : ResponseHandler, IQuizService
             StartsAt = quiz.StartsAt,
             DurationMinutes = quiz.DurationMinutes,
             EndAt = quiz.EndAtAt,
+
             SendQuizeQuestions = quiz.questions?.Select(q => new SendQuizeQuestion
             {
                 QuestionText = q.QuestionText,
                 QuestionTypeId = q.QuestionTypeId,
                 Points = q.Points,
-                CorrectAnswer = q.CorrectAnswer,
-                StudentAnswer = null, // Student hasn't answered yet
+                QuestionId = q.Id,
                 Options = q.QuestionTypeId == QuestionType.MCQ
-                    ? q.Options?.ToDictionary(opt => opt.OptionText, opt => opt.IsCorrect)
+                    ? q.Options?.ToDictionary(opt => opt.OptionText, opt => opt.Id)
                     : null
             }).ToList() ?? new List<SendQuizeQuestion>()
         };
@@ -421,6 +421,7 @@ public class QuizService : ResponseHandler, IQuizService
             StartsAt = dto.StartsAt,
             DurationMinutes = dto.DurationMinutes,
             CreatedAt = DateTime.Now,
+
             EndAtAt = dto.StartsAt.AddMinutes(dto.DurationMinutes),
             NumberOfQuestions = dto.questionListDtos?.Count ?? 0,
             PossiblePoints = dto.questionListDtos?.Sum(q => q.Points) ?? 0,
@@ -498,5 +499,10 @@ public class QuizService : ResponseHandler, IQuizService
         }
 
         return true;
+    }
+
+    public List<QuizToCorrectDto> GetQuizzesToCorrectByLessonId(int lessonId)
+    {
+        throw new NotImplementedException();
     }
 }

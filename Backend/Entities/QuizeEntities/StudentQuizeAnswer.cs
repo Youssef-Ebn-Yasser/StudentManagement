@@ -8,7 +8,7 @@ public class StudentQuizeAnswer
     public decimal? GradingRating { get; set; }
     public int? NumberOfAswered { get; set; }
     public bool? IsPassed { get; set; }
-    public StudentQuestionAnswer StudentQuestionAnswer { get; set; }
+    public List<StudentQuestionAnswer> StudentQuestionAnswer { get; set; }
     public Student Student { get; set; }
     public Quiz Quiz { get; set; }
 }
