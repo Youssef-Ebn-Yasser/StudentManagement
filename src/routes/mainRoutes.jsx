@@ -24,7 +24,6 @@ import AdminDashboard from '@/component/AdminDashboard/AdminDashboard'
 import ControlCourse from '@/component/AdminProfile/ControlCourse'
 import StudentDetails from '@/component/AdminProfile/StudentDetails'
 import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
-import StudentAssignments from '@/component/TeacherProfile/StudentAssignments'
 import CourseDashDetails from '@/component/StudentDashboard/CourseDashDetailes'
 import AddMaterial from '@/component/TeacherProfile/AddMaterial'
 import TeacherProfileView from '@/component/StudentDashboard/TeacherProfileView'
@@ -36,11 +35,18 @@ import LessonDetails from '@/component/StudentDashboard/LessonDetails'
 import CreateZoom from '@/component/TeacherProfile/CreateZoom'
 import MeetingData from '@/component/TeacherProfile/MeetingData'
 import MeetingSdata from './../component/StudentDashboard/MeetingSdata'
+<<<<<<< Updated upstream
 import ChatRoom from '@/component/StudentDashboard/ChatRoom'
 import TeacherStudents from '@/component/TeacherProfile/TeacherStudents'
 import TChatRoom from '@/component/TeacherProfile/TChatRoom'
 import StudentProfile2 from '@/component/StudentProfile/StudentProfile2'
 
+=======
+import teacherRoutes from './teacherRoutes'
+import QuizView from '../component/StudentDashboard/QuizView'
+import ReviewStudentAnswers from '@/component/TeacherProfile/teacherMange/ReviewStudentAnswers'
+import ManageAssignments from '@/component/TeacherProfile/teacherMange/ManageAssignments'
+>>>>>>> Stashed changes
 
 const routesConfig = [
     { path: '', element: <Home />, isProtected: false, accessRole: 'all' },
@@ -81,10 +87,10 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
-    path: '/studentdashboard/course/:courseId/lesson/:lessonId',
-    element: <LessonDetails />,
-    isProtected: false,
-    accessRole: 'all',
+        path: '/studentdashboard/course/:courseId/lesson/:lessonId',
+        element: <LessonDetails />,
+        isProtected: false,
+        accessRole: 'all',
     },
     {
         path: 'studentprofile',
@@ -101,6 +107,12 @@ const routesConfig = [
     {
         path: 'studentdashboard/quiz/:lessonId',
         element: <Quiz />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'studentdashboard/lesson/:lessonId/quiz',
+        element: <QuizView />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -171,7 +183,11 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
+<<<<<<< Updated upstream
         path: '/courses/course/:id',
+=======
+        path: 'courses/course/:id',
+>>>>>>> Stashed changes
         element: <CoursesDetails />,
         isProtected: false,
         accessRole: 'all',
@@ -183,7 +199,11 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
+<<<<<<< Updated upstream
         path: '/studentdashboard/course/:id',
+=======
+        path: 'studentdashboard/course/:id',
+>>>>>>> Stashed changes
         element: <CourseDashDetails />,
         isProtected: false,
         accessRole: 'all',
@@ -215,6 +235,12 @@ const routesConfig = [
     {
         path: 'teacher/course/edit',
         element: <EditCourse />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'teacher/review-student-answers',
+        element: <ReviewStudentAnswers />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -268,7 +294,7 @@ const routesConfig = [
     },
     {
         path: 'teacher/assignments',
-        element: <StudentAssignments />,
+        element: <ManageAssignments />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -290,6 +316,7 @@ const routesConfig = [
         isProtected: false,
         accessRole: 'all',
     },
+    ...teacherRoutes,
 ]
 
 const mainRoutes = [

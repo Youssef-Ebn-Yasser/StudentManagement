@@ -3,6 +3,9 @@ import useRegister from '@/hooks/auth/useRegister'
 import { Link } from 'react-router-dom'
 import { FaChalkboardTeacher } from 'react-icons/fa'
 import { useState } from 'react'
+import { GoogleLogin } from '@react-oauth/google';
+import toast from 'react-hot-toast';
+import axios from 'axios';
 
 export default function RegisterForm({ userType }) {
     const { handleGoBack, formik, loading } = useRegister(userType)
@@ -123,6 +126,56 @@ export default function RegisterForm({ userType }) {
                                 >
                                     {loading ? 'Loading...' : 'Register'}
                                 </button>
+                            </div>
+                            <div className=" flex justify-center my-3">
+                                <GoogleLogin
+                                    onSuccess={async (credentialResponse) => {
+                                        try {
+                                            console.log('Google credential response:', credentialResponse);
+                                            const requestData = { idToken: credentialResponse.credential };
+                                            console.log('Sending request with data:', requestData);
+                                            
+                                            const response = await axios.post('https://e-learn-v1.runasp.net/api/Auth/Googlelogin', 
+                                                requestData,
+                                                {
+                                                    headers: {
+                                                        'Content-Type': 'application/json',
+                                                        'Accept': 'application/json'
+                                                    }
+                                                }
+                                            );
+                                            if (response.data.succeeded) {
+                                                toast.success('Google registration successful!');
+                                                // Store the token if it's returned
+                                                if (response.data.data?.token) {
+                                                    localStorage.setItem('token', response.data.data.token);
+                                                }
+                                                // Redirect based on user role
+                                                const isAdmin = response.data.data?.roles?.includes('Admin');
+                                                const isTeacher = response.data.data?.roles?.includes('Teacher');
+                                                if (isAdmin) {
+                                                    window.location.href = '/admin/dashboard';
+                                                } else if (isTeacher) {
+                                                    window.location.href = '/teacher/profile';
+                                                } else {
+                                                    window.location.href = '/';
+                                                }
+                                            } else {
+                                                toast.error(response.data.messages?.[0] || 'Google registration failed.');
+                                            }
+                                        } catch (error) {
+                                            console.error('Google registration API error:', error);
+                                            if (error.response?.data?.messages?.[0]) {
+                                                toast.error(error.response.data.messages[0]);
+                                            } else {
+                                                toast.error('Error during Google registration. Please try again.');
+                                            }
+                                        }
+                                    }}
+                                    onError={() => {
+                                        toast.error('Google registration failed. Please try again.');
+                                    }}
+                                />
                             </div>
                             {userType === 'student' && (
                                 <div className="mb-3">

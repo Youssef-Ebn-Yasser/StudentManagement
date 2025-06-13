@@ -1,7 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+<<<<<<< Updated upstream
 import { FaCog, FaBook, FaPlus, FaChalkboardTeacher, FaFileUpload, FaClipboardList, FaChartBar } from "react-icons/fa";
 import { Users } from 'lucide-react'; // Importing Users icon from lucide-react
+=======
+import { FaCog, FaBook, FaPlus, FaChalkboardTeacher, FaFileUpload, FaClipboardList, FaChartBar, FaQuestionCircle, FaTasks } from "react-icons/fa";
+>>>>>>> Stashed changes
 
 const MainInfo = ({ teacherData }) => {
   const navigate = useNavigate();
@@ -44,9 +48,23 @@ const MainInfo = ({ teacherData }) => {
     },
     {
       icon: <FaClipboardList className="w-5 h-5" />,
-      label: "Assignments",
+      label: "Manage Quiz",
+      onClick: () => navigate('/teacher/manage-quiz'),
+      description: "Create and manage quizzes",
+      color: "from-yellow-500 to-yellow-600"
+    },
+    {
+      icon: <FaQuestionCircle className="w-5 h-5" />,
+      label: "Review Student Answers",
+      onClick: () => navigate('/teacher/review-student-answers'),
+      description: "Review and grade student quiz answers",
+      color: "from-pink-500 to-pink-600"
+    },
+    {
+      icon: <FaTasks className="w-5 h-5" />,
+      label: "Manage Assignments",
       onClick: () => navigate('/teacher/assignments'),
-      description: "Manage student assignments",
+      description: "View and manage student assignments",
       color: "from-red-500 to-red-600"
     },
     {
