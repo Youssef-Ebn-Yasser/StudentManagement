@@ -1,8 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import { FaCog, FaBook, FaPlus, FaChalkboardTeacher, FaFileUpload, FaClipboardList, FaChartBar } from "react-icons/fa";
 import { Users } from 'lucide-react'; // Importing Users icon from lucide-react
+=======
+import { FaCog, FaBook, FaPlus, FaChalkboardTeacher, FaFileUpload, FaClipboardList, FaChartBar, FaQuestionCircle, FaTasks } from "react-icons/fa";
+>>>>>>> Stashed changes
 =======
 import { FaCog, FaBook, FaPlus, FaChalkboardTeacher, FaFileUpload, FaClipboardList, FaChartBar, FaQuestionCircle, FaTasks } from "react-icons/fa";
 >>>>>>> Stashed changes

@@ -36,16 +36,22 @@ import CreateZoom from '@/component/TeacherProfile/CreateZoom'
 import MeetingData from '@/component/TeacherProfile/MeetingData'
 import MeetingSdata from './../component/StudentDashboard/MeetingSdata'
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import ChatRoom from '@/component/StudentDashboard/ChatRoom'
 import TeacherStudents from '@/component/TeacherProfile/TeacherStudents'
 import TChatRoom from '@/component/TeacherProfile/TChatRoom'
 import StudentProfile2 from '@/component/StudentProfile/StudentProfile2'
 
 =======
+=======
+>>>>>>> Stashed changes
 import teacherRoutes from './teacherRoutes'
 import QuizView from '../component/StudentDashboard/QuizView'
 import ReviewStudentAnswers from '@/component/TeacherProfile/teacherMange/ReviewStudentAnswers'
 import ManageAssignments from '@/component/TeacherProfile/teacherMange/ManageAssignments'
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 const routesConfig = [
@@ -184,7 +190,11 @@ const routesConfig = [
     },
     {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         path: '/courses/course/:id',
+=======
+        path: 'courses/course/:id',
+>>>>>>> Stashed changes
 =======
         path: 'courses/course/:id',
 >>>>>>> Stashed changes
@@ -200,7 +210,11 @@ const routesConfig = [
     },
     {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         path: '/studentdashboard/course/:id',
+=======
+        path: 'studentdashboard/course/:id',
+>>>>>>> Stashed changes
 =======
         path: 'studentdashboard/course/:id',
 >>>>>>> Stashed changes
