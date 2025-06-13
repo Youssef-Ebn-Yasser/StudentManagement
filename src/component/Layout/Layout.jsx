@@ -7,8 +7,10 @@ import Chatbot from '../Chatbot/Chatbot'
 function Layout() {
     return <>
     <Navbar/>
-        <Outlet></Outlet>
-        <Chatbot />
+            <Outlet></Outlet>
+            <Chatbot />
+        
+        
     <Footer/>
     </>
 }

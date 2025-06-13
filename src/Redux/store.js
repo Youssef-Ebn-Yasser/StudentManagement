@@ -9,7 +9,8 @@ import allCoursesReducer from './features/allCourses/allCourses'
 import allLessonsReducer from './features/allLessons/allLessons'
 import allGategoryReducer from './features/allGategory/allGategory'
 import authSlice from './auth/authSlice';
-import teacherStatsReducer from '@/redux/features/teacherStats/teacherStats';
+import teacherStatsReducer from '@/Redux/features/teacherStats/teacherStats';
+import reviewAssignReducer from '@/Redux/features/reviewAssign/reviewAssign'
 
 let store = configureStore({
     reducer: {
@@ -27,6 +28,7 @@ let store = configureStore({
         allLessons:allLessonsReducer,
         allGategory:allGategoryReducer,
         teacherStats: teacherStatsReducer,
+        reviewAssign:reviewAssignReducer,
     },
 })
 export default store

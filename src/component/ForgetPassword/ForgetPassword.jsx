@@ -63,7 +63,9 @@ function ForgetPassword() {
 
                                 <div className=" flex justify-center my-3">
                                     <button 
-                                        className="bg-blue-600 text-white px-6 py-2 rounded text-xl hover:cursor-pointer hover:shadow-sm hover:shadow-blue-500 transition-all duration-300 ease disabled:opacity-50 disabled:cursor-not-allowed" 
+                                        className="bg-blue-600 text-white px-6 py-2 rounded text-xl hover:cursor-pointer 
+                                        hover:shadow-sm hover:shadow-blue-500 transition-all duration-300 ease disabled:opacity-50 
+                                        disabled:cursor-not-allowed" 
                                         type="submit"
                                         disabled={loading}
                                     >

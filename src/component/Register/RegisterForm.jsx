@@ -7,6 +7,8 @@ import { useState } from 'react'
 export default function RegisterForm({ userType }) {
     const { handleGoBack, formik, loading } = useRegister(userType)
     const [passwordVisible, setPasswordVisible] = useState(false)
+    const [confirmPassVisible, setConfirmPassVisible] = useState(false)
+    
 
 
     return (
@@ -77,7 +79,7 @@ export default function RegisterForm({ userType }) {
                                     id="showPass"
                                     className={`fas ${
                                         passwordVisible ? 'fa-eye-slash' : 'fa-eye'
-                                    } absolute text-2xl right-3 bottom-1/2 transform -translate-y-1 text-gray-500 cursor-pointer`}
+                                    } absolute text-xl right-3 bottom-1.5 transform -translate-y-1 text-gray-500 cursor-pointer`}
                                     onClick={() => setPasswordVisible(!passwordVisible)}
                                     ></i>
                                 </div>
@@ -91,7 +93,7 @@ export default function RegisterForm({ userType }) {
                             <div className="mb-3">
                                 <div className='relative'>
                                     <input
-                                        type={passwordVisible ? 'text' : 'password'}
+                                        type={confirmPassVisible ? 'text' : 'password'}
                                         className="border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"
                                         value={formik.values.confirmPassword}
                                         name="confirmPassword"
@@ -104,9 +106,9 @@ export default function RegisterForm({ userType }) {
                                     <i
                                     id="showPass"
                                     className={`fas ${
-                                        passwordVisible ? 'fa-eye-slash' : 'fa-eye'
-                                    } absolute text-2xl right-3 bottom-1/2 transform -translate-y-1 text-gray-500 cursor-pointer`}
-                                    onClick={() => setPasswordVisible(!passwordVisible)}
+                                        confirmPassVisible ? 'fa-eye-slash' : 'fa-eye'
+                                    } absolute text-xl right-3 bottom-1.5 transform -translate-y-1 text-gray-500 cursor-pointer`}
+                                    onClick={() => setConfirmPassVisible(!confirmPassVisible)}
                                     ></i>
                                 </div>
                                {formik.touched.confirmPassword && formik.errors.confirmPassword ? (

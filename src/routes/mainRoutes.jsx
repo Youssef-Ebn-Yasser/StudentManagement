@@ -36,6 +36,7 @@ import LessonDetails from '@/component/StudentDashboard/LessonDetails'
 import CreateZoom from '@/component/TeacherProfile/CreateZoom'
 import MeetingData from '@/component/TeacherProfile/MeetingData'
 import MeetingSdata from './../component/StudentDashboard/MeetingSdata'
+import ReviewAssignment from '@/component/TeacherProfile/ReviewAssignment'
 
 const routesConfig = [
     { path: '', element: <Home />, isProtected: false, accessRole: 'all' },
@@ -258,6 +259,12 @@ const routesConfig = [
     {
         path: 'teacher/create-zoom',
         element: <CreateZoom />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'teacher/review-assignment/:id',
+        element: <ReviewAssignment />,
         isProtected: false,
         accessRole: 'all',
     },

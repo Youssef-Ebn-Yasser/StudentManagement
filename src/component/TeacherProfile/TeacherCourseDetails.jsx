@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { courseService } from '../../services/courseService';
 import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook, FaClipboardList, FaTrash, FaEdit, FaChartLine, FaCalendarAlt, FaTag, FaFileAlt, FaVideo } from 'react-icons/fa';
 import Loader from '../Loader/Loader';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { reviewAssign } from '@/Redux/features/reviewAssign/reviewAssign';
+import { useDispatch, useSelector } from 'react-redux';
 
 const TeacherCourseDetails = () => {
   const location = useLocation();
@@ -19,6 +21,60 @@ const TeacherCourseDetails = () => {
   const [editingMaterial, setEditingMaterial] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [materialFile, setMaterialFile] = useState(null);
+  const dispatch = useDispatch();
+
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  
+  const handleReviewAssign = async (lessonId) => {
+    const selectedLesson = course?.lessonInfo?.find(lesson => lesson.id === lessonId);
+    const lessonTitle = selectedLesson ? selectedLesson.title : 'Unknown Lesson';
+
+    try {
+      const resultAction = await dispatch(reviewAssign(lessonId));
+
+      // After the async operation, check if component is still mounted
+      // before attempting any UI updates or navigation.
+      if (!isMounted.current) {
+        console.log("Component unmounted before API response for reviewAssign completed.");
+        return; // Exit if component is unmounted
+      }
+
+      // If the thunk is fulfilled AND payload is an array AND not empty, navigate.
+      if (
+        reviewAssign.fulfilled.match(resultAction) &&
+        Array.isArray(resultAction.payload) &&
+        resultAction.payload.length > 0
+      ) {
+        console.log(resultAction.payload);
+        
+        console.log("Navigating to review-assignment page with assignments found.");
+        navigate(`/teacher/review-assignment/${lessonId}`, { state: { lessonName: lessonTitle } });
+      } else {
+        // This 'else' block means the thunk was fulfilled, but the payload
+        // was empty or not an array as expected. This means NO assignments were found.
+        // So, we display the toast here, as navigation will not occur.
+        const errorMsg =
+          resultAction.payload && typeof resultAction.payload === 'string'
+            ? resultAction.payload
+            : "No assignments found for this lesson.";
+        toast.error(errorMsg);
+      }
+    } catch (err) {
+      // This 'catch' block handles actual dispatch rejections (e.g., network errors).
+      // Since an error occurred, navigation will not happen, so we show the toast.
+      if (!isMounted.current) return; // Re-check if component is still mounted after an error is caught
+      const errorMsg =
+        err.response?.data?.message || err.message || "An unexpected error occurred while fetching assignments.";
+      toast.error(errorMsg);
+    }
+  };
 
   useEffect(() => {
     if (!courseId) {
@@ -31,54 +87,76 @@ const TeacherCourseDetails = () => {
       try {
         setLoading(true);
         const response = await courseService.getCourseDetails(courseId);
+
+        if (!isMounted.current) return;
+
         if (response.succeeded) {
-          setCourse(response.data);
-          const courseLessons = response.data.lessons || response.data.lessonInfo || [];
-          const materialsPromises = courseLessons.map(lesson =>
+          const validLessons = (response.data.lessons || response.data.lessonInfo || []).filter(
+            lesson => lesson && lesson.id
+          );
+          setCourse({
+            ...response.data,
+            lessonInfo: validLessons
+          });
+
+          const materialsPromises = validLessons.map(lesson =>
             axios.get(`https://e-learn-v1.runasp.net/api/Material/GetMaterialsByLessonId/GetMaterialsByLessonId/${lesson.id}`)
           );
           const materialsResponses = await Promise.all(materialsPromises);
+
+          if (!isMounted.current) return;
+
           const materialsMap = {};
           materialsResponses.forEach((response, index) => {
             if (response.data.succeeded) {
-              materialsMap[courseLessons[index].id] = response.data.data || [];
+              materialsMap[validLessons[index].id] = response.data.data || [];
             }
           });
           setLessonMaterials(materialsMap);
         } else {
           throw new Error(response.messages?.[0] || 'Failed to load course details');
         }
-      } catch (error) {
-        setError(error.message || 'Failed to load course details');
-        toast.error(error.message || 'Failed to load course details');
+      } catch (err) {
+        if (!isMounted.current) return;
+
+        setError(err.message || 'Failed to load course details');
+        toast.error(err.message || 'Failed to load course details');
       } finally {
+        if (!isMounted.current) return;
         setLoading(false);
       }
     };
 
     fetchCourseDetails();
+
+    return () => {
+      isMounted.current = false;
+    };
   }, [courseId]);
 
   const handleDeleteCourse = async () => {
     if (window.confirm(`
       Are you sure you want to delete this course?
-      
+
       Course Details:
       Title: ${course.title}
       Category: ${course.category}
       Level: ${course.level}
-      
+
       ⚠️ Warning: This action will permanently delete:
       - The course itself
       - All lessons in this course
       - All materials and assignments associated with these lessons
       - All uploaded files and resources
-      
+
       This action cannot be undone.
     `)) {
       try {
         setIsDeleting(true);
         const response = await courseService.deleteCourse(courseId);
+
+        if (!isMounted.current) return;
+
         if (response?.succeeded) {
           toast.success('Course and all associated content deleted successfully');
           navigate('/teacher/courses');
@@ -86,6 +164,8 @@ const TeacherCourseDetails = () => {
           throw new Error(response?.message || 'Failed to delete course');
         }
       } catch (err) {
+        if (!isMounted.current) return;
+
         let errorMessage = 'Failed to delete course';
         if (err.response?.data?.message) {
           errorMessage = err.response.data.message;
@@ -94,6 +174,7 @@ const TeacherCourseDetails = () => {
         }
         toast.error(errorMessage);
       } finally {
+        if (!isMounted.current) return;
         setIsDeleting(false);
       }
     }
@@ -103,6 +184,9 @@ const TeacherCourseDetails = () => {
     if (window.confirm('Are you sure you want to delete this lesson?')) {
       try {
         const response = await courseService.deleteLesson(lessonId);
+
+        if (!isMounted.current) return;
+
         if (response.succeeded) {
           setCourse(prevCourse => ({
             ...prevCourse,
@@ -112,8 +196,9 @@ const TeacherCourseDetails = () => {
         } else {
           throw new Error(response.messages?.[0] || 'Failed to delete lesson');
         }
-      } catch (error) {
-        toast.error(error.message || 'Failed to delete lesson');
+      } catch (err) {
+        if (!isMounted.current) return;
+        toast.error(err.message || 'Failed to delete lesson');
       }
     }
   };
@@ -122,6 +207,9 @@ const TeacherCourseDetails = () => {
     if (window.confirm('Are you sure you want to delete this material?')) {
       try {
         const response = await axios.delete(`https://e-learn-v1.runasp.net/api/Material/DeleteMaterial/DeleteMaterial/${materialId}`);
+
+        if (!isMounted.current) return;
+
         if (response.data.succeeded) {
           setLessonMaterials(prevMaterials => {
             const updatedMaterials = { ...prevMaterials };
@@ -136,8 +224,9 @@ const TeacherCourseDetails = () => {
         } else {
           throw new Error(response.data.messages?.[0] || 'Failed to delete material');
         }
-      } catch (error) {
-        toast.error(error.response?.data?.message || error.message || 'Failed to delete material');
+      } catch (err) {
+        if (!isMounted.current) return;
+        toast.error(err.response?.data?.message || err.message || 'Failed to delete material');
       }
     }
   };
@@ -163,6 +252,9 @@ const TeacherCourseDetails = () => {
           }
         }
       );
+
+      if (!isMounted.current) return;
+
       if (response.data.succeeded) {
         setLessonMaterials(prevMaterials => {
           const updatedMaterials = { ...prevMaterials };
@@ -179,9 +271,11 @@ const TeacherCourseDetails = () => {
       } else {
         throw new Error(response.data.messages?.[0] || 'Failed to update material');
       }
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message || 'Failed to update material');
+    } catch (err) {
+      if (!isMounted.current) return;
+      toast.error(err.response?.data?.message || err.message || 'Failed to update material');
     } finally {
+      if (!isMounted.current) return;
       setIsUpdating(false);
     }
   };
@@ -406,6 +500,7 @@ const TeacherCourseDetails = () => {
               >
                 Lessons
               </button>
+
             </nav>
           </div>
 
@@ -447,6 +542,14 @@ const TeacherCourseDetails = () => {
                             </span>
                             <h3 className="text-xl font-semibold text-gray-900">{lesson.title}</h3>
                           </div>
+                          <span>{lesson.id}</span>
+                          <button
+                            className="bg-orange-400 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shadow hover:bg-orange-500 hover:shadow-lg hover:cursor-pointer transition "
+                            onClick={()=>{handleReviewAssign(lesson.id)}}
+                          >
+                            <i className="fa-solid fa-highlighter"></i>
+                            Review Assignments
+                          </button>
                           <p className="text-gray-600 mb-4 ml-11">{lesson.description}</p>
                           {lesson.duration && (
                             <div className="ml-11 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium inline-block mb-2">
@@ -598,14 +701,6 @@ const TeacherCourseDetails = () => {
                           </div>
                         </div>
                         <div className="flex flex-col items-center gap-2">
-                          {/* Create Quiz Button */}
-                          {/* <button
-                            onClick={() => navigate(`/createquiz?lessonId=${lesson.id}`)}
-                            className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 flex items-center gap-2 mb-2"
-                          >
-                            <FaClipboardList className="text-lg" />
-                            Create Quiz
-                          </button> */}
                           <button
                             onClick={() => handleDeleteLesson(lesson.id)}
                             className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition-colors duration-200"
@@ -623,6 +718,7 @@ const TeacherCourseDetails = () => {
               )}
             </div>
           )}
+
         </div>
       </div>
     </div>
