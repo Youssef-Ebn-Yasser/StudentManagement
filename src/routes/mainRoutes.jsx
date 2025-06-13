@@ -39,6 +39,10 @@ import teacherRoutes from './teacherRoutes'
 import QuizView from '../component/StudentDashboard/QuizView'
 import ReviewStudentAnswers from '@/component/TeacherProfile/teacherMange/ReviewStudentAnswers'
 import ManageAssignments from '@/component/TeacherProfile/teacherMange/ManageAssignments'
+import ChatRoom from '@/component/StudentDashboard/ChatRoom'
+import TeacherStudents from '@/component/TeacherProfile/TeacherStudents'
+import TChatRoom from '@/component/TeacherProfile/TChatRoom'
+import StudentProfile2 from '@/component/StudentProfile/StudentProfile2'
 
 const routesConfig = [
     { path: '', element: <Home />, isProtected: false, accessRole: 'all' },
