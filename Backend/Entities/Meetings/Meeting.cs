@@ -26,6 +26,7 @@ public class Meeting
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public int CourseID { get; set; }
     public Course Course { get; set; }
+    public List<ZoomParticipant> ZoomParticipants { get; set; }
 }
 
 public enum EnMeetingType { Imidiate = 1, Scheduled = 2, ReusableLink = 8 }

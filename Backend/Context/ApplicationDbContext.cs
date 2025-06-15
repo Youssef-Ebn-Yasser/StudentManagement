@@ -34,6 +34,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
     public DbSet<ChatMessage> ChatMessages { get; set; }
     public DbSet<ManualPayment> ManualPayments { get; set; }
     public DbSet<PaymentSettings> PaymentSettings { get; set; }
+    public DbSet<MeetingAttendance> MeetingAttendances { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

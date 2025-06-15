@@ -1,6 +1,4 @@
-﻿using Backend.Entities.QuizeEntities;
-
-namespace Backend.DTOs.QuizeDTOs;
+﻿namespace Backend.DTOs.QuizeDTOs;
 
 public class GetQuizeDto
 {
@@ -13,9 +11,13 @@ public class GetQuizeDto
     public List<SendQuizeQuestion> SendQuizeQuestions { get; set; }
 }
 
-public class SendQuizeQuestion : QuestionListDto
+public class SendQuizeQuestion
 {
-    public string? StudentAnswer { get; set; }
+    public int QuestionId { get; set; }
+    public required string QuestionText { get; set; }
+    public QuestionType QuestionTypeId { get; set; }
+    public int Points { get; set; }
+    public Dictionary<string, int>? Options { get; set; } // option [ Text id ]
 }
 
 public class QuizToCorrectDto
@@ -25,21 +27,25 @@ public class QuizToCorrectDto
     public string StudentName { get; set; }
     public int StudentQuizAnswerId { get; set; }
 }
-
 public class StudentQuizAnswerDto
 {
-    public List<string>? Answer { get; set; }
-    public bool? IsCorrect { get; set; }
+    public string QuizTitle { get; set; }
+    public string StudentName { get; set; }
+
+    public List<Que> Que { get; set; }
 }
 
+public class Que
+{
+    public int QuestionId { get; set; }
+    public string QuestionText { get; set; }
+    public string QuestionTextAnswer { get; set; }
+}
 public class CorrectQuizDto
 {
     public int AnswerId { get; set; }
     public bool IsCorrect { get; set; }
-    public int Degree { get; set; }
 }
-
-
 public class CreateQuizResponseDto
 {
     public int Id { get; set; }
@@ -55,7 +61,6 @@ public class CreateQuizResponseDto
     public bool IsAutoCorrect { get; set; }
     public List<CreateQuizQuestionResponseDto> Questions { get; set; } = new();
 }
-
 public class CreateQuizQuestionResponseDto
 {
     public int Id { get; set; }
@@ -65,21 +70,18 @@ public class CreateQuizQuestionResponseDto
     public string? CorrectAnswer { get; set; }
     public List<QuestionOptionResponseDto>? Options { get; set; }
 }
-
 public class QuestionOptionResponseDto
 {
     public int Id { get; set; }
     public string OptionText { get; set; } = string.Empty;
     public bool IsCorrect { get; set; }
 }
-
 public class CreateQuizQuestionBankResponseDto
 {
     public int CourseId { get; set; }
     public string CourseName { get; set; } = string.Empty;
     public List<CreateQuizQuestionResponseDto> Questions { get; set; } = new();
 }
-
 public class LessonQuizListDto
 {
     public int QuizId { get; set; }
@@ -88,28 +90,26 @@ public class LessonQuizListDto
     public int TotalQuestions { get; set; }
     public int TotalPoints { get; set; }
 }
-
 public class SubmitQuizDto
 {
     public int StudentId { get; set; }
     public int QuizId { get; set; }
     public List<SubmitAnswerDto> Answers { get; set; } = new();
 }
-
 public class SubmitAnswerDto
 {
     public int QuestionId { get; set; }
     public string? StudentAnswerText { get; set; } // For Text answers
     public List<int>? SelectedOptionIds { get; set; } // For MCQ answers
 }
+//public class SubmitQuizResponseDto
+//{
+//    public int QuizId { get; set; }
+//    public int StudentId { get; set; }
+//    public bool IsAutoCorrected { get; set; }
+//    public decimal? GradingRating { get; set; }
+//    public int? NumberOfAnsweredCorrectly { get; set; }
+//    public bool? IsPassed { get; set; }
+//    public string Message { get; set; } = string.Empty;
+//}
 
-public class SubmitQuizResponseDto
-{
-    public int QuizId { get; set; }
-    public int StudentId { get; set; }
-    public bool IsAutoCorrected { get; set; }
-    public decimal? GradingRating { get; set; }
-    public int? NumberOfAnsweredCorrectly { get; set; }
-    public bool? IsPassed { get; set; }
-    public string Message { get; set; } = string.Empty;
-}
