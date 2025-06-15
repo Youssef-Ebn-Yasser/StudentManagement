@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Globalization;
+using System.Text.Json;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Backend.Services.Implementation;
 
@@ -186,7 +188,7 @@ public class MeetingService : ResponseHandler, IMeetingService
                 JoinUrl = meeting.JoinUrl,
                 Password = meeting.Password,
                 StartTime = meeting.StartTime,
-                Topic = meeting.Topic,
+                Topic = GeneralLocalizableEntity.Localized(meeting.TopicAr, meeting.TopicEn),
                 Type = meeting.Type,
                 ZoomMeetingId = meeting.ZoomMeetingId,
             };
@@ -216,18 +218,48 @@ public class MeetingService : ResponseHandler, IMeetingService
         // Save meeting details to our simulated database
         var savedMeeting = new Meeting
         {
-            ZoomMeetingId = meetingInfo["id"]?.ToString() ?? string.Empty,
-            Topic = request.Topic,
-            JoinUrl = meetingInfo["join_url"]?.ToString() ?? string.Empty,
-            Password = request.Password,
-            Type = (EnMeetingType)request.Type,
-            StartTime = request.StartTime,
-            Duration = request.Duration,
-            MuteParticipantsUponEntry = request.MuteParticipantsUponEntry,
-            AutoRecording = request.AutoRecording,
-            CreatedAt = DateTime.UtcNow,
-            CourseID = request.CourseId,
+            //ZoomMeetingId = meetingInfo["id"]?.ToString() ?? string.Empty,
+            //Topic = request.Topic,
+            //JoinUrl = meetingInfo["join_url"]?.ToString() ?? string.Empty,
+            //Password = request.Password,
+            //Type = (EnMeetingType)request.Type,
+            //StartTime = request.StartTime,
+            //Duration = request.Duration,
+            //MuteParticipantsUponEntry = request.MuteParticipantsUponEntry,
+            //AutoRecording = request.AutoRecording,
+            //CreatedAt = DateTime.UtcNow,
+            //CourseID = request.CourseId,
         };
+        CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+
+        if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
+        {
+            savedMeeting.ZoomMeetingId = meetingInfo["id"]?.ToString() ?? string.Empty;
+            savedMeeting.TopicAr = request.Topic;
+            savedMeeting.JoinUrl = meetingInfo["join_url"]?.ToString() ?? string.Empty;
+            savedMeeting.Password = request.Password;
+            savedMeeting.Type = (EnMeetingType)request.Type;
+            savedMeeting.StartTime = request.StartTime;
+            savedMeeting.Duration = request.Duration;
+            savedMeeting.MuteParticipantsUponEntry = request.MuteParticipantsUponEntry;
+            savedMeeting.AutoRecording = request.AutoRecording;
+            savedMeeting.CreatedAt = DateTime.UtcNow;
+            savedMeeting.CourseID = request.CourseId;
+        }
+        else
+        {
+            savedMeeting.ZoomMeetingId = meetingInfo["id"]?.ToString() ?? string.Empty;
+            savedMeeting.TopicEn = request.Topic;
+            savedMeeting.JoinUrl = meetingInfo["join_url"]?.ToString() ?? string.Empty;
+            savedMeeting.Password = request.Password;
+            savedMeeting.Type = (EnMeetingType)request.Type;
+            savedMeeting.StartTime = request.StartTime;
+            savedMeeting.Duration = request.Duration;
+            savedMeeting.MuteParticipantsUponEntry = request.MuteParticipantsUponEntry;
+            savedMeeting.AutoRecording = request.AutoRecording;
+            savedMeeting.CreatedAt = DateTime.UtcNow;
+            savedMeeting.CourseID = request.CourseId;
+        }
 
 
         // Store recurrence details as JSON string for type 8

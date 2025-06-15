@@ -1,4 +1,7 @@
-﻿namespace Backend.Services.Implementation;
+﻿using System.Globalization;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace Backend.Services.Implementation;
 
 public class ChatService : ResponseHandler, IChatService
 {
@@ -38,8 +41,8 @@ public class ChatService : ResponseHandler, IChatService
                 Id = cm.Id,
                 ChatRoomId = cm.ChatRoomId,
                 SenderId = cm.SenderId,
-                SenderName = cm.Sender.Name!,
-                Content = cm.Content,
+                SenderName = GeneralLocalizableEntity.Localized(cm.Sender.NameAr!,cm.Sender.NameEn!),
+                Content = GeneralLocalizableEntity.Localized(cm.ContentAr,cm.ContentEn),
                 Timestamp = cm.Timestamp
             })
             .ToListAsync();
@@ -103,34 +106,73 @@ public class ChatService : ResponseHandler, IChatService
 
     public async Task<Response<List<StudntChatForTeacherDto>>> GetStudentForTeacher(int teacherId)
     {
-        var courseStudentData =
+        CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+        if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
+        {
+            var courseStudentData =
                                                                        await _unitOfWork.Repository<Course>()
                                                                                         .GetTableNoTracking()
                                                                                         .Where(c => c.TecherId == teacherId)
                                                                                         .Select(c => new
                                                                                         {
-                                                                                            CourseTitle = c.Title,
+                                                                                            CourseTitle = GeneralLocalizableEntity.Localized(c.TitleAr, c.TitleEn),
                                                                                             Students = c.StudentCourses.Select(sc => new
                                                                                             {
                                                                                                 sc.Student.Id,
-                                                                                                sc.Student.Name
+                                                                                                sc.Student.NameAr
                                                                                             })
                                                                                         })
                                                                                         .ToListAsync();
 
-        var students = courseStudentData.GroupBy(c => c.CourseTitle)
-                                                         .Select(g => new StudntChatForTeacherDto
-                                                         {
-                                                             courseName = g.Key,
-                                                             keyValuePairs = g
-                                                                 .SelectMany(c => c.Students)
-                                                                 .GroupBy(s => s.Id)
-                                                                 .ToDictionary(s => s.Key, s => s.First().Name)
-                                                         })
-                                                         .ToList();
+            var students = courseStudentData.GroupBy(c => c.CourseTitle)
+                                                             .Select(g => new StudntChatForTeacherDto
+                                                             {
+                                                                 courseName = g.Key,
+                                                                 keyValuePairs = g
+                                                                     .SelectMany(c => c.Students)
+                                                                     .GroupBy(s => s.Id)
+                                                                     .ToDictionary(s => s.Key, s => s.First().NameAr)
+
+                                                             })
+                                                             .ToList();
 
 
-        return Success(students);
+            return Success(students);
+        }
+        else
+        {
+            var courseStudentData =
+                                                                       await _unitOfWork.Repository<Course>()
+                                                                                        .GetTableNoTracking()
+                                                                                        .Where(c => c.TecherId == teacherId)
+                                                                                        .Select(c => new
+                                                                                        {
+                                                                                            CourseTitle = GeneralLocalizableEntity.Localized(c.TitleAr, c.TitleEn),
+                                                                                            Students = c.StudentCourses.Select(sc => new
+                                                                                            {
+                                                                                                sc.Student.Id,
+                                                                                                sc.Student.NameEn
+                                                                                            })
+                                                                                        })
+                                                                                        .ToListAsync();
+
+            var students = courseStudentData.GroupBy(c => c.CourseTitle)
+                                                             .Select(g => new StudntChatForTeacherDto
+                                                             {
+                                                                 courseName = g.Key,
+                                                                 keyValuePairs = g
+                                                                     .SelectMany(c => c.Students)
+                                                                     .GroupBy(s => s.Id)
+                                                                     .ToDictionary(s => s.Key, s => s.First().NameEn)
+
+                                                             })
+                                                             .ToList();
+
+
+            return Success(students);
+        }
+        
+
     }
     #endregion
 }

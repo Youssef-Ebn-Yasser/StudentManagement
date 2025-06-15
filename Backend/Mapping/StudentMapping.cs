@@ -13,7 +13,7 @@ namespace Backend.Mapping
             CreateMap<Student, ShowStudentWithCoursesDto>()
                 .ForMember(dest => dest.CourseTitles,
                     opt => opt.MapFrom(src => src.StudentCourses != null
-                        ? src.StudentCourses.Select(sc => sc.Course != null ? sc.Course.Title : string.Empty).ToList()
+                        ? src.StudentCourses.Select(sc => sc.Course != null ? GeneralLocalizableEntity.Localized(sc.Course.TitleAr, sc.Course.TitleEn) : string.Empty).ToList()
                         : new List<string>()));
         }
     }

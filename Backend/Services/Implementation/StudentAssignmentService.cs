@@ -84,13 +84,13 @@ public class StudentAssignmentService : ResponseHandler, IStudentAssignmentServi
     {
         var course = await _unitOfWork.Repository<Course>()
                                       .GetTableNoTracking()
-                                      .FirstOrDefaultAsync(x => x.Title == CourseName);
+                                      .FirstOrDefaultAsync(x => GeneralLocalizableEntity.Localized(x.TitleAr, x.TitleEn) == CourseName);
         if (course == null)
             return NotFound<List<AssignmentOfLessonDto>>("Course not found.");
         var student = await _unitOfWork.Repository<Student>()
                                        .GetTableNoTracking()
                                        .Include(s => s.StudentCourses)
-                                       .FirstOrDefaultAsync(x => x.Name == StudentName && x.StudentCourses.Any(c => c.CourseId == course.Id));
+                                       .FirstOrDefaultAsync(x => GeneralLocalizableEntity.Localized(x.NameAr, x.NameEn) == StudentName && x.StudentCourses.Any(c => c.CourseId == course.Id));
         if (student == null)
             return NotFound<List<AssignmentOfLessonDto>>("Student not found.");
         var result = await _unitOfWork.Repository<StudentAssignment>()
@@ -119,7 +119,7 @@ public class StudentAssignmentService : ResponseHandler, IStudentAssignmentServi
                                                                 .Select(a => new AssignmentIconTocorrectDto
                                                                 {
                                                                     Id = a.Id,
-                                                                    Name = a.Student!.Name,
+                                                                    Name = GeneralLocalizableEntity.Localized(a.Student!.NameAr, a.Student!.NameEn),
                                                                 }).ToListAsync();
 
         if (result == null) return BadRequest<List<AssignmentIconTocorrectDto>>("no Uploaded assignment in this lesson");
@@ -140,12 +140,12 @@ public class StudentAssignmentService : ResponseHandler, IStudentAssignmentServi
                                                             .Where(x => x.Id == studentAssignmentId)
                                                             .Select(a => new StudentAssignmentDetailsDto
                                                             {
-                                                                CourseName = a.Lesson!.Course!.Title,
-                                                                LessonName = a.Lesson.Title,
+                                                                CourseName = GeneralLocalizableEntity.Localized(a.Lesson!.Course!.TitleAr, a.Lesson!.Course!.TitleEn),
+                                                                LessonName = GeneralLocalizableEntity.Localized(a.Lesson.TitleAr, a.Lesson.TitleEn),
                                                                 Path = a.Path,
                                                                 StudentAssignmentId = a.Id,
                                                                 DegreePercentage = a.DegreePercentage,
-                                                                StudentName = a.Student!.Name,
+                                                                StudentName = GeneralLocalizableEntity.Localized(a.Student!.NameAr, a.Student!.NameEn),
                                                             }).FirstOrDefaultAsync();
 
         if (result == null) return BadRequest<StudentAssignmentDetailsDto>("no Uploaded assignment this student not provide any");

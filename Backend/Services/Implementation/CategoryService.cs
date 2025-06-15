@@ -16,7 +16,7 @@ namespace Backend.Services.Implementation
         {
             var exist = await _unitOfWork.Repository<Student>()
                                                .GetTableNoTracking()
-                                               .AnyAsync(s => s.Name == name && s.IsDeleted == false);
+                                               .AnyAsync(s => GeneralLocalizableEntity.Localized(s.NameAr,s.NameEn) == name && s.IsDeleted == false);
 
             return exist;
         }

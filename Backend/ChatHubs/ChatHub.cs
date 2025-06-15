@@ -1,4 +1,7 @@
-﻿namespace Backend.ChatHubs;
+﻿using System.Globalization;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace Backend.ChatHubs;
 
 public class ChatHub : Hub
 {
@@ -21,14 +24,32 @@ public class ChatHub : Hub
     }
     public async Task SendMessage(int chatRoomId, int senderId, string message)
     {
+        CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+
         var chatMessage = new ChatMessage
         {
-            ChatRoomId = chatRoomId,
-            SenderId = senderId,
-            Content = message,
-            Timestamp = DateTime.UtcNow,
-            IsRead = false
+            //ChatRoomId = chatRoomId,
+            //SenderId = senderId,
+            //Content = message,
+            //Timestamp = DateTime.UtcNow,
+            //IsRead = false
         };
+        if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
+        {
+            chatMessage.ChatRoomId = chatRoomId;
+            chatMessage.SenderId = senderId;
+            chatMessage.ContentAr = message;
+            chatMessage.Timestamp = DateTime.UtcNow;
+            chatMessage.IsRead = false;
+        }
+        else
+        {
+            chatMessage.ChatRoomId = chatRoomId;
+            chatMessage.SenderId = senderId;
+            chatMessage.ContentEn = message;
+            chatMessage.Timestamp = DateTime.UtcNow;
+            chatMessage.IsRead = false;
+        }
 
         _context.ChatMessages.Add(chatMessage);
 

@@ -164,7 +164,7 @@ public class AuthenticationService : IAuthenticationService
         //var userExists = await _userManager.FindByEmailAsync(model.Email);
 
         var userExists = await _unitOfWork.Repository<User>().GetTableNoTracking().FirstOrDefaultAsync(u => u.Email == model.Email);
-        if (userExists != null && userExists.UserType == role)
+        if (userExists != null && GeneralLocalizableEntity.Localized(userExists.UserTypeAr,userExists.UserTypeEn) == role)
         {
             return _responseHandler.BadRequest<TokenDto>("User already exists");
         }
@@ -374,7 +374,7 @@ public class AuthenticationService : IAuthenticationService
         var userDto = new UserDto
         {
             Id = user.Id,
-            Name = user.Name,
+            Name = GeneralLocalizableEntity.Localized(user.NameAr,user.NameEn),
             Email = user.Email,
             Phone = user.PhoneNumber,
             CreatedAt = user.CreatedAt,

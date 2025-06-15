@@ -3,7 +3,8 @@
 public class ChatMessage
 {
     public int Id { get; set; }
-    public string Content { get; set; }
+    public string ContentEn { get; set; }
+    public string ContentAr { get; set; }
     public DateTime Timestamp { get; set; }
     public bool IsRead { get; set; } = false;
 

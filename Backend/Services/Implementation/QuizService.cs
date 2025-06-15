@@ -1,5 +1,9 @@
 ﻿using Backend.DTOs.QuizeDTOs;
 using Backend.Entities.QuizeEntities;
+using static System.Net.Mime.MediaTypeNames;
+using System.Globalization;
+using Backend.Entities;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Backend.Services.Implementation;
 
@@ -29,8 +33,8 @@ public class QuizService : ResponseHandler, IQuizService
         .Select(sqa => new QuizToCorrectDto
         {
             StudentQuizAnswerId = sqa.Id,
-            QuizName = sqa.Quiz.Title,
-            StudentName = sqa.Student.Name,
+            QuizName = GeneralLocalizableEntity.Localized(sqa.Quiz.TitleAr, sqa.Quiz.TitleEn),
+            StudentName = GeneralLocalizableEntity.Localized(sqa.Student.NameAr,sqa.Student.NameEn),
 
         })
         .ToList();
@@ -130,7 +134,7 @@ public class QuizService : ResponseHandler, IQuizService
                     double studentPercentage = quiz.PossiblePoints > 0 ? studentDegree / quiz.PossiblePoints * 100 : 0;
                     quizStats.Add(new QuizStatsDto
                     {
-                        QuizName = quiz.Title,
+                        QuizName = GeneralLocalizableEntity.Localized(quiz.TitleAr, quiz.TitleEn),
                         StudentDegree = studentDegree,
                         StudentPercentage = studentPercentage
                     });
@@ -138,7 +142,7 @@ public class QuizService : ResponseHandler, IQuizService
 
                 lessonStats.Add(new LessonQuizStatsDto
                 {
-                    LessonName = lesson.Title,
+                    LessonName = GeneralLocalizableEntity.Localized(lesson.TitleAr, lesson.TitleEn),
                     NumberOfQuizzesInLesson = numQuizzesInLesson,
                     PercentageOfDegreeForAllQuizzes = lessonPercentageDegree,
                     Quizzes = quizStats
@@ -147,7 +151,7 @@ public class QuizService : ResponseHandler, IQuizService
 
             result.Add(new CourseStudentQuizStatsDto
             {
-                StudentName = student.Name,
+                StudentName = GeneralLocalizableEntity.Localized(student.NameAr, student.NameEn),
                 NumberOfQuizzesSubmitted = submittedQuizzes,
                 PercentageOfSubmitted = percentageSubmitted,
                 PercentageOfDegree = percentageDegree,
@@ -211,7 +215,7 @@ public class QuizService : ResponseHandler, IQuizService
                 double studentPercentage = quiz.PossiblePoints > 0 ? studentDegree / quiz.PossiblePoints * 100 : 0;
                 quizStats.Add(new QuizStatsDto
                 {
-                    QuizName = quiz.Title,
+                    QuizName = GeneralLocalizableEntity.Localized(quiz.TitleAr, quiz.TitleEn),
                     StudentDegree = studentDegree,
                     StudentPercentage = studentPercentage
                 });
@@ -219,7 +223,7 @@ public class QuizService : ResponseHandler, IQuizService
 
             lessonStats.Add(new LessonQuizStatsDto
             {
-                LessonName = lesson.Title,
+                LessonName = GeneralLocalizableEntity.Localized(lesson.TitleAr, lesson.TitleEn),
                 NumberOfQuizzesInLesson = numQuizzesInLesson,
                 PercentageOfDegreeForAllQuizzes = lessonPercentageDegree,
                 Quizzes = quizStats
@@ -228,7 +232,7 @@ public class QuizService : ResponseHandler, IQuizService
 
         return new StudentCourseQuizStatsDto
         {
-            StudentName = student.Name,
+            StudentName = GeneralLocalizableEntity.Localized(student.NameAr, student.NameEn),
             NumberOfQuizzesSubmitted = submittedQuizzes,
             PercentageOfSubmitted = percentageSubmitted,
             PercentageOfDegree = percentageDegree,
@@ -313,7 +317,7 @@ public class QuizService : ResponseHandler, IQuizService
                                                           .Select(q => new LessonQuizListDto
                                                           {
                                                               QuizId = q.Id,
-                                                              QuizName = q.Title,
+                                                              QuizName = GeneralLocalizableEntity.Localized(q.TitleAr, q.TitleEn),
                                                               CreatedAt = q.CreatedAt,
                                                               TotalQuestions = q.questions != null ? q.questions.Count : 0,
                                                               TotalPoints = q.questions != null ? q.PossiblePoints : 0
@@ -391,8 +395,8 @@ public class QuizService : ResponseHandler, IQuizService
         var quizDto = new GetQuizeDto
         {
             Id = quiz.Id,
-            Title = quiz.Title,
-            Description = quiz.Description,
+            Title = GeneralLocalizableEntity.Localized(quiz.TitleAr, quiz.TitleEn),
+            Description = GeneralLocalizableEntity.Localized(quiz.TitleAr, quiz.TitleEn),
             StartsAt = quiz.StartsAt,
             DurationMinutes = quiz.DurationMinutes,
             EndAt = quiz.EndAtAt,
@@ -413,19 +417,27 @@ public class QuizService : ResponseHandler, IQuizService
     }
     private static Quiz MapToEntity(CreateQuizeWithQuestionDto dto)
     {
-        var quiz = new Quiz
+        var quiz = new Quiz { 
+            TitleAr = dto.Title,
+            TitleEn = dto.Title,
+        };
+        
+
+        CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+
+        if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
         {
-            LessonId = dto.LessonId,
-            Title = dto.Title,
-            Description = dto.Description,
-            StartsAt = dto.StartsAt,
-            DurationMinutes = dto.DurationMinutes,
-            CreatedAt = DateTime.Now,
-            EndAtAt = dto.StartsAt.AddMinutes(dto.DurationMinutes),
-            NumberOfQuestions = dto.questionListDtos?.Count ?? 0,
-            PossiblePoints = dto.questionListDtos?.Sum(q => q.Points) ?? 0,
-            IsAutoCorrect = dto.IsAutoCorrect,
-            questions = dto.questionListDtos?.Select(qDto => new Question
+            quiz.LessonId = dto.LessonId;
+            quiz.TitleAr = dto.Title;
+            quiz.DescriptionAr = dto.Description;
+            quiz.StartsAt = dto.StartsAt;
+            quiz.DurationMinutes = dto.DurationMinutes;
+            quiz.CreatedAt = DateTime.Now;
+            quiz.EndAtAt = dto.StartsAt.AddMinutes(dto.DurationMinutes);
+            quiz.NumberOfQuestions = dto.questionListDtos?.Count ?? 0;
+            quiz.PossiblePoints = dto.questionListDtos?.Sum(q => q.Points) ?? 0;
+            quiz.IsAutoCorrect = dto.IsAutoCorrect;
+            quiz.questions = dto.questionListDtos?.Select(qDto => new Question
             {
                 QuestionText = qDto.QuestionText,
                 QuestionTypeId = qDto.QuestionTypeId,
@@ -436,8 +448,33 @@ public class QuizService : ResponseHandler, IQuizService
                     OptionText = opt.Key,
                     IsCorrect = opt.Value
                 }).ToList()
-            }).ToList()
-        };
+            }).ToList();
+        }
+        else
+        {
+            quiz.LessonId = dto.LessonId;
+            quiz.TitleEn = dto.Title;
+            quiz.DescriptionEn = dto.Description;
+            quiz.StartsAt = dto.StartsAt;
+            quiz.DurationMinutes = dto.DurationMinutes;
+            quiz.CreatedAt = DateTime.Now;
+            quiz.EndAtAt = dto.StartsAt.AddMinutes(dto.DurationMinutes);
+            quiz.NumberOfQuestions = dto.questionListDtos?.Count ?? 0;
+            quiz.PossiblePoints = dto.questionListDtos?.Sum(q => q.Points) ?? 0;
+            quiz.IsAutoCorrect = dto.IsAutoCorrect;
+            quiz.questions = dto.questionListDtos?.Select(qDto => new Question
+            {
+                QuestionText = qDto.QuestionText,
+                QuestionTypeId = qDto.QuestionTypeId,
+                Points = qDto.Points,
+                CorrectAnswer = qDto.CorrectAnswer,
+                Options = qDto.Options?.Select(opt => new QuestionOption
+                {
+                    OptionText = opt.Key,
+                    IsCorrect = opt.Value
+                }).ToList()
+            }).ToList();
+        }
 
         return quiz;
     }
@@ -456,7 +493,7 @@ public class QuizService : ResponseHandler, IQuizService
     private async Task<bool> SendEmailsToStudnet(Quiz quiz, int lessonId)
     {
         // Send email notification to students
-        string emailSubject = $"New Quiz: \"{quiz.Title}\" Scheduled for {quiz.StartsAt:MMMM d, yyyy 'at' h:mm tt}";
+        string emailSubject = $"New Quiz: \"{GeneralLocalizableEntity.Localized(quiz.TitleAr, quiz.TitleEn)}\" Scheduled for {quiz.StartsAt:MMMM d, yyyy 'at' h:mm tt}";
         string emailMessage = $@"
                                     <html>
                                       <body style='font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; color: #333;'>
@@ -469,8 +506,8 @@ public class QuizService : ResponseHandler, IQuizService
                                     
                                           <h3 style='color: #333; margin-top: 20px;'>📋 Quiz Details:</h3>
                                           <ul style='padding-left: 20px;'>
-                                            <li style='margin-bottom: 8px;'><strong>Title:</strong> {quiz.Title}</li>
-                                            <li style='margin-bottom: 8px;'><strong>Description:</strong> {quiz.Description ?? "No description provided."}</li>
+                                            <li style='margin-bottom: 8px;'><strong>Title:</strong> {GeneralLocalizableEntity.Localized(quiz.TitleAr, quiz.TitleEn)}</li>
+                                            <li style='margin-bottom: 8px;'><strong>Description:</strong> {GeneralLocalizableEntity.Localized(quiz.DescriptionAr, quiz.DescriptionEn) ?? "No description provided."}</li>
                                             <li style='margin-bottom: 8px;'><strong>Start Time:</strong> {quiz.StartsAt:MMMM d, yyyy 'at' h:mm tt}</li>
                                             <li style='margin-bottom: 8px;'><strong>Duration:</strong> {quiz.DurationMinutes} minutes</li>
                                             <li style='margin-bottom: 8px;'><strong>Number of Questions:</strong> {quiz.NumberOfQuestions}</li>

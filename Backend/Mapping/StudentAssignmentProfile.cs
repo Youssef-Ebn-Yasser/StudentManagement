@@ -10,11 +10,12 @@ public class StudentAssignmentProfile : Profile
         CreateMap<StudentAssignment, StudentAssignmentCourseDto>();
         CreateMap<StudentAssignment, AssignmentStudentDto>()
             .ForMember(dest => dest.Path, opt => opt.MapFrom(src => src.Path))
-            .ForMember(dest => dest.LessonName, opt => opt.MapFrom(src => src.Lesson.Title))
-            .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Name));
+            .ForMember(dest => dest.LessonName, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.Lesson.TitleAr, src.Lesson.TitleEn))
+            //.ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Name))
+            );
         CreateMap<StudentAssignment, AssignmentOfLessonDto>()
             .ForMember(dest => dest.Path, opt => opt.MapFrom(src => src.Path))
-            .ForMember(dest => dest.LessonName, opt => opt.MapFrom(src => src.Lesson.Title));
+            .ForMember(dest => dest.LessonName, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.Lesson.TitleAr, src.Lesson.TitleEn)));
             
 
     }
