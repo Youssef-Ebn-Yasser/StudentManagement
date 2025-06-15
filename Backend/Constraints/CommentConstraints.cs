@@ -6,7 +6,11 @@ public class CommentConstraints : IEntityTypeConfiguration<Comment>
     {
         builder.HasKey(c => c.Id);
 
-        builder.Property(c => c.Content)
+        builder.Property(c => c.ContentEn)
+               .IsRequired()
+               .HasMaxLength(500);
+
+        builder.Property(c => c.ContentAr)
                .IsRequired()
                .HasMaxLength(500);
 

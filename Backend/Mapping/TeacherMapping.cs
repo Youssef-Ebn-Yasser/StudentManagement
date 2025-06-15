@@ -15,7 +15,7 @@ public class TeacherMapping : Profile
         // Course to CoursesProfile mapping
         CreateMap<Course, CoursesProfile>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title));
+            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.TitleAr, src.TitleEn)));
 
         // Other mappings
         CreateMap<Teacher, TeacherProfileDto>();

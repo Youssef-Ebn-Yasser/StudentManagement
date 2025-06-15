@@ -39,13 +39,13 @@ public class CourseService : ResponseHandler, ICourseService
         var courses = await _unitOfWork.Repository<Course>()
                                                       .GetTableNoTracking()
                                                       .Include(c => c.Category)
-                                                      .Where(c => c.Category!.CategoryName == categoryName && c.IsDeleted == false)
+                                                      .Where(c => GeneralLocalizableEntity.Localized(c.Category!.CategoryNameAr, c.Category!.CategoryNameEn) == categoryName && c.IsDeleted == false)
                                                       .Select(c => new HomeCourses
                                                       {
                                                           Id = c.Id,
-                                                          Title = c.Title,
-                                                          Description = c.Description,
-                                                          Level = c.Level,
+                                                          Title = GeneralLocalizableEntity.Localized(c.TitleAr,c.TitleEn),
+                                                          Description = GeneralLocalizableEntity.Localized(c.DescriptionAr,c.DescriptionEn),
+                                                          Level = GeneralLocalizableEntity.Localized(c.LevelAr,c.LevelEn),
                                                           Price = c.Price,
                                                           ImagePath = c.ImagePath,
                                                       })
@@ -204,14 +204,14 @@ public class CourseService : ResponseHandler, ICourseService
     {
         var courses = await _unitOfWork.Repository<Course>()
             .GetTableNoTracking()
-            .Where(c => c.Category!.CategoryName == category && c.IsDeleted == false)
+            .Where(c => GeneralLocalizableEntity.Localized(c.Category!.CategoryNameAr, c.Category!.CategoryNameEn) == category && c.IsDeleted == false)
             .Select(c => new ShowCourseInfoByCategoryDto
             {
-                Description = c.Description,
+                Description = GeneralLocalizableEntity.Localized(c.DescriptionAr, c.DescriptionEn),
                 Price = c.Price,
                 CreatedAt = c.CreatedAt,
                 ImagePath = c.ImagePath,
-                Level = c.Level,
+                Level = GeneralLocalizableEntity.Localized(c.LevelAr, c.LevelEn),
                 Hours = c.Hours
             })
             .ToListAsync();

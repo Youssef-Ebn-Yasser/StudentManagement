@@ -2,7 +2,8 @@
 
 public class Material : BaseEntity
 {
-    public string? Content { get; set; }
+    public string? ContentEn { get; set; }
+    public string? ContentAr { get; set; }
     public bool IsDeleted { get; set; }
     public string? Path { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;

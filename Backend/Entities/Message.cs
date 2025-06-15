@@ -3,7 +3,8 @@
 public class Message
 {
     public int Id { get; set; }
-    public string content { get; set; } = string.Empty;
+    public string contentEn { get; set; } = string.Empty;
+    public string contentAr { get; set; } = string.Empty;
     public int SenderId { get; set; }
     public int? ReceiverId { get; set; }
     public DateTime CreatedAt { get; set; }

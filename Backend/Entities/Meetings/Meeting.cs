@@ -4,7 +4,8 @@ public class Meeting
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string ZoomMeetingId { get; set; } = string.Empty;
-    public string Topic { get; set; } = string.Empty;
+    public string TopicEn { get; set; } = string.Empty;
+    public string TopicAr { get; set; }
     public string JoinUrl { get; set; } = string.Empty;
     public string? Password { get; set; }
     public EnMeetingType Type { get; set; }
