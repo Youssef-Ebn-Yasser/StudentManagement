@@ -22,8 +22,8 @@ public class QuizService : ResponseHandler, IQuizService
             .Select(sqa => new QuizToCorrectDto
             {
                 StudentQuizAnswerId = sqa.Id,
-                QuizName = sqa.Quiz.Title,
-                StudentName = sqa.Student.Name
+                QuizName = sqa.Quiz.TitleEn,
+                StudentName = sqa.Student.NameEn
             })
             .ToList();
         return quizzesToCorrect;
@@ -38,8 +38,8 @@ public class QuizService : ResponseHandler, IQuizService
                                                        .ThenInclude(opt => opt.studentQuestionOptions)
                                                        .Select(a => new StudentQuizAnswerDto
                                                        {
-                                                           QuizTitle = a.Quiz.Title,
-                                                           StudentName = a.Student.Name,
+                                                           QuizTitle = a.Quiz.TitleEn,
+                                                           StudentName = a.Student.NameEn,
                                                            Que = a.StudentQuestionAnswer.Where(q => q.StudentAnswerText != null).Select(sqa => new Que
                                                            {
                                                                QuestionId = sqa.Id,
@@ -453,28 +453,25 @@ public class QuizService : ResponseHandler, IQuizService
     }
     private static Quiz MapToEntity(CreateQuizeWithQuestionDto dto)
     {
-        var quiz = new Quiz { 
-            TitleAr = dto.Title,
-            TitleEn = dto.Title,
-        };
-        
+        var quiz = new Quiz();
+
 
         CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
 
         if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
         {
-            LessonId = dto.LessonId,
-            Title = dto.Title,
-            Description = dto.Description,
-            StartsAt = dto.StartsAt,
-            DurationMinutes = dto.DurationMinutes,
-            CreatedAt = DateTime.Now,
+            quiz.LessonId = dto.LessonId;
+            quiz.TitleAr = dto.Title;
+            quiz.DescriptionAr = dto.Description;
+            quiz.StartsAt = dto.StartsAt;
+            quiz.DurationMinutes = dto.DurationMinutes;
+            quiz.CreatedAt = DateTime.Now;
 
-            EndAtAt = dto.StartsAt.AddMinutes(dto.DurationMinutes),
-            NumberOfQuestions = dto.questionListDtos?.Count ?? 0,
-            PossiblePoints = dto.questionListDtos?.Sum(q => q.Points) ?? 0,
-            IsAutoCorrect = dto.IsAutoCorrect,
-            questions = dto.questionListDtos?.Select(qDto => new Question
+            quiz.EndAtAt = dto.StartsAt.AddMinutes(dto.DurationMinutes);
+            quiz.NumberOfQuestions = dto.questionListDtos?.Count ?? 0;
+            quiz.PossiblePoints = dto.questionListDtos?.Sum(q => q.Points) ?? 0;
+            quiz.IsAutoCorrect = dto.IsAutoCorrect;
+            quiz.questions = dto.questionListDtos?.Select(qDto => new Question
             {
                 QuestionText = qDto.QuestionText,
                 QuestionTypeId = qDto.QuestionTypeId,
@@ -607,14 +604,14 @@ public class QuizService : ResponseHandler, IQuizService
 
             var studentSubmissions = studentAnswers.Select(a => new StudentQuizSubmissionDto
             {
-                StudentName = a.Student?.Name,
+                StudentName = a.Student?.NameEn,
                 StudentDegree = (double)(a.GradingRating ?? 0),
                 NumberOfSubmittedQuestions = a.StudentQuestionAnswer?.Count ?? 0
             }).ToList();
 
             quizAnalyticsList.Add(new QuizAnalyticsDto
             {
-                QuizName = quiz.Title,
+                QuizName = quiz.TitleEn,
                 PercentageWithDegree = percentageWithDegree,
                 NumberOfStudentSubmit = numSubmitted,
                 PercentageOfSubmit = percentageOfSubmit,
@@ -627,7 +624,7 @@ public class QuizService : ResponseHandler, IQuizService
 
         var result = new LessonQuizesStatsDto
         {
-            LessonName = lesson.Title,
+            LessonName = lesson.TitleEn,
             NumberOfQuizzes = totalQuizzes,
             PercentageOfAllQuizzes = 100, // For a single lesson, always 100%
             Quizzes = quizAnalyticsList
@@ -669,14 +666,14 @@ public class QuizService : ResponseHandler, IQuizService
 
                 var studentSubmissions = studentAnswers.Select(a => new StudentQuizSubmissionDto
                 {
-                    StudentName = a.Student?.Name,
+                    StudentName = a.Student?.NameEn,
                     StudentDegree = (double)(a.GradingRating ?? 0),
                     NumberOfSubmittedQuestions = a.StudentQuestionAnswer?.Count ?? 0
                 }).ToList();
 
                 quizAnalyticsList.Add(new QuizAnalyticsDto
                 {
-                    QuizName = quiz.Title,
+                    QuizName = quiz.TitleEn,
                     PercentageWithDegree = percentageWithDegree,
                     NumberOfStudentSubmit = numSubmitted,
                     PercentageOfSubmit = percentageOfSubmit,
@@ -688,7 +685,7 @@ public class QuizService : ResponseHandler, IQuizService
             }
             result.Add(new LessonQuizesStatsDto
             {
-                LessonName = lesson.Title,
+                LessonName = lesson.TitleEn,
                 NumberOfQuizzes = totalQuizzes,
                 PercentageOfAllQuizzes = percentageOfAllQuizzes,
                 Quizzes = quizAnalyticsList
