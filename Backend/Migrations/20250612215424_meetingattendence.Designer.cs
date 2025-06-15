@@ -4,6 +4,7 @@ using Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250612215424_meetingattendence")]
+    partial class meetingattendence
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -579,6 +582,9 @@ namespace Backend.Migrations
                     b.Property<DateTime>("EndAtAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal?>("GradingRating")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<bool>("IsAutoCorrect")
                         .HasColumnType("bit");
 
@@ -629,7 +635,8 @@ namespace Backend.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.HasIndex("studentQuizeAnswerId");
+                    b.HasIndex("studentQuizeAnswerId")
+                        .IsUnique();
 
                     b.ToTable("StudentQuestionAnswers");
                 });
@@ -1206,7 +1213,7 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Entities.Meetings.ZoomParticipant", b =>
                 {
                     b.HasOne("Backend.Entities.Meetings.Meeting", "Meeting")
-                        .WithMany("ZoomParticipants")
+                        .WithMany()
                         .HasForeignKey("MeetingId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1269,14 +1276,14 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Entities.QuizeEntities.StudentQuestionAnswer", b =>
                 {
                     b.HasOne("Backend.Entities.QuizeEntities.Question", "Question")
-                        .WithMany("StudentQuestionAnswers")
+                        .WithMany()
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Backend.Entities.QuizeEntities.StudentQuizeAnswer", "studentQuizeAnswer")
-                        .WithMany("StudentQuestionAnswer")
-                        .HasForeignKey("studentQuizeAnswerId")
+                        .WithOne("StudentQuestionAnswer")
+                        .HasForeignKey("Backend.Entities.QuizeEntities.StudentQuestionAnswer", "studentQuizeAnswerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1307,7 +1314,7 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Entities.QuizeEntities.StudentQuizeAnswer", b =>
                 {
                     b.HasOne("Backend.Entities.QuizeEntities.Quiz", "Quiz")
-                        .WithMany("StudentQuizeAnswers")
+                        .WithMany()
                         .HasForeignKey("QuizId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1337,11 +1344,11 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Entities.StudentAssignment", b =>
                 {
                     b.HasOne("Backend.Entities.Lesson", "Lesson")
-                        .WithMany("StudentAssignments")
+                        .WithMany()
                         .HasForeignKey("LessonId");
 
                     b.HasOne("Backend.Entities.Student", "Student")
-                        .WithMany("StudentAssignments")
+                        .WithMany()
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1442,27 +1449,16 @@ namespace Backend.Migrations
                 {
                     b.Navigation("Quizs");
 
-                    b.Navigation("StudentAssignments");
-
                     b.Navigation("materials");
-                });
-
-            modelBuilder.Entity("Backend.Entities.Meetings.Meeting", b =>
-                {
-                    b.Navigation("ZoomParticipants");
                 });
 
             modelBuilder.Entity("Backend.Entities.QuizeEntities.Question", b =>
                 {
                     b.Navigation("Options");
-
-                    b.Navigation("StudentQuestionAnswers");
                 });
 
             modelBuilder.Entity("Backend.Entities.QuizeEntities.Quiz", b =>
                 {
-                    b.Navigation("StudentQuizeAnswers");
-
                     b.Navigation("questions");
                 });
 
@@ -1473,7 +1469,8 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Entities.QuizeEntities.StudentQuizeAnswer", b =>
                 {
-                    b.Navigation("StudentQuestionAnswer");
+                    b.Navigation("StudentQuestionAnswer")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Backend.Entities.Student", b =>
@@ -1481,8 +1478,6 @@ namespace Backend.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("Payments");
-
-                    b.Navigation("StudentAssignments");
 
                     b.Navigation("StudentCourses");
                 });

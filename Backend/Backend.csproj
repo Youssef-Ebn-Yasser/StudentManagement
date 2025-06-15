@@ -6,6 +6,7 @@
     <UserSecretsId>3625c041-3902-477b-a304-cfa186736ac8</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="AspNetCore.JsonLocalization" Version="1.0.0" />
     <PackageReference Include="CloudinaryDotNet" Version="1.27.5" />
     <PackageReference Include="Google.Apis.Auth" Version="1.69.0" />
     <PackageReference Include="MailKit" Version="4.11.0" />

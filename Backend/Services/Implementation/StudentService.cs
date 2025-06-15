@@ -1,4 +1,6 @@
 ﻿using Backend.DTOs.StudentDOs;
+using Backend.DTOs.StudentProfileDto;
+using Backend.Entities.QuizeEntities;
 using Backend.Wrapper;
 
 namespace Backend.Services.Implementation;
@@ -254,5 +256,115 @@ public class StudentService : ResponseHandler, IStudentService
     await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => GeneralLocalizableEntity.Localized(s.NameAr, s.NameEn) == name);
     private async Task<Student> _studentExistById(int id) =>
 await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => s.Id == id);
-    #endregion
+
+    public async Task<Response<StudentProfDTO>> GetStudentProfileAsync(int studentId)
+    {
+        var student = await _studentExistById(studentId);
+        if (student == null)
+            return NotFound<StudentProfDTO>($"Student with ID {studentId} not found");
+
+        // Get student basic info
+        var studentInfo = _mapper.Map<ShowStudentDto>(student);
+
+        //var listOfAssignment = _unitOfWork.Repository<Lesson>()
+        //    .GetTableNoTracking()
+        //    .Include(sa => sa.StudentAssignments)
+        //    .Include(l => l.Quizs)
+        //.Select(l => new
+        // {
+        //     AssignmentDetails = l.StudentAssignments.Where(sa => sa.LessonId == l.Id)
+        //                           .Select(sa => new
+        //                           {
+        //                               StudentDegreePercentage = sa.DegreePercentage,
+        //                               StudentAssignmentId = sa.Id,
+        //                               AssignmentName = l.materials.Where(m => m.LessonId == l.Id)
+        //                                                           .Select(m => m.Title)
+        //                                                           .FirstOrDefault(),
+        //                           }).FirstOrDefault(),
+
+        //     numberOfQuizesInLesson = l.Quizs.Where(q => q.LessonId == l.Id).Count(),
+        //     TotalQuizesDegreeInLessons = l.Quizs.Where(q => q.LessonId == l.Id).Sum(q => q.PossiblePoints),
+        //     StudentDegreeOfQuizesInLessons = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Sum(qa => qa.GradingRating),
+        //     quizLestDetails = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Select(qa => new
+        //     {
+        //         studentQuizAnswerId = qa.Id,
+        //         quizPercentageDegree = qa.GradingRating,
+        //         IsPass = qa.IsPassed,
+        //         PossiblePoints = qa.Quiz.PossiblePoints,
+        //         NumberOfAswered = qa.NumberOfAswered,
+        //         quizName = qa.Quiz.Title,
+
+        //     })
+        // });
+
+
+
+
+
+
+
+
+        // Get assignments
+        var assignments = await _unitOfWork.Repository<StudentAssignment>()
+            .GetTableNoTracking()
+            .Include(sa => sa.Lesson)
+            .ThenInclude(l => l.Course)
+            .Where(sa => sa.StudentId == studentId)
+            .Select(sa => new DTOs.StudentProfileDto.StudentAssignmentDto
+            {
+                Id = sa.Id,
+                CourseName = sa.Lesson.Course.Title,
+                LessonName = sa.Lesson.Title,
+                Path = sa.Path,
+                DegreePercentage = sa.DegreePercentage
+
+            })
+            .ToListAsync();
+
+
+
+        var quizzes = await _unitOfWork.Repository<StudentQuizeAnswer>()
+         .GetTableNoTracking()
+         .Include(sqa => sqa.Quiz)
+        .Where(sqa => sqa.StudentId == studentId)
+        .Select(sqa => new StudentQuizDto
+        {
+            QuizId = sqa.Id,
+            QuizTitle = sqa.Quiz.Title,
+            GradingRating = sqa.GradingRating,
+            IsPassed = sqa.IsPassed,
+
+        })
+      .ToListAsync();
+        var attendance = await GetStudentAttendance(studentId);
+
+        // Create the profile DTO
+        var profile = new StudentProfDTO
+        {
+            StudentInfo = studentInfo,
+            Assignments = assignments,
+            Quizzes = quizzes,
+            Attendance = attendance
+        };
+
+        return Success(profile);
+    }
+    private async Task<List<StudentAttendanceDto>> GetStudentAttendance(int studentId)
+    {
+        // Implement this based on how you track meeting attendance
+        // This is just a placeholder implementation
+        return await _unitOfWork.Repository<MeetingAttendance>() // You'll need this entity
+            .GetTableNoTracking()
+            .Include(ma => ma.Meeting)
+            .Where(ma => ma.StudentId == studentId)
+            .Select(ma => new StudentAttendanceDto
+            {
+                Id = ma.Id,
+                MeetingTopic = ma.Meeting.Topic,
+                MeetingDate = ma.Meeting.StartTime ?? ma.Meeting.CreatedAt,
+                Attended = ma.Attended
+            })
+            .ToListAsync();
+    }
 }
+#endregion
