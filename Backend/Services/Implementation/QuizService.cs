@@ -1,7 +1,4 @@
-﻿using Backend.DTOs.QuizeDTOs;
-using Backend.Entities.QuizeEntities;
-
-namespace Backend.Services.Implementation;
+﻿namespace Backend.Services.Implementation;
 
 public class QuizService : ResponseHandler, IQuizService
 {
@@ -21,8 +18,7 @@ public class QuizService : ResponseHandler, IQuizService
     {
         var quizzesToCorrect = _unitOfWork.Repository<StudentQuizeAnswer>()
             .GetTableNoTracking()
-            .Where(sqa => sqa.Quiz.LessonId == lessonId)
-            .Where(sqa => sqa.StudentQuestionAnswer.Any(sqaQ => sqaQ.IsCorrect == null))
+            .Where(sqa => sqa.Quiz.LessonId == lessonId && !sqa.Quiz.IsAutoCorrect)
             .Select(sqa => new QuizToCorrectDto
             {
                 StudentQuizAnswerId = sqa.Id,
@@ -33,37 +29,86 @@ public class QuizService : ResponseHandler, IQuizService
         return quizzesToCorrect;
     }
 
-    public List<StudentQuizAnswerDto> GetStudentQuizAnswer(int answerId)
+    public async Task<Response<StudentQuizAnswerDto>> GetStudentQuizAnswer(int answerId)
     {
+        var result = await _unitOfWork.Repository<StudentQuizeAnswer>()
+                                                       .GetTableNoTracking()
+                                                       .Where(a => a.Id == answerId)
+                                                       .Include(a => a.StudentQuestionAnswer)!
+                                                       .ThenInclude(opt => opt.studentQuestionOptions)
+                                                       .Select(a => new StudentQuizAnswerDto
+                                                       {
+                                                           QuizTitle = a.Quiz.Title,
+                                                           StudentName = a.Student.Name,
+                                                           Que = a.StudentQuestionAnswer.Where(q => q.StudentAnswerText != null).Select(sqa => new Que
+                                                           {
+                                                               QuestionId = sqa.Id,
+                                                               QuestionText = sqa.Question.QuestionText,
+                                                               QuestionTextAnswer = sqa.StudentAnswerText!,
+                                                           }).ToList(),
+                                                       }).FirstOrDefaultAsync();
 
-        return _unitOfWork.Repository<StudentQuestionAnswer>()
-         .GetTableNoTracking()
-         .Where(a => a.studentQuizeAnswerId == answerId && a.IsCorrect == null)
-         .Include(a => a.studentQuestionOptions)
-         .ThenInclude(opt => opt.QuestionOption)
-         .Select(a => new StudentQuizAnswerDto
-         {
-             Answer = a.studentQuestionOptions.Select(opt => opt.QuestionOption.OptionText).ToList(),
-             IsCorrect = null
-
-         })
-         .ToList();
+        return result == null ? BadRequest<StudentQuizAnswerDto>("No Text question") : Success(result);
     }
 
-    public void CorrectQuiz(int AnswerId, bool isCorrect)
+    public async Task<Response<string>> CorrectQuiz(int studentQuizAnswerId, List<CorrectQuizDto> dto)
     {
-        var answer = _unitOfWork.Repository<StudentQuestionAnswer>()
-            .GetTableAsTracking()
-            .Where(a => a.Id == AnswerId).FirstOrDefault();
+        foreach (var item in dto)
+        {
+            var answer = await _unitOfWork.Repository<StudentQuestionAnswer>()
+                                         .GetTableAsTracking()
+                                         .Where(a => a.Id == item.AnswerId)
+                                         .FirstOrDefaultAsync();
 
 
-        if (answer == null)
-            throw new Exception("Answer not found");
+            if (answer == null)
+                return BadRequest<string>("Answer not found");
 
-        answer.IsCorrect = isCorrect;
+            answer.IsCorrect = item.IsCorrect;
+        }
 
-        _unitOfWork.Repository<StudentQuestionAnswer>().Update(answer);
         _unitOfWork.Complete();
+
+
+        var q = await _unitOfWork.Repository<StudentQuestionAnswer>()
+                                                  .GetTableAsTracking()
+                                                  .Where(a => a.studentQuizeAnswerId == studentQuizAnswerId)
+                                                  .Select(q => new
+                                                  {
+                                                      Points = q.Question.Points,
+                                                      IsCorrect = q.IsCorrect,
+                                                  }).ToListAsync();
+        int totalPoint = 0;
+        int degree = 0;
+        int numberOfAnswered = 0;
+
+        foreach (var item in q)
+        {
+
+            if (item.IsCorrect != null && item.IsCorrect == true)
+            {
+                degree += item.Points;
+                numberOfAnswered++;
+            }
+
+            totalPoint += item.Points;
+        }
+
+        decimal gradingRating = numberOfAnswered > 0
+               ? (decimal)degree * 100 / totalPoint
+               : 0;
+        bool isPassed = gradingRating >= 50;
+
+        var studentQuizAnswer = await _unitOfWork.Repository<StudentQuizeAnswer>()
+                                                  .GetTableAsTracking()
+                                                  .FirstOrDefaultAsync(a => a.Id == studentQuizAnswerId);
+
+        studentQuizAnswer.GradingRating = gradingRating;
+        studentQuizAnswer.IsPassed = isPassed;
+        studentQuizAnswer.NumberOfAswered = numberOfAnswered;
+
+        var finalResult = _unitOfWork.Complete();
+        return finalResult > 0 ? Success("Quiz Correct successfully") : BadRequest<string>("error happen whe try correct it");
     }
 
     public List<CourseStudentQuizStatsDto> GetCourseStudentQuizStats(int courseId)
@@ -496,7 +541,7 @@ public class QuizService : ResponseHandler, IQuizService
         return true;
     }
 
-   
+
     public async Task<Response<LessonQuizesStatsDto>> GetLessonQuizStats(int lessonId)
     {
         var lesson = await _unitOfWork.Repository<Lesson>()
