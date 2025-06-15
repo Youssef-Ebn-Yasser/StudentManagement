@@ -38,13 +38,13 @@ namespace Backend.Controllers
            ImageUrl = s.ImageUrl,
            Phone = s.PhoneNumber,
            Id = s.Id,
-           Name = s.Name,
+           Name = s.NameEn,
            Email = s.Email,
            CourseDetails = s.StudentCourses.Where(sc => sc.Student.Id == s.Id)
                               .Select(c => c.Course)
                             .Select(c => new
                             {
-                                CourseName = c.Title,
+                                CourseName = c.TitleEn,
                                 CourseId = c.Id,
                                 AssignmentCountInCourse = c.lessons.SelectMany(l => l.materials).Where(m => m.Type == MaterialTypeId.Assignment).Count(),
                                 TotalPercentageDegreeInCourse = c.lessons.SelectMany(l => l.StudentAssignments).Where(sa => sa.Id == s.Id).Sum(sa => sa.DegreePercentage),
@@ -71,7 +71,7 @@ namespace Backend.Controllers
                                        StudentDegreePercentage = sa.DegreePercentage,
                                        StudentAssignmentId = sa.Id,
                                        AssignmentName = l.materials.Where(m => m.LessonId == l.Id)
-                                                                   .Select(m => m.Title)
+                                                                   .Select(m => m.TitleEn)
                                                                    .FirstOrDefault(),
                                    }).FirstOrDefault(),
 
@@ -86,7 +86,7 @@ namespace Backend.Controllers
                                         IsPass = qa.IsPassed,
                                         PossiblePoints = qa.Quiz.PossiblePoints,
                                         NumberOfAswered = qa.NumberOfAswered,
-                                        QuizName = qa.Quiz.Title,
+                                        QuizName = qa.Quiz.TitleEn,
 
                                     })
                                 })

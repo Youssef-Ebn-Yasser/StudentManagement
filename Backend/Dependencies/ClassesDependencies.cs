@@ -31,7 +31,7 @@ public static class ClassesDependencies
         services.AddTransient<IStudentAssignmentService, StudentAssignmentService>();
         services.AddTransient<IMeetingService, MeetingService>();
         services.AddTransient<IChatService, ChatService>();
-        services.AddTransient<IQuizService, QuizService>();
+        //services.AddTransient<IQuizService, QuizService>();
 
         services.AddScoped<IPhysicalFileUpload, PhysicalFileUpload>();
 

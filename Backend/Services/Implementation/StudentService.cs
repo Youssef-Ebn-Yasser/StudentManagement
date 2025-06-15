@@ -313,8 +313,8 @@ await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync
             .Select(sa => new DTOs.StudentProfileDto.StudentAssignmentDto
             {
                 Id = sa.Id,
-                CourseName = sa.Lesson.Course.Title,
-                LessonName = sa.Lesson.Title,
+                CourseName = sa.Lesson.Course.TitleEn,
+                LessonName = sa.Lesson.TitleEn,
                 Path = sa.Path,
                 DegreePercentage = sa.DegreePercentage
 
@@ -330,7 +330,7 @@ await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync
         .Select(sqa => new StudentQuizDto
         {
             QuizId = sqa.Id,
-            QuizTitle = sqa.Quiz.Title,
+            QuizTitle = sqa.Quiz.TitleEn,
             GradingRating = sqa.GradingRating,
             IsPassed = sqa.IsPassed,
 
@@ -360,7 +360,7 @@ await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync
             .Select(ma => new StudentAttendanceDto
             {
                 Id = ma.Id,
-                MeetingTopic = ma.Meeting.Topic,
+                MeetingTopic = ma.Meeting.TopicEn,
                 MeetingDate = ma.Meeting.StartTime ?? ma.Meeting.CreatedAt,
                 Attended = ma.Attended
             })
