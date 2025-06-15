@@ -112,7 +112,7 @@ const QuizView = () => {
             };
           } else if (question.questionTypeId === 2 || question.questionTypeId === 3) { // Handle both 2 and 3 as short answer
             console.log('Processing short answer:', answer); // Debug log
-            return {
+          return {
               questionId: question.questionId,
               studentAnswerText: answer,
               selectedOptionIds: []

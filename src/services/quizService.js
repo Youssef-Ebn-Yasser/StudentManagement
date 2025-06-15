@@ -104,5 +104,13 @@ export const quizService = {
       console.error('Error fetching quizzes to correct:', error.response?.data || error.message);
       throw error.response?.data || error.message;
     }
+  },
+
+  async getCourseQuizStats(courseId) {
+    return await axiosInstance.get(`/api/Quize/CourseLessonQuizStats/${courseId}`);
+  },
+
+  async getLessonQuizStats(lessonId) {
+    return await axiosInstance.get(`/api/Quize/LessonQuizStats/${lessonId}`);
   }
 }; 

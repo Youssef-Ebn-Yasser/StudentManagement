@@ -194,12 +194,12 @@ const ReviewStudentAnswers = () => {
                     >
                       {item.title}
                     </li>
-                  ))}
+            ))}
               </ul>
             </div>
           </div>
 
-          {selectedCourse && (
+        {selectedCourse && (
             <div>
               <label {...lessonCombobox.getLabelProps()} className="block text-lg font-semibold text-gray-800 mb-2">Select Lesson</label>
               <div className="relative group">
@@ -241,11 +241,11 @@ const ReviewStudentAnswers = () => {
                       >
                         {item.title}
                       </li>
-                    ))}
+              ))}
                 </ul>
               </div>
             </div>
-          )}
+        )}
         </div>
       </div>
 

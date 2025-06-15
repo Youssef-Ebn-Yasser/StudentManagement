@@ -265,12 +265,12 @@ const ManageAssignments = () => {
                     >
                       {item.title}
                     </li>
-                  ))}
+            ))}
               </ul>
             </div>
           </div>
 
-          {selectedCourse && (
+        {selectedCourse && (
             <div>
               <label {...lessonCombobox.getLabelProps()} className="block text-lg font-semibold text-gray-800 mb-2">Select Lesson</label>
               <div className="relative group">
@@ -312,11 +312,11 @@ const ManageAssignments = () => {
                       >
                         {item.title}
                       </li>
-                    ))}
+              ))}
                 </ul>
               </div>
             </div>
-          )}
+        )}
         </div>
       </div>
 
@@ -348,10 +348,10 @@ const ManageAssignments = () => {
                 <p className="text-gray-600 text-md mb-4">Grade: <span className="font-semibold text-gray-800">{assignment.degreePercentage}%</span></p>
               )}
               <button
-                onClick={() => handleViewAssignment(assignment.id)}
+              onClick={() => handleViewAssignment(assignment.id)}
                 className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                View Assignment
+            >
+              View Assignment
               </button>
             </div>
           ))}
@@ -361,7 +361,7 @@ const ManageAssignments = () => {
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="lg" fullWidth>
         <DialogTitle>Correct Assignment</DialogTitle>
         <DialogContent>
-          {assignmentDetails && (
+        {assignmentDetails && (
             <div className="space-y-4 p-4 bg-white rounded-lg shadow">
               <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
                 <p className="text-sm text-gray-600 font-medium">Student Name</p>
@@ -379,13 +379,13 @@ const ManageAssignments = () => {
                 <p className="text-sm text-gray-600 font-medium">Assignment Title</p>
                 <p className="text-lg font-semibold text-gray-900">{assignmentDetails.assignmentTitle}</p>
               </div>
-              {assignmentDetails.path && (
+                {assignmentDetails.path && (
                 <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
                   <p className="text-sm text-gray-600 font-medium">Attachment</p>
-                  <a
-                    href={assignmentDetails.path}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    <a
+                      href={assignmentDetails.path}
+                      target="_blank"
+                      rel="noopener noreferrer"
                     className="text-blue-600 hover:underline text-lg font-semibold"
                   >
                     View Attachment
@@ -401,22 +401,22 @@ const ManageAssignments = () => {
                 </p>
               </div>
 
-              <TextField
+                  <TextField
                 label="Degree Percentage"
-                type="number"
-                fullWidth
-                value={degreePercentage}
-                onChange={(e) => setDegreePercentage(e.target.value)}
+                    type="number"
+                    fullWidth
+                    value={degreePercentage}
+                    onChange={(e) => setDegreePercentage(e.target.value)}
                 margin="normal"
                 inputProps={{ min: 0, max: 100 }}
-              />
+                  />
             </div>
           )}
-        </DialogContent>
-        <DialogActions>
+            </DialogContent>
+            <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
           <Button onClick={handleSaveGrade} color="primary">Save Grade</Button>
-        </DialogActions>
+            </DialogActions>
       </Dialog>
     </div>
   );
