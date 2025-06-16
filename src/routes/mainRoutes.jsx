@@ -12,6 +12,7 @@ import AccountSettings from '@/component/TeacherProfile/settingsPage/AccountSett
 import TeacherCourseDetails from '@/component/TeacherProfile/TeacherCourseDetails'
 import StudentDashboard from '@/component/StudentDashboard/StudentDashboard'
 import StudentProfile from '@/component/StudentProfile/StudentProfile'
+import StudentProfile2 from '@/component/StudentProfile/StudentProfile2'
 import EditProfile from '@/component/StudentProfile/EditProfile'
 import AddLesson from '@/component/TeacherProfile/AddLesson'
 import EditCourse from '@/component/TeacherProfile/EditCourse'
@@ -39,10 +40,10 @@ import teacherRoutes from './teacherRoutes'
 import QuizView from '../component/StudentDashboard/QuizView'
 import ReviewStudentAnswers from '@/component/TeacherProfile/teacherMange/ReviewStudentAnswers'
 import ManageAssignments from '@/component/TeacherProfile/teacherMange/ManageAssignments'
-import ChatRoom from '@/component/StudentDashboard/ChatRoom'
-import TeacherStudents from '@/component/TeacherProfile/TeacherStudents'
-import TChatRoom from '@/component/TeacherProfile/TChatRoom'
-import StudentProfile2 from '@/component/StudentProfile/StudentProfile2'
+import TeacherStudents from '../component/TeacherProfile/TeacherStudents'
+import ChatRoom from '../component/StudentDashboard/ChatRoom'
+import TChatRoom from '../component/TeacherProfile/TChatRoom'
+
 
 const routesConfig = [
     { path: '', element: <Home />, isProtected: false, accessRole: 'all' },
