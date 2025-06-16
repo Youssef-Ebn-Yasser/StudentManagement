@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loader from '../Loader/Loader';
 import { FaVideo } from 'react-icons/fa';
+import { FaGraduationCap } from 'react-icons/fa';
 
 export default function CourseDashDetails() {
   const { id } = useParams();
@@ -125,14 +126,22 @@ export default function CourseDashDetails() {
                   </span>
                 </div>
               </div>
-              {/* View Meetings Button */}
-              <div className="mt-4">
+              <div className="mt-4 flex flex-wrap gap-4">
+                {/* View Meetings Button */}
                 <button
                   onClick={() => navigate(`/studentdashboard/course/${course.id}/stmeetings`)}
                   className="inline-flex items-center bg-purple-600 text-white px-6 py-2 rounded-lg shadow hover:bg-purple-700 transition font-semibold"
                 >
                   <FaVideo className="mr-2 text-lg" />
                   View Zoom Meetings
+                </button>
+                {/* Show Quiz Results Button */}
+                <button
+                  onClick={() => navigate(`/studentdashboard/course/${course.id}/quiz-stats`)}
+                  className="inline-flex items-center bg-green-600 text-white px-6 py-2 rounded-lg shadow hover:bg-green-700 transition font-semibold"
+                >
+                  <FaGraduationCap className="mr-2 text-lg" />
+                  Show Quiz Results
                 </button>
               </div>
             </div>

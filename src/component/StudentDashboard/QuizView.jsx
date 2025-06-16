@@ -101,12 +101,25 @@ const QuizView = () => {
         quizId: parseInt(selectedQuiz.id) || 0,
         answers: Object.entries(answers).map(([questionIndex, answer]) => {
           const question = selectedQuiz.sendQuizeQuestions[parseInt(questionIndex)];
+          console.log('Processing question:', { question, answer }); // Debug log
+          
+          if (question.questionTypeId === 1) {
+            const selectedOption = question.options.find(opt => opt.optionId === parseInt(answer));
+            return {
+              questionId: question.questionId,
+              studentAnswerText: selectedOption?.optionText,
+              selectedOptionIds: [parseInt(answer) || 0]
+            };
+          } else if (question.questionTypeId === 2 || question.questionTypeId === 3) { // Handle both 2 and 3 as short answer
+            console.log('Processing short answer:', answer); // Debug log
           return {
-            questionId: question.questionId, // Use the actual questionId from the fetched quiz
-            studentAnswerText: question.questionTypeId === 2 ? answer.toString() : null, // Only for text answers
-            selectedOptionIds: question.questionTypeId === 1 ? [parseInt(answer) || 0] : [] // 'answer' for MCQs should be the optionId
-          };
-        })
+              questionId: question.questionId,
+              studentAnswerText: answer,
+              selectedOptionIds: []
+            };
+          }
+          return null;
+        }).filter(answer => answer !== null)
       };
       console.log('Submitting quiz data:', quizData); // Debug log
       

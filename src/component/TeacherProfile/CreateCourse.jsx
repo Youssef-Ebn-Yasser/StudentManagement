@@ -115,24 +115,48 @@ const CreateCourse = () => {
       setError(null);
       const formData = new FormData(e.target);
       
-      // Create course data object with required fields
+      // Get teacher ID from localStorage
+      const teacherId = localStorage.getItem('guestId');
+      if (!teacherId) {
+        throw new Error('Teacher ID not found. Please log in again.');
+      }
+
+      // Validate and format the data
+      const title = formData.get('title')?.trim();
+      const description = formData.get('description')?.trim();
+      const price = parseFloat(formData.get('price'));
+      const categoryId = parseInt(formData.get('categoryId'));
+      const level = formData.get('level')?.trim();
+      const hours = formData.get('hours')?.trim();
+      const image = formData.get('thumbnail');
+
+      // Validate required fields
+      const validationErrors = [];
+      if (!title) validationErrors.push('Course title is required');
+      if (!description) validationErrors.push('Course description is required');
+      if (!price || isNaN(price) || price <= 0) validationErrors.push('Valid price is required');
+      if (!categoryId || isNaN(categoryId)) validationErrors.push('Valid category is required');
+      if (!level) validationErrors.push('Course level is required');
+      if (!hours) validationErrors.push('Course hours is required');
+
+      if (validationErrors.length > 0) {
+        throw new Error(`Validation failed: ${validationErrors.join(', ')}`);
+      }
+
+      // Create course data object with validated fields and proper casing
       const courseData = {
-        title: formData.get('title')?.trim(),
-        description: formData.get('description')?.trim(),
-        price: parseFloat(formData.get('price')),
-        teacherId: teacherId, // Use the teacherId from Redux
-        categoryId: parseInt(formData.get('categoryId')),
-        level: formData.get('level'),
-        hours: formData.get('hours'),
-        image: formData.get('thumbnail')
+        Title: title,
+        Description: description,
+        Price: price.toString(), // Convert price to string
+        TeacherId: parseInt(teacherId), // Ensure teacherId is a number
+        CategoryId: categoryId,
+        Level: level,
+        Hours: hours,
+        Image: image
       };
 
       // Log the data being sent
       console.log('Sending course data:', courseData);
-
-      if (!teacherId) {
-        throw new Error('Teacher ID is required');
-      }
 
       const response = await courseService.createCourse(courseData);
       console.log('Course created successfully:', response);
@@ -141,14 +165,14 @@ const CreateCourse = () => {
       e.target.reset();
       
       // Show enhanced success message
-      const categoryName = categories.find(cat => cat.id === courseData.categoryId)?.name || 'N/A';
+      const categoryName = categories.find(cat => cat.id === categoryId)?.name || 'N/A';
       const successMessage = `
         🎉 Course Created Successfully!
         
-        Title: ${courseData.title}
+        Title: ${title}
         Category: ${categoryName}
-        Level: ${courseData.level}
-        Duration: ${courseData.hours}
+        Level: ${level}
+        Duration: ${hours}
         
         You can now add lessons and materials to your course.
       `;
@@ -160,10 +184,7 @@ const CreateCourse = () => {
       
     } catch (error) {
       console.error('Error creating course:', error);
-      if (error.response?.data) {
-        console.error('Error details:', error.response.data);
-      }
-      setError(error.response?.data?.message || error.message || 'Failed to create course');
+      setError(error.message || 'Failed to create course');
     } finally {
       setIsLoading(false);
     }
