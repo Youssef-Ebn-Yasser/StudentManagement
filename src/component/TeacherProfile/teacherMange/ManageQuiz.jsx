@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Tabs, Tab, Box, Typography, TextField, Button, FormControl, InputLabel, Select, MenuItem, IconButton, Paper, Divider, Checkbox, FormControlLabel } from '@mui/material';
+import { Tabs, Tab, Box, Typography, TextField, Button, FormControl, InputLabel, Select, MenuItem, IconButton, Paper, Divider, Checkbox, FormControlLabel, Alert } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import { FaTrash, FaPlus, FaQuestionCircle, FaCheck, FaArrowLeft } from 'react-icons/fa';
@@ -20,6 +20,7 @@ const ManageQuiz = () => {
   const [selectedLesson, setSelectedLesson] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const [lessonQuiz, setLessonQuiz] = useState({
     lessonId: '',
@@ -227,6 +228,7 @@ const ManageQuiz = () => {
   };
 
   const handleSubmit = async () => {
+    setSuccessMessage('');
     try {
       if (activeTab === 0 && !selectedLesson) {
         toast.error('Please select a lesson');
@@ -275,6 +277,7 @@ const ManageQuiz = () => {
 
       if (response.succeeded) {
         toast.success('Quiz created successfully!');
+        setSuccessMessage('Quiz created successfully!');
         // Reset form
         if (activeTab === 0) {
           setLessonQuiz({
@@ -351,6 +354,7 @@ const ManageQuiz = () => {
         }}>
           Manage Quiz
         </Typography>
+        {successMessage && <Alert severity="success" sx={{ mb: 2 }}>{successMessage}</Alert>}
         
         <Box sx={{ borderBottom: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
           <Tabs
