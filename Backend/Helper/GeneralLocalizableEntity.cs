@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace Backend.Helper;
+﻿namespace Backend.Helper;
 
 public class GeneralLocalizableEntity
 {

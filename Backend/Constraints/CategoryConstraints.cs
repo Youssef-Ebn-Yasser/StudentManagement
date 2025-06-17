@@ -8,7 +8,11 @@ namespace Backend.Constraints
         {
             builder.HasKey(c => c.Id);
 
-            builder.Property(c => c.CategoryName)
+            builder.Property(c => c.CategoryNameEn)
+                   .IsRequired()
+                   .HasMaxLength(50);
+
+            builder.Property(c => c.CategoryNameAr)
                    .IsRequired()
                    .HasMaxLength(50);
 

@@ -1,8 +1,12 @@
-﻿using Backend.Settings;
+﻿using Backend.Entities;
+using Backend.Settings;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Stripe;
 using Stripe.Checkout;
+using Stripe.V2;
+using System.Globalization;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Backend.Controllers;
 
@@ -128,16 +132,38 @@ public class PaymentsController : ControllerBase
                 var courseId = int.Parse(session.Metadata["courseId"]);
 
                 // Create payment record
+                CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
                 var payment = new Payment
                 {
-                    Amount = amount,
-                    Status = "Completed",
-                    PaymentDate = paymentDate,
-                    CompleteDate = DateTime.UtcNow,
-                    Currency = currency,
-                    StudentId = studentId,
-                    CourseId = courseId
+                    //Amount = amount,
+                    //Status = "Completed",
+                    //PaymentDate = paymentDate,
+                    //CompleteDate = DateTime.UtcNow,
+                    //Currency = currency,
+                    //StudentId = studentId,
+                    //CourseId = courseId
                 };
+                if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
+                {
+                    payment.Amount = amount;
+                    payment.StatusAr = "Completed";
+                    payment.PaymentDate = paymentDate;
+                    payment.CompleteDate = DateTime.UtcNow;
+                    payment.Currency = currency;
+                    payment.StudentId = studentId;
+                    payment.CourseId = courseId;
+                }
+                else
+                {
+                    payment.Amount = amount;
+                    payment.StatusEn = "Completed";
+                    payment.PaymentDate = paymentDate;
+                    payment.CompleteDate = DateTime.UtcNow;
+                    payment.Currency = currency;
+                    payment.StudentId = studentId;
+                    payment.CourseId = courseId;
+                }
+
 
                 // Save payment to database
                 await _unitOfWork.Repository<Payment>().AddAsync(payment);

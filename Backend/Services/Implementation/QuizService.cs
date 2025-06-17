@@ -1,7 +1,4 @@
-﻿using Backend.DTOs.QuizeDTOs;
-using Backend.Entities.QuizeEntities;
-
-namespace Backend.Services.Implementation;
+﻿namespace Backend.Services.Implementation;
 
 public class QuizService : ResponseHandler, IQuizService
 {
@@ -21,49 +18,97 @@ public class QuizService : ResponseHandler, IQuizService
     {
         var quizzesToCorrect = _unitOfWork.Repository<StudentQuizeAnswer>()
             .GetTableNoTracking()
-            .Where(sqa => sqa.Quiz.LessonId == lessonId)
-            .Where(sqa => sqa.StudentQuestionAnswer.Any(sqaQ => sqaQ.IsCorrect == null))
+            .Where(sqa => sqa.Quiz.LessonId == lessonId && !sqa.Quiz.IsAutoCorrect)
             .Select(sqa => new QuizToCorrectDto
             {
                 StudentQuizAnswerId = sqa.Id,
-                QuizName = sqa.Quiz.Title,
-                StudentName = sqa.Student.Name
+                QuizName = sqa.Quiz.TitleEn,
+                StudentName = sqa.Student.NameEn
             })
             .ToList();
         return quizzesToCorrect;
     }
 
-    public List<StudentQuizAnswerDto> GetStudentQuizAnswer(int answerId)
+    public async Task<Response<StudentQuizAnswerDto>> GetStudentQuizAnswer(int answerId)
     {
+        var result = await _unitOfWork.Repository<StudentQuizeAnswer>()
+                                                       .GetTableNoTracking()
+                                                       .Where(a => a.Id == answerId)
+                                                       .Include(a => a.StudentQuestionAnswer)!
+                                                       .ThenInclude(opt => opt.studentQuestionOptions)
+                                                       .Select(a => new StudentQuizAnswerDto
+                                                       {
+                                                           QuizTitle = a.Quiz.TitleEn,
+                                                           StudentName = a.Student.NameEn,
+                                                           Que = a.StudentQuestionAnswer.Where(q => q.StudentAnswerText != null).Select(sqa => new Que
+                                                           {
+                                                               QuestionId = sqa.Id,
+                                                               QuestionText = sqa.Question.QuestionText,
+                                                               QuestionTextAnswer = sqa.StudentAnswerText!,
+                                                           }).ToList(),
+                                                       }).FirstOrDefaultAsync();
 
-        return _unitOfWork.Repository<StudentQuestionAnswer>()
-         .GetTableNoTracking()
-         .Where(a => a.studentQuizeAnswerId == answerId && a.IsCorrect == null)
-         .Include(a => a.studentQuestionOptions)
-         .ThenInclude(opt => opt.QuestionOption)
-         .Select(a => new StudentQuizAnswerDto
-         {
-             Answer = a.studentQuestionOptions.Select(opt => opt.QuestionOption.OptionText).ToList(),
-             IsCorrect = null
-
-         })
-         .ToList();
+        return result == null ? BadRequest<StudentQuizAnswerDto>("No Text question") : Success(result);
     }
 
-    public void CorrectQuiz(int AnswerId, bool isCorrect)
+    public async Task<Response<string>> CorrectQuiz(int studentQuizAnswerId, List<CorrectQuizDto> dto)
     {
-        var answer = _unitOfWork.Repository<StudentQuestionAnswer>()
-            .GetTableAsTracking()
-            .Where(a => a.Id == AnswerId).FirstOrDefault();
+        foreach (var item in dto)
+        {
+            var answer = await _unitOfWork.Repository<StudentQuestionAnswer>()
+                                         .GetTableAsTracking()
+                                         .Where(a => a.Id == item.AnswerId)
+                                         .FirstOrDefaultAsync();
 
 
-        if (answer == null)
-            throw new Exception("Answer not found");
+            if (answer == null)
+                return BadRequest<string>("Answer not found");
 
-        answer.IsCorrect = isCorrect;
+            answer.IsCorrect = item.IsCorrect;
+        }
 
-        _unitOfWork.Repository<StudentQuestionAnswer>().Update(answer);
         _unitOfWork.Complete();
+
+
+        var q = await _unitOfWork.Repository<StudentQuestionAnswer>()
+                                                  .GetTableAsTracking()
+                                                  .Where(a => a.studentQuizeAnswerId == studentQuizAnswerId)
+                                                  .Select(q => new
+                                                  {
+                                                      Points = q.Question.Points,
+                                                      IsCorrect = q.IsCorrect,
+                                                  }).ToListAsync();
+        int totalPoint = 0;
+        int degree = 0;
+        int numberOfAnswered = 0;
+
+        foreach (var item in q)
+        {
+
+            if (item.IsCorrect != null && item.IsCorrect == true)
+            {
+                degree += item.Points;
+                numberOfAnswered++;
+            }
+
+            totalPoint += item.Points;
+        }
+
+        decimal gradingRating = numberOfAnswered > 0
+               ? (decimal)degree * 100 / totalPoint
+               : 0;
+        bool isPassed = gradingRating >= 50;
+
+        var studentQuizAnswer = await _unitOfWork.Repository<StudentQuizeAnswer>()
+                                                  .GetTableAsTracking()
+                                                  .FirstOrDefaultAsync(a => a.Id == studentQuizAnswerId);
+
+        studentQuizAnswer.GradingRating = gradingRating;
+        studentQuizAnswer.IsPassed = isPassed;
+        studentQuizAnswer.NumberOfAswered = numberOfAnswered;
+
+        var finalResult = _unitOfWork.Complete();
+        return finalResult > 0 ? Success("Quiz Correct successfully") : BadRequest<string>("error happen whe try correct it");
     }
 
     public List<CourseStudentQuizStatsDto> GetCourseStudentQuizStats(int courseId)
@@ -125,7 +170,7 @@ public class QuizService : ResponseHandler, IQuizService
                     double studentPercentage = quiz.PossiblePoints > 0 ? studentDegree / quiz.PossiblePoints * 100 : 0;
                     quizStats.Add(new QuizStatsDto
                     {
-                        QuizName = quiz.Title,
+                        QuizName = GeneralLocalizableEntity.Localized(quiz.TitleAr, quiz.TitleEn),
                         StudentDegree = studentDegree,
                         StudentPercentage = studentPercentage
                     });
@@ -133,7 +178,7 @@ public class QuizService : ResponseHandler, IQuizService
 
                 lessonStats.Add(new LessonQuizStatsDto
                 {
-                    LessonName = lesson.Title,
+                    LessonName = GeneralLocalizableEntity.Localized(lesson.TitleAr, lesson.TitleEn),
                     NumberOfQuizzesInLesson = numQuizzesInLesson,
                     PercentageOfDegreeForAllQuizzes = lessonPercentageDegree,
                     Quizzes = quizStats
@@ -142,7 +187,7 @@ public class QuizService : ResponseHandler, IQuizService
 
             result.Add(new CourseStudentQuizStatsDto
             {
-                StudentName = student.Name,
+                StudentName = GeneralLocalizableEntity.Localized(student.NameAr, student.NameEn),
                 NumberOfQuizzesSubmitted = submittedQuizzes,
                 PercentageOfSubmitted = percentageSubmitted,
                 PercentageOfDegree = percentageDegree,
@@ -206,7 +251,7 @@ public class QuizService : ResponseHandler, IQuizService
                 double studentPercentage = quiz.PossiblePoints > 0 ? studentDegree / quiz.PossiblePoints * 100 : 0;
                 quizStats.Add(new QuizStatsDto
                 {
-                    QuizName = quiz.Title,
+                    QuizName = GeneralLocalizableEntity.Localized(quiz.TitleAr, quiz.TitleEn),
                     StudentDegree = studentDegree,
                     StudentPercentage = studentPercentage
                 });
@@ -214,7 +259,7 @@ public class QuizService : ResponseHandler, IQuizService
 
             lessonStats.Add(new LessonQuizStatsDto
             {
-                LessonName = lesson.Title,
+                LessonName = GeneralLocalizableEntity.Localized(lesson.TitleAr, lesson.TitleEn),
                 NumberOfQuizzesInLesson = numQuizzesInLesson,
                 PercentageOfDegreeForAllQuizzes = lessonPercentageDegree,
                 Quizzes = quizStats
@@ -223,7 +268,7 @@ public class QuizService : ResponseHandler, IQuizService
 
         return new StudentCourseQuizStatsDto
         {
-            StudentName = student.Name,
+            StudentName = GeneralLocalizableEntity.Localized(student.NameAr, student.NameEn),
             NumberOfQuizzesSubmitted = submittedQuizzes,
             PercentageOfSubmitted = percentageSubmitted,
             PercentageOfDegree = percentageDegree,
@@ -308,7 +353,7 @@ public class QuizService : ResponseHandler, IQuizService
                                                           .Select(q => new LessonQuizListDto
                                                           {
                                                               QuizId = q.Id,
-                                                              QuizName = q.Title,
+                                                              QuizName = GeneralLocalizableEntity.Localized(q.TitleAr, q.TitleEn),
                                                               CreatedAt = q.CreatedAt,
                                                               TotalQuestions = q.questions != null ? q.questions.Count : 0,
                                                               TotalPoints = q.questions != null ? q.PossiblePoints : 0
@@ -386,8 +431,8 @@ public class QuizService : ResponseHandler, IQuizService
         var quizDto = new GetQuizeDto
         {
             Id = quiz.Id,
-            Title = quiz.Title,
-            Description = quiz.Description,
+            Title = GeneralLocalizableEntity.Localized(quiz.TitleAr, quiz.TitleEn),
+            Description = GeneralLocalizableEntity.Localized(quiz.TitleAr, quiz.TitleEn),
             StartsAt = quiz.StartsAt,
             DurationMinutes = quiz.DurationMinutes,
             EndAt = quiz.EndAtAt,
@@ -408,20 +453,25 @@ public class QuizService : ResponseHandler, IQuizService
     }
     private static Quiz MapToEntity(CreateQuizeWithQuestionDto dto)
     {
-        var quiz = new Quiz
-        {
-            LessonId = dto.LessonId,
-            Title = dto.Title,
-            Description = dto.Description,
-            StartsAt = dto.StartsAt,
-            DurationMinutes = dto.DurationMinutes,
-            CreatedAt = DateTime.Now,
+        var quiz = new Quiz();
 
-            EndAtAt = dto.StartsAt.AddMinutes(dto.DurationMinutes),
-            NumberOfQuestions = dto.questionListDtos?.Count ?? 0,
-            PossiblePoints = dto.questionListDtos?.Sum(q => q.Points) ?? 0,
-            IsAutoCorrect = dto.IsAutoCorrect,
-            questions = dto.questionListDtos?.Select(qDto => new Question
+
+        CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+
+        if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
+        {
+            quiz.LessonId = dto.LessonId;
+            quiz.TitleAr = dto.Title;
+            quiz.DescriptionAr = dto.Description;
+            quiz.StartsAt = dto.StartsAt;
+            quiz.DurationMinutes = dto.DurationMinutes;
+            quiz.CreatedAt = DateTime.Now;
+
+            quiz.EndAtAt = dto.StartsAt.AddMinutes(dto.DurationMinutes);
+            quiz.NumberOfQuestions = dto.questionListDtos?.Count ?? 0;
+            quiz.PossiblePoints = dto.questionListDtos?.Sum(q => q.Points) ?? 0;
+            quiz.IsAutoCorrect = dto.IsAutoCorrect;
+            quiz.questions = dto.questionListDtos?.Select(qDto => new Question
             {
                 QuestionText = qDto.QuestionText,
                 QuestionTypeId = qDto.QuestionTypeId,
@@ -432,8 +482,33 @@ public class QuizService : ResponseHandler, IQuizService
                     OptionText = opt.Key,
                     IsCorrect = opt.Value
                 }).ToList()
-            }).ToList()
-        };
+            }).ToList();
+        }
+        else
+        {
+            quiz.LessonId = dto.LessonId;
+            quiz.TitleEn = dto.Title;
+            quiz.DescriptionEn = dto.Description;
+            quiz.StartsAt = dto.StartsAt;
+            quiz.DurationMinutes = dto.DurationMinutes;
+            quiz.CreatedAt = DateTime.Now;
+            quiz.EndAtAt = dto.StartsAt.AddMinutes(dto.DurationMinutes);
+            quiz.NumberOfQuestions = dto.questionListDtos?.Count ?? 0;
+            quiz.PossiblePoints = dto.questionListDtos?.Sum(q => q.Points) ?? 0;
+            quiz.IsAutoCorrect = dto.IsAutoCorrect;
+            quiz.questions = dto.questionListDtos?.Select(qDto => new Question
+            {
+                QuestionText = qDto.QuestionText,
+                QuestionTypeId = qDto.QuestionTypeId,
+                Points = qDto.Points,
+                CorrectAnswer = qDto.CorrectAnswer,
+                Options = qDto.Options?.Select(opt => new QuestionOption
+                {
+                    OptionText = opt.Key,
+                    IsCorrect = opt.Value
+                }).ToList()
+            }).ToList();
+        }
 
         return quiz;
     }
@@ -452,7 +527,7 @@ public class QuizService : ResponseHandler, IQuizService
     private async Task<bool> SendEmailsToStudnet(Quiz quiz, int lessonId)
     {
         // Send email notification to students
-        string emailSubject = $"New Quiz: \"{quiz.Title}\" Scheduled for {quiz.StartsAt:MMMM d, yyyy 'at' h:mm tt}";
+        string emailSubject = $"New Quiz: \"{GeneralLocalizableEntity.Localized(quiz.TitleAr, quiz.TitleEn)}\" Scheduled for {quiz.StartsAt:MMMM d, yyyy 'at' h:mm tt}";
         string emailMessage = $@"
                                     <html>
                                       <body style='font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; color: #333;'>
@@ -465,8 +540,8 @@ public class QuizService : ResponseHandler, IQuizService
                                     
                                           <h3 style='color: #333; margin-top: 20px;'>📋 Quiz Details:</h3>
                                           <ul style='padding-left: 20px;'>
-                                            <li style='margin-bottom: 8px;'><strong>Title:</strong> {quiz.Title}</li>
-                                            <li style='margin-bottom: 8px;'><strong>Description:</strong> {quiz.Description ?? "No description provided."}</li>
+                                            <li style='margin-bottom: 8px;'><strong>Title:</strong> {GeneralLocalizableEntity.Localized(quiz.TitleAr, quiz.TitleEn)}</li>
+                                            <li style='margin-bottom: 8px;'><strong>Description:</strong> {GeneralLocalizableEntity.Localized(quiz.DescriptionAr, quiz.DescriptionEn) ?? "No description provided."}</li>
                                             <li style='margin-bottom: 8px;'><strong>Start Time:</strong> {quiz.StartsAt:MMMM d, yyyy 'at' h:mm tt}</li>
                                             <li style='margin-bottom: 8px;'><strong>Duration:</strong> {quiz.DurationMinutes} minutes</li>
                                             <li style='margin-bottom: 8px;'><strong>Number of Questions:</strong> {quiz.NumberOfQuestions}</li>
@@ -496,7 +571,7 @@ public class QuizService : ResponseHandler, IQuizService
         return true;
     }
 
-   
+
     public async Task<Response<LessonQuizesStatsDto>> GetLessonQuizStats(int lessonId)
     {
         var lesson = await _unitOfWork.Repository<Lesson>()
@@ -529,14 +604,14 @@ public class QuizService : ResponseHandler, IQuizService
 
             var studentSubmissions = studentAnswers.Select(a => new StudentQuizSubmissionDto
             {
-                StudentName = a.Student?.Name,
+                StudentName = a.Student?.NameEn,
                 StudentDegree = (double)(a.GradingRating ?? 0),
                 NumberOfSubmittedQuestions = a.StudentQuestionAnswer?.Count ?? 0
             }).ToList();
 
             quizAnalyticsList.Add(new QuizAnalyticsDto
             {
-                QuizName = quiz.Title,
+                QuizName = quiz.TitleEn,
                 PercentageWithDegree = percentageWithDegree,
                 NumberOfStudentSubmit = numSubmitted,
                 PercentageOfSubmit = percentageOfSubmit,
@@ -549,7 +624,7 @@ public class QuizService : ResponseHandler, IQuizService
 
         var result = new LessonQuizesStatsDto
         {
-            LessonName = lesson.Title,
+            LessonName = lesson.TitleEn,
             NumberOfQuizzes = totalQuizzes,
             PercentageOfAllQuizzes = 100, // For a single lesson, always 100%
             Quizzes = quizAnalyticsList
@@ -591,14 +666,14 @@ public class QuizService : ResponseHandler, IQuizService
 
                 var studentSubmissions = studentAnswers.Select(a => new StudentQuizSubmissionDto
                 {
-                    StudentName = a.Student?.Name,
+                    StudentName = a.Student?.NameEn,
                     StudentDegree = (double)(a.GradingRating ?? 0),
                     NumberOfSubmittedQuestions = a.StudentQuestionAnswer?.Count ?? 0
                 }).ToList();
 
                 quizAnalyticsList.Add(new QuizAnalyticsDto
                 {
-                    QuizName = quiz.Title,
+                    QuizName = quiz.TitleEn,
                     PercentageWithDegree = percentageWithDegree,
                     NumberOfStudentSubmit = numSubmitted,
                     PercentageOfSubmit = percentageOfSubmit,
@@ -610,7 +685,7 @@ public class QuizService : ResponseHandler, IQuizService
             }
             result.Add(new LessonQuizesStatsDto
             {
-                LessonName = lesson.Title,
+                LessonName = lesson.TitleEn,
                 NumberOfQuizzes = totalQuizzes,
                 PercentageOfAllQuizzes = percentageOfAllQuizzes,
                 Quizzes = quizAnalyticsList

@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Globalization;
+using System.Security.Cryptography;
 using System.Text.Json;
 
 namespace Backend.Controllers;
@@ -216,18 +217,39 @@ public class ZoomController : AppControllerBase
         var json = await response.Content.ReadAsStringAsync();
         var doc = JsonDocument.Parse(json);
 
-        var participants = doc.RootElement.GetProperty("participants")
+        CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+        if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
+        {
+            var participants = doc.RootElement.GetProperty("participants")
             .EnumerateArray()
             .Select(p => new ZoomParticipant
             {
-                Name = p.GetProperty("name").GetString(),
+                NameAr = p.GetProperty("name").GetString(),
                 Email = p.GetProperty("user_email").GetString(),
                 JoinTime = p.GetProperty("join_time").GetDateTime(),
                 LeaveTime = p.GetProperty("leave_time").GetDateTime(),
                 Duration = p.GetProperty("duration").GetInt32()
             }).ToList();
 
-        return Ok(participants);
+
+            return Ok(participants);
+        }
+        else
+        {
+            var participants = doc.RootElement.GetProperty("participants")
+            .EnumerateArray()
+            .Select(p => new ZoomParticipant
+            {
+                NameEn = p.GetProperty("name").GetString(),
+                Email = p.GetProperty("user_email").GetString(),
+                JoinTime = p.GetProperty("join_time").GetDateTime(),
+                LeaveTime = p.GetProperty("leave_time").GetDateTime(),
+                Duration = p.GetProperty("duration").GetInt32()
+            }).ToList();
+
+
+            return Ok(participants);
+        }
     }
 
     [HttpPost("webhook")]

@@ -35,7 +35,7 @@ public class TeacherService : ResponseHandler, ITeacherService
                                .Where(t => !t.IsDeleted);
 
         if (orderBy == enTeacherOrderBy.Name)
-            query = query.OrderBy(t => t.Name);
+            query = query.OrderBy(t => GeneralLocalizableEntity.Localized(t.NameAr, t.NameEn));
         else if (orderBy == enTeacherOrderBy.CreatedAt)
             query = query.OrderBy(t => t.CreatedAt);
         else
@@ -72,7 +72,7 @@ public class TeacherService : ResponseHandler, ITeacherService
     {
         var teacher = await _unitOfWork.Repository<Teacher>()
                                               .GetTableNoTracking()
-                                              .FirstOrDefaultAsync(t => t.Name == name && t.IsDeleted == false);
+                                              .FirstOrDefaultAsync(t => GeneralLocalizableEntity.Localized(t.NameAr, t.NameEn) == name && t.IsDeleted == false);
 
         if (teacher == null)
             return NotFound<GetTeacherDto>($"this teacher {name} not exist");
@@ -169,7 +169,7 @@ public class TeacherService : ResponseHandler, ITeacherService
     {
         var isExist = await _unitOfWork.Repository<Teacher>()
                                 .GetTableNoTracking()
-                                .AnyAsync(t => t.Name == name && t.IsDeleted == false);
+                                .AnyAsync(t => GeneralLocalizableEntity.Localized(t.NameAr, t.NameEn) == name && t.IsDeleted == false);
         return isExist;
     }
     private async Task<bool> _isTeacherExistByIdAsync(int id)
@@ -184,7 +184,7 @@ public class TeacherService : ResponseHandler, ITeacherService
     {
         var isExist = await _unitOfWork.Repository<Teacher>()
                                            .GetTableNoTracking()
-                                           .AnyAsync(t => t.Name == name && t.IsDeleted == false && t.Id != id);
+                                           .AnyAsync(t => GeneralLocalizableEntity.Localized(t.NameAr, t.NameEn) == name && t.IsDeleted == false && t.Id != id);
         return isExist;
     }
     private async Task<bool> _isTeacherEmailExistBeforeAsync(string email, int id)

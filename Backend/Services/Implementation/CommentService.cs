@@ -1,4 +1,5 @@
 ﻿using Backend.DTOs.CommentDTOs;
+using System.Globalization;
 
 namespace Backend.Services.Implementation;
 
@@ -22,14 +23,28 @@ public class CommentService : ResponseHandler, ICommentService
         if (student == null || lesson == null)
             return NotFound<string>("Student or Lesson not found.");
 
-        var comment = new Comment
+
+
+        var comment = new Comment {};
+    CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+
+        if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
         {
-            Content = createCommentDto.Content,
-            LessonId = createCommentDto.LessonId,
-            StudentId = createCommentDto.StudentId,
-            CourseId = createCommentDto.CourseId,
-            CreatedAt = DateTime.UtcNow
-        };
+            comment.ContentAr = createCommentDto.Content;
+            comment.LessonId = createCommentDto.LessonId;
+            comment.StudentId = createCommentDto.StudentId;
+            comment.CourseId = createCommentDto.CourseId;
+            comment.CreatedAt = DateTime.UtcNow;
+        }
+        else
+        {
+            comment.ContentEn = createCommentDto.Content;
+            comment.LessonId = createCommentDto.LessonId;
+            comment.StudentId = createCommentDto.StudentId;
+            comment.CourseId = createCommentDto.CourseId;
+            comment.CreatedAt = DateTime.UtcNow;
+        }
+        
 
         await _unitOfWork.Repository<Comment>().AddAsync(comment);
         var response = _unitOfWork.Complete();
@@ -61,8 +76,8 @@ public class CommentService : ResponseHandler, ICommentService
         var result = comments.Select(c => new ShowAllCommentByLessonIdOrderByDateDto
         {
             Id = c.Id,
-            Content = c.Content,
-            StudentName = c.Student != null ? c.Student.Name : "Unknown"
+            Content = GeneralLocalizableEntity.Localized(c.ContentAr,c.ContentEn),
+            StudentName = c.Student != null ? GeneralLocalizableEntity.Localized(c.Student.NameAr, c.Student.NameEn) : "Unknown"
         }).ToList();
 
         return Success(result);
@@ -79,8 +94,8 @@ public class CommentService : ResponseHandler, ICommentService
         var result = comments.Select(c => new ShowAllCommentForStudentInLessonOrderByDateDto
         {
             Id = c.Id,
-            Content = c.Content,
-            StudentName = c.Student != null ? c.Student.Name : "Unknown"
+            Content = GeneralLocalizableEntity.Localized(c.ContentAr,c.ContentEn),
+            StudentName = c.Student != null ? GeneralLocalizableEntity.Localized(c.Student.NameAr, c.Student.NameEn) : "Unknown"
         }).ToList();
 
         return Success(result);

@@ -5,10 +5,12 @@ namespace Backend.Entities;
 public class Course : BaseEntity
 {
 
-    public string? Description { get; set; }
+    public string? DescriptionEn { get; set; }
+    public string? DescriptionAr {  get; set; }
     public double Price { get; set; }
     public string? ImagePath { get; set; }
-    public string? Level { get; set; }
+    public string? LevelEn { get; set; }
+    public string? LevelAr { get; set; }
     public string? Hours { get; set; }
     public List<Lesson>? lessons { get; set; }
     [ForeignKey("TecherId")]

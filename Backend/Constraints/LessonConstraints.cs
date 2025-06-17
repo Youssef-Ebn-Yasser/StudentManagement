@@ -7,7 +7,11 @@ public class LessonConstraints : IEntityTypeConfiguration<Lesson>
     public void Configure(EntityTypeBuilder<Lesson> builder)
     {
 
-        builder.Property(l => l.Description)
+        builder.Property(l => l.DescriptionEn)
+               .HasMaxLength(250)
+               .IsRequired();
+
+        builder.Property(l => l.DescriptionAr)
                .HasMaxLength(250)
                .IsRequired();
 

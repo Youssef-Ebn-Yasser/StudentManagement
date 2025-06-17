@@ -2,7 +2,8 @@
 
 public class Comment : BaseEntity
 {
-    public string? Content { get; set; }
+    public string? ContentEn { get; set; }
+    public string? ContentAr {  get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     public bool IsDeleted { get; set; } = false;

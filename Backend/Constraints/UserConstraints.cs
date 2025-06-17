@@ -7,7 +7,11 @@ public class UserConstraints : IEntityTypeConfiguration<User>
         builder.HasKey(u => u.Id);
 
 
-        builder.Property(u => u.Name)
+        builder.Property(u => u.NameEn)
+               .IsRequired()
+               .HasMaxLength(50);
+
+        builder.Property(u => u.NameAr)
                .IsRequired()
                .HasMaxLength(50);
 

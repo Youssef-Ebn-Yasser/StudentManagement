@@ -1,16 +1,870 @@
 [
   {
-    "Key": "Error_NotFound",
+    "Key": "welcome",
     "Value": {
-      "en": "Not found",
-      "ar": "غير موجود"
+      "en": "Welcome to the API",
+      "ar": "مرحبًا بك في واجهة برمجة التطبيقات."
     }
   },
   {
-    "Key": "Error_Unauthorized",
+    "Key": "errorNotFound",
     "Value": {
-      "en": "Unauthorized",
-      "ar": "غير مصرح"
+      "en": "The requested resource was not found.",
+      "ar": "المورد المطلوب غير موجود."
+    }
+  },
+  {
+    "Key": "badRequest",
+    "Value": {
+      "en": "Invalid credentials this student not exist.",
+      "ar": "بيانات الاعتماد غير صحيحة، الطالب غير مسجل."
+    }
+  },
+  {
+    "Key": "invalidPassword",
+    "Value": {
+      "en": "Invalid credentials",
+      "ar": "كلمة المرور غير صحيحة."
+    }
+  },
+  {
+    "Key": "userAddedSuccess",
+    "Value": {
+      "en": "welcome in our sit you can now login to your account update your data or upload courses with your email and keep your password secret",
+      "ar": "تمت إضافتك بنجاح! يمكنك الآن تسجيل الدخول، تحديث بياناتك، أو رفع الدورات باستخدام بريدك الإلكتروني. يُرجى الحفاظ على كلمة مرورك."
+    }
+  },
+  {
+    "Key": "userAddedEmailFail",
+    "Value": {
+      "en": "can not send email but user added",
+      "ar": "تمت إضافة المستخدم بنجاح، لكن تعذر إرسال البريد الإلكتروني."
+    }
+  },
+  {
+    "Key": "userExists",
+    "Value": {
+      "en": "User already exists",
+      "ar": "المستخدم مسجل بالفعل."
+    }
+  },
+  {
+    "Key": "confirmEmail",
+    "Value": {
+      "en": "Please confirm your account",
+      "ar": "يرجى تأكيد حسابك عبر البريد الإلكتروني."
+    }
+  },
+  {
+    "Key": "emailFailed",
+    "Value": {
+      "en": "confirmation failed",
+      "ar": "فشل تأكيد البريد الإلكتروني."
+    }
+  },
+  {
+    "Key": "emailSuccess",
+    "Value": {
+      "en": "confirmation successfully",
+      "ar": "تم تأكيد البريد الإلكتروني بنجاح."
+    }
+  },
+  {
+    "Key": "resetPassword",
+    "Value": {
+      "en": "Please reset your password",
+      "ar": "يرجى إعادة تعيين كلمة المرور الخاصة بك."
+    }
+  },
+  {
+    "Key": "tokenExpired",
+    "Value": {
+      "en": "Token has expired",
+      "ar": "انتهت صلاحية الرمز."
+    }
+  },
+  {
+    "Key": "googleConfigMissing",
+    "Value": {
+      "en": "no config for google",
+      "ar": "إعدادات Google غير موجودة."
+    }
+  },
+  {
+    "Key": "userNotRegistered",
+    "Value": {
+      "en": "this user not register yet",
+      "ar": "هذا المستخدم غير مسجل."
+    }
+  },
+  {
+    "Key": "unauthorizedAccess",
+    "Value": {
+      "en": "have no authorized access",
+      "ar": "لا تملك صلاحية الوصول."
+    }
+  },
+  {
+    "Key": "studentNameExists",
+    "Value": {
+      "en": "Student Name is already exist",
+      "ar": "اسم الطالب مستخدم مسبقًا."
+    }
+  },
+  {
+    "Key": "categoryCreated",
+    "Value": {
+      "en": "Category Created Successfully",
+      "ar": "تم إنشاء القسم بنجاح."
+    }
+  },
+  {
+    "Key": "categoryNotFound",
+    "Value": {
+      "en": "Category not found",
+      "ar": "القسم غير موجود."
+    }
+  },
+  {
+    "Key": "categoryDeleted",
+    "Value": {
+      "en": "Category deleted successfully",
+      "ar": "تم حذف القسم بنجاح."
+    }
+  },
+  {
+    "Key": "categoryUpdated",
+    "Value": {
+      "en": "Category updated successfully",
+      "ar": "تم تحديث القسم بنجاح."
+    }
+  },
+  {
+    "Key": "chatRoomNotFound",
+    "Value": {
+      "en": "Chat room with roomId not found or you are not a participant.",
+      "ar": "غرفة المحادثة غير موجودة أو أنك لست ضمن المشاركين."
+    }
+  },
+  {
+    "Key": "createChatRoomMissingIds",
+    "Value": {
+      "en": "Both StudentId and TeacherId must be provided to create a chat room.",
+      "ar": "يجب إدخال معرف الطالب ومعرف المعلم لإنشاء غرفة محادثة."
+    }
+  },
+  {
+    "Key": "invalidUserRoles",
+    "Value": {
+      "en": "One of the specified users is not in the correct role (Student/Teacher).",
+      "ar": "أحد المستخدمين المحددين ليس طالبًا أو معلمًا."
+    }
+  },
+  {
+    "Key": "studentOrLessonNotFound",
+    "Value": {
+      "en": "Student or Lesson not found.",
+      "ar": "الطالب أو الدرس غير موجود."
+    }
+  },
+  {
+    "Key": "commentCreated",
+    "Value": {
+      "en": "Comment created successfully.",
+      "ar": "تم إضافة التعليق بنجاح."
+    }
+  },
+  {
+    "Key": "commentFailed",
+    "Value": {
+      "en": "failed.",
+      "ar": "فشل في إضافة التعليق."
+    }
+  },
+  {
+    "Key": "commentDeleted",
+    "Value": {
+      "en": "Comment deleted successfully.",
+      "ar": "تم حذف التعليق بنجاح."
+    }
+  },
+  {
+    "Key": "courseTitleRequired",
+    "Value": {
+      "en": "Course title is required",
+      "ar": "عنوان الدورة مطلوب."
+    }
+  },
+  {
+    "Key": "invalidCoursePrice",
+    "Value": {
+      "en": "Course price must be greater than 0",
+      "ar": "سعر الدورة يجب أن يكون أكبر من صفر."
+    }
+  },
+  {
+    "Key": "invalidTeacherId",
+    "Value": {
+      "en": "Valid teacher ID is required",
+      "ar": "معرف المعلم مطلوب ويجب أن يكون صالحًا."
+    }
+  },
+  {
+    "Key": "imageUploadFailed",
+    "Value": {
+      "en": "Image upload failed",
+      "ar": "فشل في رفع الصورة."
+    }
+  },
+  {
+    "Key": "courseCreated",
+    "Value": {
+      "en": "Course created successfully",
+      "ar": "تم إنشاء الدورة بنجاح."
+    }
+  },
+  {
+    "Key": "courseDeleted",
+    "Value": {
+      "en": "Course deleted successfully",
+      "ar": "تم حذف الدورة بنجاح."
+    }
+  },
+  {
+    "Key": "courseUpdated",
+    "Value": {
+      "en": "Course Updated successfully",
+      "ar": "تم تحديث الدورة بنجاح."
+    }
+  },
+  {
+    "Key": "courseNotFound",
+    "Value": {
+      "en": "Course not found",
+      "ar": "لم يتم العثور على الدورة."
+    }
+  },
+  {
+    "Key": "emailSent",
+    "Value": {
+      "en": "Email sent successfully to mailTo",
+      "ar": "تم إرسال البريد الإلكتروني إلى mailTo بنجاح."
+    }
+  },
+  {
+    "Key": "emailNotSent",
+    "Value": {
+      "en": "Failed to send email to mailTo",
+      "ar": "فشل إرسال البريد الإلكتروني إلى mailTo."
+    }
+  },
+  {
+    "Key": "lessonNotFoundShort",
+    "Value": {
+      "en": "lesson_notfound",
+      "ar": "الدرس غير موجود."
+    }
+  },
+  {
+    "Key": "lessonCreated",
+    "Value": {
+      "en": "Lesson Created Successfully",
+      "ar": "تم إنشاء الدرس بنجاح."
+    }
+  },
+  {
+    "Key": "lessonDeleted",
+    "Value": {
+      "en": "lesson deleted successfully",
+      "ar": "تم حذف الدرس بنجاح."
+    }
+  },
+  {
+    "Key": "lessonUpdated",
+    "Value": {
+      "en": "lesson Updated successfully",
+      "ar": "تم تحديث الدرس بنجاح."
+    }
+  },
+  {
+    "Key": "invalidFile",
+    "Value": {
+      "en": "Invalid file type or size.",
+      "ar": "نوع الملف أو حجمه غير مدعوم."
+    }
+  },
+  {
+    "Key": "paymentSuccess",
+    "Value": {
+      "en": "Manual payment submitted successfully.",
+      "ar": "تم إرسال الدفع اليدوي بنجاح."
+    }
+  },
+  {
+    "Key": "materialCreated",
+    "Value": {
+      "en": "Material created successfully",
+      "ar": "تم إنشاء المادة بنجاح."
+    }
+  },
+  {
+    "Key": "materialDeleted",
+    "Value": {
+      "en": "Material deleted successfully",
+      "ar": "تم حذف المادة بنجاح."
+    }
+  },
+  {
+    "Key": "materialUpdated",
+    "Value": {
+      "en": "Material Updated successfully",
+      "ar": "تم تحديث المادة بنجاح."
+    }
+  },
+  {
+    "Key": "materialNotFound",
+    "Value": {
+      "en": "Material Not Found",
+      "ar": "المادة غير موجودة."
+    }
+  },
+  {
+    "Key": "zoomTokenError",
+    "Value": {
+      "en": "Zoom token request failed content",
+      "ar": "فشل في طلب رمز Zoom."
+    }
+  },
+  {
+    "Key": "zoomSuccess",
+    "Value": {
+      "en": "Zoom Success RedirectUri",
+      "ar": "تم التوجيه بنجاح إلى Zoom."
+    }
+  },
+  {
+    "Key": "noCourseWithId",
+    "Value": {
+      "en": "no course with this id exist",
+      "ar": "لا توجد دورة بالمعرف المحدد."
+    }
+  },
+  {
+    "Key": "zoomUnauthorized",
+    "Value": {
+      "en": "Zoom not authorized. Please connect with Zoom first.",
+      "ar": "لم يتم تفويض Zoom. يرجى الاتصال بـ Zoom أولاً."
+    }
+  },
+  {
+    "Key": "invalidMeetingPayload",
+    "Value": {
+      "en": "Data has an error enter valid data",
+      "ar": "هناك خطأ في البيانات المدخلة، يُرجى إدخال بيانات صحيحة."
+    }
+  },
+  {
+    "Key": "zoomResponseError",
+    "Value": {
+      "en": "Response error from zoom can not create a meeting",
+      "ar": "حدث خطأ أثناء إنشاء الاجتماع عبر Zoom."
+    }
+  },
+  {
+    "Key": "zoomJoinUrlMissing",
+    "Value": {
+      "en": "Zoom didn't return a join URL",
+      "ar": "لم يتم توفير رابط الانضمام من Zoom."
+    }
+  },
+  {
+    "Key": "dbSaveError",
+    "Value": {
+      "en": "Can not save in Db but link created big problem....",
+      "ar": "حدث خطأ أثناء الحفظ في قاعدة البيانات، رغم إنشاء الرابط."
+    }
+  },
+  {
+    "Key": "zoomMeetingCreated",
+    "Value": {
+      "en": "Created Link Success",
+      "ar": "تم إنشاء الاجتماع بنجاح."
+    }
+  },
+  {
+    "Key": "answerNotFound",
+    "Value": {
+      "en": "Answer not found",
+      "ar": "لم يتم العثور على الإجابة."
+    }
+  },
+  {
+    "Key": "quizNotFound",
+    "Value": {
+      "en": "Quiz not found",
+      "ar": "لم يتم العثور على الاختبار."
+    }
+  },
+  {
+    "Key": "invalidAnswer",
+    "Value": {
+      "en": "Provided answer is invalid",
+      "ar": "الإجابة المدخلة غير صحيحة."
+    }
+  },
+  {
+    "Key": "quizSaveError",
+    "Value": {
+      "en": "Error saving quiz answer",
+      "ar": "حدث خطأ أثناء حفظ الإجابة."
+    }
+  },
+  {
+    "Key": "assignmentSuccess",
+    "Value": {
+      "en": "Assignment Added successfully.",
+      "ar": "تمت إضافة الواجب بنجاح."
+    }
+  },
+  {
+    "Key": "assignmentNotFound",
+    "Value": {
+      "en": "Assignment not found.",
+      "ar": "الواجب غير موجود."
+    }
+  },
+  {
+    "Key": "studentNotFound",
+    "Value": {
+      "en": "Student not found.",
+      "ar": "الطالب غير موجود."
+    }
+  },
+  {
+    "Key": "studentIdNotExist",
+    "Value": {
+      "en": "this Student with this id : {id} not exist",
+      "ar": "لا يوجد طالب بالمعرف: {id}."
+    }
+  },
+  {
+    "Key": "courseIdNotExist",
+    "Value": {
+      "en": "this Course with this id : {id} not exist",
+      "ar": "لا توجد دورة بالمعرف: {id}."
+    }
+  },
+  {
+    "Key": "studentAlreadyEnrolled",
+    "Value": {
+      "en": "this student Already in this course",
+      "ar": "الطالب مسجل مسبقًا في هذه الدورة."
+    }
+  },
+  {
+    "Key": "enrollSuccess",
+    "Value": {
+      "en": "Enroll Success",
+      "ar": "تم التسجيل في الدورة بنجاح."
+    }
+  },
+  {
+    "Key": "enrollFailed",
+    "Value": {
+      "en": "Can not enroll to course",
+      "ar": "تعذر التسجيل في الدورة."
+    }
+  },
+  {
+    "Key": "studentNotInCourse",
+    "Value": {
+      "en": "not in course",
+      "ar": "الطالب غير مسجل في هذه الدورة."
+    }
+  },
+  {
+    "Key": "studentEmailExists",
+    "Value": {
+      "en": "Student Email is already exist",
+      "ar": "البريد الإلكتروني للطالب مستخدم مسبقًا."
+    }
+  },
+  {
+    "Key": "studentAddSuccess",
+    "Value": {
+      "en": "Student Added Successfully",
+      "ar": "تمت إضافة الطالب بنجاح."
+    }
+  },
+  {
+    "Key": "studentAddFail",
+    "Value": {
+      "en": "can not add this student error happen when try add",
+      "ar": "فشل في إضافة الطالب. حدث خطأ أثناء المعالجة."
+    }
+  },
+  {
+    "Key": "studentIdNotFound",
+    "Value": {
+      "en": "Student with this id = {id} not exist",
+      "ar": "الطالب بالمعرف = {id} غير موجود."
+    }
+  },
+  {
+    "Key": "studentDeleteSuccess",
+    "Value": {
+      "en": "Student Deleted Successfully",
+      "ar": "تم حذف الطالب بنجاح."
+    }
+  },
+  {
+    "Key": "studentDeleteFail",
+    "Value": {
+      "en": "can not delete this student error happen when try deleting",
+      "ar": "فشل حذف الطالب. حدث خطأ أثناء الحذف."
+    }
+  },
+  {
+    "Key": "studentNameNotFound",
+    "Value": {
+      "en": "Student with this name = {name} not exist",
+      "ar": "الطالب بالاسم = {name} غير موجود."
+    }
+  },
+  {
+    "Key": "courseNameNotFound",
+    "Value": {
+      "en": "Course with this name = {name} not exist",
+      "ar": "الدورة بالاسم = {name} غير موجودة."
+    }
+  },
+  {
+    "Key": "studentNotEnrolled",
+    "Value": {
+      "en": "Student with this name = {name} not enroll in this course",
+      "ar": "الطالب بالاسم = {name} غير مسجل في هذه الدورة."
+    }
+  },
+  {
+    "Key": "studentCourseDeleteSuccess",
+    "Value": {
+      "en": "Student Deleted From Course Successfully",
+      "ar": "تم إزالة الطالب من الدورة بنجاح."
+    }
+  },
+  {
+    "Key": "studentCourseDeleteFail",
+    "Value": {
+      "en": "can not delete this student from course error happen when try deleting",
+      "ar": "فشل في إزالة الطالب من الدورة."
+    }
+  },
+  {
+    "Key": "studentUpdateSuccess",
+    "Value": {
+      "en": "Student Updated Successfully",
+      "ar": "تم تحديث بيانات الطالب بنجاح."
+    }
+  },
+  {
+    "Key": "studentUpdateFail",
+    "Value": {
+      "en": "can not Updated this student error happen when trying",
+      "ar": "فشل في تحديث بيانات الطالب."
+    }
+  },
+  {
+    "Key": "teacherNotFoundById",
+    "Value": {
+      "en": "This teachers with ID: {0} does not exist.",
+      "ar": "لا يوجد معلم بالمعرف: {0}."
+    }
+  },
+  {
+    "Key": "teacherNotFoundByName",
+    "Value": {
+      "en": "This teacher with name: {0} does not exist.",
+      "ar": "لا يوجد معلم بالاسم: {0}."
+    }
+  },
+  {
+    "Key": "noTeachers",
+    "Value": {
+      "en": "There are no teachers.",
+      "ar": "لا يوجد معلمون متاحون حاليًا."
+    }
+  },
+  {
+    "Key": "teacherExists",
+    "Value": {
+      "en": "This teacher already exists.",
+      "ar": "المعلم مسجل بالفعل."
+    }
+  },
+  {
+    "Key": "teacherCreated",
+    "Value": {
+      "en": "Teacher created successfully.",
+      "ar": "تم تسجيل المعلم بنجاح."
+    }
+  },
+  {
+    "Key": "teacherCreateFail",
+    "Value": {
+      "en": "Cannot add this teacher.",
+      "ar": "فشل في تسجيل المعلم."
+    }
+  },
+  {
+    "Key": "teacherUpdated",
+    "Value": {
+      "en": "Teacher updated successfully.",
+      "ar": "تم تحديث بيانات المعلم بنجاح."
+    }
+  },
+  {
+    "Key": "teacherUpdateFail",
+    "Value": {
+      "en": "Cannot update this teacher.",
+      "ar": "فشل في تحديث بيانات المعلم."
+    }
+  },
+  {
+    "Key": "teacherNameExists",
+    "Value": {
+      "en": "This teacher name already exists.",
+      "ar": "اسم المعلم مستخدم مسبقًا."
+    }
+  },
+  {
+    "Key": "teacherNotExist",
+    "Value": {
+      "en": "This teacher does not exist.",
+      "ar": "المعلم غير موجود."
+    }
+  },
+  {
+    "Key": "teacherDeleteFail",
+    "Value": {
+      "en": "Cannot delete this teacher.",
+      "ar": "فشل في حذف المعلم."
+    }
+  },
+  {
+    "Key": "teacherDeleted",
+    "Value": {
+      "en": "Teacher deleted successfully.",
+      "ar": "تم حذف المعلم بنجاح."
+    }
+  },
+  {
+    "Key": "emailTeacherRequestSubject",
+    "Value": {
+      "en": "Ask for Uploading a teacher",
+      "ar": "طلب تفعيل حساب معلم"
+    }
+  },
+  {
+    "Key": "emailTeacherRequestBody",
+    "Value": {
+      "en": "I am a teacher and want to apply to upload my courses here. This is my name: {0}, and this is my email: {1}.",
+      "ar": "أنا معلم وأرغب في نشر دوراتي على المنصة. الاسم: {0}، البريد الإلكتروني: {1}."
+    }
+  },
+  {
+    "Key": "emailTeacherRequestTo",
+    "Value": {
+      "en": "hadeer.abdelgawad44@gmail.com",
+      "ar": "hadeer.abdelgawad44@gmail.com"
+    }
+  },
+  {
+    "Key": "authRefreshTokenRequired",
+    "Value": {
+      "en": "Refresh token is required.",
+      "ar": "رمز التحديث مطلوب."
+    }
+  },
+  {
+    "Key": "authRefreshTokenInvalid",
+    "Value": {
+      "en": "Invalid refresh token.",
+      "ar": "رمز التحديث غير صالح."
+    }
+  },
+  {
+    "Key": "fileUploadNoFile",
+    "Value": {
+      "en": "No file uploaded.",
+      "ar": "لم يتم تحديد أي ملف للرفع."
+    }
+  },
+  {
+    "Key": "fileUploadFail",
+    "Value": {
+      "en": "Failed to upload file.",
+      "ar": "فشل في رفع الملف."
+    }
+  },
+  {
+    "Key": "fileDeleteSuccess",
+    "Value": {
+      "en": "File deleted successfully.",
+      "ar": "تم حذف الملف بنجاح."
+    }
+  },
+  {
+    "Key": "fileDeleteFail",
+    "Value": {
+      "en": "Failed to delete file.",
+      "ar": "فشل في حذف الملف."
+    }
+  },
+  {
+    "Key": "fileDeleteTip",
+    "Value": {
+      "en": "Make sure: 1) URL is correct 2) File exists 3) API key has delete permissions.",
+      "ar": "تأكد من: 1) صحة الرابط 2) وجود الملف 3) صلاحية مفتاح API."
+    }
+  },
+  {
+    "Key": "stripeSecretKeyMissing",
+    "Value": {
+      "en": "Stripe SecretKey is not configured.",
+      "ar": "لم يتم إعداد مفتاح Stripe السري."
+    }
+  },
+  {
+    "Key": "createPaymentIntentError",
+    "Value": {
+      "en": "An unexpected error occurred.",
+      "ar": "حدث خطأ غير متوقع أثناء إنشاء الدفع."
+    }
+  },
+  {
+    "Key": "stripeWebhookSecretMissing",
+    "Value": {
+      "en": "Stripe webhook secret is not configured.",
+      "ar": "مفتاح Webhook الخاص بـ Stripe غير مهيأ."
+    }
+  },
+  {
+    "Key": "stripeSignatureHeaderMissing",
+    "Value": {
+      "en": "Missing Stripe-Signature header.",
+      "ar": "رأس التوقيع Stripe-Signature مفقود."
+    }
+  },
+  {
+    "Key": "stripeSessionInvalid",
+    "Value": {
+      "en": "Invalid session data.",
+      "ar": "جلسة الدفع غير صالحة."
+    }
+  },
+  {
+    "Key": "stripeSessionMetadataMissing",
+    "Value": {
+      "en": "Missing required metadata in session.",
+      "ar": "المعلومات المطلوبة غير موجودة في الجلسة."
+    }
+  },
+  {
+    "Key": "paymentSaved",
+    "Value": {
+      "en": "Payment processed successfully.",
+      "ar": "تم حفظ معلومات الدفع بنجاح."
+    }
+  },
+  {
+    "Key": "paymentSaveFail",
+    "Value": {
+      "en": "Failed to save payment to database.",
+      "ar": "فشل حفظ معلومات الدفع في قاعدة البيانات."
+    }
+  },
+  {
+    "Key": "stripeWebhookReceived",
+    "Value": {
+      "en": "Webhook received.",
+      "ar": "تم استقبال Webhook بنجاح."
+    }
+  },
+  {
+    "Key": "stripeWebhookError",
+    "Value": {
+      "en": "Stripe webhook error: {0}",
+      "ar": "حدث خطأ في Webhook الخاص بـ Stripe: {0}"
+    }
+  },
+  {
+    "Key": "unexpectedStripeWebhookError",
+    "Value": {
+      "en": "An unexpected error occurred: {0}",
+      "ar": "حدث خطأ غير متوقع: {0}"
+    }
+  },
+  {
+    "Key": "videoSdkKeysMissing",
+    "Value": {
+      "en": "VideoSDK API keys are not configured correctly on the backend.",
+      "ar": "مفاتيح VideoSDK غير مهيأة بشكل صحيح."
+    }
+  },
+  {
+    "Key": "videoSdkTokenFail",
+    "Value": {
+      "en": "Failed to generate VideoSDK token due to a server error.",
+      "ar": "فشل إنشاء رمز VideoSDK بسبب خطأ في الخادم."
+    }
+  },
+  {
+    "Key": "zoomAuthError",
+    "Value": {
+      "en": "error happen",
+      "ar": "حدث خطأ أثناء التفويض مع Zoom."
+    }
+  },
+  {
+    "Key": "zoomMeetingCreationError",
+    "Value": {
+      "en": "error happen",
+      "ar": "حدث خطأ أثناء إنشاء اجتماع Zoom."
+    }
+  },
+  {
+    "Key": "zoomAuthCheckSuccess",
+    "Value": {
+      "en": "Zoom authentication check succeeded.",
+      "ar": "تم التحقق من تفويض Zoom بنجاح."
+    }
+  },
+  {
+    "Key": "zoomGetMeetingsError",
+    "Value": {
+      "en": "error happen",
+      "ar": "حدث خطأ أثناء جلب الاجتماعات من Zoom."
+    }
+  },
+  {
+    "Key": "zoomMeetingTopic",
+    "Value": {
+      "en": "Test Meeting",
+      "ar": "اجتماع تجريبي"
+    }
+  },
+  {
+    "Key": "zoomMeetingAgenda",
+    "Value": {
+      "en": "Test Meeting via API",
+      "ar": "اجتماع Zoom عبر API"
+    }
+  },
+  {
+    "Key": "zoomAttendanceFail",
+    "Value": {
+      "en": "Failed to fetch Zoom attendance.",
+      "ar": "فشل في جلب بيانات الحضور من Zoom."
     }
   }
 ]
