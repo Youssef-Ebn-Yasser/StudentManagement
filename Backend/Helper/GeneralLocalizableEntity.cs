@@ -7,7 +7,7 @@ public class GeneralLocalizableEntity
         CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
 
         if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
-            return textAr;
+            return string.IsNullOrEmpty(textAr) ? textEn : textAr;
 
         return textEn;
     }

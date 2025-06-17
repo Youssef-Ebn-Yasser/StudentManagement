@@ -31,8 +31,14 @@ public static class ClassesDependencies
         services.AddTransient<IStudentAssignmentService, StudentAssignmentService>();
         services.AddTransient<IMeetingService, MeetingService>();
         services.AddTransient<IChatService, ChatService>();
+        services.AddTransient<IStructuredLogger, StructuredLogger>();
+
         //services.AddTransient<IQuizService, QuizService>();
         services.AddTransient<IStructuredLogger, StructuredLogger>();
+
+
+        services.AddTransient<IGeminiObjectTranslator, GeminiObjectTranslator>();
+
 
         services.AddScoped<IPhysicalFileUpload, PhysicalFileUpload>();
 
