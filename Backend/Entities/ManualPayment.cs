@@ -8,7 +8,9 @@
         public string TransactionId { get; set; } = string.Empty;
         public string ScreenshotPath { get; set; } = string.Empty;
         public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
-        public string? RejectionReason { get; set; }
+        public string? RejectionReasonEn { get; set; }
+        public string? RejectionReasonAr { get; set; }
+
         public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
     }
 

@@ -2,7 +2,11 @@
 using Backend.DTOs.ChatDTOs;
 using Backend.Entities.ChatEntities;
 using Microsoft.AspNetCore.SignalR;
+using MimeKit;
+using System.Globalization;
 using System.Security.Claims;
+using System.Threading;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Backend.Hubs;
 
@@ -103,14 +107,31 @@ public class ChatHub : Hub
         }
 
         // Create and save the message to the database
-        var chatMessage = new ChatMessage
-        {
-            ChatRoomId = chatRoomId,
-            SenderId = senderId,
-            Content = messageContent,
-            Timestamp = DateTime.UtcNow,
-            IsRead = false // Set to false initially
+        CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+        var chatMessage = new ChatMessage { 
+        //{
+        //    ChatRoomId = chatRoomId,
+        //    SenderId = senderId,
+        //    Content = messageContent,
+        //    Timestamp = DateTime.UtcNow,
+        //    IsRead = false // Set to false initially
         };
+        if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
+        {
+            chatMessage.ChatRoomId = chatRoomId;
+            chatMessage.SenderId = senderId;
+            chatMessage.ContentAr = messageContent;
+            chatMessage.Timestamp = DateTime.UtcNow;
+            chatMessage.IsRead = false; // Set to false initially
+        }
+        else
+        {
+            chatMessage.ChatRoomId = chatRoomId;
+            chatMessage.SenderId = senderId;
+            chatMessage.ContentEn = messageContent;
+            chatMessage.Timestamp = DateTime.UtcNow;
+            chatMessage.IsRead = false; // Set to false initially
+        }
 
         _context.ChatMessages.Add(chatMessage);
 
@@ -131,7 +152,7 @@ public class ChatHub : Hub
             ChatRoomId = chatMessage.ChatRoomId,
             SenderId = chatMessage.SenderId,
             SenderName = senderName,
-            Content = chatMessage.Content,
+            Content = GeneralLocalizableEntity.Localized(chatMessage.ContentAr, chatMessage.ContentEn),
             Timestamp = chatMessage.Timestamp
         };
 

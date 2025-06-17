@@ -1,7 +1,4 @@
-﻿using Backend.DTOs.QuizeDTOs;
-using Backend.Entities.QuizeEntities;
-
-namespace Backend.Controllers;
+﻿namespace Backend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -26,10 +23,10 @@ public class QuizeController : AppControllerBase
 
 
     [HttpPost("CorrectAnswer")]
-    public IActionResult CorrectAnswer([FromBody] CorrectQuizDto dto)
+    public async Task<IActionResult> CorrectAnswer(int quizeAnserId, [FromBody] List<CorrectQuizDto> dto)
     {
-        _service.CorrectQuiz(dto.AnswerId, dto.IsCorrect);
-        return Ok();
+        var result = await _service.CorrectQuiz(quizeAnserId, dto);
+        return NewResult(result);
     }
 
     [HttpGet("ToCorrect")]
@@ -40,11 +37,23 @@ public class QuizeController : AppControllerBase
     }
 
     [HttpGet("StudentAnswers")]
-    public IActionResult GetStudentAnswers([FromQuery] int studentQuizAnswerId)
+    public async Task<IActionResult> GetStudentAnswers([FromQuery] int studentQuizAnswerId)
     {
-        var result = _service.GetStudentQuizAnswer(studentQuizAnswerId);
-
-        return Ok(result);
+        try
+        {
+            var result = await _service.GetStudentQuizAnswer(studentQuizAnswerId);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new Response<List<StudentQuizAnswerDto>>
+            {
+                httpStatusCode = HttpStatusCode.InternalServerError,
+                Succeeded = false,
+                Massage = "Failed to retrieve student answers",
+                Errors = new List<string> { ex.Message }
+            });
+        }
     }
 
 
@@ -137,7 +146,7 @@ public class QuizeController : AppControllerBase
     }
 
     [HttpPost("SubmitQuiz")]
-    public async Task<ActionResult<Response<SubmitQuizResponseDto>>> SubmitQuiz([FromBody] SubmitQuizDto submission)
+    public async Task<ActionResult<Response<string>>> SubmitQuiz([FromBody] SubmitQuizDto submission)
     {
         try
         {
@@ -145,7 +154,7 @@ public class QuizeController : AppControllerBase
             var student = await _context.Users.FindAsync(submission.StudentId);
             if (student == null)
             {
-                return NotFound(new Response<SubmitQuizResponseDto>
+                return NotFound(new Response<string>
                 {
                     httpStatusCode = HttpStatusCode.NotFound,
                     Succeeded = false,
@@ -161,7 +170,7 @@ public class QuizeController : AppControllerBase
 
             if (quiz == null)
             {
-                return NotFound(new Response<SubmitQuizResponseDto>
+                return NotFound(new Response<string>
                 {
                     httpStatusCode = HttpStatusCode.NotFound,
                     Succeeded = false,
@@ -174,7 +183,7 @@ public class QuizeController : AppControllerBase
             {
                 StudentId = submission.StudentId,
                 QuizId = submission.QuizId,
-                StudentQuestionAnswer = new List<StudentQuestionAnswer>()
+                StudentQuestionAnswer = new List<StudentQuestionAnswer>(),
             };
 
             // 3. Loop through answers and build the tree
@@ -186,8 +195,8 @@ public class QuizeController : AppControllerBase
                 var studentAnswer = new StudentQuestionAnswer
                 {
                     QuestionId = submittedAnswer.QuestionId,
-                    IsCorrect = false,
-                    StudentAnswerText = question.QuestionTypeId == QuestionType.Text ? submittedAnswer.StudentAnswerText : null,
+                    IsCorrect = null,
+                    StudentAnswerText = submittedAnswer.StudentAnswerText,
                     studentQuestionOptions = new List<StudentQuestionOption>()
                 };
 
@@ -196,9 +205,12 @@ public class QuizeController : AppControllerBase
                 {
                     foreach (var optionId in submittedAnswer.SelectedOptionIds)
                     {
+                        var isCorrectOption = await _context.QuestionOptions.Where(q => q.Id == optionId).Select(o => o.IsCorrect).FirstOrDefaultAsync();
+
                         studentAnswer.studentQuestionOptions.Add(new StudentQuestionOption
                         {
-                            QuestionOptionId = optionId
+                            QuestionOptionId = optionId,
+                            IsCorrect = isCorrectOption,
                         });
                     }
                 }
@@ -213,16 +225,45 @@ public class QuizeController : AppControllerBase
 
 
             // 5. Auto-correct if enabled
-            if (quiz.IsAutoCorrect)
+
+            int correctAnswersCount = 0;
+            int totalPointsEarned = 0;
+
+            foreach (var studentAnswer in studentQuizAnswer.StudentQuestionAnswer)
             {
-                int correctAnswersCount = 0;
-                int totalPointsEarned = 0;
-
-                foreach (var studentAnswer in studentQuizAnswer.StudentQuestionAnswer)
+                var question = quiz.questions.FirstOrDefault(q => q.Id == studentAnswer.QuestionId);
+                if (quiz.IsAutoCorrect)
                 {
-                    var question = quiz.questions.FirstOrDefault(q => q.Id == studentAnswer.QuestionId);
-                    if (question == null || question.QuestionTypeId != QuestionType.MCQ) continue;
+                    if (question.QuestionTypeId == QuestionType.Text)
+                    {
+                        string prompt = $@"
+                                                Compare the following two answers:
+                                                
+                                                Answer 1: ""{question.CorrectAnswer}""
+                                                Answer 2: ""{studentAnswer.StudentAnswerText}""
+                                                
+                                                If the two answers match in meaning or content by 70% or more, return only: true
+                                                Otherwise, return only: false
+                                                
+                                                Respond with only true or false.
+                                                ";
 
+                        var result = await _geminiService.GetResponseAsync(prompt);
+
+                        if (result.Trim().ToLower() == "true")
+                        {
+                            studentAnswer.IsCorrect = true;
+                            correctAnswersCount++;
+                            totalPointsEarned += question.Points;
+                        }
+                        else
+                        {
+                            studentAnswer.IsCorrect = false;
+                        }
+                    }
+                }
+                else
+                {
                     var correctOption = question.Options.FirstOrDefault(o => o.IsCorrect);
                     var selectedOptionIds = studentAnswer.studentQuestionOptions
                         .Select(o => o.QuestionOptionId)
@@ -240,28 +281,59 @@ public class QuizeController : AppControllerBase
                         totalPointsEarned += question.Points;
                     }
                 }
-
-                decimal gradingRating = quiz.PossiblePoints > 0
-                    ? (decimal)totalPointsEarned * 100 / quiz.PossiblePoints
-                    : 0;
-                bool isPassed = gradingRating >= 50;
-
-                studentQuizAnswer.GradingRating = gradingRating;
-                studentQuizAnswer.NumberOfAswered = correctAnswersCount;
-                studentQuizAnswer.IsPassed = isPassed;
             }
 
+            decimal gradingRating = quiz.PossiblePoints > 0
+                ? (decimal)totalPointsEarned * 100 / quiz.PossiblePoints
+                : 0;
+            bool isPassed = gradingRating >= 50;
 
-            return Ok(new Response<SubmitQuizResponseDto>
+            studentQuizAnswer.GradingRating = gradingRating;
+            studentQuizAnswer.NumberOfAswered = correctAnswersCount;
+            studentQuizAnswer.IsPassed = isPassed;
+
+            // 6. Save the grading results
+            _context.studentQuizeAnswers.Update(studentQuizAnswer);
+            await _context.SaveChangesAsync();
+
+
+            //// 8. Send email notification
+            //var emailSubject = "Quiz Submission Confirmation";
+            //var emailBody = $"Dear {student.UserName},<br/><br/>" +
+            //                $"You have successfully submitted the quiz '{quiz.Name}'.<br/>" +
+            //                $"Your grading rating is: {responseDto.GradingRating}%<br/>" +
+            //                $"You have answered {responseDto.NumberOfAnsweredCorrectly} questions correctly.<br/>" +
+            //                $"Thank you for participating!<br/><br/>" +
+            //                "Best regards,<br/>Your Course Team";
+            //_emailSender.SendEmailAsync(student.Email, emailSubject, emailBody);
+            //// 9. Return the response
+            //if (responseDto.GradingRating >= 50)
+            //{
+            //    _emailSender.SendEmailAsync(student.Email, "Congratulations on Passing the Quiz",
+            //        $"Dear {student.UserName},<br/><br/>" +
+            //        $"Congratulations! You have passed the quiz with a score of {responseDto.GradingRating}%.<br/>" +
+            //        "Keep up the great work!<br/><br/>" +
+            //        "Best regards,<br/>Your Course Team");
+            //}
+            //else {
+            //    _emailSender.SendEmailAsync(student.Email, "Quiz Submission Result",
+            //        $"Dear {student.UserName},<br/><br/>" +
+            //        $"You have submitted the quiz with a score of {responseDto.GradingRating}%.<br/>" +
+            //        "Unfortunately, you did not pass this time. Please review the material and try again.<br/><br/>" +
+            //        "Best regards,<br/>Your Course Team");
+            //}
+
+
+            return Ok(new Response<string>
             {
                 httpStatusCode = HttpStatusCode.OK,
                 Succeeded = true,
-                Massage = "Quiz submitted successfully"
+                Massage = "Quiz submitted successfully",
             });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new Response<SubmitQuizResponseDto>
+            return StatusCode(500, new Response<string>
             {
                 httpStatusCode = HttpStatusCode.InternalServerError,
                 Succeeded = false,

@@ -1,6 +1,4 @@
-﻿using Backend.Entities.QuizeEntities;
-
-namespace Backend.DTOs.QuizeDTOs;
+﻿namespace Backend.DTOs.QuizeDTOs;
 
 public class GetQuizeDto
 {
@@ -19,7 +17,7 @@ public class SendQuizeQuestion
     public required string QuestionText { get; set; }
     public QuestionType QuestionTypeId { get; set; }
     public int Points { get; set; }
-    public Dictionary<string, int>? Options { get; set; }
+    public Dictionary<string, int>? Options { get; set; } // option [ Text id ]
 }
 
 public class QuizToCorrectDto
@@ -31,14 +29,22 @@ public class QuizToCorrectDto
 }
 public class StudentQuizAnswerDto
 {
-    public List<string>? Answer { get; set; }
-    public bool? IsCorrect { get; set; }
+    public string QuizTitle { get; set; }
+    public string StudentName { get; set; }
+
+    public List<Que> Que { get; set; }
+}
+
+public class Que
+{
+    public int QuestionId { get; set; }
+    public string QuestionText { get; set; }
+    public string QuestionTextAnswer { get; set; }
 }
 public class CorrectQuizDto
 {
     public int AnswerId { get; set; }
     public bool IsCorrect { get; set; }
-    public int Degree { get; set; }
 }
 public class CreateQuizResponseDto
 {
@@ -96,13 +102,14 @@ public class SubmitAnswerDto
     public string? StudentAnswerText { get; set; } // For Text answers
     public List<int>? SelectedOptionIds { get; set; } // For MCQ answers
 }
-public class SubmitQuizResponseDto
-{
-    public int QuizId { get; set; }
-    public int StudentId { get; set; }
-    public bool IsAutoCorrected { get; set; }
-    public decimal? GradingRating { get; set; }
-    public int? NumberOfAnsweredCorrectly { get; set; }
-    public bool? IsPassed { get; set; }
-    public string Message { get; set; } = string.Empty;
-}
+//public class SubmitQuizResponseDto
+//{
+//    public int QuizId { get; set; }
+//    public int StudentId { get; set; }
+//    public bool IsAutoCorrected { get; set; }
+//    public decimal? GradingRating { get; set; }
+//    public int? NumberOfAnsweredCorrectly { get; set; }
+//    public bool? IsPassed { get; set; }
+//    public string Message { get; set; } = string.Empty;
+//}
+

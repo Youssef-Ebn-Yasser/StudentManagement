@@ -7,14 +7,14 @@ namespace Backend.Mapping
         public CategoryProfile()
         {
             CreateMap<Category, CategoryDto>()
-            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CategoryName));
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.CategoryNameAr, src.CategoryNameEn)));
 
             CreateMap<CreateCategoryDto, Category>()
-                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => GeneralLocalizableEntity.Localized(dest.CategoryNameAr, dest.CategoryNameEn), opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => false)); // Default false
 
             CreateMap<UpdateCategoryDto, Category>()
-                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => GeneralLocalizableEntity.Localized(dest.CategoryNameAr, dest.CategoryNameEn), opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted));
         }
     }

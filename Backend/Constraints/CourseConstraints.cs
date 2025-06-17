@@ -6,14 +6,21 @@ public class CourseConstraints : IEntityTypeConfiguration<Course>
 {
     public void Configure(EntityTypeBuilder<Course> builder)
     {
-        builder.Property(c => c.Description)
+        builder.Property(c => c.DescriptionEn)
                .HasMaxLength(250);
-               
+
+        builder.Property(c => c.DescriptionAr)
+               .HasMaxLength(250);
+
         builder.Property(c => c.Price)
                .IsRequired()
                .HasMaxLength(10);
 
-        builder.Property(c => c.Level)
+        builder.Property(c => c.LevelEn)
+               .IsRequired()
+               .HasMaxLength(50);
+
+        builder.Property(c => c.LevelAr)
                .IsRequired()
                .HasMaxLength(50);
 

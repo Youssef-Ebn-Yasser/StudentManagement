@@ -1,4 +1,7 @@
 using Backend.DTOs.MaterialDTOs;
+using static System.Net.Mime.MediaTypeNames;
+using System.Globalization;
+using MimeKit;
 
 namespace Backend.Services.Implementation
 {
@@ -29,21 +32,55 @@ namespace Backend.Services.Implementation
         {
             var path = await _physicalFileUpload.UploadFileAsync("Material", createMaterialDto.Data);
 
-            var material = new Material
+            //var material = new Material
+            //{
+            //    if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
+            //      { TitleAr = createMaterialDto.Title; }
+            //    else
+            //      { TitleEn = createMaterialDto.Title; }
+            //Title = createMaterialDto.Title,
+            //    Content = createMaterialDto.Content,
+            //    Type = createMaterialDto.Type,
+            //    LessonId = createMaterialDto.LessonId,
+            //    Path = path,
+            //    CreatedAt = DateTime.UtcNow,
+            //    IsDeleted = false,
+            //};
+            CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+
+            var material = new Material { };
+            
+            if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
+
             {
-                Title = createMaterialDto.Title,
-                Content = createMaterialDto.Content,
-                Type = createMaterialDto.Type,
-                LessonId = createMaterialDto.LessonId,
-                Path = path,
-                CreatedAt = DateTime.UtcNow,
-                IsDeleted = false,
+                material.TitleAr = createMaterialDto.Title;
+                material.ContentAr = createMaterialDto.Content;
+                material.Type = createMaterialDto.Type;
+                material.LessonId = createMaterialDto.LessonId;
+                material.Path = path;
+                material.CreatedAt = DateTime.UtcNow;
+                material.IsDeleted = false;
+            }
+
+
+            else
+            {
+
+                material.TitleEn = createMaterialDto.Title;
+                material.ContentEn = createMaterialDto.Content;
+                material.Type = createMaterialDto.Type;
+                material.LessonId = createMaterialDto.LessonId;
+                material.Path = path;
+                material.CreatedAt = DateTime.UtcNow;
+                material.IsDeleted = false;
+
             };
+
 
             // var material = _mapper.Map<Material>(createMaterialDto);
             await _unitOfWork.Repository<Material>().AddAsync(material);
             _unitOfWork.Complete();
-            return Success("Material Created Successfully");
+            return Success("Material Created Successfully"); 
         }
 
         public async Task<Response<string>> UpdateAsync(UpdateMaterialDto updateMaterialDto)
@@ -54,13 +91,34 @@ namespace Backend.Services.Implementation
 
             var path = await _physicalFileUpload.UploadFileAsync("Material", updateMaterialDto.Data);
 
-            existingMaterial.Title = updateMaterialDto.Title;
-            existingMaterial.Content = updateMaterialDto.Content;
-            existingMaterial.Type = updateMaterialDto.Type;
-            existingMaterial.LessonId = updateMaterialDto.LessonId;
-            existingMaterial.Path = path;
-            existingMaterial.CreatedAt = DateTime.UtcNow;
-            existingMaterial.IsDeleted = false;
+            //existingMaterial.Title = updateMaterialDto.Title;
+            //existingMaterial.Content = updateMaterialDto.Content;
+            //existingMaterial.Type = updateMaterialDto.Type;
+            //existingMaterial.LessonId = updateMaterialDto.LessonId;
+            //existingMaterial.Path = path;
+            //existingMaterial.CreatedAt = DateTime.UtcNow;
+            //existingMaterial.IsDeleted = false;
+            CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+            if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
+            {
+                existingMaterial.TitleAr = updateMaterialDto.Title;
+                existingMaterial.ContentAr = updateMaterialDto.Content;
+                existingMaterial.Type = updateMaterialDto.Type;
+                existingMaterial.LessonId = updateMaterialDto.LessonId;
+                existingMaterial.Path = path;
+                existingMaterial.CreatedAt = DateTime.UtcNow;
+                existingMaterial.IsDeleted = false;
+            }
+            else
+            {
+                existingMaterial.TitleEn = updateMaterialDto.Title;
+                existingMaterial.ContentEn = updateMaterialDto.Content;
+                existingMaterial.Type = updateMaterialDto.Type;
+                existingMaterial.LessonId = updateMaterialDto.LessonId;
+                existingMaterial.Path = path;
+                existingMaterial.CreatedAt = DateTime.UtcNow;
+                existingMaterial.IsDeleted = false;
+            }
 
 
             // _mapper.Map(updateMaterialDto, existingMaterial);

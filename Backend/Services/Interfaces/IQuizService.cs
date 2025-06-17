@@ -1,12 +1,10 @@
-﻿using Backend.DTOs.QuizeDTOs;
-
-namespace Backend.Services.Interfaces;
+﻿namespace Backend.Services.Interfaces;
 
 public interface IQuizService
 {
     public List<QuizToCorrectDto> GetQuizzesToCorrectByLessonId(int lessonId);
-    public List<StudentQuizAnswerDto> GetStudentQuizAnswer(int answerId);
-    public void CorrectQuiz(int AnswerId, bool isCorrect);
+    public Task<Response<StudentQuizAnswerDto>> GetStudentQuizAnswer(int answerId);
+    public Task<Response<string>> CorrectQuiz(int studentQuizAnswerId, List<CorrectQuizDto> dto);
     public List<CourseStudentQuizStatsDto> GetCourseStudentQuizStats(int courseId);
     public StudentCourseQuizStatsDto GetStudentCourseQuizStats(int studentId, int courseId);
     public Task<Response<LessonQuizesStatsDto>> GetLessonQuizStats(int lessonId);

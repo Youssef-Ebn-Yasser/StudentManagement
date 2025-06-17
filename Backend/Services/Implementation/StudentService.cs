@@ -38,7 +38,7 @@ public class StudentService : ResponseHandler, IStudentService
     {
         var students = await _unitOfWork.Repository<Student>()
                                                     .GetTableNoTracking()
-                                                    .Where(s => s.StudentCourses.Any(sc => sc.Course.Title.ToLower().Contains(courseName.ToLower())) && s.IsDeleted == false)
+                                                    //.Where(s => s.StudentCourses.Any(sc => sc.Course.Title.ToLower().Contains(courseName.ToLower())) && s.IsDeleted == false)
                                                     .Include(s => s.StudentCourses)
                                                     .ThenInclude(sc => sc.Course)
                                                     .ToListAsync();
@@ -61,7 +61,7 @@ public class StudentService : ResponseHandler, IStudentService
     {
         var student = await _unitOfWork.Repository<Student>()
                                               .GetTableNoTracking()
-                                              .FirstOrDefaultAsync(s => s.Name == name && s.IsDeleted == false);
+                                              .FirstOrDefaultAsync(s => GeneralLocalizableEntity.Localized(s.NameAr, s.NameEn) == name && s.IsDeleted == false);
         if (student == null)
             return NotFound<ShowStudentDto>("Student Not Found");
 
@@ -93,13 +93,13 @@ public class StudentService : ResponseHandler, IStudentService
                    .Select(_ => new ShowStudentCourseDto
                    {
                        Id = _.Course.Id,
-                       Title = _.Course.Title,
-                       Description = _.Course.Description,
-                       Level = _.Course.Level,
-                       CategoryName = _.Course.Category.CategoryName,
+                       Title = GeneralLocalizableEntity.Localized(_.Course.TitleAr, _.Course.TitleEn),
+                       Description = GeneralLocalizableEntity.Localized(_.Course.DescriptionAr, _.Course.DescriptionEn),
+                       Level = GeneralLocalizableEntity.Localized(_.Course.LevelAr, _.Course.LevelEn),
+                       CategoryName = GeneralLocalizableEntity.Localized(_.Course.Category.CategoryNameAr, _.Course.Category.CategoryNameEn),
                        ImagePath = _.Course.ImagePath,
                        Hours = _.Course.Hours,
-                       TeacherName = _.Course.Teacher.Name
+                       TeacherName = GeneralLocalizableEntity.Localized(_.Course.Teacher.NameAr, _.Course.Teacher.NameEn)
 
                    })
                    .ToListAsync();
@@ -228,7 +228,7 @@ public class StudentService : ResponseHandler, IStudentService
     {
         var exist = await _unitOfWork.Repository<Student>()
                                            .GetTableNoTracking()
-                                           .AnyAsync(s => s.Name == name && s.IsDeleted == false);
+                                           .AnyAsync(s => GeneralLocalizableEntity.Localized(s.NameAr, s.NameEn) == name && s.IsDeleted == false);
 
         return exist;
     }
@@ -251,9 +251,9 @@ public class StudentService : ResponseHandler, IStudentService
     private async Task<bool> _isCourseExistById(int id) =>
     await _unitOfWork.Repository<Course>().GetTableNoTracking().AnyAsync(s => s.Id == id);
     private async Task<Course> _courseExistByName(string Name) =>
-   await _unitOfWork.Repository<Course>().GetTableNoTracking().FirstOrDefaultAsync(c => c.Title == Name);
+   await _unitOfWork.Repository<Course>().GetTableNoTracking().FirstOrDefaultAsync(c => GeneralLocalizableEntity.Localized(c.TitleAr, c.TitleEn) == Name);
     private async Task<Student> _studentExistByName(string name) =>
-    await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => s.Name == name);
+    await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => GeneralLocalizableEntity.Localized(s.NameAr, s.NameEn) == name);
     private async Task<Student> _studentExistById(int id) =>
 await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => s.Id == id);
 
@@ -313,8 +313,8 @@ await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync
             .Select(sa => new DTOs.StudentProfileDto.StudentAssignmentDto
             {
                 Id = sa.Id,
-                CourseName = sa.Lesson.Course.Title,
-                LessonName = sa.Lesson.Title,
+                CourseName = sa.Lesson.Course.TitleEn,
+                LessonName = sa.Lesson.TitleEn,
                 Path = sa.Path,
                 DegreePercentage = sa.DegreePercentage
 
@@ -330,7 +330,7 @@ await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync
         .Select(sqa => new StudentQuizDto
         {
             QuizId = sqa.Id,
-            QuizTitle = sqa.Quiz.Title,
+            QuizTitle = sqa.Quiz.TitleEn,
             GradingRating = sqa.GradingRating,
             IsPassed = sqa.IsPassed,
 
@@ -360,7 +360,7 @@ await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync
             .Select(ma => new StudentAttendanceDto
             {
                 Id = ma.Id,
-                MeetingTopic = ma.Meeting.Topic,
+                MeetingTopic = ma.Meeting.TopicEn,
                 MeetingDate = ma.Meeting.StartTime ?? ma.Meeting.CreatedAt,
                 Attended = ma.Attended
             })
