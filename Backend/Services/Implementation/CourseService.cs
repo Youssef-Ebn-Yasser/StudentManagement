@@ -30,10 +30,12 @@ public class CourseService : ResponseHandler, ICourseService
     public async Task<Response<List<ShowAllCoursesDto>>> GetAllAsync()
     {
         var courses = await _unitOfWork.Repository<Course>()
-        .GetTableNoTracking()
-        .Where(c => c.IsDeleted == false)
-        .Include(c => c.Category)
-        .ToListAsync();
+                                                  .GetTableNoTracking()
+                                                  .Where(c => c.IsDeleted == false)
+                                                  .Include(c => c.Category)
+                                                  .ToListAsync();
+
+
 
         var result = _mapper.Map<List<ShowAllCoursesDto>>(courses);
         return Success(result);
@@ -48,9 +50,9 @@ public class CourseService : ResponseHandler, ICourseService
                                                       .Select(c => new HomeCourses
                                                       {
                                                           Id = c.Id,
-                                                          Title = GeneralLocalizableEntity.Localized(c.TitleAr,c.TitleEn),
-                                                          Description = GeneralLocalizableEntity.Localized(c.DescriptionAr,c.DescriptionEn),
-                                                          Level = GeneralLocalizableEntity.Localized(c.LevelAr,c.LevelEn),
+                                                          Title = GeneralLocalizableEntity.Localized(c.TitleAr, c.TitleEn),
+                                                          Description = GeneralLocalizableEntity.Localized(c.DescriptionAr, c.DescriptionEn),
+                                                          Level = GeneralLocalizableEntity.Localized(c.LevelAr, c.LevelEn),
                                                           Price = c.Price,
                                                           ImagePath = c.ImagePath,
                                                       })
