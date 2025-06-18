@@ -19,6 +19,7 @@ builder.Services.AddConnectionDependency(builder.Configuration)
 
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IPaymobService,PaymobService>();
+builder.Services.AddScoped<IReportServices, ReportServices>();
 
 #region Payment stripe
 
