@@ -3,6 +3,9 @@ import useLogin from '@/hooks/auth/useLogin'
 import { Link } from 'react-router-dom'
 import Loader from '../Loader/Loader'
 import { useState } from 'react'
+import { GoogleLogin } from '@react-oauth/google';
+import toast from 'react-hot-toast';
+import axios from 'axios';
 
 function Login() {
     const { loading, formik, error, handleGoBack } = useLogin()
@@ -90,6 +93,57 @@ function Login() {
                                     >
                                         {loading ? <Loader /> : 'Login'}
                                     </button>
+                                </div>
+
+                                <div className=" flex justify-center my-3">
+                                    <GoogleLogin
+                                        onSuccess={async (credentialResponse) => {
+                                            try {
+                                                console.log('Google credential response:', credentialResponse);
+                                                const requestData = { idToken: credentialResponse.credential };
+                                                console.log('Sending request with data:', requestData);
+                                                
+                                                const response = await axios.post('https://e-learn-v1.runasp.net/api/Auth/Googlelogin', 
+                                                    requestData,
+                                                    {
+                                                        headers: {
+                                                            'Content-Type': 'application/json',
+                                                            'Accept': 'application/json'
+                                                        }
+                                                    }
+                                                );
+                                                if (response.data.succeeded) {
+                                                    toast.success('Google login successful!');
+                                                    // Store the token if it's returned
+                                                    if (response.data.data?.token) {
+                                                        localStorage.setItem('token', response.data.data.token);
+                                                    }
+                                                    // Redirect based on user role
+                                                    const isAdmin = response.data.data?.roles?.includes('Admin');
+                                                    const isTeacher = response.data.data?.roles?.includes('Teacher');
+                                                    if (isAdmin) {
+                                                        window.location.href = '/admin/dashboard';
+                                                    } else if (isTeacher) {
+                                                        window.location.href = '/teacher/profile';
+                                                    } else {
+                                                        window.location.href = '/';
+                                                    }
+                                                } else {
+                                                    toast.error(response.data.messages?.[0] || 'Google login failed.');
+                                                }
+                                            } catch (error) {
+                                                console.error('Google login API error:', error);
+                                                if (error.response?.data?.messages?.[0]) {
+                                                    toast.error(error.response.data.messages[0]);
+                                                } else {
+                                                    toast.error('Error during Google login. Please try again.');
+                                                }
+                                            }
+                                        }}
+                                        onError={() => {
+                                            toast.error('Google login failed. Please try again.');
+                                        }}
+                                    />
                                 </div>
 
                                 <div className="">

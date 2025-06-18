@@ -12,6 +12,7 @@ import AccountSettings from '@/component/TeacherProfile/settingsPage/AccountSett
 import TeacherCourseDetails from '@/component/TeacherProfile/TeacherCourseDetails'
 import StudentDashboard from '@/component/StudentDashboard/StudentDashboard'
 import StudentProfile from '@/component/StudentProfile/StudentProfile'
+import StudentProfile2 from '@/component/StudentProfile/StudentProfile2'
 import EditProfile from '@/component/StudentProfile/EditProfile'
 import AddLesson from '@/component/TeacherProfile/AddLesson'
 import EditCourse from '@/component/TeacherProfile/EditCourse'
@@ -24,7 +25,6 @@ import AdminDashboard from '@/component/AdminDashboard/AdminDashboard'
 import ControlCourse from '@/component/AdminProfile/ControlCourse'
 import StudentDetails from '@/component/AdminProfile/StudentDetails'
 import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
-import StudentAssignments from '@/component/TeacherProfile/StudentAssignments'
 import CourseDashDetails from '@/component/StudentDashboard/CourseDashDetailes'
 import AddMaterial from '@/component/TeacherProfile/AddMaterial'
 import TeacherProfileView from '@/component/StudentDashboard/TeacherProfileView'
@@ -36,7 +36,13 @@ import LessonDetails from '@/component/StudentDashboard/LessonDetails'
 import CreateZoom from '@/component/TeacherProfile/CreateZoom'
 import MeetingData from '@/component/TeacherProfile/MeetingData'
 import MeetingSdata from './../component/StudentDashboard/MeetingSdata'
-import ReviewAssignment from '@/component/TeacherProfile/ReviewAssignment'
+import teacherRoutes from './teacherRoutes'
+import QuizView from '../component/StudentDashboard/QuizView'
+import ReviewStudentAnswers from '@/component/TeacherProfile/teacherMange/ReviewStudentAnswers'
+import ManageAssignments from '@/component/TeacherProfile/teacherMange/ManageAssignments'
+import TeacherStudents from '../component/TeacherProfile/TeacherStudents'
+import ChatRoom from '../component/StudentDashboard/ChatRoom'
+import TChatRoom from '../component/TeacherProfile/TChatRoom'
 
 const routesConfig = [
     { path: '', element: <Home />, isProtected: false, accessRole: 'all' },
@@ -77,14 +83,20 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
-    path: '/studentdashboard/course/:courseId/lesson/:lessonId',
-    element: <LessonDetails />,
-    isProtected: false,
-    accessRole: 'all',
+        path: '/studentdashboard/course/:courseId/lesson/:lessonId',
+        element: <LessonDetails />,
+        isProtected: false,
+        accessRole: 'all',
     },
     {
         path: 'studentprofile',
         element: <StudentProfile />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'studentprofilee',
+        element: <StudentProfile2 />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -95,8 +107,20 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
+        path: 'studentdashboard/lesson/:lessonId/quiz',
+        element: <QuizView />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
         path: 'teacher/profile',
         element: <TeacherProfile />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'teacher/profile/students',
+        element: <TeacherStudents />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -149,26 +173,38 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
-        path: 'studentdashboard/course/meetings',
+        path: 'studentdashboard/course/:courseId/stmeetings',
         element: <MeetingSdata />,
         isProtected: false,
         accessRole: 'all',
     },
     {
-        path: 'courses/details',
+        path: 'courses/course/:id',
         element: <CoursesDetails />,
         isProtected: false,
         accessRole: 'all',
     },
     {
-        path: 'courses/teacher',
+        path: 'courses/teacher/:teacherName',
         element: <TeacherProfileView />,
         isProtected: false,
         accessRole: 'all',
     },
     {
-        path: 'studentdashboard/course',
+        path: 'studentdashboard/course/:id',
         element: <CourseDashDetails />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: '/chat/:teacherId',
+        element: <ChatRoom />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: '/chatt/:studentId',
+        element: <TChatRoom />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -187,6 +223,12 @@ const routesConfig = [
     {
         path: 'teacher/course/edit',
         element: <EditCourse />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'teacher/review-student-answers',
+        element: <ReviewStudentAnswers />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -240,7 +282,7 @@ const routesConfig = [
     },
     {
         path: 'teacher/assignments',
-        element: <StudentAssignments />,
+        element: <ManageAssignments />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -262,12 +304,7 @@ const routesConfig = [
         isProtected: false,
         accessRole: 'all',
     },
-    {
-        path: 'teacher/review-assignment/:id',
-        element: <ReviewAssignment />,
-        isProtected: false,
-        accessRole: 'all',
-    },
+    ...teacherRoutes,
 ]
 
 const mainRoutes = [

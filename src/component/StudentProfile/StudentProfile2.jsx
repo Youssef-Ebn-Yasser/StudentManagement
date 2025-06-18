@@ -5,10 +5,58 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaTachometerAlt,
+  FaBookOpen,
+  FaTasks,
+  FaQuestionCircle,
 } from 'react-icons/fa';
 import axios from 'axios';
 
-export default function StudentProfile() {
+// --- New ProgressCircle Component ---
+const ProgressCircle = ({ percentage, color = '#6366f1', size = 50, strokeWidth = 5 }) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (percentage / 100) * circumference;
+
+  return (
+    <svg width={size} height={size} className="transform -rotate-90">
+      <circle
+        stroke="#e0e7ff" // Light background for the circle
+        fill="transparent"
+        strokeWidth={strokeWidth}
+        r={radius}
+        cx={size / 2}
+        cy={size / 2}
+      />
+      <circle
+        stroke={color}
+        fill="transparent"
+        strokeWidth={strokeWidth}
+        strokeDasharray={circumference + ' ' + circumference}
+        strokeDashoffset={offset}
+        r={radius}
+        cx={size / 2}
+        cy={size / 2}
+        strokeLinecap="round"
+        style={{ transition: 'stroke-dashoffset 0.5s ease-in-out' }}
+      />
+      <text
+        x="50%"
+        y="50%"
+        dominantBaseline="middle"
+        textAnchor="middle"
+        fontSize="0.75em" // Smaller font for percentage
+        fill="#4b5563" // Darker text for readability
+        className="transform rotate-90 origin-center" // Rotate text back
+      >
+        {percentage}%
+      </text>
+    </svg>
+  );
+};
+// --- End ProgressCircle Component ---
+
+
+export default function StudentProfile2() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,10 +67,11 @@ export default function StudentProfile() {
     imageUrl: '',
     enrolledCourses: [],
   });
+  const [testCourseDetails, setTestCourseDetails] = useState([]); // New state for the test API data
   const [currentCourseIndex, setCurrentCourseIndex] = useState(0);
 
   // Get studentId from localStorage (set this at login)
-  const studentId = localStorage.getItem('guestId');
+  const studentId = localStorage.getItem('guestId'); // Assuming studentId is 160 for the test API based on your prompt
 
   useEffect(() => {
     const fetchStudentData = async () => {
@@ -43,7 +92,17 @@ export default function StudentProfile() {
           `https://e-learn-v1.runasp.net/api/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses?studentId=${studentId}`
         );
 
-        if (studentResponse.data.succeeded && coursesResponse.data.succeeded) {
+        // --- New API Call for get/forTest ---
+        const testDetailsResponse = await axios.get(
+          `https://e-learn-v1.runasp.net/api/Student/get/forTest?studentId=${studentId}`
+        );
+        // --- End New API Call ---
+
+        if (
+          studentResponse.data.succeeded &&
+          coursesResponse.data.succeeded &&
+          testDetailsResponse.status === 200 // Check for successful HTTP status
+        ) {
           const student = studentResponse.data.data;
           const enrolledCourses = coursesResponse.data.data || [];
           setStudentData({
@@ -53,6 +112,7 @@ export default function StudentProfile() {
             imageUrl: student.imageUrl || 'https://via.placeholder.com/150',
             enrolledCourses: enrolledCourses,
           });
+          setTestCourseDetails(testDetailsResponse.data[0]?.courseDetails || []); // Set the new state
           setCurrentCourseIndex(0); // Reset slider to first course
         } else {
           throw new Error('Failed to fetch student data or courses');
@@ -153,6 +213,72 @@ export default function StudentProfile() {
           </div>
         </div>
 
+        {/* --- Improved Section: Detailed Course Progress --- */}
+        {testCourseDetails.length > 0 && (
+          <div className="bg-white border rounded-2xl p-6 shadow-lg mb-10 animate-fade-in"> {/* Added animate-fade-in */}
+            <h2 className="text-2xl font-extrabold text-indigo-800 mb-8 text-center">Your Course Progress</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {testCourseDetails.map((course, index) => (
+                <div
+                  key={course.courseId}
+                  className="
+                    bg-white border border-indigo-100 rounded-xl p-6 shadow-md
+                    hover:shadow-xl hover:border-indigo-300 transition-all duration-300
+                    flex flex-col transform hover:-translate-y-1
+                  "
+                  style={{ animationDelay: `${index * 0.1}s` }} // Staggered animation
+                >
+                  <h3 className="text-lg font-bold text-indigo-700 mb-4 flex items-center gap-3">
+                    <FaBookOpen className="text-indigo-600 text-xl" /> {course.courseName}
+                  </h3>
+                  <div className="flex-grow space-y-3 text-gray-700 text-base">
+                    <div className="flex justify-between items-center">
+                      <span className="flex items-center gap-2">
+                        <FaTasks className="text-blue-500" /> **Assignments:**
+                      </span>
+                      <span className="font-semibold text-gray-800">
+                         {course.numberOfDeliverAssignment} / {course.assignmentCountInCourse || 0} delivered
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="flex items-center gap-2">
+                        <FaQuestionCircle className="text-purple-500" /> **Quizzes:**
+                      </span>
+                      <span className="font-semibold text-gray-800">
+                        {course.totalStudentDegreeInCourse} / {course.totalDegreeQuizInCourse || 0} total degree
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 pt-4 border-t border-indigo-100 flex justify-around items-center">
+                    <div className="text-center">
+                      <ProgressCircle
+                        percentage={course.totalPercentageDegreeInCourse}
+                        color="#22c55e" // Green for assignment percentage
+                        size={60}
+                        strokeWidth={6}
+                      />
+                      <p className="text-sm text-gray-600 mt-2">Assignment %</p>
+                    </div>
+                    <div className="text-center">
+                      <ProgressCircle
+                        percentage={course.totalQuizPercentage}
+                        color="#f97316" // Orange for quiz percentage
+                        size={60}
+                        strokeWidth={6}
+                      />
+                      <p className="text-sm text-gray-600 mt-2">Quiz %</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {/* --- End Improved Section --- */}
+
+
         {/* Profile Details */}
         <div className="grid md:grid-cols-2 gap-10">
           {/* About Section */}
@@ -187,8 +313,9 @@ export default function StudentProfile() {
               <div className="flex-1 min-w-0">
                 {hasCourses ? (
                   <div className="border border-indigo-100 rounded-xl p-4 flex items-center gap-6 bg-white shadow hover:shadow-xl transition-shadow duration-200">
+                    {/* Add a fallback image if imagePath is missing or broken */}
                     <img
-                      src={currentCourse.imagePath}
+                      src={currentCourse.imagePath || 'https://via.placeholder.com/150'}
                       alt={currentCourse.title}
                       className="w-24 h-24 object-cover rounded-xl border-2 border-indigo-200 shadow transition-transform duration-200 hover:scale-105"
                     />

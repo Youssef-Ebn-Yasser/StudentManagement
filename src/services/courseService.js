@@ -9,50 +9,63 @@ export const courseService = {
       // Create FormData object
       const formData = new FormData();
       
-      // Add all required fields
-      formData.append('Title', courseData.title?.trim());
-      formData.append('Description', courseData.description?.trim() || '');
-      formData.append('Price', courseData.price);
-      formData.append('TeacherId', courseData.teacherId);
-      formData.append('CategoryId', courseData.categoryId);
-      formData.append('Level', courseData.level);
-      formData.append('Hours', courseData.hours);
-      
-      // Add image if provided
-      if (courseData.image) {
-        formData.append('Image', courseData.image);
-      }
-
-      // Validate required fields
-      if (!courseData.title?.trim()) {
+      // Add all required fields with proper validation
+      if (!courseData.Title?.trim()) {
         throw new Error('Course title is required');
       }
-      if (!courseData.price || courseData.price <= 0) {
-        throw new Error('Course price must be greater than 0');
+      formData.append('Title', courseData.Title.trim());
+
+      if (!courseData.Description?.trim()) {
+        throw new Error('Course description is required');
       }
-      if (!courseData.teacherId || courseData.teacherId <= 0) {
+      formData.append('Description', courseData.Description.trim());
+
+      // Validate and format price
+      const price = parseFloat(courseData.Price);
+      if (isNaN(price) || price <= 0) {
+        throw new Error('Valid course price is required');
+      }
+      formData.append('Price', price.toString());
+
+      // Validate and format teacher ID
+      const teacherId = parseInt(courseData.TeacherId);
+      if (isNaN(teacherId) || teacherId <= 0) {
         throw new Error('Valid teacher ID is required');
       }
-      if (!courseData.categoryId || courseData.categoryId <= 0) {
+      formData.append('TeacherId', teacherId.toString());
+
+      // Validate and format category ID
+      const categoryId = parseInt(courseData.CategoryId);
+      if (isNaN(categoryId) || categoryId <= 0) {
         throw new Error('Valid category ID is required');
       }
-      if (!courseData.level?.trim()) {
+      formData.append('CategoryId', categoryId.toString());
+
+      if (!courseData.Level?.trim()) {
         throw new Error('Course level is required');
       }
-      if (!courseData.hours?.trim()) {
+      formData.append('Level', courseData.Level.trim());
+
+      if (!courseData.Hours?.trim()) {
         throw new Error('Course hours is required');
+      }
+      formData.append('Hours', courseData.Hours.trim());
+      
+      // Add image if provided
+      if (courseData.Image) {
+        formData.append('Image', courseData.Image);
       }
 
       // Log the form data for debugging
       console.log('Course form data:', {
-        Title: courseData.title,
-        Description: courseData.description,
-        Price: courseData.price,
-        TeacherId: courseData.teacherId,
-        CategoryId: courseData.categoryId,
-        Level: courseData.level,
-        Hours: courseData.hours,
-        HasImage: !!courseData.image
+        Title: courseData.Title,
+        Description: courseData.Description,
+        Price: price.toString(),
+        TeacherId: teacherId.toString(),
+        CategoryId: categoryId.toString(),
+        Level: courseData.Level,
+        Hours: courseData.Hours,
+        HasImage: !!courseData.Image
       });
 
       // Add retry logic for the request
@@ -72,28 +85,67 @@ export const courseService = {
               console.log(`Upload progress: ${percentCompleted}%`);
             }
           });
+
+          if (!response.data) {
+            throw new Error('No data received from server');
+          }
+
           return response.data;
         } catch (error) {
           lastError = error;
-          if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
-            retryCount++;
-            if (retryCount < maxRetries) {
-              console.log(`Retry attempt ${retryCount} of ${maxRetries}`);
-              // Wait for 2 seconds before retrying
-              await new Promise(resolve => setTimeout(resolve, 2000));
-              continue;
+          
+          // Handle specific error cases
+          if (error.response) {
+            const status = error.response.status;
+            const data = error.response.data;
+            
+            if (status === 400) {
+              const errorMessage = data?.message || data?.error || 'Invalid request data';
+              console.error('Server validation error:', data);
+              if (data?.errors) {
+                const validationErrors = Object.entries(data.errors)
+                  .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
+                  .join('\n');
+                throw new Error(`Validation failed:\n${validationErrors}`);
+              }
+              throw new Error(`Invalid request: ${errorMessage}`);
+            } else if (status === 401) {
+              throw new Error('Unauthorized: Please log in again');
+            } else if (status === 403) {
+              throw new Error('Access denied: You do not have permission to create courses');
+            } else if (status === 413) {
+              throw new Error('File too large: Please reduce the image size');
+            } else if (status === 500) {
+              throw new Error('Server error: Please try again later');
             }
+          } else if (error.request) {
+            if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+              retryCount++;
+              if (retryCount < maxRetries) {
+                console.log(`Retry attempt ${retryCount} of ${maxRetries}`);
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                continue;
+              }
+              throw new Error('Request timed out. Please check your internet connection and try again.');
+            }
+            throw new Error('No response from server. Please check your internet connection.');
           }
-          throw error;
+          
+          throw new Error(`Failed to create course: ${error.message}`);
         }
       }
 
       throw lastError;
     } catch (error) {
-      console.error('Course creation error:', error.response?.data || error.message);
-      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
-        throw new Error('Request timed out. Please try again. The server might be busy or your internet connection is slow.');
-      }
+      // Log the error for debugging
+      console.error('Course creation error:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        headers: error.response?.headers
+      });
+
+      // Rethrow the error with a user-friendly message
       throw error;
     }
   },

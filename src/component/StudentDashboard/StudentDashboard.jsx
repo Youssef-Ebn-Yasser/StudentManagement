@@ -23,7 +23,7 @@ export default function StudentDashboard() {
         setLoading(true);
 
         // Get studentId from localStorage
-        const studentId = localStorage.getItem('studentId');
+        const studentId = localStorage.getItem('guestId');
         if (!studentId) {
           setError('Student not logged in.');
           setLoading(false);

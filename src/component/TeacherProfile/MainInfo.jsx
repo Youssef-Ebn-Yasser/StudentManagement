@@ -1,12 +1,16 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FaCog, FaBook, FaPlus, FaChalkboardTeacher, FaFileUpload, FaClipboardList, FaChartBar } from "react-icons/fa";
+import { FaCog, FaBook, FaPlus, FaChalkboardTeacher, FaFileUpload, FaClipboardList, FaChartBar, FaQuestionCircle, FaTasks } from "react-icons/fa";
+import { Users } from "lucide-react";
 
 const MainInfo = ({ teacherData }) => {
   const navigate = useNavigate();
 
   const handleSettingsClick = () => {
     navigate('/teacher/settings');
+  };
+  const handleStudentsClick = () => {
+    navigate('/teacher/profile/students');
   };
 
   const quickActions = [
@@ -40,9 +44,23 @@ const MainInfo = ({ teacherData }) => {
     },
     {
       icon: <FaClipboardList className="w-5 h-5" />,
-      label: "Assignments",
+      label: "Manage Quiz",
+      onClick: () => navigate('/teacher/manage-quiz'),
+      description: "Create and manage quizzes",
+      color: "from-yellow-500 to-yellow-600"
+    },
+    {
+      icon: <FaQuestionCircle className="w-5 h-5" />,
+      label: "Review Student Answers",
+      onClick: () => navigate('/teacher/review-student-answers'),
+      description: "Review and grade student quiz answers",
+      color: "from-pink-500 to-pink-600"
+    },
+    {
+      icon: <FaTasks className="w-5 h-5" />,
+      label: "Manage Assignments",
       onClick: () => navigate('/teacher/assignments'),
-      description: "Manage student assignments",
+      description: "View and manage student assignments",
       color: "from-red-500 to-red-600"
     },
     {
@@ -57,12 +75,30 @@ const MainInfo = ({ teacherData }) => {
   return (
     <aside className="sticky top-0 bg-white md:mx-8 lg:mx-4 mb-8 p-6 shadow-md rounded-md -mt-40 relative">
       <button
+        onClick={handleStudentsClick}
+        className="        bg-blue-600 hover:bg-blue-700 active:bg-blue-800 
+        text-white font-semibold 
+        py-3 px-6 
+        rounded-xl 
+        shadow-lg hover:shadow-xl 
+        transition-all duration-300 ease-in-out 
+        inline-flex items-center justify-center
+        space-x-3 
+        focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-75 
+        max-w-xs mx-auto 
+        transform hover:scale-105 "
+      >
+      <Users size={24} className="mr-2" /> {/* Users icon from lucide-react */}
+      <span>View Students</span>
+      </button>
+      <button
         onClick={handleSettingsClick}
-        className="absolute top-4 right-4 inline-flex items-center px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-50"
+        className="absolute  top-4 right-4 inline-flex items-center px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-50"
       >
         <FaCog className="mr-2" />
         Edit Profile
       </button>
+   
       <div className="w-64 h-64 rounded-md overflow-hidden mx-auto mb-5">
         <img 
           src={teacherData.profileImagePath || '../../../public/teacher-photo.avif'} 
@@ -107,7 +143,7 @@ const MainInfo = ({ teacherData }) => {
       <div className="text-start pt-6 border-t border-gray-200 mt-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-xl font-bold text-gray-800 bg-gradient-to-r from-violet-600 to-violet-800 bg-clip-text text-transparent">
+            <h3 className="text-xl font-bold text-gray-800 bg-gradient-to-r from-violet-600 to-violet-800 bg-clip-text ">
               Quick Actions
             </h3>
             <p className="text-sm text-gray-500 mt-1">Access your most used features</p>

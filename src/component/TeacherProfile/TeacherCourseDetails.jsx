@@ -5,7 +5,6 @@ import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook, FaClipboardList, FaT
 import Loader from '../Loader/Loader';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import { reviewAssign } from '@/Redux/features/reviewAssign/reviewAssign';
 import { useDispatch, useSelector } from 'react-redux';
 
 const TeacherCourseDetails = () => {
@@ -32,50 +31,7 @@ const TeacherCourseDetails = () => {
   }, []);
 
   
-  const handleReviewAssign = async (lessonId) => {
-    const selectedLesson = course?.lessonInfo?.find(lesson => lesson.id === lessonId);
-    const lessonTitle = selectedLesson ? selectedLesson.title : 'Unknown Lesson';
-
-    try {
-      const resultAction = await dispatch(reviewAssign(lessonId));
-
-      // After the async operation, check if component is still mounted
-      // before attempting any UI updates or navigation.
-      if (!isMounted.current) {
-        console.log("Component unmounted before API response for reviewAssign completed.");
-        return; // Exit if component is unmounted
-      }
-
-      // If the thunk is fulfilled AND payload is an array AND not empty, navigate.
-      if (
-        reviewAssign.fulfilled.match(resultAction) &&
-        Array.isArray(resultAction.payload) &&
-        resultAction.payload.length > 0
-      ) {
-        console.log(resultAction.payload);
-        
-        console.log("Navigating to review-assignment page with assignments found.");
-        navigate(`/teacher/review-assignment/${lessonId}`, { state: { lessonName: lessonTitle } });
-      } else {
-        // This 'else' block means the thunk was fulfilled, but the payload
-        // was empty or not an array as expected. This means NO assignments were found.
-        // So, we display the toast here, as navigation will not occur.
-        const errorMsg =
-          resultAction.payload && typeof resultAction.payload === 'string'
-            ? resultAction.payload
-            : "No assignments found for this lesson.";
-        toast.error(errorMsg);
-      }
-    } catch (err) {
-      // This 'catch' block handles actual dispatch rejections (e.g., network errors).
-      // Since an error occurred, navigation will not happen, so we show the toast.
-      if (!isMounted.current) return; // Re-check if component is still mounted after an error is caught
-      const errorMsg =
-        err.response?.data?.message || err.message || "An unexpected error occurred while fetching assignments.";
-      toast.error(errorMsg);
-    }
-  };
-
+  
   useEffect(() => {
     if (!courseId) {
       setError('Course ID is required');
@@ -543,13 +499,6 @@ const TeacherCourseDetails = () => {
                             <h3 className="text-xl font-semibold text-gray-900">{lesson.title}</h3>
                           </div>
                           <span>{lesson.id}</span>
-                          <button
-                            className="bg-orange-400 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shadow hover:bg-orange-500 hover:shadow-lg hover:cursor-pointer transition "
-                            onClick={()=>{handleReviewAssign(lesson.id)}}
-                          >
-                            <i className="fa-solid fa-highlighter"></i>
-                            Review Assignments
-                          </button>
                           <p className="text-gray-600 mb-4 ml-11">{lesson.description}</p>
                           {lesson.duration && (
                             <div className="ml-11 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium inline-block mb-2">

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaStar, FaUserGraduate, FaBook, FaClock, FaEnvelope, FaPhone, FaLinkedin, FaTwitter, FaFacebook } from 'react-icons/fa';
+import { FaStar, FaUserGraduate, FaBook, FaClock, FaEnvelope, FaPhone, FaLinkedin, FaTwitter, FaFacebook, FaComments } from 'react-icons/fa'; // Added FaComments for the chat icon
 import Loader from '../Loader/Loader';
 import toast from 'react-hot-toast';
 
@@ -55,6 +55,23 @@ const TeacherProfileView = () => {
     console.log('Current courses state:', courses);
   }, [courses]);
 
+  // Handle chat button click
+  const handleChatClick = () => {
+    // You'll need to define how your chat page identifies the conversation.
+    // Common approaches:
+    // 1. Pass the teacher's ID: `/chat/${teacher.id}`
+    // 2. Pass the teacher's name: `/chat/${teacher.name}`
+    // 3. Initiate a new chat session and get a chat room ID, then navigate.
+    // For this example, I'm using teacher.id as it's a unique identifier.
+    if (teacher && teacher.id) {
+      navigate(`/chat/${teacher.id}`);
+      // Or if your chat route is simpler, e.g., for a general chat:
+      // navigate('/chat');
+    } else {
+      toast.error("Cannot start chat: Teacher ID not available.");
+    }
+  };
+
   if (loading) return <Loader />;
   if (error) return <div className="text-center text-red-500 mt-8">{error}</div>;
   if (!teacher) return <div className="text-center text-gray-500 mt-8">Teacher not found</div>;
@@ -62,7 +79,7 @@ const TeacherProfileView = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Teacher Profile Section */}
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-8 relative"> {/* Added relative for FAB positioning */}
         <div className="flex flex-col md:flex-row items-start gap-6">
           {/* Teacher Image */}
           <div className="w-48 h-48 rounded-full overflow-hidden">
@@ -138,7 +155,47 @@ const TeacherProfileView = () => {
             </div>
           </div>
         </div>
-      </div>
+
+        {/* --- Chat Button --- */}
+        {/* Placed absolutely within the teacher profile section or fixed to the viewport */}
+        <button
+          onClick={handleChatClick}
+          className="
+            absolute        
+            bottom-4        
+            right-4
+            md:mt-6        
+            bg-indigo-600   
+            text-white
+            py-3
+            px-6
+            rounded-full
+            shadow-lg
+            hover:bg-indigo-700
+            hover:shadow-xl
+            hover:scale-105
+            focus:outline-none
+            focus:ring-2
+            focus:ring-indigo-500
+            focus:ring-opacity-75
+            transition-all
+            duration-300
+            ease-in-out
+            flex
+            items-center
+            justify-center
+            space-x-2
+            z-10           
+          "
+          aria-label="Start chat with teacher"
+          title={`Start chat with ${teacher.name}`}
+        >
+          <FaComments className="text-xl" />
+          <span className="text-lg font-semibold hidden md:inline"> Chat</span> {/* Hide text on small screens, show on medium+ */}
+        </button>
+        {/* --- End Chat Button --- */}
+
+      </div> {/* End Teacher Profile Section */}
 
       {/* Teacher's Courses */}
       <div className="bg-white rounded-lg shadow-lg p-6">
@@ -175,4 +232,4 @@ const TeacherProfileView = () => {
   );
 };
 
-export default TeacherProfileView; 
+export default TeacherProfileView;

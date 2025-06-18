@@ -49,7 +49,7 @@ export const loginBuilder = (builder) => {
             if (action.payload.isAdmin) {
                 localStorage.setItem('adminId', action.payload.user.id)
             } else {
-                localStorage.setItem('studentId', action.payload.user.id)
+                localStorage.setItem('guestId', action.payload.user.id)
             }
             localStorage.setItem('isAdmin', action.payload.isAdmin)
             localStorage.setItem('isTeacher', action.payload.isTeacher)

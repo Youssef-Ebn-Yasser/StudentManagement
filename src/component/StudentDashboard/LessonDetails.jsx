@@ -25,7 +25,7 @@ export default function LessonDetails() {
   const [quiz, setQuiz] = useState(null);
   const [quizLoading, setQuizLoading] = useState(true);
 
-  const studentId = localStorage.getItem('studentId');
+  const studentId = localStorage.getItem('guestId');
 
   // Quiz submission state (persisted)
   const quizSubmissionKey = `quiz_submitted_${studentId}_${lessonId}`;
@@ -434,6 +434,15 @@ export default function LessonDetails() {
               )}
             </div>
           </section>
+
+          <div className="flex gap-4 mt-4">
+            <button
+              onClick={() => navigate(`/studentdashboard/lesson/${lessonId}/quiz`)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Take Quiz
+            </button>
+          </div>
         </div>
       )}
       {/* Global Success/Error */}
