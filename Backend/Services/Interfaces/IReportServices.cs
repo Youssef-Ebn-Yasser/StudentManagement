@@ -9,5 +9,6 @@ namespace Backend.Services.Interfaces
         Task<List<CourseRevenueReportDto>> GetCourseRevenuesAsync();
         Task<List<WeeklyStudentEnrollmentDto>> GetWeeklyNewStudentsAsync();
         Task<List<AverageAssignmentScoreDto>> GetAverageStudentScoresAsync();
+        Task<StudentComprehensiveReportDto> GetStudentComprehensiveReportAsync(int studentId);
     }
 }

@@ -371,5 +371,18 @@ await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync
             })
             .ToListAsync();
     }
+
+    public async Task<Response<string>> GenerateStudentReportAsync(int studentId)
+    {
+        // Implement the logic to generate a report for the student
+        // This could involve creating a PDF or any other format you prefer
+        // For now, we will just return a success message
+        var student = await _studentExistById(studentId);
+        if (student == null)
+            return NotFound<string>($"Student with ID {studentId} not found");
+        // Here you would generate the report and save it to a file or database
+        // For simplicity, we will just return a success message
+        return Success("Student report generated successfully");
+    }
 }
 #endregion
