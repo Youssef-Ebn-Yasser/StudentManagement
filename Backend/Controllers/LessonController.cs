@@ -6,12 +6,20 @@ namespace Backend.Controllers
     [ApiController]
     public class LessonController : AppControllerBase
     {
+        #region Fields
         private readonly ILessonService _lessonService;
+        private readonly IStructuredLogger _logger;
+        #endregion
 
-        public LessonController(ILessonService lessonService)
+        #region Constructor
+        public LessonController(ILessonService lessonService, IStructuredLogger logger)
         {
             _lessonService = lessonService;
+            _logger = logger;
         }
+        #endregion
+
+        #region Method
         [HttpGet("Get/All/Lessons")]
         public async Task<IActionResult> GetLessonDetails()
         {
@@ -47,4 +55,5 @@ namespace Backend.Controllers
             return NewResult(result);
         }
     }
+    #endregion
 }

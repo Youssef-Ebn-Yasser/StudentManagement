@@ -8,13 +8,20 @@ namespace Backend.Controllers
     [ApiController]
     public class PaymobController : ControllerBase
     {
+        #region Fields
         private readonly IPaymobService _paymobService;
+        private readonly IStructuredLogger _logger;
+        #endregion
 
-        public PaymobController(IPaymobService paymobService)
+        #region Constructor
+        public PaymobController(IPaymobService paymobService, IStructuredLogger logger)
         {
             _paymobService = paymobService;
+            _logger = logger;
         }
+        #endregion
 
+        #region Method
         [HttpPost("start-payment")]
         public async Task<IActionResult> StartPayment([FromBody] PaymentRequestDto request)
         {
@@ -36,4 +43,5 @@ namespace Backend.Controllers
             }
         }
     }
+    #endregion
 }

@@ -32,6 +32,7 @@ public static class ClassesDependencies
         services.AddTransient<IMeetingService, MeetingService>();
         services.AddTransient<IChatService, ChatService>();
         //services.AddTransient<IQuizService, QuizService>();
+        services.AddTransient<IStructuredLogger, StructuredLogger>();
 
         services.AddScoped<IPhysicalFileUpload, PhysicalFileUpload>();
 

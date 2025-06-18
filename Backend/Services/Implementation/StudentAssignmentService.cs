@@ -7,15 +7,20 @@ public class StudentAssignmentService : ResponseHandler, IStudentAssignmentServi
     #region    Fields
     public IUnitOfWork _unitOfWork { get; }
     private readonly IPhysicalFileUpload _physicalFileUpload;
+    private readonly IStructuredLogger _logger;
     public IMapper _mapper { get; }
     #endregion
 
     #region    Constructor
-    public StudentAssignmentService(IUnitOfWork unitOfWork, IMapper Mapper, IPhysicalFileUpload physicalFileUpload)
+    public StudentAssignmentService(IUnitOfWork unitOfWork, 
+                                    IMapper Mapper, 
+                                    IPhysicalFileUpload physicalFileUpload, 
+                                    IStructuredLogger logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = Mapper;
         _physicalFileUpload = physicalFileUpload;
+        _logger = logger;
     }
     #endregion
 

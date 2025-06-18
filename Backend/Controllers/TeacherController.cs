@@ -4,11 +4,20 @@
 [ApiController]
 public class TeacherController : AppControllerBase
 {
+    #region Fields
     private readonly ITeacherService _teacherService;
-    public TeacherController(ITeacherService teacherService)
+    private readonly IStructuredLogger _logger;
+    #endregion
+
+    #region Constructor
+    public TeacherController(ITeacherService teacherService, IStructuredLogger logger)
     {
         _teacherService = teacherService;
+        _logger = logger;
     }
+    #endregion
+
+    #region Method
     [HttpGet("Teacher/ById/{id}")]
     public async Task<IActionResult> GetTeacherById(int id)
     {
@@ -55,4 +64,5 @@ public class TeacherController : AppControllerBase
 
         return NewResult(result);
     }
+    #endregion
 }

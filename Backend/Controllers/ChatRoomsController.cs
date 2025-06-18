@@ -6,12 +6,14 @@ public class ChatRoomsController : AppControllerBase
 {
     #region   Fields
     private readonly IChatService _chatService;
+    private readonly IStructuredLogger _logger;
     #endregion
 
     #region   Constructor
-    public ChatRoomsController(IChatService chatService)
+    public ChatRoomsController(IChatService chatService, IStructuredLogger logger)
     {
         _chatService = chatService;
+        _logger = logger;
     }
     #endregion
 
