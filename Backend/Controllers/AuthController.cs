@@ -8,17 +8,27 @@ namespace Backend.Controllers;
 [ApiController]
 public class AuthController : AppControllerBase
 {
+    #region Fields
     private readonly IAuthenticationService _authService;
     private readonly IAuthGoogleService _authGoogleService;
     private readonly IEmailSender _emailSender;
+    private readonly IStructuredLogger _logger;
+    #endregion
 
-    public AuthController(IAuthenticationService authService, IAuthGoogleService authGoogleService, IEmailSender emailSender)
+    #region Constructor
+    public AuthController(IAuthenticationService authService, 
+                          IAuthGoogleService authGoogleService, 
+                          IEmailSender emailSender, 
+                          IStructuredLogger logger)
     {
         _authService = authService;
         _authGoogleService = authGoogleService;
         _emailSender = emailSender;
+        _logger = logger;
     }
+    #endregion
 
+    #region Method
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto model)
     {
@@ -123,4 +133,5 @@ public class AuthController : AppControllerBase
         var result = await _authService.ResetPasswordAsync(model.Email, model.Token, model.NewPassword);
         return NewResult(result);
     }
+    #endregion
 }

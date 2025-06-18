@@ -8,12 +8,14 @@ namespace Backend.Controllers
     {
         #region Fields
         private readonly ICommentService _commentService;
+        private readonly IStructuredLogger _logger;
         #endregion
 
         #region Constructor
-        public CommentController(ICommentService commentService)
+        public CommentController(ICommentService commentService, IStructuredLogger logger)
         {
             _commentService = commentService;
+            _logger = logger;
         }
         #endregion
 

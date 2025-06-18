@@ -5,15 +5,22 @@ namespace Backend.Services.Implementation
 {
     public class ManualPaymentService: IManualPaymentService
     {
+        #region Fields
         private readonly IWebHostEnvironment _env;
         private readonly ApplicationDbContext _db;
+        private readonly IStructuredLogger _logger;
+        #endregion
 
-        public ManualPaymentService(IWebHostEnvironment env, ApplicationDbContext db)
+        #region Constructor
+        public ManualPaymentService(IWebHostEnvironment env, ApplicationDbContext db, IStructuredLogger logger)
         {
             _env = env;
             _db = db;
+            _logger = logger;
         }
+        #endregion
 
+        #region Method
         public async Task<(bool Success, string Message)> SubmitManualPaymentAsync(ManualPaymentDto dto)
         {
             // Validate file
@@ -52,4 +59,5 @@ namespace Backend.Services.Implementation
             return (true, "Manual payment submitted successfully.");
         }
     }
+    #endregion
 }

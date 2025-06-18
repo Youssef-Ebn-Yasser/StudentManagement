@@ -4,14 +4,24 @@
 [ApiController]
 public class QuizeController : AppControllerBase
 {
+    #region Fields
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IEmailSender _emailSender;
     private readonly GeminiService _geminiService;
     private readonly IQuizService _service;
     private readonly ApplicationDbContext _context;
+    private readonly IStructuredLogger _logger;
+    #endregion
 
-    public QuizeController(IUnitOfWork unitOfWork, IMapper mapper, IEmailSender emailSender, GeminiService geminiService, IQuizService service, ApplicationDbContext context)
+    #region Constructor
+    public QuizeController(IUnitOfWork unitOfWork, 
+                           IMapper mapper, 
+                           IEmailSender emailSender, 
+                           GeminiService geminiService, 
+                           IQuizService service, 
+                           ApplicationDbContext context,
+                           IStructuredLogger logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
@@ -19,9 +29,11 @@ public class QuizeController : AppControllerBase
         _geminiService = geminiService;
         _service = service;
         _context = context;
+        _logger = logger;
     }
+    #endregion
 
-
+    #region Method
     [HttpPost("CorrectAnswer")]
     public async Task<IActionResult> CorrectAnswer(int quizeAnserId, [FromBody] List<CorrectQuizDto> dto)
     {
@@ -427,4 +439,5 @@ public class QuizeController : AppControllerBase
             });
         }
     }
+    #endregion
 }

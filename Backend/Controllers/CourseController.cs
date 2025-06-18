@@ -3,13 +3,20 @@ namespace Backend.Controllers;
 [ApiController]
 public class CourseController : AppControllerBase
 {
-
+    #region Fields
     private readonly ICourseService _courseService;
-    public CourseController(ICourseService courseService)
+    private readonly IStructuredLogger _logger;
+    #endregion
+
+    #region Constructor
+    public CourseController(ICourseService courseService, IStructuredLogger logger)
     {
         _courseService = courseService;
+        _logger = logger;
     }
+    #endregion
 
+    #region Method
     [HttpPost("Course/Create")]
 
     public async Task<IActionResult> Create(CreateCourseDto createCourseDto)
@@ -73,4 +80,5 @@ public class CourseController : AppControllerBase
         var result = await _courseService.GetCourseInfoByCategoryAsync(category);
         return NewResult(result);
     }
+    #endregion
 }

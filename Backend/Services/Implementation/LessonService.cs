@@ -4,15 +4,22 @@ namespace Backend.Services.Implementation
 {
     public class LessonService : ResponseHandler, ILessonService
     {
+        #region Fields
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IStructuredLogger _logger;
+        #endregion
 
-        public LessonService(IUnitOfWork unitOfWork, IMapper mapper)
+        #region Constructor
+        public LessonService(IUnitOfWork unitOfWork, IMapper mapper, IStructuredLogger logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _logger = logger;
         }
+        #endregion
 
+        #region Method
         public async Task<Response<List<ShowLessonDetailsPage>>> GetAll()
         {
 
@@ -75,4 +82,5 @@ namespace Backend.Services.Implementation
             return Success("Lesson Deleted Successfully");
         }
     }
+    #endregion
 }

@@ -8,14 +8,24 @@ namespace Backend.Controllers;
 [ApiController]
 public class CategoryController : ControllerBase
 {
+    #region Fields
     private readonly IStringLocalizer<Messages> _localizer;
     private readonly ICategoryService _categoryService;
-    public CategoryController(ICategoryService service, IStringLocalizer<Messages> localizer)
+    private readonly IStructuredLogger _logger;
+    #endregion
+
+    #region Constructor
+    public CategoryController(ICategoryService service, 
+                              IStringLocalizer<Messages> localizer, 
+                              IStructuredLogger logger)
     {
         _categoryService = service;
         _localizer = localizer;
+        _logger = logger;
     }
+    #endregion
 
+    #region Method
     [HttpGet("testLocaLization")]
     public async Task<IActionResult> testLoca()
     {
@@ -59,4 +69,5 @@ public class CategoryController : ControllerBase
         var result = await _categoryService.CreateAsync(dto);
         return Ok(result);
     }
+    #endregion
 }

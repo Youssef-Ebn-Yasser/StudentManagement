@@ -9,14 +9,19 @@ public class CourseService : ResponseHandler, ICourseService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IPhysicalFileUpload _physicalFileUpload;
+    private readonly IStructuredLogger _logger;
     #endregion
 
     #region   Counstructor
-    public CourseService(IUnitOfWork unitOfWork, IMapper mapper, IPhysicalFileUpload physicalFileUpload)
+    public CourseService(IUnitOfWork unitOfWork, 
+                         IMapper mapper, 
+                         IPhysicalFileUpload physicalFileUpload, 
+                         IStructuredLogger logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _physicalFileUpload = physicalFileUpload;
+        _logger = logger;
     }
     #endregion
 

@@ -6,15 +6,22 @@ namespace Backend.Controllers
     [ApiController]
     public class StudentController : AppControllerBase
     {
+        #region Fields
         private readonly IStudentService _studentService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IStructuredLogger _logger;
+        #endregion
 
-        public StudentController(IStudentService studentService, IUnitOfWork unitOfWork)
+        #region Constructor
+        public StudentController(IStudentService studentService, IUnitOfWork unitOfWork, IStructuredLogger logger)
         {
             _studentService = studentService;
             _unitOfWork = unitOfWork;
+            _logger = logger;
         }
+        #endregion
 
+        #region Method
         [HttpGet("forTest")]
         public async Task<IActionResult> get(int studentId)
         {
@@ -196,4 +203,5 @@ namespace Backend.Controllers
             return NewResult(result);
         }
     }
+    #endregion
 }

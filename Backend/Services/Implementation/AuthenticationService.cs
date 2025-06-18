@@ -9,6 +9,7 @@ namespace Backend.Services.Implementation;
 
 public class AuthenticationService : IAuthenticationService
 {
+    #region Fields
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole<int>> _roleManager;
     private readonly JwtSettings _jwtSettings;
@@ -18,7 +19,10 @@ public class AuthenticationService : IAuthenticationService
     private readonly string _baseUrl;
     private readonly ResponseHandler _responseHandler;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IStructuredLogger _Logger;
+    #endregion
 
+    #region Constructor
     public AuthenticationService(
         UserManager<User> userManager,
         RoleManager<IdentityRole<int>> roleManager,
@@ -28,7 +32,8 @@ public class AuthenticationService : IAuthenticationService
         IEmailSender emailSender,
         IConfiguration configuration,
         ResponseHandler responseHandler,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IStructuredLogger Logger)
     {
         _userManager = userManager;
         _roleManager = roleManager;
@@ -39,8 +44,11 @@ public class AuthenticationService : IAuthenticationService
         _baseUrl = configuration["ApplicationSettings:BaseUrl"] ?? "https://localhost:5175";
         _responseHandler = responseHandler;
         _unitOfWork = unitOfWork;
+        _Logger = Logger;
     }
+    #endregion
 
+    #region Method
     public async Task<Response<TokenDto>> LoginAsync(LoginDto model)
     {
         //var user = await _userManager.FindByEmailAsync(model.Email);
@@ -384,4 +392,5 @@ public class AuthenticationService : IAuthenticationService
 
         return _responseHandler.Success(userDto);
     }
+    #endregion
 }

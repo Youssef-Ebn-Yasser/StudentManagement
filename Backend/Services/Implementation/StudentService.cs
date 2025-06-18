@@ -11,14 +11,19 @@ public class StudentService : ResponseHandler, IStudentService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IPhysicalFileUpload _physicalFileUpload;
+    private readonly IStructuredLogger _logger;
     #endregion
 
     #region Constructor
-    public StudentService(IUnitOfWork unitOfWork, IMapper mapper, IPhysicalFileUpload physicalFileUpload)
+    public StudentService(IUnitOfWork unitOfWork, 
+                          IMapper mapper, 
+                          IPhysicalFileUpload physicalFileUpload, 
+                          IStructuredLogger logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _physicalFileUpload = physicalFileUpload;
+        _logger = logger;
     }
     #endregion
 

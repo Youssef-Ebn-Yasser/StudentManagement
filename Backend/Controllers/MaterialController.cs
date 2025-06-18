@@ -6,13 +6,20 @@ namespace Backend.Controllers
     [ApiController]
     public class MaterialController : AppControllerBase
     {
+        #region Fields
         private readonly IMaterialService _materialService;
+        private readonly IStructuredLogger _logger;
+        #endregion
 
-        public MaterialController(IMaterialService materialService)
+        #region Constructor
+        public MaterialController(IMaterialService materialService, IStructuredLogger logger)
         {
             _materialService = materialService;
+            _logger = logger;
         }
+        #endregion
 
+        #region Method
         [HttpGet("GetMaterialsByLessonId/{lessonId}")]
         public async Task<IActionResult> GetMaterialsByLessonId(int lessonId)
         {
@@ -41,4 +48,5 @@ namespace Backend.Controllers
             return NewResult(result);
         }
     }
+    #endregion
 }

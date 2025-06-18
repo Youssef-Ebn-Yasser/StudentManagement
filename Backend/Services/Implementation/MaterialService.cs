@@ -7,16 +7,27 @@ namespace Backend.Services.Implementation
 {
     public class MaterialService : ResponseHandler, IMaterialService
     {
+        #region Fields
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IPhysicalFileUpload _physicalFileUpload;
-        public MaterialService(IUnitOfWork unitOfWork, IMapper mapper, IPhysicalFileUpload physicalFileUpload)
+        private readonly IStructuredLogger _logger;
+        #endregion
+
+        #region Constructor
+        public MaterialService(IUnitOfWork unitOfWork, 
+                               IMapper mapper, 
+                               IPhysicalFileUpload physicalFileUpload, 
+                               IStructuredLogger logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _physicalFileUpload = physicalFileUpload;
+            _logger = logger;
         }
+        #endregion
 
+        #region Method
         public async Task<Response<List<ShowMaterialDto>>> GetAllMaterialByLessonIdAsync(int lessonId)
         {
             var materials = await _unitOfWork.Repository<Material>()
@@ -138,4 +149,5 @@ namespace Backend.Services.Implementation
             return Success("Material Deleted Successfully");
         }
     }
+    #endregion
 }

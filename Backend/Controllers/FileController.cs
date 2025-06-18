@@ -5,16 +5,22 @@
 [ApiController]
 public class FileController : ControllerBase
 {
+    #region Fields
     private readonly IFileService _cloudinaryService;
     private readonly PhysicalFileUpload physicalFileUpload;
+    private readonly IStructuredLogger _logger;
+    #endregion
 
-    public FileController(IFileService cloudinaryService, PhysicalFileUpload physicalFileUpload)
+    #region Constructor
+    public FileController(IFileService cloudinaryService, PhysicalFileUpload physicalFileUpload, IStructuredLogger logger)
     {
         _cloudinaryService = cloudinaryService;
         this.physicalFileUpload = physicalFileUpload;
+        _logger = logger;
     }
+    #endregion
 
-
+    #region Method
     [HttpPost("upload/file")]
     public async Task<IActionResult> UploadFile([FromBody] IFormFile file)
     {
@@ -82,4 +88,5 @@ public class FileController : ControllerBase
             Tip = "Make sure: 1) URL is correct 2) File exists 3) API key has delete permissions"
         });
     }
+    #endregion
 }

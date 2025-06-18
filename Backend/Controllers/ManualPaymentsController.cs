@@ -9,15 +9,24 @@ namespace Backend.Controllers
     [Route("api/[controller]")]
     public class ManualPaymentsController : ControllerBase
     {
+        #region Fields
         private readonly IManualPaymentService _manualPaymentService;
         private readonly ApplicationDbContext _db;
+        private readonly IStructuredLogger _logger;
+        #endregion
 
-        public ManualPaymentsController(IManualPaymentService manualPaymentService, ApplicationDbContext db)
+        #region Constructor
+        public ManualPaymentsController(IManualPaymentService manualPaymentService, 
+                                        ApplicationDbContext db, 
+                                        IStructuredLogger logger)
         {
             _manualPaymentService = manualPaymentService;
             _db = db;
+            _logger = logger;
         }
+        #endregion
 
+        #region Method
         [HttpPost]
         [Authorize] // Only logged-in users can submit
         public async Task<IActionResult> SubmitManualPayment([FromForm] ManualPaymentDto dto)
@@ -57,4 +66,5 @@ namespace Backend.Controllers
 
 
     }
+    #endregion
 }

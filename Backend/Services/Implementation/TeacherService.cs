@@ -10,18 +10,21 @@ public class TeacherService : ResponseHandler, ITeacherService
     private readonly IPhysicalFileUpload _physicalFileUpload;
     public IMapper _mapper { get; }
     public IAuthenticationService _authenticationService { get; }
+    private readonly IStructuredLogger _logger;
     #endregion
 
     #region   Constructor
     public TeacherService(IUnitOfWork unitOfWork,
                           IPhysicalFileUpload physicalFileUpload,
                           IMapper mapper,
-                          IAuthenticationService authenticationService)
+                          IAuthenticationService authenticationService,
+                          IStructuredLogger logger)
     {
         _unitOfWork = unitOfWork;
         _physicalFileUpload = physicalFileUpload;
         _mapper = mapper;
         _authenticationService = authenticationService;
+        _logger = logger;
     }
     #endregion
 

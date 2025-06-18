@@ -2,18 +2,24 @@
 
 public class QuizService : ResponseHandler, IQuizService
 {
-
+    #region Fields
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IEmailSender _emailSender;
+    private readonly IStructuredLogger _logger;
+    #endregion
 
-    public QuizService(IUnitOfWork unitOfWork, IMapper mapper, IEmailSender emailSender)
+    #region Constructor
+    public QuizService(IUnitOfWork unitOfWork, IMapper mapper, IEmailSender emailSender, IStructuredLogger logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _emailSender = emailSender;
+        _logger = logger;
     }
+    #endregion
 
+    #region Method
     public List<QuizToCorrectDto> GetQuizzesToCorrectByLessonId(int lessonId)
     {
         var quizzesToCorrect = _unitOfWork.Repository<StudentQuizeAnswer>()
@@ -693,4 +699,5 @@ public class QuizService : ResponseHandler, IQuizService
         }
         return Success(result);
     }
+    #endregion
 }
