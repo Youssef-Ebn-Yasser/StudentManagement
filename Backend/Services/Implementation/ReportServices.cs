@@ -1,7 +1,5 @@
 ﻿using Backend.DTOs.ReportDTOS;
 using Backend.DTOs.StudentProfileDto;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using StudentAssignmentDto = Backend.DTOs.StudentProfileDto.StudentAssignmentDto;
 
 namespace Backend.Services.Implementation
@@ -9,20 +7,22 @@ namespace Backend.Services.Implementation
     public class ReportServices : IReportServices
     {
         private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ReportServices(ApplicationDbContext context)
+        public ReportServices(ApplicationDbContext context, IUnitOfWork unitOfWork)
         {
             _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<List<AverageAssignmentScoreDto>> GetAverageStudentScoresAsync()
         {
             var data = await _context.StudentAssignments
-                                     .GroupBy(s => new { s.StudentId,s.Name})
+                                     .GroupBy(s => new { s.StudentId, s.TitleEn })
                                      .Select(g => new AverageAssignmentScoreDto
                                      {
                                          StudentId = g.Key.StudentId,
-                                         StudentName = $"{g.Key.Name}",
+                                         StudentName = $"{g.Key}",
                                          AverageScore = g.Average(x => x.DegreePercentage)
                                      })
         .ToListAsync();
@@ -34,11 +34,11 @@ namespace Backend.Services.Implementation
         {
             var report = await _context.Courses
                        .Select(c => new CourseEnrollmentReportDto
-        {
-            CourseId = c.Id,
-            CourseName = c.Title,
-            StudentsCount = c.StudentCourses.Count(sc => !sc.IsDeleted)
-        })
+                       {
+                           CourseId = c.Id,
+                           CourseName = c.TitleEn,
+                           StudentsCount = c.StudentCourses.Count(sc => !sc.IsDeleted)
+                       })
         .ToListAsync();
 
             return report;
@@ -47,12 +47,11 @@ namespace Backend.Services.Implementation
         public async Task<List<CourseRevenueReportDto>> GetCourseRevenuesAsync()
         {
             var data = await _context.Payments
-          .Where(p => p.Status == "Paid") // عدل حسب حالتك
-          .GroupBy(p => new { p.CourseId, p.Course.Title })
+          .GroupBy(p => new { p.CourseId, p.Course.TitleEn })
           .Select(g => new CourseRevenueReportDto
           {
               CourseId = g.Key.CourseId ?? 0,
-              CourseName = g.Key.Title,
+              CourseName = g.Key.TitleEn,
               TotalRevenue = g.Sum(x => (decimal)x.Amount),
               PaymentsCount = g.Count()
           })
@@ -68,15 +67,15 @@ namespace Backend.Services.Implementation
             var firstDayOfMonth = new DateTime(now.Year, now.Month, 1);
 
             var totalUsers = await _context.Users.CountAsync();
-            var totalStudents = await _context.Students.CountAsync();
-            var totalTeachers = await _context.Teachers.CountAsync();
+            var totalStudents = await _unitOfWork.Repository<Student>().GetTableNoTracking().CountAsync();
+            var totalTeachers = await _unitOfWork.Repository<Teacher>().GetTableNoTracking().CountAsync();
             var newUsersLast7Days = await _context.Users.CountAsync(u => u.CreatedAt >= last7Days);
 
             var totalCourses = await _context.Courses.CountAsync();
             var totalPayments = await _context.Payments.CountAsync();
 
             var revenueThisMonth = await _context.Payments
-                .Where(p => p.PaymentDate >= firstDayOfMonth && p.Status == "Success")
+                .Where(p => p.PaymentDate >= firstDayOfMonth)
                 .SumAsync(p => (decimal?)p.Amount) ?? 0;
 
             return new DashboardSummaryDto
@@ -118,7 +117,8 @@ namespace Backend.Services.Implementation
 
         public async Task<StudentComprehensiveReportDto> GetStudentComprehensiveReportAsync(int studentId)
         {
-            var student = await _context.Students
+            var student = await _unitOfWork.Repository<Student>()
+            .GetTableNoTracking()
                 .Include(s => s.StudentCourses)
                     .ThenInclude(sc => sc.Course)
                 .FirstOrDefaultAsync(s => s.Id == studentId);
@@ -171,11 +171,11 @@ namespace Backend.Services.Implementation
                     .CountAsync();
 
                 var completedAssignments = await _context.StudentAssignments
-                    .Where(sa => sa.StudentId == studentId && 
+                    .Where(sa => sa.StudentId == studentId &&
                            sa.Lesson.CourseId == course.Id)
                     .CountAsync();
 
-                courseReport.AssignmentCompletionRate = totalAssignments > 0 ? 
+                courseReport.AssignmentCompletionRate = totalAssignments > 0 ?
                     (double)completedAssignments / totalAssignments * 100 : 0;
 
                 // Calculate quiz completion rate
@@ -185,29 +185,29 @@ namespace Backend.Services.Implementation
                     .CountAsync();
 
                 var completedQuizzes = await _context.studentQuizeAnswers
-                    .Where(sqa => sqa.StudentId == studentId && 
+                    .Where(sqa => sqa.StudentId == studentId &&
                            sqa.Quiz.Lesson.CourseId == course.Id)
                     .CountAsync();
 
-                courseReport.QuizCompletionRate = totalQuizzes > 0 ? 
+                courseReport.QuizCompletionRate = totalQuizzes > 0 ?
                     (double)completedQuizzes / totalQuizzes * 100 : 0;
 
                 // Calculate overall grade
                 var assignmentGrades = await _context.StudentAssignments
-                    .Where(sa => sa.StudentId == studentId && 
+                    .Where(sa => sa.StudentId == studentId &&
                            sa.Lesson.CourseId == course.Id)
                     .Select(sa => sa.DegreePercentage)
                     .ToListAsync();
 
                 var quizGrades = await _context.studentQuizeAnswers
-                    .Where(sqa => sqa.StudentId == studentId && 
+                    .Where(sqa => sqa.StudentId == studentId &&
                            sqa.Quiz.Lesson.CourseId == course.Id)
                     .Select(sqa => sqa.GradingRating)
                     .ToListAsync();
 
-                var totalGrades = assignmentGrades.Count + quizGrades.Count;
-                courseReport.OverallGrade = totalGrades > 0 ? 
-                    (assignmentGrades.Sum() + quizGrades.Sum()) / totalGrades : 0;
+                //var totalGrades = assignmentGrades.Count + quizGrades.Count;
+                //courseReport.OverallGrade = totalGrades > 0 ? 
+                //    (assignmentGrades.Sum()+ quizGrades.Sum()) / totalGrades : 0;
 
                 report.EnrolledCourses.Add(courseReport);
             }
@@ -223,7 +223,7 @@ namespace Backend.Services.Implementation
                 TotalMeetings = attendance.Count,
                 AttendedMeetings = attendance.Count(a => a.Attended),
                 AbsentMeetings = attendance.Count(a => !a.Attended),
-                AttendanceRate = attendance.Count > 0 ? 
+                AttendanceRate = attendance.Count > 0 ?
                     (double)attendance.Count(a => a.Attended) / attendance.Count * 100 : 0,
                 RecentAttendance = attendance
                     .OrderByDescending(a => a.AttendanceDate)
@@ -248,7 +248,7 @@ namespace Backend.Services.Implementation
             {
                 TotalAssignments = assignments.Count,
                 CompletedAssignments = assignments.Count,
-                AverageAssignmentScore = assignments.Any() ? 
+                AverageAssignmentScore = assignments.Any() ?
                     assignments.Average(a => a.DegreePercentage) : 0,
                 RecentAssignments = assignments
                     .Take(5)
@@ -274,9 +274,9 @@ namespace Backend.Services.Implementation
                 TotalQuizzes = quizzes.Count,
                 CompletedQuizzes = quizzes.Count,
                 PassedQuizzes = quizzes.Count(q => (bool)q.IsPassed),
-                AverageQuizScore = (double)(quizzes.Any() ? 
+                AverageQuizScore = (double)(quizzes.Any() ?
                     quizzes.Average(q => q.GradingRating) : 0),
-                PassRate = quizzes.Any() ? 
+                PassRate = quizzes.Any() ?
                     (double)quizzes.Count(q => (bool)q.IsPassed) / quizzes.Count * 100 : 0,
                 RecentQuizzes = quizzes
                     .Take(5)
