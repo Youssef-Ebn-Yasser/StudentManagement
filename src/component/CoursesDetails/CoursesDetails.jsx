@@ -38,6 +38,10 @@ export default function CoursesDetails() {
     const date = new Date(dateString);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
   };
+  
+  const handlePaymobPayment = () => {
+     navigate('paymob-checkout');
+  };
 
   // Payment handler: open Stripe in the same tab
   const handlePayment = async () => {
@@ -254,15 +258,23 @@ export default function CoursesDetails() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
+               <div className="flex flex-col gap-4 items-start">
                 <div className="text-3xl font-bold text-gray-900">${price}</div>
-                <button
-                  onClick={handlePayment}
-                  disabled={isProcessing}
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-                >
-                  {isProcessing ? 'Processing...' : 'Buy Now'}
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handlePayment}
+                    disabled={isProcessing}
+                    className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  >
+                    {isProcessing ? 'Processing...' : 'Buy Now'}
+                  </button>
+                  <button
+                    onClick={handlePaymobPayment}
+                    className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    Buy with Paymob
+                  </button>
+                </div>
               </div>
             </div>
           </div>

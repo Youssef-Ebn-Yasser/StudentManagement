@@ -45,6 +45,7 @@ import ChatRoom from '../component/StudentDashboard/ChatRoom'
 import TChatRoom from '../component/TeacherProfile/TChatRoom'
 import StudentAnswers from '@/component/TeacherProfile/teacherMange/StudentAnswers'
 import StudentQuizStats from '@/component/StudentDashboard/StudentQuizStats'
+import PaymobCheckout from '@/component/CoursesDetails/PaymobCheckout'
 
 
 const routesConfig = [
@@ -100,6 +101,12 @@ const routesConfig = [
     {
         path: 'studentprofilee',
         element: <StudentProfile2 />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'courses/course/:id/paymob-checkout',
+        element: <PaymobCheckout/>,
         isProtected: false,
         accessRole: 'all',
     },
