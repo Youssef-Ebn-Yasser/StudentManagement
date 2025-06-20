@@ -1,6 +1,4 @@
-﻿using Backend.Entities.QuizeEntities;
-
-namespace Backend.Entities;
+﻿namespace Backend.Entities;
 
 public class Lesson : BaseEntity
 {

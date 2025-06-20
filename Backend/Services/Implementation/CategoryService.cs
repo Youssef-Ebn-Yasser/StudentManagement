@@ -10,8 +10,6 @@ public class CategoryService : ResponseHandler, ICategoryService
     private readonly IMapper _mapper;
     private readonly IStringLocalizer _localizer;
     private readonly IStructuredLogger _logger;
-
-
     #endregion
 
     #region   Constructor
@@ -28,15 +26,35 @@ public class CategoryService : ResponseHandler, ICategoryService
     #endregion
 
     #region   Method
-    private async Task<bool> _isNameExist(string name)
+    public async Task<Response<List<CategoryDto>>> GetAllAsync()
     {
-        var exist = await _unitOfWork.Repository<Student>()
-                                           .GetTableNoTracking()
-                                           .AnyAsync(s => GeneralLocalizableEntity.Localized(s.NameAr, s.NameEn) == name && s.IsDeleted == false);
+        var allCategories = await _unitOfWork.Repository<Category>()
+                                                          .GetTableNoTracking()
+                                                          .Where(c => !c.IsDeleted)
+                                                          .ToListAsync();
 
-        return exist;
+        if (allCategories == null)
+        {
+            _logger.LogInfo("No Category Exist");
+            return BadRequest<List<CategoryDto>>("No Category Found");
+        }
+
+        var mapped = _mapper.Map<List<CategoryDto>>(allCategories);
+        return Success(mapped);
     }
 
+    public async Task<Response<CategoryDto>> GetByIdAsync(int id)
+    {
+        var category = await _unitOfWork.Repository<Category>().GetByIdAsync(id);
+        if (category == null || category.IsDeleted)
+        {
+            _logger.LogInfo($"No Category with this Id = {id} found");
+            return NotFound<CategoryDto>("Category not found");
+        }
+
+        var mapped = _mapper.Map<CategoryDto>(category);
+        return Success(mapped);
+    }
     public async Task<Response<string>> CreateAsync(CreateCategoryDto dto)
     {
         var IsExistCategory = await _isNameExist(dto.Name);
@@ -58,44 +76,7 @@ public class CategoryService : ResponseHandler, ICategoryService
 
         _logger.LogInfo("Create category done successfully");
         return Success("Category Created Successfully");
-
     }
-
-    public async Task<Response<string>> DeleteAsync(int id)
-    {
-        var category = await _unitOfWork.Repository<Category>().GetByIdAsync(id);
-        if (category == null)
-            return NotFound<string>("Category not found");
-
-        category.IsDeleted = true;
-        _unitOfWork.Repository<Category>().Delete(category);
-        _unitOfWork.Complete();
-
-        return Success("Category deleted successfully");
-    }
-
-    public async Task<Response<List<CategoryDto>>> GetAllAsync()
-    {
-        var allCategories = await _unitOfWork.Repository<Category>()
-                                                          .GetTableNoTracking()
-                                                          .Where(c => !c.IsDeleted)
-                                                          .ToListAsync();
-
-
-        var mapped = _mapper.Map<List<CategoryDto>>(allCategories);
-        return Success(mapped);
-    }
-
-    public async Task<Response<CategoryDto>> GetByIdAsync(int id)
-    {
-        var category = await _unitOfWork.Repository<Category>().GetByIdAsync(id);
-        if (category == null || category.IsDeleted)
-            return NotFound<CategoryDto>("Category not found");
-
-        var mapped = _mapper.Map<CategoryDto>(category);
-        return Success(mapped);
-    }
-
     public async Task<Response<string>> UpdateAsync(int id, UpdateCategoryDto dto)
     {
         var category = await _unitOfWork.Repository<Category>().GetByIdAsync(id);
@@ -108,6 +89,29 @@ public class CategoryService : ResponseHandler, ICategoryService
 
         return Success("Category updated successfully");
     }
-    #endregion
+    public async Task<Response<string>> DeleteAsync(int id)
+    {
+        var category = await _unitOfWork.Repository<Category>().GetByIdAsync(id);
+        if (category == null)
+        {
+            _logger.LogInfo($"Category with this id = {id} not found");
+            return NotFound<string>("Category not found");
+        }
 
+        if (category.Courses != null && category.Courses.Any()) return BadRequest<string>("Can not delete this category has an courses");
+
+        category.IsDeleted = true;
+        _unitOfWork.Complete();
+
+        return Success("Category deleted successfully");
+    }
+    private async Task<bool> _isNameExist(string name)
+    {
+        var exist = await _unitOfWork.Repository<Student>()
+                                           .GetTableNoTracking()
+                                           .AnyAsync(s => GeneralLocalizableEntity.Localized(s.NameAr, s.NameEn) == name && s.IsDeleted == false);
+
+        return exist;
+    }
+    #endregion
 }

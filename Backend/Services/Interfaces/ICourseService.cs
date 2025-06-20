@@ -6,7 +6,7 @@ public interface ICourseService
 {
     public Task<Response<ShowCourseDto>> GetCourseByIdAsync(int id);
     public Task<Response<List<ShowAllCoursesDto>>> GetAllAsync();
-    public Task<Response<List<HomeCourses>>> GetAllByCategoryAsync(string categoryName);
+    public Task<Response<List<HomeCourses>>> GetAllByCategoryAsync(int categoryId);
 
     public Task<Response<PaginateResult<HomeCourses>>> GetPaginatedCourse(int pageNumber, int pageSize, enOrderBy? orderBy = null);
     public Task<Response<string>> CreateAsync(CreateCourseDto createCourseDto);

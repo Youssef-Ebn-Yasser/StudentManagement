@@ -1,4 +1,6 @@
-﻿namespace Backend.Mapping;
+﻿using System.Text.RegularExpressions;
+
+namespace Backend.Mapping;
 
 public class TeacherMapping : Profile
 {
@@ -6,6 +8,8 @@ public class TeacherMapping : Profile
     {
         // Teacher to ShowAllTeacherDto mapping with Courses
         CreateMap<Teacher, ShowAllTeacherDto>()
+           .ForMember(dest => dest.Name,
+                      opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.NameAr, src.NameEn)))
             .ForMember(dest => dest.coursesProfiles,
                       opt => opt.MapFrom(src => src.Courses));
 
@@ -19,9 +23,30 @@ public class TeacherMapping : Profile
 
         // Other mappings
         CreateMap<Teacher, TeacherProfileDto>();
-        CreateMap<Teacher, GetTeacherDto>();
-        CreateMap<CreateTeacherDto, Teacher>();
-        CreateMap<UpdateTeacherDto, Teacher>();
+        CreateMap<Teacher, GetTeacherDto>()
+                            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.NameAr, src.NameEn)))
+                            .ForMember(dest => dest.AdditionalInfo, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.AdditionalInfoAr, src.AdditionalInfoEn)))
+                            .ForMember(dest => dest.Specialization, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.SpecializationAr, src.SpecializationEn)));
 
+        CreateMap<UpdateTeacherDto, Teacher>()
+        .AfterMap((src, dest) =>
+        {
+            if (IsArabic(src.Name))
+            {
+                dest.AdditionalInfoAr = src.AdditionalInfo;
+                dest.NameAr = src.Name;
+                dest.SpecializationAr = src.Specialization;
+            }
+            else
+            {
+                dest.NameEn = src.Name;
+                dest.AdditionalInfoEn = string.Empty;
+                dest.SpecializationEn = src.Specialization;
+            }
+        });
+    }
+    private static bool IsArabic(string text)
+    {
+        return !string.IsNullOrWhiteSpace(text) && Regex.IsMatch(text, @"\p{IsArabic}");
     }
 }

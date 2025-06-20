@@ -1,55 +1,54 @@
 ﻿using Backend.DTOs.CategoryDTOOS;
 using System.Text.RegularExpressions;
 
-namespace Backend.Mapping
+namespace Backend.Mapping;
+
+public class CategoryProfile : Profile
 {
-    public class CategoryProfile : Profile
+    public CategoryProfile()
     {
-        public CategoryProfile()
-        {
-            // Entity to DTO (Reading)
-            CreateMap<Category, CategoryDto>()
-                .ForMember(dest => dest.Name,
-                           opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.CategoryNameAr, src.CategoryNameEn)));
+        // Entity to DTO (Reading)
+        CreateMap<Category, CategoryDto>()
+            .ForMember(dest => dest.Name,
+                       opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.CategoryNameAr, src.CategoryNameEn)));
 
-            // Create DTO to Entity (Writing)
-            CreateMap<CreateCategoryDto, Category>()
-                .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => false))
-                .AfterMap((src, dest) =>
+        // Create DTO to Entity (Writing)
+        CreateMap<CreateCategoryDto, Category>()
+            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => false))
+            .AfterMap((src, dest) =>
+            {
+                if (IsArabic(src.Name))
                 {
-                    if (IsArabic(src.Name))
-                    {
-                        dest.CategoryNameAr = src.Name;
-                        dest.CategoryNameEn = string.Empty;
-                    }
-                    else
-                    {
-                        dest.CategoryNameEn = src.Name;
-                        dest.CategoryNameAr = string.Empty;
-                    }
-                });
-
-            // Update DTO to Entity (Writing)
-            CreateMap<UpdateCategoryDto, Category>()
-                .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
-                .AfterMap((src, dest) =>
+                    dest.CategoryNameAr = src.Name;
+                    dest.CategoryNameEn = string.Empty;
+                }
+                else
                 {
-                    if (IsArabic(src.Name))
-                    {
-                        dest.CategoryNameAr = src.Name;
-                        dest.CategoryNameEn = string.Empty;
-                    }
-                    else
-                    {
-                        dest.CategoryNameEn = src.Name;
-                        dest.CategoryNameAr = string.Empty;
-                    }
-                });
-        }
+                    dest.CategoryNameEn = src.Name;
+                    dest.CategoryNameAr = string.Empty;
+                }
+            });
 
-        private static bool IsArabic(string text)
-        {
-            return !string.IsNullOrWhiteSpace(text) && Regex.IsMatch(text, @"\p{IsArabic}");
-        }
+        // Update DTO to Entity (Writing)
+        CreateMap<UpdateCategoryDto, Category>()
+            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
+            .AfterMap((src, dest) =>
+            {
+                if (IsArabic(src.Name))
+                {
+                    dest.CategoryNameAr = src.Name;
+                    dest.CategoryNameEn = string.Empty;
+                }
+                else
+                {
+                    dest.CategoryNameEn = src.Name;
+                    dest.CategoryNameAr = string.Empty;
+                }
+            });
+    }
+
+    private static bool IsArabic(string text)
+    {
+        return !string.IsNullOrWhiteSpace(text) && Regex.IsMatch(text, @"\p{IsArabic}");
     }
 }
