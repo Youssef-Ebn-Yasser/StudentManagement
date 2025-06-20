@@ -289,23 +289,27 @@ public class AuthenticationService : IAuthenticationService
         return _responseHandler.Success("Password has been reset successfully");
     }
 
+
+    private async Task<List<Claim>> GetClaims(User user)
+    {
+        var roles = await _userManager.GetRolesAsync(user);
+        var claims = new List<Claim>()
+        {
+            new Claim(ClaimTypes.Name,user.UserName!),
+            new Claim(ClaimTypes.NameIdentifier,user.UserName!),
+            new Claim(ClaimTypes.Email,user.Email!),
+        };
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+        var userClaims = await _userManager.GetClaimsAsync(user);
+        claims.AddRange(userClaims);
+        return claims;
+    }
     private async Task<TokenDto> GenerateJwtToken(User user)
     {
-        var userRoles = await _userManager.GetRolesAsync(user);
-
-        var authClaims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email ?? string.Empty),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty)
-        };
-
-        foreach (var userRole in userRoles)
-        {
-            authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-        }
+        var claims = await GetClaims(user);
 
         var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
 
@@ -313,7 +317,7 @@ public class AuthenticationService : IAuthenticationService
             issuer: _jwtSettings.Issuer,
             audience: _jwtSettings.Audience,
             expires: DateTime.Now.AddMinutes(_jwtSettings.DurationInMinutes),
-            claims: authClaims,
+            claims: claims,
             signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
         );
 
