@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { courseService } from '../../services/courseService';
-import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook, FaClipboardList, FaTrash, FaEdit, FaChartLine, FaCalendarAlt, FaTag, FaFileAlt, FaVideo } from 'react-icons/fa';
+import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook, FaClipboardList, FaTrash, FaEdit, FaChartLine, FaCalendarAlt, FaTag, FaFileAlt, FaVideo, FaChartBar } from 'react-icons/fa';
 import Loader from '../Loader/Loader';
 import { toast } from 'react-toastify';
 import axios from 'axios';
@@ -357,6 +357,13 @@ const TeacherCourseDetails = () => {
                 </div>
                 <div className="flex gap-2">
                   <button
+                    onClick={() => navigate(`/teacher/course/${courseId}/quiz-stats`)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  >
+                    <FaChartBar className="inline-block mr-2" />
+                    Quiz Stats
+                  </button>
+                  <button
                     onClick={() => navigate('/teacher/course/edit', { state: { courseId: course.id } })}
                     className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                   >
@@ -485,182 +492,205 @@ const TeacherCourseDetails = () => {
 
               {course.lessonInfo?.length > 0 ? (
                 <div className="space-y-6">
-                  {course.lessonInfo.map((lesson, index) => (
-                    <div
-                      key={lesson.id}
-                      className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-semibold">
-                              {index + 1}
-                            </span>
-                            <h3 className="text-xl font-semibold text-gray-900">{lesson.title}</h3>
-                          </div>
-                          <span>{lesson.id}</span>
-                          <p className="text-gray-600 mb-4 ml-11">{lesson.description}</p>
-                          {lesson.duration && (
-                            <div className="ml-11 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium inline-block mb-2">
-                              {lesson.duration} minutes
+                  {course.lessonInfo.map((lesson, index) => {
+                    console.log(`Full Lesson Object for ${lesson.title}:`, lesson);
+                    console.log(`Lesson ID for ${lesson.title}:`, lesson.id);
+                    return (
+                      <div
+                        key={lesson.id}
+                        className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-semibold">
+                                {index + 1}
+                              </span>
+                              <h3 className="text-xl font-semibold text-gray-900">{lesson.title}</h3>
                             </div>
-                          )}
-                          {lesson.difficulty && (
-                            <div className="ml-11 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium inline-block mb-2">
-                              {lesson.difficulty}
-                            </div>
-                          )}
+                            <p className="text-gray-600 mb-4 ml-11">{lesson.description}</p>
+                            {lesson.duration && (
+                              <div className="ml-11 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium inline-block mb-2">
+                                {lesson.duration} minutes
+                              </div>
+                            )}
+                            {lesson.difficulty && (
+                              <div className="ml-11 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium inline-block mb-2">
+                                {lesson.difficulty}
+                              </div>
+                            )}
 
-                          {/* Create Quiz Button */}
-                          <div className="ml-11 mb-2">
+                            {/* Create Quiz Button */}
+                            <div className="ml-11 mb-2 flex gap-2">
+                              <button
+                                onClick={() => navigate('/teacher/manage-quiz')}
+                                className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 flex items-center gap-2"
+                              >
+                                <FaClipboardList className="text-lg" />
+                                Create Quiz
+                              </button>
+                              {lesson.id ? (
+                                <button
+                                  onClick={() => {
+                                    console.log('Navigating to lesson stats with ID:', String(lesson.id));
+                                    navigate(`/teacher/lesson/${String(lesson.id)}/quiz-stats`);
+                                  }}
+                                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center gap-2"
+                                >
+                                  <FaChartBar className="text-lg" />
+                                  Quiz Statistics
+                                </button>
+                              ) : (
+                                <button
+                                  disabled
+                                  className="bg-gray-400 text-white px-4 py-2 rounded cursor-not-allowed flex items-center gap-2"
+                                >
+                                  <FaChartBar className="text-lg" />
+                                  Quiz Statistics (ID missing)
+                                </button>
+                              )}
+                            </div>
+
+                            {/* Materials Section */}
+                            <div className="ml-11 mt-4">
+                              <div className="flex items-center justify-between mb-3">
+                                <h4 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
+                                  <FaFileAlt className="text-blue-500" />
+                                  Materials
+                                </h4>
+                                <button
+                                  onClick={() => navigate('/teacher/course/lesson/material/new', { state: { courseId: course.id, lessonId: lesson.id } })}
+                                  className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 flex items-center gap-2"
+                                >
+                                  <FaFileAlt className="text-sm" />
+                                  Add Material
+                                </button>
+                              </div>
+
+                              {lessonMaterials[lesson.id]?.length > 0 ? (
+                                <div className="space-y-3">
+                                  {lessonMaterials[lesson.id].map((material) => (
+                                    <div
+                                      key={material.id}
+                                      className="bg-gray-50 p-3 rounded-lg flex items-center justify-between"
+                                    >
+                                      {editingMaterial?.id === material.id ? (
+                                        <form onSubmit={handleEditSubmit} className="flex-1">
+                                          <div className="space-y-3">
+                                            <input
+                                              type="text"
+                                              value={editingMaterial.title}
+                                              onChange={(e) => setEditingMaterial(prev => ({ ...prev, title: e.target.value }))}
+                                              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                              placeholder="Material Title"
+                                              required
+                                            />
+                                            <textarea
+                                              value={editingMaterial.content}
+                                              onChange={(e) => setEditingMaterial(prev => ({ ...prev, content: e.target.value }))}
+                                              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                              placeholder="Material Content"
+                                              rows="3"
+                                              required
+                                            />
+                                            <div className="flex items-center gap-2">
+                                              <label className="text-sm text-gray-600">Material Type:</label>
+                                              <select
+                                                value={editingMaterial.type || 1}
+                                                onChange={(e) => setEditingMaterial(prev => ({ ...prev, type: parseInt(e.target.value) }))}
+                                                className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                              >
+                                                <option value={1}>Regular Material</option>
+                                                <option value={2}>Assignment</option>
+                                              </select>
+                                            </div>
+                                            <div>
+                                              <label className="block text-sm text-gray-600 mb-1">Update File (Optional)</label>
+                                              <input
+                                                type="file"
+                                                onChange={handleFileChange}
+                                                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                              />
+                                            </div>
+                                            <div className="flex justify-end gap-2">
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  setEditingMaterial(null);
+                                                  setMaterialFile(null);
+                                                }}
+                                                className="px-3 py-1 text-gray-600 hover:text-gray-800"
+                                                disabled={isUpdating}
+                                              >
+                                                Cancel
+                                              </button>
+                                              <button
+                                                type="submit"
+                                                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+                                                disabled={isUpdating}
+                                              >
+                                                {isUpdating ? 'Updating...' : 'Save Changes'}
+                                              </button>
+                                            </div>
+                                          </div>
+                                        </form>
+                                      ) : (
+                                        <>
+                                          <div className="flex items-center gap-3">
+                                            <FaFileAlt className="text-gray-500" />
+                                            <div>
+                                              <h5 className="font-medium text-gray-800">{material.title}</h5>
+                                              <p className="text-sm text-gray-600">{material.content}</p>
+                                            </div>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            {material.data && (
+                                              <a
+                                                href={material.data}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-500 hover:text-blue-600 flex items-center gap-1"
+                                              >
+                                                <FaFileAlt className="text-sm" />
+                                                View
+                                              </a>
+                                            )}
+                                            <button
+                                              onClick={() => handleEditClick(material)}
+                                              className="text-gray-500 hover:text-gray-600"
+                                            >
+                                              <FaEdit />
+                                            </button>
+                                            <button
+                                              onClick={() => handleDeleteMaterial(material.id)}
+                                              className="text-red-500 hover:text-red-600"
+                                            >
+                                              <FaTrash />
+                                            </button>
+                                          </div>
+                                        </>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <p className="text-gray-500 text-sm">No materials uploaded yet</p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-center gap-2">
                             <button
-                              onClick={() => navigate(`/createquiz?lessonId=${lesson.id}`)}
-                              className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 flex items-center gap-2"
+                              onClick={() => handleDeleteLesson(lesson.id)}
+                              className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition-colors duration-200"
+                              title="Delete Lesson"
                             >
-                              <FaClipboardList className="text-lg" />
-                              Create Quiz
+                              <FaTrash className="text-lg" />
                             </button>
                           </div>
-
-                          {/* Materials Section */}
-                          <div className="ml-11 mt-4">
-                            <div className="flex items-center justify-between mb-3">
-                              <h4 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
-                                <FaFileAlt className="text-blue-500" />
-                                Materials
-                              </h4>
-                              <button
-                                onClick={() => navigate('/teacher/course/lesson/material/new', { state: { courseId: course.id, lessonId: lesson.id } })}
-                                className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 flex items-center gap-2"
-                              >
-                                <FaFileAlt className="text-sm" />
-                                Add Material
-                              </button>
-                            </div>
-
-                            {lessonMaterials[lesson.id]?.length > 0 ? (
-                              <div className="space-y-3">
-                                {lessonMaterials[lesson.id].map((material) => (
-                                  <div
-                                    key={material.id}
-                                    className="bg-gray-50 p-3 rounded-lg flex items-center justify-between"
-                                  >
-                                    {editingMaterial?.id === material.id ? (
-                                      <form onSubmit={handleEditSubmit} className="flex-1">
-                                        <div className="space-y-3">
-                                          <input
-                                            type="text"
-                                            value={editingMaterial.title}
-                                            onChange={(e) => setEditingMaterial(prev => ({ ...prev, title: e.target.value }))}
-                                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            placeholder="Material Title"
-                                            required
-                                          />
-                                          <textarea
-                                            value={editingMaterial.content}
-                                            onChange={(e) => setEditingMaterial(prev => ({ ...prev, content: e.target.value }))}
-                                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            placeholder="Material Content"
-                                            rows="3"
-                                            required
-                                          />
-                                          <div className="flex items-center gap-2">
-                                            <label className="text-sm text-gray-600">Material Type:</label>
-                                            <select
-                                              value={editingMaterial.type || 1}
-                                              onChange={(e) => setEditingMaterial(prev => ({ ...prev, type: parseInt(e.target.value) }))}
-                                              className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            >
-                                              <option value={1}>Regular Material</option>
-                                              <option value={2}>Assignment</option>
-                                            </select>
-                                          </div>
-                                          <div>
-                                            <label className="block text-sm text-gray-600 mb-1">Update File (Optional)</label>
-                                            <input
-                                              type="file"
-                                              onChange={handleFileChange}
-                                              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            />
-                                          </div>
-                                          <div className="flex justify-end gap-2">
-                                            <button
-                                              type="button"
-                                              onClick={() => {
-                                                setEditingMaterial(null);
-                                                setMaterialFile(null);
-                                              }}
-                                              className="px-3 py-1 text-gray-600 hover:text-gray-800"
-                                              disabled={isUpdating}
-                                            >
-                                              Cancel
-                                            </button>
-                                            <button
-                                              type="submit"
-                                              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-                                              disabled={isUpdating}
-                                            >
-                                              {isUpdating ? 'Updating...' : 'Save Changes'}
-                                            </button>
-                                          </div>
-                                        </div>
-                                      </form>
-                                    ) : (
-                                      <>
-                                        <div className="flex items-center gap-3">
-                                          <FaFileAlt className="text-gray-500" />
-                                          <div>
-                                            <h5 className="font-medium text-gray-800">{material.title}</h5>
-                                            <p className="text-sm text-gray-600">{material.content}</p>
-                                          </div>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                          {material.data && (
-                                            <a
-                                              href={material.data}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className="text-blue-500 hover:text-blue-600 flex items-center gap-1"
-                                            >
-                                              <FaFileAlt className="text-sm" />
-                                              View
-                                            </a>
-                                          )}
-                                          <button
-                                            onClick={() => handleEditClick(material)}
-                                            className="text-gray-500 hover:text-gray-600"
-                                          >
-                                            <FaEdit />
-                                          </button>
-                                          <button
-                                            onClick={() => handleDeleteMaterial(material.id)}
-                                            className="text-red-500 hover:text-red-600"
-                                          >
-                                            <FaTrash />
-                                          </button>
-                                        </div>
-                                      </>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <p className="text-gray-500 text-sm">No materials uploaded yet</p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                          <button
-                            onClick={() => handleDeleteLesson(lesson.id)}
-                            className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition-colors duration-200"
-                            title="Delete Lesson"
-                          >
-                            <FaTrash className="text-lg" />
-                          </button>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <p className="text-gray-500 text-center py-4">No lessons available</p>

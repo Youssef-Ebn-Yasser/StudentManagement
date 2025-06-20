@@ -43,6 +43,9 @@ import ManageAssignments from '@/component/TeacherProfile/teacherMange/ManageAss
 import TeacherStudents from '../component/TeacherProfile/TeacherStudents'
 import ChatRoom from '../component/StudentDashboard/ChatRoom'
 import TChatRoom from '../component/TeacherProfile/TChatRoom'
+import StudentAnswers from '@/component/TeacherProfile/teacherMange/StudentAnswers'
+import StudentQuizStats from '@/component/StudentDashboard/StudentQuizStats'
+
 
 const routesConfig = [
     { path: '', element: <Home />, isProtected: false, accessRole: 'all' },
@@ -109,6 +112,12 @@ const routesConfig = [
     {
         path: 'studentdashboard/lesson/:lessonId/quiz',
         element: <QuizView />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'studentdashboard/course/:courseId/quiz-stats',
+        element: <StudentQuizStats />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -229,6 +238,12 @@ const routesConfig = [
     {
         path: 'teacher/review-student-answers',
         element: <ReviewStudentAnswers />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'teacher/review-student-answers/:answerId',
+        element: <StudentAnswers />,
         isProtected: false,
         accessRole: 'all',
     },
