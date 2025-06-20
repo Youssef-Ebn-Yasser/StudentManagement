@@ -6,8 +6,8 @@ public class UpdateTeacherDto
     [Required]
     public string Name { get; set; }
     public byte? Age { get; set; }
-    [Required]
-    public string Specialization { get; set; }
+    public string? Specialization { get; set; }
+    public string? AdditionalInfo { get; set; }
     [Required]
     [Phone]
     public string? Phone { get; set; }

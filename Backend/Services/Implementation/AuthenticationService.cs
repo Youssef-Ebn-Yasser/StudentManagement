@@ -1,5 +1,4 @@
 using Backend.DTOs.AuthDTOs;
-using Backend.Settings;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
@@ -172,7 +171,7 @@ public class AuthenticationService : IAuthenticationService
         //var userExists = await _userManager.FindByEmailAsync(model.Email);
 
         var userExists = await _unitOfWork.Repository<User>().GetTableNoTracking().FirstOrDefaultAsync(u => u.Email == model.Email);
-        if (userExists != null && GeneralLocalizableEntity.Localized(userExists.UserTypeAr,userExists.UserTypeEn) == role)
+        if (userExists != null && userExists.UserType == role)
         {
             return _responseHandler.BadRequest<TokenDto>("User already exists");
         }
@@ -382,7 +381,7 @@ public class AuthenticationService : IAuthenticationService
         var userDto = new UserDto
         {
             Id = user.Id,
-            Name = GeneralLocalizableEntity.Localized(user.NameAr,user.NameEn),
+            Name = GeneralLocalizableEntity.Localized(user.NameAr, user.NameEn),
             Email = user.Email,
             Phone = user.PhoneNumber,
             CreatedAt = user.CreatedAt,
