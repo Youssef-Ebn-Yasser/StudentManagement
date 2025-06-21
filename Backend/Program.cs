@@ -1,5 +1,6 @@
 using AspNetCore.JsonLocalization;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +19,7 @@ builder.Services.AddConnectionDependency(builder.Configuration)
                 .AddClassesDependencies();
 
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<IPaymobService,PaymobService>();
+builder.Services.AddScoped<IPaymobService, PaymobService>();
 builder.Services.AddScoped<IReportServices, ReportServices>();
 
 #region Payment stripe
@@ -153,7 +154,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 #region   localization
-app.UseRequestLocalization();
+var locOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>();
+app.UseRequestLocalization(locOptions.Value);
+//app.UseRequestLocalization();
 #endregion
 
 // Map SignalR Hub

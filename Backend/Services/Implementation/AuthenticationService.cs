@@ -326,7 +326,8 @@ public class AuthenticationService : IAuthenticationService
         {
             Token = new JwtSecurityTokenHandler().WriteToken(token),
             Expiration = token.ValidTo,
-            RefreshToken = refreshToken.Token
+            RefreshToken = refreshToken.Token,
+            Type = user.UserType,
         };
     }
 
@@ -346,7 +347,8 @@ public class AuthenticationService : IAuthenticationService
             ExpiryDate = DateTime.Now.AddDays(7), // Refresh token valid for 7 days
             IsUsed = false,
             IsRevoked = false,
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.Now,
+
         };
 
         // Save to database
