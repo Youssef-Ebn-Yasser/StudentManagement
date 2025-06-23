@@ -6,8 +6,11 @@ import { useState } from 'react'
 import { GoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+
 
 function Login() {
+    const { t } = useTranslation();
     const { loading, formik, error, handleGoBack } = useLogin()
     const [passwordVisible, setPasswordVisible] = useState(false)
 
@@ -36,8 +39,8 @@ function Login() {
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
                                         id="Email"
-                                        placeholder="Enter your email"
                                         required
+                                        placeholder={t('enter_your_email')}
                                     />
                                     {formik.touched.Email &&
                                     formik.errors.Email ? (
@@ -59,7 +62,7 @@ function Login() {
                                             onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
                                             id="Password"
-                                            placeholder="Password"
+                                            placeholder={t('password')}
                                             required
                                         />
                                         <i
@@ -81,7 +84,7 @@ function Login() {
                                     )}
                                     <button className="text-gray-400 hover:cursor-pointer hover:underline transition-all duration-300 ease">
                                         <Link to={'/auth/forgetpassword'}>
-                                            Forget my password?
+                                            {t('forget_my_password')}
                                         </Link>
                                     </button>
                                 </div>
@@ -91,7 +94,7 @@ function Login() {
                                         className="bg-blue-600 text-white px-6 py-2 rounded text-xl  hover:cursor-pointer hover:shadow-sm hover:shadow-blue-500 transition-all duration-300 ease"
                                         type="submit"
                                     >
-                                        {loading ? <Loader /> : 'Login'}
+                                        {loading ? <Loader /> : t('login')}
                                     </button>
                                 </div>
 
@@ -129,31 +132,31 @@ function Login() {
                                                         window.location.href = '/';
                                                     }
                                                 } else {
-                                                    toast.error(response.data.messages?.[0] || 'Google login failed.');
+                                                    toast.error(response.data.messages?.[0] || t('google_login_failed'));
                                                 }
                                             } catch (error) {
                                                 console.error('Google login API error:', error);
                                                 if (error.response?.data?.messages?.[0]) {
                                                     toast.error(error.response.data.messages[0]);
                                                 } else {
-                                                    toast.error('Error during Google login. Please try again.');
+                                                    toast.error(t('error_during_google_login'));
                                                 }
                                             }
                                         }}
                                         onError={() => {
-                                            toast.error('Google login failed. Please try again.');
+                                            toast.error(t('error_during_google_login'));
                                         }}
                                     />
                                 </div>
 
                                 <div className="">
                                     <p className="m-0 text-secondary text-center">
-                                        Not Register Yet?{' '}
+                                        {t('not_register_yet')}{' '}
                                         <Link
                                             to={'/auth/register'}
                                             className="text-blue-600 hover:underline transition-all duration-300 ease"
                                         >
-                                            Sign up
+                                            {t('sign_up')}
                                         </Link>
                                     </p>
                                 </div>

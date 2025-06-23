@@ -1,0 +1,15 @@
+{
+  "welcome": "Welcome to our application!",
+  "greeting": "Hello, world!",
+  "change_language": "Change Language",
+  "direction": "ltr",
+  "enter_your_email": "Enter Your Email",
+  "password": "Password",
+  "forget_my_password": "Forget my password?",
+  "login": "Login",
+  "not_register_yet": "Not Register Yet?",
+  "sign_up": "Sign up",
+  "student_image_alt": "Student registration image",
+  "google_login_failed":"Google login failed.",
+  "error_during_google_login":"Error during Google login. Please try again."
+}

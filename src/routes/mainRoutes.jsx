@@ -46,6 +46,7 @@ import TChatRoom from '../component/TeacherProfile/TChatRoom'
 import StudentAnswers from '@/component/TeacherProfile/teacherMange/StudentAnswers'
 import StudentQuizStats from '@/component/StudentDashboard/StudentQuizStats'
 import PaymobCheckout from '@/component/CoursesDetails/PaymobCheckout'
+import Translate from '@/component/Translate/Translate'
 
 
 const routesConfig = [
@@ -327,6 +328,12 @@ const routesConfig = [
         accessRole: 'all',
     },
     ...teacherRoutes,
+    {
+        path: 'translate',
+        element: <Translate/>,
+        isProtected: false,
+        accessRole: 'all',
+    },
 ]
 
 const mainRoutes = [

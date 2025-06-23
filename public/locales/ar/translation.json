@@ -1,0 +1,16 @@
+{
+  "welcome": "مرحبًا بك في تطبيقنا!",
+  "greeting": "مرحباً بالعالم!",
+  "change_language": "تغيير اللغة",
+  "direction": "rtl",
+  "enter_your_email": "أدخل بريدك الإلكتروني",
+  "password": "كلمة المرور",
+  "forget_my_password": "هل نسيت كلمة المرور؟",
+  "login": "تسجيل الدخول",
+  "not_register_yet": "ليس لديك حساب بعد؟",
+  "sign_up": "اشترك",
+  "student_image_alt": "صورة تسجيل الطلاب",
+  "google_login_failed": "فشل اثناء تسجيل الدخول باستخدام جوجل",
+  "error_during_google_login":"حدث خطأ أثناء تسجيل الدخول باستخدام جوجل"
+  
+}
