@@ -29,35 +29,39 @@ namespace Backend.Services.Implementation
 
             return data;
         }
-
         public async Task<List<CourseEnrollmentReportDto>> GetCourseEnrollmentStatsAsync(bool isArabic = false)
         {
             var report = await _context.Courses
-                       .Select(c => new CourseEnrollmentReportDto
-        {
-            CourseId = c.Id,
-            CourseName = c.Title,
-            StudentsCount = c.StudentCourses.Count(sc => !sc.IsDeleted)
-        })
-        .ToListAsync();
+                .Select(c => new CourseEnrollmentReportDto
+                {
+                    CourseId = c.Id,
+                    CourseName = isArabic ? c.TitleAr : c.TitleEn,
+                    StudentsCount = c.StudentCourses.Count(sc => !sc.IsDeleted)
+                })
+                .ToListAsync();
 
             return report;
         }
 
 
+
         public async Task<List<CourseRevenueReportDto>> GetCourseRevenuesAsync(bool isArabic = false)
         {
             var data = await _context.Payments
-          .Where(p => p.Status == "Paid") // عدل حسب حالتك
-          .GroupBy(p => new { p.CourseId, p.Course.Title })
-          .Select(g => new CourseRevenueReportDto
-          {
-              CourseId = g.Key.CourseId ?? 0,
-              CourseName = g.Key.Title,
-              TotalRevenue = g.Sum(x => (decimal)x.Amount),
-              PaymentsCount = g.Count()
-          })
-          .ToListAsync();
+                .Where(p => p.StatusEn == "Paid")
+                .GroupBy(p => new
+                {
+                    p.CourseId,
+                    Title = isArabic ? p.Course.TitleAr : p.Course.TitleEn
+                })
+                .Select(g => new CourseRevenueReportDto
+                {
+                    CourseId = g.Key.CourseId ?? 0,
+                    CourseName = g.Key.Title,
+                    TotalRevenue = g.Sum(x => (decimal)x.Amount),
+                    PaymentsCount = g.Count()
+                })
+                .ToListAsync();
 
             return data;
         }
@@ -70,15 +74,15 @@ namespace Backend.Services.Implementation
             var firstDayOfMonth = new DateTime(now.Year, now.Month, 1);
 
             var totalUsers = await _context.Users.CountAsync();
-            var totalStudents = await _unitOfWork.Repository<Student>().GetTableNoTracking().CountAsync();
-            var totalTeachers = await _unitOfWork.Repository<Teacher>().GetTableNoTracking().CountAsync();
+            var totalStudents = await _context.Students.CountAsync();
+            var totalTeachers = await _context.Teachers.CountAsync();
             var newUsersLast7Days = await _context.Users.CountAsync(u => u.CreatedAt >= last7Days);
 
             var totalCourses = await _context.Courses.CountAsync();
             var totalPayments = await _context.Payments.CountAsync();
 
             var revenueThisMonth = await _context.Payments
-                .Where(p => p.PaymentDate >= firstDayOfMonth && p.Status == "Success")
+                .Where(p => p.PaymentDate >= firstDayOfMonth && p.StatusEn == "Success")
                 .SumAsync(p => (decimal?)p.Amount) ?? 0;
 
             return new DashboardSummaryDto
@@ -92,6 +96,7 @@ namespace Backend.Services.Implementation
                 RevenueThisMonth = revenueThisMonth
             };
         }
+
 
 
         public async Task<List<WeeklyStudentEnrollmentDto>> GetWeeklyNewStudentsAsync()
