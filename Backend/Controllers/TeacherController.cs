@@ -1,58 +1,116 @@
-﻿namespace Backend.Controllers;
+﻿using static Backend.Services.Interfaces.ITeacherService;
+
+namespace Backend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
 public class TeacherController : AppControllerBase
 {
+    #region Fields
     private readonly ITeacherService _teacherService;
-    public TeacherController(ITeacherService teacherService)
+    private readonly IStructuredLogger _logger;
+    #endregion
+
+    #region Constructor
+    public TeacherController(ITeacherService teacherService, IStructuredLogger logger)
     {
         _teacherService = teacherService;
+        _logger = logger;
     }
+    #endregion
+
+    #region Method
     [HttpGet("Teacher/ById/{id}")]
     public async Task<IActionResult> GetTeacherById(int id)
     {
-        var result = await _teacherService.GetByIdAsync(id);
-
-        return NewResult(result);
+        try
+        {
+            var result = await _teacherService.GetByIdAsync(id);
+            return NewResult(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetTeacherById");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
     }
 
     [HttpGet("Teacher/All")]
     public async Task<IActionResult> GetAll()
     {
-        var result = await _teacherService.GetAllAsync();
-        return NewResult(result);
-
+        try
+        {
+            var result = await _teacherService.GetAllAsync();
+            return NewResult(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
     }
+
+    [HttpGet("Teacher/GetPaginated")]
+    public async Task<IActionResult> GetAllPaginated(int pageNumber, int pageSize, enTeacherOrderBy enTeacherOrderBy)
+    {
+        try
+        {
+            var result = await _teacherService.GetAllPaginatedAsync(pageNumber, pageSize, enTeacherOrderBy);
+            return Ok(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAllPaginated Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
+    }
+
     [HttpGet("Teacher/ByName/{name}")]
     public async Task<IActionResult> GetTeacherByName(string name)
     {
-        var result = await _teacherService.GetByNameAsync(name);
+        try
+        {
+            var result = await _teacherService.GetByNameAsync(name);
 
-        return NewResult(result);
+            return NewResult(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetTeacherByName");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
     }
-
-    //[HttpPost("Teacher/Create")]
-    //public async Task<IActionResult> Create(CreateTeacherDto createTeacherDto)
-    //{
-    //    var result = await _teacherService.CreateAsync(createTeacherDto);
-
-    //    return NewResult(result);
-    //}
 
     [HttpPut("Teacher/Update")]
     public async Task<IActionResult> Update(UpdateTeacherDto updateTeacherDto)
     {
-        var result = await _teacherService.UpdateAsync(updateTeacherDto);
+        try
+        {
+            var result = await _teacherService.UpdateAsync(updateTeacherDto);
 
-        return NewResult(result);
+            return NewResult(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in Update Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
     }
 
     [HttpDelete("Teacher/Delete")]
     public async Task<IActionResult> DeleteAll(int id)
     {
-        var result = await _teacherService.DeleteAsync(id);
+        try
+        {
+            var result = await _teacherService.DeleteAsync(id);
 
-        return NewResult(result);
+            return NewResult(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
     }
+    #endregion
 }

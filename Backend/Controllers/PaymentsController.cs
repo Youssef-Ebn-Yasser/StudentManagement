@@ -14,11 +14,18 @@ namespace Backend.Controllers;
 [ApiController]
 public class PaymentsController : ControllerBase
 {
+    #region Fields
     private readonly IUnitOfWork _unitOfWork;
     private readonly StripeSettings _stripeSettings;
     private readonly IConfiguration _config;
+    private readonly IStructuredLogger _logger;
+    #endregion
 
-    public PaymentsController(IUnitOfWork unitOfWork, IOptions<StripeSettings> stripeSettings, IConfiguration config)
+    #region Constructor
+    public PaymentsController(IUnitOfWork unitOfWork, 
+                              IOptions<StripeSettings> stripeSettings, 
+                              IConfiguration config, 
+                              IStructuredLogger logger)
     {
         _unitOfWork = unitOfWork;
         _stripeSettings = stripeSettings?.Value ?? throw new ArgumentNullException(nameof(stripeSettings));
@@ -29,8 +36,11 @@ public class PaymentsController : ControllerBase
 
         StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
         _config = config;
+        _logger = logger;
     }
+    #endregion
 
+    #region Method
     [HttpPost("create-payment-intent")]
     public async Task<ActionResult> CreatePaymentIntent([FromBody] PaymentIntentCreateRequest request)
     {
@@ -190,6 +200,7 @@ public class PaymentsController : ControllerBase
             return StatusCode(500, new { error = $"An unexpected error occurred: {ex.Message}" });
         }
     }
+    #endregion
 }
 
 public class PaymentIntentCreateRequest

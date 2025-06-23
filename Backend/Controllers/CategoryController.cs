@@ -6,16 +6,26 @@ namespace Backend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class CategoryController : ControllerBase
+public class CategoryController : AppControllerBase
 {
+    #region Fields
     private readonly IStringLocalizer<Messages> _localizer;
     private readonly ICategoryService _categoryService;
-    public CategoryController(ICategoryService service, IStringLocalizer<Messages> localizer)
+    private readonly IStructuredLogger _logger;
+    #endregion
+
+    #region Constructor
+    public CategoryController(ICategoryService service,
+                              IStringLocalizer<Messages> localizer,
+                              IStructuredLogger logger)
     {
         _categoryService = service;
         _localizer = localizer;
+        _logger = logger;
     }
+    #endregion
 
+    #region Method
     [HttpGet("testLocaLization")]
     public async Task<IActionResult> testLoca()
     {
@@ -28,35 +38,76 @@ public class CategoryController : ControllerBase
     [HttpGet("GetAll")]
     public async Task<IActionResult> GetAll()
     {
-        var result = await _categoryService.GetAllAsync();
-        return Ok(result);
+        try
+        {
+            var result = await _categoryService.GetAllAsync();
+            return Ok(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var result = await _categoryService.GetByIdAsync(id);
-        return Ok(result);
+        try
+        {
+            var result = await _categoryService.GetByIdAsync(id);
+            return Ok(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoryDto dto)
     {
-        var result = await _categoryService.UpdateAsync(id, dto);
-        return Ok(result);
+        try
+        {
+            var result = await _categoryService.UpdateAsync(id, dto);
+            return Ok(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
     }
 
     [HttpDelete("Delete")]
     public async Task<IActionResult> Delete([FromBody] int id)
     {
-        var result = await _categoryService.DeleteAsync(int.Parse(id.ToString().Trim()));
-        return Ok(result);
+        try
+        {
+            var result = await _categoryService.DeleteAsync(int.Parse(id.ToString().Trim()));
+            return Ok(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
     }
 
     [HttpPost("Create")]
     public async Task<IActionResult> Create([FromBody] CreateCategoryDto dto)
     {
-        var result = await _categoryService.CreateAsync(dto);
-        return Ok(result);
+        try
+        {
+            var result = await _categoryService.CreateAsync(dto);
+            return Ok(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
     }
+    #endregion
 }

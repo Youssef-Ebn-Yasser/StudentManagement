@@ -4,13 +4,20 @@
 [ApiController]
 public class GeminiController : ControllerBase
 {
+    #region Fields
     private readonly GeminiService _gemini;
+    private readonly IStructuredLogger _logger;
+    #endregion
 
-    public GeminiController(GeminiService gemini)
+    #region Constructor
+    public GeminiController(GeminiService gemini, IStructuredLogger logger)
     {
         _gemini = gemini;
+        _logger = logger;
     }
+    #endregion
 
+    #region Method
     [HttpPost("chatboot")]
     public async Task<IActionResult> Chat([FromBody] PromptRequest request)
     {
@@ -22,4 +29,5 @@ public class GeminiController : ControllerBase
     {
         public string Prompt { get; set; } = string.Empty;
     }
+    #endregion
 }

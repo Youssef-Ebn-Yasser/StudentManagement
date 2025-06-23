@@ -9,14 +9,19 @@ public class CourseService : ResponseHandler, ICourseService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IPhysicalFileUpload _physicalFileUpload;
+    private readonly IStructuredLogger _logger;
     #endregion
 
     #region   Counstructor
-    public CourseService(IUnitOfWork unitOfWork, IMapper mapper, IPhysicalFileUpload physicalFileUpload)
+    public CourseService(IUnitOfWork unitOfWork,
+                         IMapper mapper,
+                         IPhysicalFileUpload physicalFileUpload,
+                         IStructuredLogger logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _physicalFileUpload = physicalFileUpload;
+        _logger = logger;
     }
     #endregion
 
@@ -25,67 +30,92 @@ public class CourseService : ResponseHandler, ICourseService
     public async Task<Response<List<ShowAllCoursesDto>>> GetAllAsync()
     {
         var courses = await _unitOfWork.Repository<Course>()
-        .GetTableNoTracking()
-        .Where(c => c.IsDeleted == false)
-        .Include(c => c.Category)
-        .ToListAsync();
+                                                  .GetTableNoTracking()
+                                                  .Where(c => c.IsDeleted == false)
+                                                  .Include(c => c.Category)
+                                                  .Include(c => c.Teacher)
+                                                  .ToListAsync();
+        if (courses == null)
+        {
+            _logger.LogInfo("No Courses");
+            BadRequest<List<ShowAllCoursesDto>>("Courses is null");
+        }
 
         var result = _mapper.Map<List<ShowAllCoursesDto>>(courses);
         return Success(result);
     }
-
-    public async Task<Response<List<HomeCourses>>> GetAllByCategoryAsync(string categoryName)
+    public async Task<Response<List<HomeCourses>>> GetAllByCategoryAsync(int categoryId)
     {
         var courses = await _unitOfWork.Repository<Course>()
                                                       .GetTableNoTracking()
                                                       .Include(c => c.Category)
-                                                      .Where(c => GeneralLocalizableEntity.Localized(c.Category!.CategoryNameAr, c.Category!.CategoryNameEn) == categoryName && c.IsDeleted == false)
+                                                      .Where(c => c.Category.Id == categoryId && c.IsDeleted == false)
                                                       .Select(c => new HomeCourses
                                                       {
                                                           Id = c.Id,
-                                                          Title = GeneralLocalizableEntity.Localized(c.TitleAr,c.TitleEn),
-                                                          Description = GeneralLocalizableEntity.Localized(c.DescriptionAr,c.DescriptionEn),
-                                                          Level = GeneralLocalizableEntity.Localized(c.LevelAr,c.LevelEn),
+                                                          Title = GeneralLocalizableEntity.Localized(c.TitleAr, c.TitleEn),
+                                                          Description = GeneralLocalizableEntity.Localized(c.DescriptionAr, c.DescriptionEn),
+                                                          Level = GeneralLocalizableEntity.Localized(c.LevelAr, c.LevelEn),
                                                           Price = c.Price,
                                                           ImagePath = c.ImagePath,
                                                       })
                                                       .ToListAsync();
-
+        if (courses == null)
+        {
+            _logger.LogInfo("No Courses in GetAllByCategoryAsync");
+            BadRequest<List<ShowAllCoursesDto>>("Courses is null in this category");
+        }
 
         return Success(courses);
     }
+    public async Task<Response<List<ShowCourseDto>>> GetAllCoursesOfTeacherAsync(int teacherId)
+    {
+        var courses = await _unitOfWork.Repository<Course>()
+                                                  .GetTableNoTracking()
+                                                  .Where(c => c.TecherId == teacherId && c.IsDeleted == false)
+                                                  .Include(c => c.Teacher)
+                                                  .Include(c => c.Category)
+                                                  .Include(c => c.lessons)
+                                                  .ToListAsync();
 
+        if (courses == null)
+        {
+            _logger.LogInfo($"No Courses in GetAllCoursesOfTeacherAsync");
+            return NotFound<List<ShowCourseDto>>("Course not found");
+        }
+
+        var result = _mapper.Map<List<ShowCourseDto>>(courses);
+        return Success(result);
+    }
     public async Task<Response<ShowCourseDto>> GetCourseByIdAsync(int id)
     {
         var course = await _unitOfWork.Repository<Course>()
                                                        .GetTableNoTracking()
                                                        .Where(c => c.IsDeleted == false)
-                                                       .Include(c => c.Category)
+                                                       .Include(c => c.Category)!
                                                        .Include(c => c.Teacher)
-                                                       .Include(c => c.lessons)
-                                                       .Include(c => c.StudentCourses)
-                                                       .ThenInclude(sc => sc.Student)
-                                                       .ThenInclude(s => s.Comments)
-                                                       .ThenInclude(c => c.Lesson)
+                                                       .Include(c => c.lessons)!
+                                                       .Include(c => c.StudentCourses)!
+                                                       .ThenInclude(sc => sc.Student)!
                                                        .FirstOrDefaultAsync(c => c.Id == id);
 
         if (course == null)
+        {
+            _logger.LogInfo($"No Course with this id => {id} in GetCourseByIdAsync");
             return NotFound<ShowCourseDto>("Course not found");
-
+        }
         var result = _mapper.Map<ShowCourseDto>(course);
         return Success(result);
-    }
-
-    private IQueryable<Course> GetCourseQuerable()
-    {
-        var result = _unitOfWork.Repository<Course>().GetTableNoTracking().Where(c => c.IsDeleted == false);
-
-        return result;
     }
     public async Task<Response<PaginateResult<HomeCourses>>> GetPaginatedCourse(int pageNumber, int pageSize, enOrderBy? orderBy = null)
     {
         var querable = GetCourseQuerable();
 
+        if (querable == null)
+        {
+            _logger.LogInfo($"No Courses in GetPaginatedCourse in this page");
+            return NotFound<PaginateResult<HomeCourses>>("Course not found");
+        }
         switch (orderBy)
         {
             case enOrderBy.Price:
@@ -123,55 +153,51 @@ public class CourseService : ResponseHandler, ICourseService
 
         if (createCourseDto.Image != null)
         {
+            _logger.LogInfo("start upload physical image");
             imageUrl = await _physicalFileUpload.UploadFileAsync("Courses", createCourseDto.Image);
 
             if (imageUrl == null)
+            {
+                _logger.LogInfo("Can not upload physical image");
                 return BadRequest<string>("Image upload failed");
+            }
         }
 
         var course = _mapper.Map<Course>(createCourseDto);
         course.ImagePath = imageUrl;
 
         await _unitOfWork.Repository<Course>().AddAsync(course);
-        _unitOfWork.Complete();
+        var isSuccessAdd = _unitOfWork.Complete();
 
-        return Created<string>("Course created successfully");
+        if (isSuccessAdd > 0)
+        {
+            _logger.LogInfo("Course Added Successfully");
+            return Created<string>("Course created successfully");
+        }
+        _logger.LogInfo("Error when try add course");
+        return Created<string>("can not crate course try later");
     }
 
     public async Task<Response<string>> UpdateAsync(UpdateCourseDto updateCourseDto)
     {
-        if (updateCourseDto == null || string.IsNullOrWhiteSpace(updateCourseDto.Id))
+        if (updateCourseDto == null)
             return BadRequest<string>("Invalid course data");
 
-        var course = await _unitOfWork.Repository<Course>().GetByIdAsync(int.Parse(updateCourseDto.Id));
+        var course = await _unitOfWork.Repository<Course>().GetByIdAsync(updateCourseDto.Id);
         if (course == null)
             return NotFound<string>("Course not found");
 
-        string? newImagePath = course.ImagePath;
+
+        string? imageUrl = null;
 
         if (updateCourseDto.Image != null)
         {
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Images");
-            Directory.CreateDirectory(uploadsFolder);
-
-            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(updateCourseDto.Image.FileName);
-            var filePath = Path.Combine(uploadsFolder, fileName);
-
-            using var stream = new FileStream(filePath, FileMode.Create);
-            await updateCourseDto.Image.CopyToAsync(stream);
-
-            newImagePath = $"/Images/{fileName}";
-
-            if (!string.IsNullOrWhiteSpace(course.ImagePath))
-            {
-                var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", course.ImagePath.TrimStart('/'));
-                if (File.Exists(oldImagePath))
-                    File.Delete(oldImagePath);
-            }
+            _logger.LogInfo("start upload physical image in update");
+            imageUrl = await _physicalFileUpload.UploadFileAsync("Courses", updateCourseDto.Image);
         }
 
         _mapper.Map(updateCourseDto, course);
-        course.ImagePath = newImagePath;
+        course.ImagePath = imageUrl;
 
         _unitOfWork.Repository<Course>().Update(course);
         _unitOfWork.Complete();
@@ -217,18 +243,11 @@ public class CourseService : ResponseHandler, ICourseService
             .ToListAsync();
         return Success(courses);
     }
-
-    public async Task<Response<List<ShowCourseDto>>> GetAllCoursesOfTeacherAsync(int teacherId)
+    private IQueryable<Course> GetCourseQuerable()
     {
-        var courses = await _unitOfWork.Repository<Course>()
-            .GetTableNoTracking()
-            .Where(c => c.TecherId == teacherId && c.IsDeleted == false)
-            .Include(c => c.Teacher)
-            .Include(c => c.Category)
-            .Include(c => c.lessons)
-            .ToListAsync();
-        var result = _mapper.Map<List<ShowCourseDto>>(courses);
-        return Success(result);
+        var result = _unitOfWork.Repository<Course>().GetTableNoTracking().Where(c => c.IsDeleted == false);
+
+        return result;
     }
     #endregion
 }

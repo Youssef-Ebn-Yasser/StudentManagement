@@ -10,18 +10,21 @@ public class AuthGoogleService : ResponseHandler, IAuthGoogleService
     private readonly IAuthenticationService _authenticationService;
     private readonly IConfiguration _configuration;
     private readonly string _googleClientID;
+    private readonly IStructuredLogger _logger;
     #endregion
 
     #region   Constructor
     public AuthGoogleService(UserManager<User> userManager,
                              IAuthenticationService authenticationService,
-                             IConfiguration configuration)
+                             IConfiguration configuration,
+                             IStructuredLogger logger)
     {
         _userManager = userManager;
         _authenticationService = authenticationService;
         _configuration = configuration;
         _googleClientID = _configuration["Authorization:google:clientId"] ??
                     throw new ArgumentNullException("no config for google");
+        _logger = logger;
     }
     #endregion
 

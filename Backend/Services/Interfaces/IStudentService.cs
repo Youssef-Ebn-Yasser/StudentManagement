@@ -21,6 +21,8 @@ public interface IStudentService
     public Task<Response<string>> DeleteAsync(int id);
     public Task<Response<string>> DeleteStudentFromCourseAsync(DeleteStudentFromCourseDto deleteStudent);
     public Task<Response<StudentProfDTO>> GetStudentProfileAsync(int studentId);
+
+   
     // enroll to course
     // first should check in payment table
 }

@@ -1,5 +1,4 @@
 using Backend.DTOs.AuthDTOs;
-using Backend.Settings;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,6 +8,7 @@ namespace Backend.Services.Implementation;
 
 public class AuthenticationService : IAuthenticationService
 {
+    #region Fields
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole<int>> _roleManager;
     private readonly JwtSettings _jwtSettings;
@@ -18,7 +18,10 @@ public class AuthenticationService : IAuthenticationService
     private readonly string _baseUrl;
     private readonly ResponseHandler _responseHandler;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IStructuredLogger _Logger;
+    #endregion
 
+    #region Constructor
     public AuthenticationService(
         UserManager<User> userManager,
         RoleManager<IdentityRole<int>> roleManager,
@@ -28,7 +31,8 @@ public class AuthenticationService : IAuthenticationService
         IEmailSender emailSender,
         IConfiguration configuration,
         ResponseHandler responseHandler,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IStructuredLogger Logger)
     {
         _userManager = userManager;
         _roleManager = roleManager;
@@ -39,8 +43,11 @@ public class AuthenticationService : IAuthenticationService
         _baseUrl = configuration["ApplicationSettings:BaseUrl"] ?? "https://localhost:5175";
         _responseHandler = responseHandler;
         _unitOfWork = unitOfWork;
+        _Logger = Logger;
     }
+    #endregion
 
+    #region Method
     public async Task<Response<TokenDto>> LoginAsync(LoginDto model)
     {
         //var user = await _userManager.FindByEmailAsync(model.Email);
@@ -164,7 +171,7 @@ public class AuthenticationService : IAuthenticationService
         //var userExists = await _userManager.FindByEmailAsync(model.Email);
 
         var userExists = await _unitOfWork.Repository<User>().GetTableNoTracking().FirstOrDefaultAsync(u => u.Email == model.Email);
-        if (userExists != null && GeneralLocalizableEntity.Localized(userExists.UserTypeAr,userExists.UserTypeEn) == role)
+        if (userExists != null && userExists.UserType == role)
         {
             return _responseHandler.BadRequest<TokenDto>("User already exists");
         }
@@ -282,23 +289,27 @@ public class AuthenticationService : IAuthenticationService
         return _responseHandler.Success("Password has been reset successfully");
     }
 
+
+    private async Task<List<Claim>> GetClaims(User user)
+    {
+        var roles = await _userManager.GetRolesAsync(user);
+        var claims = new List<Claim>()
+        {
+            new Claim(ClaimTypes.Name,user.UserName!),
+            new Claim(ClaimTypes.NameIdentifier,user.UserName!),
+            new Claim(ClaimTypes.Email,user.Email!),
+        };
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+        var userClaims = await _userManager.GetClaimsAsync(user);
+        claims.AddRange(userClaims);
+        return claims;
+    }
     private async Task<TokenDto> GenerateJwtToken(User user)
     {
-        var userRoles = await _userManager.GetRolesAsync(user);
-
-        var authClaims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email ?? string.Empty),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty)
-        };
-
-        foreach (var userRole in userRoles)
-        {
-            authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-        }
+        var claims = await GetClaims(user);
 
         var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
 
@@ -306,7 +317,7 @@ public class AuthenticationService : IAuthenticationService
             issuer: _jwtSettings.Issuer,
             audience: _jwtSettings.Audience,
             expires: DateTime.Now.AddMinutes(_jwtSettings.DurationInMinutes),
-            claims: authClaims,
+            claims: claims,
             signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
         );
 
@@ -315,7 +326,8 @@ public class AuthenticationService : IAuthenticationService
         {
             Token = new JwtSecurityTokenHandler().WriteToken(token),
             Expiration = token.ValidTo,
-            RefreshToken = refreshToken.Token
+            RefreshToken = refreshToken.Token,
+            Type = user.UserType,
         };
     }
 
@@ -335,7 +347,8 @@ public class AuthenticationService : IAuthenticationService
             ExpiryDate = DateTime.Now.AddDays(7), // Refresh token valid for 7 days
             IsUsed = false,
             IsRevoked = false,
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.Now,
+
         };
 
         // Save to database
@@ -374,7 +387,7 @@ public class AuthenticationService : IAuthenticationService
         var userDto = new UserDto
         {
             Id = user.Id,
-            Name = GeneralLocalizableEntity.Localized(user.NameAr,user.NameEn),
+            Name = GeneralLocalizableEntity.Localized(user.NameAr, user.NameEn),
             Email = user.Email,
             Phone = user.PhoneNumber,
             CreatedAt = user.CreatedAt,
@@ -384,4 +397,5 @@ public class AuthenticationService : IAuthenticationService
 
         return _responseHandler.Success(userDto);
     }
+    #endregion
 }

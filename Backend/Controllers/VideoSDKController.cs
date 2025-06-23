@@ -7,17 +7,25 @@ namespace Backend.Controllers;
 [ApiController]
 public class VideoSDKController : ControllerBase
 {
+    #region Fields
     private readonly IConfiguration _configuration;
+    private readonly IStructuredLogger _logger;
+    #endregion
 
-    public VideoSDKController(IConfiguration configuration)
+    #region Constructor
+    public VideoSDKController(IConfiguration configuration, IStructuredLogger logger)
     {
         _configuration = configuration;
+        _logger = logger;
     }
+    #endregion
 
     /// <summary>
     /// Endpoint for the frontend to securely request a VideoSDK authentication token.
     /// </summary>
     /// <returns>A JSON object containing the VideoSDK token.</returns>
+
+    #region Method
     [HttpPost("generateVideoSDKToken")] // The specific route for this action
     public IActionResult GenerateVideoSDKToken()
     {
@@ -72,4 +80,5 @@ public class VideoSDKController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to generate VideoSDK token due to a server error." });
         }
     }
+    #endregion
 }

@@ -8,20 +8,31 @@ namespace Backend.Controllers;
 [Route("api/zoom")]
 public class ZoomController : AppControllerBase
 {
+    #region Fields
     private readonly IMeetingService _meetService;
     private readonly IConfiguration _configuration;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ApplicationDbContext _context;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IStructuredLogger _logger;
+    #endregion
 
-    public ZoomController(IMeetingService meetService, IConfiguration configuration, IHttpClientFactory httpClientFactory, ApplicationDbContext context, IUnitOfWork unitOfWork)
+    #region Constructor
+    public ZoomController(IMeetingService meetService, 
+                          IConfiguration configuration, 
+                          IHttpClientFactory httpClientFactory, 
+                          ApplicationDbContext context, 
+                          IUnitOfWork unitOfWork,
+                          IStructuredLogger logger)
     {
         _meetService = meetService;
         _configuration = configuration;
         _httpClientFactory = httpClientFactory;
         _context = context;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
+    #endregion
 
     //[HttpGet("authorize")]
     //public IActionResult Authorize()
@@ -81,7 +92,7 @@ public class ZoomController : AppControllerBase
 
 
 
-
+    #region Method
     [HttpGet("meetings")]
     public async Task<IActionResult> GetMeetings(int courseId)
     {
@@ -315,4 +326,5 @@ public class ZoomController : AppControllerBase
         var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(plainToken));
         return Convert.ToBase64String(hash);
     }
+    #endregion
 }
