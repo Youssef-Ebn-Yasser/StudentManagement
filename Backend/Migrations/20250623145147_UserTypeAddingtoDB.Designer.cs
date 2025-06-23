@@ -4,6 +4,7 @@ using Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250623145147_UserTypeAddingtoDB")]
+    partial class UserTypeAddingtoDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -121,7 +124,7 @@ namespace Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Content")
+                    b.Property<string>("ContentAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContentEn")
@@ -142,7 +145,7 @@ namespace Backend.Migrations
                     b.Property<int?>("StudentId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("TitleAr")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -175,7 +178,7 @@ namespace Backend.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("DescriptionAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DescriptionEn")
@@ -190,7 +193,7 @@ namespace Backend.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Level")
+                    b.Property<string>("LevelAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LevelEn")
@@ -202,7 +205,7 @@ namespace Backend.Migrations
                     b.Property<int?>("TecherId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("TitleAr")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -233,7 +236,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("DescriptionAr")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -244,7 +247,7 @@ namespace Backend.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("TitleAr")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -271,7 +274,7 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RejectionReason")
+                    b.Property<string>("RejectionReasonAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RejectionReasonEn")
@@ -307,7 +310,7 @@ namespace Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Content")
+                    b.Property<string>("ContentAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContentEn")
@@ -891,7 +894,11 @@ namespace Backend.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
