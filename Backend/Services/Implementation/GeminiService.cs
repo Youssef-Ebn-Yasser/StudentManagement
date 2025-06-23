@@ -4,18 +4,25 @@ namespace Backend.Services.Implementation;
 
 public class GeminiService
 {
+    #region Fields
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _config;
     private readonly string _apiKey;
     private readonly string _endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+    private readonly IStructuredLogger _logger;
+    #endregion
 
-    public GeminiService(HttpClient httpClient, IConfiguration config)
+    #region Constructor
+    public GeminiService(HttpClient httpClient, IConfiguration config, IStructuredLogger logger)
     {
         _httpClient = httpClient;
         _config = config;
         _apiKey = _config["Gemini:ApiKey"]!;
+        _logger = logger;
     }
+    #endregion
 
+    #region Method
     public async Task<string> GetResponseAsync(string prompt)
     {
         var requestBody = new
@@ -50,4 +57,5 @@ public class GeminiService
 
         return text ?? "No response.";
     }
+    #endregion
 }

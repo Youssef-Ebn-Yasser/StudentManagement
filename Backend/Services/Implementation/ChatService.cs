@@ -9,16 +9,19 @@ public class ChatService : ResponseHandler, IChatService
     private readonly ApplicationDbContext _context;
     private readonly IUnitOfWork _unitOfWork;
     private readonly UserManager<User> _userManager;
+    private readonly IStructuredLogger _logger;
     #endregion
 
     #region    Constructor
     public ChatService(ApplicationDbContext context,
                        UserManager<User> userManager,
-                       IUnitOfWork unitOfWork)
+                       IUnitOfWork unitOfWork,
+                       IStructuredLogger logger)
     {
         _context = context;
         _userManager = userManager;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
     #endregion
 

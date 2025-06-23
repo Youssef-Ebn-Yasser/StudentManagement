@@ -20,6 +20,7 @@ public static class ClassesDependencies
 
 
         services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IAuthorizeService, AuthorizeService>();
         services.AddTransient<ICourseService, CourseService>();
         services.AddTransient<IStudentService, StudentService>();
         services.AddTransient<IMaterialService, MaterialService>();
@@ -31,7 +32,16 @@ public static class ClassesDependencies
         services.AddTransient<IStudentAssignmentService, StudentAssignmentService>();
         services.AddTransient<IMeetingService, MeetingService>();
         services.AddTransient<IChatService, ChatService>();
+        services.AddTransient<IStructuredLogger, StructuredLogger>();
+
         //services.AddTransient<IQuizService, QuizService>();
+        services.AddTransient<IStructuredLogger, StructuredLogger>();
+        services.AddTransient<IReportServices, ReportServices>();
+
+
+
+        services.AddTransient<IGeminiObjectTranslator, GeminiObjectTranslator>();
+
 
         services.AddScoped<IPhysicalFileUpload, PhysicalFileUpload>();
 

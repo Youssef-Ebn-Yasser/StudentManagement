@@ -11,7 +11,6 @@ public class ShowCourseDto
     public int LessonCount { get; set; }
     public string? Hours { get; set; }
     public List<LessonInfo>? LessonInfo { get; set; }
-    public List<CommentInfo>? CommentInfo { get; set; }
 
     public string? CategoryName { get; set; }
 }

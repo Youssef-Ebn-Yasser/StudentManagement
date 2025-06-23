@@ -61,4 +61,14 @@ public class ResponseHandler
             Massage = message == null ? "Created" : message
         };
     }
+
+    public static Response<T> ServerError<T>()
+    {
+        return new Response<T>()
+        {
+            httpStatusCode = System.Net.HttpStatusCode.InternalServerError,
+            Succeeded = false,
+            Massage = "Server Error Try Latter"
+        };
+    }
 }

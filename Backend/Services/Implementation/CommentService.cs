@@ -5,15 +5,22 @@ namespace Backend.Services.Implementation;
 
 public class CommentService : ResponseHandler, ICommentService
 {
+    #region Fields
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly IStructuredLogger _logger;
+    #endregion
 
-    public CommentService(IUnitOfWork unitOfWork, IMapper mapper)
+    #region Constructor
+    public CommentService(IUnitOfWork unitOfWork, IMapper mapper, IStructuredLogger logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _logger = logger;
     }
+    #endregion
 
+    #region Method
     public async Task<Response<string>> CreateAsync(CreateCommentDto createCommentDto)
     {
         // Check if student and lesson exist
@@ -100,4 +107,5 @@ public class CommentService : ResponseHandler, ICommentService
 
         return Success(result);
     }
+    #endregion
 }

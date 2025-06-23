@@ -1,9 +1,4 @@
-﻿using Backend.DTOs.StudentDOs;
-using Backend.DTOs.StudentProfileDto;
-using Backend.Entities.QuizeEntities;
-using Backend.Wrapper;
-
-namespace Backend.Services.Implementation;
+﻿namespace Backend.Services.Implementation;
 
 public class StudentService : ResponseHandler, IStudentService
 {
@@ -11,14 +6,20 @@ public class StudentService : ResponseHandler, IStudentService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IPhysicalFileUpload _physicalFileUpload;
+    private readonly IStructuredLogger _logger;
+    CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
     #endregion
 
     #region Constructor
-    public StudentService(IUnitOfWork unitOfWork, IMapper mapper, IPhysicalFileUpload physicalFileUpload)
+    public StudentService(IUnitOfWork unitOfWork,
+                          IMapper mapper,
+                          IPhysicalFileUpload physicalFileUpload,
+                          IStructuredLogger logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _physicalFileUpload = physicalFileUpload;
+        _logger = logger;
     }
     #endregion
 
@@ -30,18 +31,47 @@ public class StudentService : ResponseHandler, IStudentService
                                                     .Where(s => s.IsDeleted == false)
                                                     .ToListAsync();
 
+        if (students == null)
+        {
+            _logger.LogInfo("No Students in GetAllAsync");
+            BadRequest<List<ShowAllCoursesDto>>("Students is null");
+        }
+
         var mappedStudents = _mapper.Map<List<ShowStudentDto>>(students);
         return Success(mappedStudents);
     }
 
     public async Task<Response<List<ShowStudentWithCoursesDto>>> GetAllInCourseByCourseNameAsync(string courseName)
     {
-        var students = await _unitOfWork.Repository<Student>()
-                                                    .GetTableNoTracking()
-                                                    //.Where(s => s.StudentCourses.Any(sc => sc.Course.Title.ToLower().Contains(courseName.ToLower())) && s.IsDeleted == false)
-                                                    .Include(s => s.StudentCourses)
-                                                    .ThenInclude(sc => sc.Course)
-                                                    .ToListAsync();
+
+        List<Student> students = new List<Student>();
+
+        if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
+        {
+            students = await _unitOfWork.Repository<Student>()
+                                                       .GetTableNoTracking()
+                                                       .Where(s => s.StudentCourses.Any(sc => sc.Course.TitleAr.ToLower().Contains(courseName.ToLower())) && s.IsDeleted == false)
+                                                       .Include(s => s.StudentCourses)
+                                                       .ThenInclude(sc => sc.Course)
+                                                       .ToListAsync();
+        }
+        else
+        {
+            students = await _unitOfWork.Repository<Student>()
+                                                       .GetTableNoTracking()
+                                                       .Where(s => s.StudentCourses.Any(sc => sc.Course.TitleEn.ToLower().Contains(courseName.ToLower())) && s.IsDeleted == false)
+                                                       .Include(s => s.StudentCourses)
+                                                       .ThenInclude(sc => sc.Course)
+                                                       .ToListAsync();
+        }
+
+
+        if (students == null)
+        {
+            _logger.LogInfo("No Students in GetAllAsync");
+            BadRequest<List<ShowAllCoursesDto>>("Students is null");
+        }
+
 
         var mappedStudents = _mapper.Map<List<ShowStudentWithCoursesDto>>(students);
         return Success(mappedStudents);
@@ -51,7 +81,10 @@ public class StudentService : ResponseHandler, IStudentService
     {
         var student = await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => s.Id == id && s.IsDeleted == false);
         if (student == null)
+        {
+            _logger.LogInfo($"No Students with this id {id}");
             return NotFound<ShowStudentDto>("Student Not Found");
+        }
 
         var mappedStudent = _mapper.Map<ShowStudentDto>(student);
         return Success(mappedStudent);
@@ -59,11 +92,26 @@ public class StudentService : ResponseHandler, IStudentService
 
     public async Task<Response<ShowStudentDto>> GetByNameAsync(string name)
     {
-        var student = await _unitOfWork.Repository<Student>()
-                                              .GetTableNoTracking()
-                                              .FirstOrDefaultAsync(s => GeneralLocalizableEntity.Localized(s.NameAr, s.NameEn) == name && s.IsDeleted == false);
+        Student student = new Student();
+
+        if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
+        {
+            student = await _unitOfWork.Repository<Student>()
+                                       .GetTableNoTracking()
+                                       .FirstOrDefaultAsync(s => s.NameAr == name && s.IsDeleted == false);
+        }
+        else
+        {
+            student = await _unitOfWork.Repository<Student>()
+                                       .GetTableNoTracking()
+                                       .FirstOrDefaultAsync(s => s.NameEn == name && s.IsDeleted == false);
+        }
+
         if (student == null)
+        {
+            _logger.LogInfo("Student Not Found trying with student name");
             return NotFound<ShowStudentDto>("Student Not Found");
+        }
 
         var mappedStudent = _mapper.Map<ShowStudentDto>(student);
         return Success(mappedStudent);
@@ -71,13 +119,17 @@ public class StudentService : ResponseHandler, IStudentService
 
     public async Task<Response<PaginateResult<ShowStudentDto>>> GetPaginatedListOfStudentAsync(int pageNumber, int pageSize)
     {
-        var student = _unitOfWork.Repository<Student>()
+        var students = _unitOfWork.Repository<Student>()
                                                  .GetTableNoTracking()
-                                                    .Where(s => !s.IsDeleted)
-                                                 ;
+                                                    .Where(s => !s.IsDeleted);
 
+        if (students == null)
+        {
+            _logger.LogInfo("Student Not Found trying with GetPaginatedListOfStudentAsync");
+            return NotFound<PaginateResult<ShowStudentDto>>("Students Not Found");
+        }
 
-        var mapper = await _mapper.ProjectTo<ShowStudentDto>(student)
+        var mapper = await _mapper.ProjectTo<ShowStudentDto>(students)
                                                           .ToPaginatedListAsync(pageNumber, pageSize);
         return Success(mapper);
     }
@@ -102,7 +154,13 @@ public class StudentService : ResponseHandler, IStudentService
                        TeacherName = GeneralLocalizableEntity.Localized(_.Course.Teacher.NameAr, _.Course.Teacher.NameEn)
 
                    })
-                   .ToListAsync();
+        .ToListAsync();
+
+        if (studentCourses == null)
+        {
+            _logger.LogInfo("Student Not with id {id} not enroll in any courses");
+            return NotFound<List<ShowStudentCourseDto>>("no enroll courses");
+        }
 
         return Success(studentCourses);
     }
@@ -122,15 +180,26 @@ public class StudentService : ResponseHandler, IStudentService
         var isEnroll = await IsEnrolledInCourse(studentEnrollDto);
 
         if (isEnroll.Data)
+        {
+            _logger.LogInfo($"Student with id : {studentEnrollDto.StudentId} is enroll in course with id :{studentEnrollDto.CourseId}");
             return BadRequest<string>($"this student Already in this course");
+        }
 
         var mapper = _mapper.Map<StudentCourse>(studentEnrollDto);
 
         await _unitOfWork.Repository<StudentCourse>().AddAsync(mapper);
         var result = _unitOfWork.Complete();
 
-        return result > 0 ? Success("Enroll Success") :
-                            BadRequest<string>("Can not enroll to course");
+        if (result > 0)
+        {
+            _logger.LogInfo($"eroll success for Student with id : {studentEnrollDto.StudentId} and course with id :{studentEnrollDto.CourseId}");
+            return Success("Enroll Success");
+        }
+        else
+        {
+            _logger.LogInfo($"Error Student with id : {studentEnrollDto.StudentId} can not  enroll in course with id :{studentEnrollDto.CourseId}");
+            return BadRequest<string>("Can not enroll to course");
+        }
     }
     public async Task<Response<bool>> IsEnrolledInCourse(StudentEnrollDto studentEnrollDto)
     {
@@ -152,57 +221,14 @@ public class StudentService : ResponseHandler, IStudentService
 
         var newStudent = _mapper.Map<Student>(createStudent);
 
+
+
         await _unitOfWork.Repository<Student>().AddAsync(newStudent);
         var result = _unitOfWork.Complete();
 
         return result > 0 ? Success("Student Added Successfully") :
                             BadRequest<string>("can not add this student error happen when try add");
     }
-
-    public async Task<Response<string>> DeleteAsync(int id)
-    {
-        var isNameExist = await _isExistById(id);
-        if (!isNameExist) return NotFound<string>($"Student with this id = {id} not exist");
-
-        var student = await _unitOfWork.Repository<Student>()
-                                              .GetTableAsTracking()
-                                              .FirstOrDefaultAsync(s => s.Id == id);
-
-        student!.IsDeleted = true;
-        _unitOfWork.Repository<Student>().Update(student);
-        var result = _unitOfWork.Complete();
-
-        return result > 0 ? Success("Student Deleted Successfully") :
-                            BadRequest<string>("can not delete this student error happen when try deleting");
-    }
-
-    public async Task<Response<String>> DeleteStudentFromCourseAsync(DeleteStudentFromCourseDto deleteStudent)
-    {
-        var StudentExist = await _studentExistByName(deleteStudent.StudentName);
-        if (StudentExist == null) return NotFound<string>($"Student with this name = {deleteStudent.StudentName} not exist");
-
-        var CourseExist = await _courseExistByName(deleteStudent.CourseName);
-        if (CourseExist == null) return NotFound<string>($"Course with this name = {deleteStudent.CourseName} not exist");
-
-
-
-        var studentCourse = await _unitOfWork.Repository<StudentCourse>()
-                                                        .GetTableAsTracking()
-                                                        .Where(sc => sc.StudentId == StudentExist.Id && sc.CourseId == CourseExist.Id)
-                                                        .FirstOrDefaultAsync();
-
-        if (studentCourse == null) return NotFound<string>($"Student with this name = {deleteStudent.StudentName} not enroll in this course");
-
-
-        studentCourse.IsDeleted = true;
-
-        _unitOfWork.Repository<StudentCourse>().Update(studentCourse);
-        var result = _unitOfWork.Complete();
-
-        return result > 0 ? Success("Student Deleted From Course Successfully") :
-                            BadRequest<string>("can not delete this student from course error happen when try deleting");
-    }
-
     public async Task<Response<string>> UpdateAsync(UpdateStudentDto updateStudentDto)
     {
         // check this student is exist 
@@ -214,21 +240,114 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (updateStudentDto.Image != null)
         {
+            _logger.LogInfo("Satrt Upload physical file");
             var path = await _physicalFileUpload.UploadFileAsync("Students", updateStudentDto.Image);
+
+            if (string.IsNullOrEmpty(path))
+                _logger.LogInfo("Upload file faild");
+
+            _logger.LogInfo("Upload physical file Success");
             student.ImageUrl = path;
         }
         _unitOfWork.Repository<Student>().Update(student);
         var result = _unitOfWork.Complete();
 
-        return result > 0 ? Success("Student Updated Successfully") :
-                            BadRequest<string>("can not Updated this student error happen when trying");
+        if (result > 0)
+        {
+            _logger.LogInfo($"Student Updated Successfully");
+            return Success("Student Updated Successfully");
+        }
+        else
+        {
+            _logger.LogInfo($"Error can not Updated this student error happen when trying");
+            return BadRequest<string>("can not Updated this student error happen when trying");
+        }
+    }
+    public async Task<Response<string>> DeleteAsync(int id)
+    {
+        var isNameExist = await _isExistById(id);
+        if (!isNameExist)
+        {
+            _logger.LogInfo($"try to delete student with id : {id} but not found");
+            return NotFound<string>($"Student with this id = {id} not exist");
+        }
+
+        var student = await _unitOfWork.Repository<Student>()
+                                              .GetTableAsTracking()
+                                              .FirstOrDefaultAsync(s => s.Id == id);
+
+        student!.IsDeleted = true;
+
+        var result = _unitOfWork.Complete();
+
+        if (result > 0)
+        {
+            _logger.LogInfo($"Student Deleted Successfully with id : {id}");
+            return Success("Student Deleted Successfully");
+        }
+        else
+        {
+            _logger.LogInfo($"Error Student with id : {id} can not deleted");
+            return BadRequest<string>("can not delete this student error happen when try deleting");
+        }
+    }
+    public async Task<Response<String>> DeleteStudentFromCourseAsync(DeleteStudentFromCourseDto deleteStudent)
+    {
+        var StudentExist = await _studentExistByName(deleteStudent.StudentName);
+        if (StudentExist == null)
+        {
+            _logger.LogInfo($"try to delete student with name : {deleteStudent.StudentName} from course {deleteStudent.CourseName} but not found student");
+            return NotFound<string>($"Student with this name = {deleteStudent.StudentName} not exist");
+        }
+
+        var CourseExist = await _courseExistByName(deleteStudent.CourseName);
+        if (CourseExist == null)
+        {
+            _logger.LogInfo($"try to delete course with name : {deleteStudent.CourseName} for  student with name : {deleteStudent.StudentName} but not found course");
+            return NotFound<string>($"Course with this name = {deleteStudent.CourseName} not exist");
+        }
+
+
+
+        var studentCourse = await _unitOfWork.Repository<StudentCourse>()
+                                                        .GetTableAsTracking()
+                                                        .Where(sc => sc.StudentId == StudentExist.Id && sc.CourseId == CourseExist.Id)
+                                                        .FirstOrDefaultAsync();
+
+        if (studentCourse == null) return NotFound<string>($"Student with this name = {deleteStudent.StudentName} not enroll in this course");
+
+        studentCourse.IsDeleted = true;
+
+        var result = _unitOfWork.Complete();
+
+        if (result > 0)
+        {
+            _logger.LogInfo($"Student delete from course with name : {deleteStudent.CourseName} for  student with name : {deleteStudent.StudentName}");
+            return Success("Student Deleted From Course Successfully");
+        }
+        else
+        {
+            _logger.LogInfo($"Error can not Student delete from course with name : {deleteStudent.CourseName} for  student with name : {deleteStudent.StudentName}");
+            return BadRequest<string>("can not delete this student from course error happen when try deleting");
+        }
     }
 
     private async Task<bool> _isNameExist(string name)
     {
-        var exist = await _unitOfWork.Repository<Student>()
+        bool exist = false;
+
+        if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
+        {
+            exist = await _unitOfWork.Repository<Student>()
                                            .GetTableNoTracking()
-                                           .AnyAsync(s => GeneralLocalizableEntity.Localized(s.NameAr, s.NameEn) == name && s.IsDeleted == false);
+                                           .AnyAsync(s => s.NameAr == name && s.IsDeleted == false);
+        }
+        else
+        {
+            exist = await _unitOfWork.Repository<Student>()
+                                           .GetTableNoTracking()
+                                           .AnyAsync(s => s.NameEn == name && s.IsDeleted == false);
+        }
 
         return exist;
     }
@@ -250,10 +369,46 @@ public class StudentService : ResponseHandler, IStudentService
     }
     private async Task<bool> _isCourseExistById(int id) =>
     await _unitOfWork.Repository<Course>().GetTableNoTracking().AnyAsync(s => s.Id == id);
-    private async Task<Course> _courseExistByName(string Name) =>
-   await _unitOfWork.Repository<Course>().GetTableNoTracking().FirstOrDefaultAsync(c => GeneralLocalizableEntity.Localized(c.TitleAr, c.TitleEn) == Name);
-    private async Task<Student> _studentExistByName(string name) =>
-    await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => GeneralLocalizableEntity.Localized(s.NameAr, s.NameEn) == name);
+    private async Task<Course> _courseExistByName(string Name)
+    {
+        Course course = new Course();
+
+        if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
+        {
+            course = await _unitOfWork.Repository<Course>()
+                        .GetTableNoTracking()
+                        .FirstOrDefaultAsync(s => s.TitleAr == Name);
+        }
+        else
+        {
+            course = await _unitOfWork.Repository<Course>()
+                                      .GetTableNoTracking()
+                                      .FirstOrDefaultAsync(s => s.TitleEn == Name);
+        }
+
+        return course;
+    }
+    private async Task<Student> _studentExistByName(string name)
+    {
+        Student student = new Student();
+
+        if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
+        {
+            student = await _unitOfWork.Repository<Student>()
+                        .GetTableNoTracking()
+                        .FirstOrDefaultAsync(s => s.NameAr == name);
+
+        }
+        else
+        {
+            student = await _unitOfWork.Repository<Student>()
+                                      .GetTableNoTracking()
+                                      .FirstOrDefaultAsync(s => s.NameEn == name);
+        }
+
+
+        return student;
+    }
     private async Task<Student> _studentExistById(int id) =>
 await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => s.Id == id);
 

@@ -8,17 +8,25 @@ namespace Backend.Services.Implementation;
 
 public class EmailSender : IEmailSender
 {
+    #region Fields
     private readonly ILogger<EmailSender> _logger;
     private readonly EmailSettings _emailSettings;
+    private readonly IStructuredLogger _Logger;
+    #endregion
 
+    #region Constructor
     public EmailSender(
         ILogger<EmailSender> logger,
-        IOptions<EmailSettings> emailSettingsOptions)
+        IOptions<EmailSettings> emailSettingsOptions,
+        IStructuredLogger Logger)
     {
         _logger = logger;
         _emailSettings = emailSettingsOptions.Value;
+        _Logger = Logger;
     }
+    #endregion
 
+    #region Method
     public async Task<bool> SendEmailAsync(string mailTo, string subject, string message)
     {
         try
@@ -54,4 +62,5 @@ public class EmailSender : IEmailSender
             return false;
         }
     }
+    #endregion
 }

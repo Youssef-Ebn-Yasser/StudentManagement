@@ -12,6 +12,6 @@ public class ShowMaterialsLesson
 {
     public string? Title { get; set; }
     public string? Content { get; set; }
-    public IFormFile? Data { get; set; }
+    public string? Data { get; set; }
     public MaterialTypeId? Type { get; set; }
 }

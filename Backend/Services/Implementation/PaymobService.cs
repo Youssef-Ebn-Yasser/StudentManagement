@@ -5,19 +5,26 @@ namespace Backend.Services.Implementation
 {
     public class PaymobService : IPaymobService
     {
+        #region Fields
         private readonly HttpClient _httpClient;
         private readonly string _apiKey;
         private readonly int _integrationId;
         private readonly int _iframeId;
+        private readonly IStructuredLogger _logger;
+        #endregion
 
-        public PaymobService(HttpClient httpClient, IConfiguration config)
+        #region Constructor
+        public PaymobService(HttpClient httpClient, IConfiguration config, IStructuredLogger logger)
         {
             _httpClient = httpClient;
             _apiKey = config["Paymob:ApiKey"] ?? throw new ArgumentNullException("Paymob:ApiKey");
             _integrationId = int.Parse(config["Paymob:IntegrationId"] ?? throw new ArgumentNullException("Paymob:IntegrationId"));
             _iframeId = int.Parse(config["Paymob:IframeId"] ?? throw new ArgumentNullException("Paymob:IframeId"));
+            _logger = logger;
         }
+        #endregion
 
+        #region Method
         public async Task<string> GetAuthTokenAsync()
         {
             var request = new { api_key = _apiKey };
@@ -107,4 +114,5 @@ namespace Backend.Services.Implementation
             return $"https://accept.paymob.com/api/acceptance/iframes/{_iframeId}?payment_token={paymentToken}";
         }
     }
+    #endregion
 }

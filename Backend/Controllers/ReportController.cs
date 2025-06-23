@@ -51,5 +51,24 @@ namespace Backend.Controllers
             var report = await _reportServices.GetWeeklyNewStudentsAsync();
             return Ok(report);
         }
+
+        [HttpGet("student-comprehensive/{studentId}")]
+        public async Task<IActionResult> GetStudentComprehensiveReport(int studentId)
+        {
+            try
+            {
+                var report = await _reportServices.GetStudentComprehensiveReportAsync(studentId);
+                return Ok(report);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    StatusCode = 500,
+                    Message = "Failed to generate student report",
+                    Error = ex.Message
+                });
+            }
+        }
     }
 }

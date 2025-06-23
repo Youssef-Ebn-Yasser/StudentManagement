@@ -9,14 +9,16 @@ public class MeetingService : ResponseHandler, IMeetingService
     #region    Fields
     private readonly IUnitOfWork _unitOfWork;
     private readonly IConfiguration _config;
+    private readonly IStructuredLogger _logger;
     //private static string? _accessToken;
     #endregion
 
     #region   Constructor
-    public MeetingService(IConfiguration config, IUnitOfWork unitOfWork)
+    public MeetingService(IConfiguration config, IUnitOfWork unitOfWork, IStructuredLogger logger)
     {
         _config = config;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
     #endregion
 

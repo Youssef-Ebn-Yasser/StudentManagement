@@ -36,3 +36,6 @@ global using System.Net;
 global using System.Net.Http.Headers;
 global using System.Reflection;
 global using System.Text;
+global using Backend.DTOs.StudentDOs;
+global using Backend.DTOs.StudentProfileDto;
+global using Backend.Wrapper;
