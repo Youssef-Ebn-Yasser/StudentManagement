@@ -1,4 +1,5 @@
-﻿using Backend.DTOs.AuthorizeDTO;
+﻿using Backend.DTOs.AdminDTOs;
+using Backend.DTOs.AuthorizeDTO;
 using System.Security.Claims;
 
 namespace Backend.Services.Implementation;
@@ -81,6 +82,29 @@ public class AuthorizeService : ResponseHandler, IAuthorizeService
             _unitOfWork.RollbackTransaction();
             return BadRequest<string>("FailedToUpdateClaims");
         }
+    }
+
+    public async Task<Response<List<AdminDto>>> GetAllAdminsAsync()
+    {
+        var admins = await _unitOfWork.Repository<Admin>()
+            .GetTableNoTracking()
+            .Where(a => !a.IsDeleted)
+            .Select(a => new AdminDto { Id = a.Id, Name = a.NameEn ?? string.Empty })
+            .ToListAsync();
+        return Success(admins);
+    }
+
+    public async Task<Response<AdminDto>> UpdateAdminAsync(UpdateAdminDto dto)
+    {
+        var admin = await _unitOfWork.Repository<Admin>()
+            .GetTableAsTracking()
+            .FirstOrDefaultAsync(a => a.Id == dto.Id && !a.IsDeleted);
+        if (admin == null)
+            return BadRequest<AdminDto>("Admin not found");
+        admin.NameEn = dto.Name;
+        _unitOfWork.Repository<Admin>().Update(admin);
+        _unitOfWork.Complete();
+        return Success(new AdminDto { Id = admin.Id, Name = admin.NameEn ?? string.Empty });
     }
     #endregion
 }

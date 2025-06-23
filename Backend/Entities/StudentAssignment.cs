@@ -3,7 +3,8 @@
 public class StudentAssignment : BaseEntity
 {
     public string? Path { get; set; }
-    public string? Name { get; set; }
+    public string? NameEn { get; set; }
+    public string? NameAr { get; set; }
 
     [ForeignKey("LessonId")]
     public Lesson? Lesson { get; set; }
