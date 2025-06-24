@@ -37,15 +37,51 @@ public class QuizeController : AppControllerBase
     [HttpPost("CorrectAnswer")]
     public async Task<IActionResult> CorrectAnswer(int quizeAnserId, [FromBody] List<CorrectQuizDto> dto)
     {
-        var result = await _service.CorrectQuiz(quizeAnserId, dto);
-        return NewResult(result);
+        try
+        {
+            _logger.LogInfo($"Correcting quiz answer for QuizAnswerId: {quizeAnserId}");
+            
+            var result = await _service.CorrectQuiz(quizeAnserId, dto);
+            
+            _logger.LogInfo($"Successfully corrected quiz answer for QuizAnswerId: {quizeAnserId}");
+            return NewResult(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogInfo($"Error correcting quiz answer for QuizAnswerId: {quizeAnserId}. Exception: {ex.Message}");
+            return StatusCode(500, new Response<string>
+            {
+                httpStatusCode = HttpStatusCode.InternalServerError,
+                Succeeded = false,
+                Massage = "Failed to correct quiz answer",
+                Errors = new List<string> { ex.Message }
+            });
+        }
     }
 
     [HttpGet("ToCorrect")]
     public IActionResult GetQuizzesToCorrect([FromQuery] int lessonId)
     {
-        var result = _service.GetQuizzesToCorrectByLessonId(lessonId);
-        return Ok(result);
+        try
+        {
+            _logger.LogInfo($"Getting quizzes to correct for LessonId: {lessonId}");
+            
+            var result = _service.GetQuizzesToCorrectByLessonId(lessonId);
+            
+            _logger.LogInfo($"Successfully retrieved {result.Count} quizzes to correct for LessonId: {lessonId}");
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogInfo($"Error getting quizzes to correct for LessonId: {lessonId}. Exception: {ex.Message}");
+            return StatusCode(500, new Response<List<QuizToCorrectDto>>
+            {
+                httpStatusCode = HttpStatusCode.InternalServerError,
+                Succeeded = false,
+                Massage = "Failed to retrieve quizzes to correct",
+                Errors = new List<string> { ex.Message }
+            });
+        }
     }
 
     [HttpGet("StudentAnswers")]
@@ -53,11 +89,16 @@ public class QuizeController : AppControllerBase
     {
         try
         {
+            _logger.LogInfo($"Getting student answers for StudentQuizAnswerId: {studentQuizAnswerId}");
+            
             var result = await _service.GetStudentQuizAnswer(studentQuizAnswerId);
+            
+            _logger.LogInfo($"Successfully retrieved student answers for StudentQuizAnswerId: {studentQuizAnswerId}");
             return Ok(result);
         }
         catch (Exception ex)
         {
+            _logger.LogInfo($"Error getting student answers for StudentQuizAnswerId: {studentQuizAnswerId}. Exception: {ex.Message}");
             return StatusCode(500, new Response<List<StudentQuizAnswerDto>>
             {
                 httpStatusCode = HttpStatusCode.InternalServerError,
@@ -68,18 +109,21 @@ public class QuizeController : AppControllerBase
         }
     }
 
-
     [HttpPost("CreateQuizWithLesson")]
     public async Task<IActionResult> CreateQuizWithLesson([FromBody] CreateQuizeWithQuestionDto dto)
     {
         try
         {
+            _logger.LogInfo($"Creating quiz with lesson for LessonId: {dto.LessonId}");
+            
             var result = await _service.CreateQuizWithLesson(dto);
 
+            _logger.LogInfo($"Successfully created quiz with lesson for LessonId: {dto.LessonId}");
             return NewResult(result);
         }
         catch (Exception ex)
         {
+            _logger.LogInfo($"Error creating quiz with lesson for LessonId: {dto.LessonId}. Exception: {ex.Message}");
             return BadRequest(new Response<string>
             {
                 httpStatusCode = HttpStatusCode.BadRequest,
@@ -95,12 +139,16 @@ public class QuizeController : AppControllerBase
     {
         try
         {
+            _logger.LogInfo($"Creating quiz with course for CourseId: {dto.CourseId}");
+            
             var result = await _service.CreateQuizWithCourse(dto);
 
+            _logger.LogInfo($"Successfully created quiz with course for CourseId: {dto.CourseId}");
             return NewResult(result);
         }
         catch (Exception ex)
         {
+            _logger.LogInfo($"Error creating quiz with course for CourseId: {dto.CourseId}. Exception: {ex.Message}");
             return BadRequest(new Response<string>
             {
                 httpStatusCode = HttpStatusCode.BadRequest,
@@ -116,12 +164,16 @@ public class QuizeController : AppControllerBase
     {
         try
         {
+            _logger.LogInfo($"Getting lesson quizzes for LessonId: {lessonId}");
+            
             var result = await _service.GetLessonQuizzes(lessonId);
 
+            _logger.LogInfo($"Successfully retrieved lesson quizzes for LessonId: {lessonId}");
             return NewResult(result);
         }
         catch (Exception ex)
         {
+            _logger.LogInfo($"Error getting lesson quizzes for LessonId: {lessonId}. Exception: {ex.Message}");
             return StatusCode(500, new Response<List<LessonQuizListDto>>
             {
                 httpStatusCode = HttpStatusCode.InternalServerError,
@@ -132,21 +184,21 @@ public class QuizeController : AppControllerBase
         }
     }
 
-
-
-
-
     [HttpGet("GetQuizById/{quizId}")]
     public async Task<ActionResult<Response<GetQuizeDto>>> GetQuizById(int quizId)
     {
         try
         {
+            _logger.LogInfo($"Getting quiz by ID: {quizId}");
+            
             var result = await _service.GetQuizById(quizId);
 
+            _logger.LogInfo($"Successfully retrieved quiz for QuizId: {quizId}");
             return NewResult(result);
         }
         catch (Exception ex)
         {
+            _logger.LogInfo($"Error getting quiz by ID: {quizId}. Exception: {ex.Message}");
             return StatusCode(500, new Response<GetQuizeDto>
             {
                 httpStatusCode = HttpStatusCode.InternalServerError,
@@ -162,10 +214,13 @@ public class QuizeController : AppControllerBase
     {
         try
         {
+            _logger.LogInfo($"Submitting quiz for StudentId: {submission.StudentId}, QuizId: {submission.QuizId}");
+            
             // 1. Get student & quiz
             var student = await _context.Users.FindAsync(submission.StudentId);
             if (student == null)
             {
+                _logger.LogInfo($"Student not found for StudentId: {submission.StudentId}");
                 return NotFound(new Response<string>
                 {
                     httpStatusCode = HttpStatusCode.NotFound,
@@ -182,6 +237,7 @@ public class QuizeController : AppControllerBase
 
             if (quiz == null)
             {
+                _logger.LogInfo($"Quiz not found for QuizId: {submission.QuizId}");
                 return NotFound(new Response<string>
                 {
                     httpStatusCode = HttpStatusCode.NotFound,
@@ -234,10 +290,7 @@ public class QuizeController : AppControllerBase
             _context.studentQuizeAnswers.Add(studentQuizAnswer);
             await _context.SaveChangesAsync();
 
-
-
             // 5. Auto-correct if enabled
-
             int correctAnswersCount = 0;
             int totalPointsEarned = 0;
 
@@ -295,7 +348,7 @@ public class QuizeController : AppControllerBase
                 }
             }
 
-            decimal gradingRating = quiz.PossiblePoints > 0
+            decimal gradingRating = correctAnswersCount > 0
                 ? (decimal)totalPointsEarned * 100 / quiz.PossiblePoints
                 : 0;
             bool isPassed = gradingRating >= 50;
@@ -308,33 +361,7 @@ public class QuizeController : AppControllerBase
             _context.studentQuizeAnswers.Update(studentQuizAnswer);
             await _context.SaveChangesAsync();
 
-
-            //// 8. Send email notification
-            //var emailSubject = "Quiz Submission Confirmation";
-            //var emailBody = $"Dear {student.UserName},<br/><br/>" +
-            //                $"You have successfully submitted the quiz '{quiz.Name}'.<br/>" +
-            //                $"Your grading rating is: {responseDto.GradingRating}%<br/>" +
-            //                $"You have answered {responseDto.NumberOfAnsweredCorrectly} questions correctly.<br/>" +
-            //                $"Thank you for participating!<br/><br/>" +
-            //                "Best regards,<br/>Your Course Team";
-            //_emailSender.SendEmailAsync(student.Email, emailSubject, emailBody);
-            //// 9. Return the response
-            //if (responseDto.GradingRating >= 50)
-            //{
-            //    _emailSender.SendEmailAsync(student.Email, "Congratulations on Passing the Quiz",
-            //        $"Dear {student.UserName},<br/><br/>" +
-            //        $"Congratulations! You have passed the quiz with a score of {responseDto.GradingRating}%.<br/>" +
-            //        "Keep up the great work!<br/><br/>" +
-            //        "Best regards,<br/>Your Course Team");
-            //}
-            //else {
-            //    _emailSender.SendEmailAsync(student.Email, "Quiz Submission Result",
-            //        $"Dear {student.UserName},<br/><br/>" +
-            //        $"You have submitted the quiz with a score of {responseDto.GradingRating}%.<br/>" +
-            //        "Unfortunately, you did not pass this time. Please review the material and try again.<br/><br/>" +
-            //        "Best regards,<br/>Your Course Team");
-            //}
-
+            _logger.LogInfo($"Successfully submitted quiz for StudentId: {submission.StudentId}, QuizId: {submission.QuizId}. Grade: {gradingRating}%, Passed: {isPassed}");
 
             return Ok(new Response<string>
             {
@@ -345,6 +372,7 @@ public class QuizeController : AppControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogInfo($"Error submitting quiz for StudentId: {submission.StudentId}, QuizId: {submission.QuizId}. Exception: {ex.Message}");
             return StatusCode(500, new Response<string>
             {
                 httpStatusCode = HttpStatusCode.InternalServerError,
@@ -355,19 +383,21 @@ public class QuizeController : AppControllerBase
         }
     }
 
-
-
-
     [HttpGet("CourseStudentStats")]
     public IActionResult GetCourseStudentStats([FromQuery] int courseId)
     {
         try
         {
+            _logger.LogInfo($"Getting course student stats for CourseId: {courseId}");
+            
             var result = _service.GetCourseStudentQuizStats(courseId);
+            
+            _logger.LogInfo($"Successfully retrieved course student stats for CourseId: {courseId}");
             return Ok(result);
         }
         catch (Exception ex)
         {
+            _logger.LogInfo($"Error getting course student stats for CourseId: {courseId}. Exception: {ex.Message}");
             return StatusCode(500, new Response<List<CourseStudentQuizStatsDto>>
             {
                 httpStatusCode = HttpStatusCode.InternalServerError,
@@ -383,13 +413,21 @@ public class QuizeController : AppControllerBase
     {
         try
         {
+            _logger.LogInfo($"Getting student course stats for StudentId: {studentId}, CourseId: {courseId}");
+            
             var result = _service.GetStudentCourseQuizStats(studentId, courseId);
             if (result == null)
+            {
+                _logger.LogInfo($"Student course stats not found for StudentId: {studentId}, CourseId: {courseId}");
                 return NotFound();
+            }
+            
+            _logger.LogInfo($"Successfully retrieved student course stats for StudentId: {studentId}, CourseId: {courseId}");
             return Ok(result);
         }
         catch (Exception ex)
         {
+            _logger.LogInfo($"Error getting student course stats for StudentId: {studentId}, CourseId: {courseId}. Exception: {ex.Message}");
             return StatusCode(500, new Response<StudentCourseQuizStatsDto>
             {
                 httpStatusCode = HttpStatusCode.InternalServerError,
@@ -405,11 +443,16 @@ public class QuizeController : AppControllerBase
     {
         try
         {
+            _logger.LogInfo($"Getting lesson quiz stats for LessonId: {lessonId}");
+            
             var result = await _service.GetLessonQuizStats(lessonId);
+            
+            _logger.LogInfo($"Successfully retrieved lesson quiz stats for LessonId: {lessonId}");
             return NewResult(result);
         }
         catch (Exception ex)
         {
+            _logger.LogInfo($"Error getting lesson quiz stats for LessonId: {lessonId}. Exception: {ex.Message}");
             return StatusCode(500, new Response<LessonQuizStatsDto>
             {
                 httpStatusCode = HttpStatusCode.InternalServerError,
@@ -425,11 +468,16 @@ public class QuizeController : AppControllerBase
     {
         try
         {
+            _logger.LogInfo($"Getting course lesson quiz stats for CourseId: {courseId}");
+            
             var result = await _service.GetCourseLessonQuizStats(courseId);
+            
+            _logger.LogInfo($"Successfully retrieved course lesson quiz stats for CourseId: {courseId}");
             return NewResult(result);
         }
         catch (Exception ex)
         {
+            _logger.LogInfo($"Error getting course lesson quiz stats for CourseId: {courseId}. Exception: {ex.Message}");
             return StatusCode(500, new Response<List<LessonQuizStatsDto>>
             {
                 httpStatusCode = HttpStatusCode.InternalServerError,
