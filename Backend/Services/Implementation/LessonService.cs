@@ -77,6 +77,7 @@ public class LessonService : ResponseHandler, ILessonService
     {
         var existingLesson = await _unitOfWork.Repository<Lesson>()
                                                .GetByIdAsync(updateLessonDto.Id);
+                                              
         if (existingLesson == null)
         {
             _logger.LogInfo("Lesson Not found to Update");
