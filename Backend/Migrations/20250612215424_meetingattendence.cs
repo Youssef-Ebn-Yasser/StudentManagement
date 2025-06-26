@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -107,7 +106,7 @@ namespace Backend.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ZoomParticipants_MeetingId1",
                 table: "ZoomParticipants",
-                column: "MeetingId1");
+                column: "MeetingId");
         }
 
         /// <inheritdoc />
