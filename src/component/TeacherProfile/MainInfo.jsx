@@ -73,7 +73,7 @@ const MainInfo = ({ teacherData }) => {
   ];
 
   return (
-    <aside className="sticky top-0 bg-white md:mx-8 lg:mx-4 mb-8 p-6 shadow-md rounded-md -mt-40 relative">
+    <aside className="relative top-0 bg-white md:mx-8 lg:mx-4 mb-8 p-6 shadow-md rounded-md -mt-40 relative">
       <button
         onClick={handleStudentsClick}
         className="        bg-blue-600 hover:bg-blue-700 active:bg-blue-800 
@@ -143,45 +143,25 @@ const MainInfo = ({ teacherData }) => {
       <div className="text-start pt-6 border-t border-gray-200 mt-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-xl font-bold text-gray-800 bg-gradient-to-r from-violet-600 to-violet-800 bg-clip-text ">
+            <h3 className="text-xl font-bold text-gray-800">
               Quick Actions
             </h3>
             <p className="text-sm text-gray-500 mt-1">Access your most used features</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {quickActions.map((action, index) => (
             <button
               key={index}
               onClick={action.onClick}
-              className="group relative flex items-center gap-4 px-4 py-5 bg-white hover:bg-gradient-to-r hover:from-white hover:to-violet-50 border border-gray-200 hover:border-violet-200 rounded-md transition-all duration-300 shadow-sm hover:shadow-lg hover:-translate-y-0.5"
+              className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300 flex flex-col items-center justify-center"
+              type="button"
             >
-              <div className={`flex items-center justify-center w-14 h-14 rounded-md bg-gradient-to-br ${action.color} group-hover:scale-110 transition-transform duration-300`}>
-                <span className="text-white transform group-hover:rotate-12 transition-transform duration-300 text-xl">
-                  {action.icon}
-                </span>
+              <div className="w-12 h-12 mx-auto mb-4 flex items-center justify-center">
+                <span className="text-2xl text-indigo-600">{action.icon}</span>
               </div>
-              <div className="flex flex-col items-start flex-grow">
-                <span className="text-base font-semibold text-gray-700 group-hover:text-violet-700 transition-colors duration-200">
-                  {action.label}
-                </span>
-                <span className="text-sm text-gray-500 group-hover:text-violet-500 transition-colors duration-200">
-                  {action.description}
-                </span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-10 h-10 rounded-md bg-gray-50 group-hover:bg-violet-50 flex items-center justify-center transition-colors duration-200">
-                  <svg 
-                    className="w-5 h-5 text-gray-400 group-hover:text-violet-500 transform group-hover:translate-x-1 transition-all duration-200" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </div>
-              <div className="absolute inset-0 rounded-md bg-gradient-to-r from-violet-500/0 to-violet-500/0 group-hover:from-violet-500/5 group-hover:to-violet-500/10 transition-all duration-300" />
+              <h3 className="text-lg font-semibold text-indigo-600 mb-1">{action.label}</h3>
+              <span className="text-sm text-gray-500">{action.description}</span>
             </button>
           ))}
         </div>

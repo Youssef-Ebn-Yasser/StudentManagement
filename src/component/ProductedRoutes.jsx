@@ -13,7 +13,7 @@ const ProtectedRoutes = ({ isProtected, accessRole, children }) => {
         return <Navigate to="/auth/login" />
     }
 
-    if (isProtected && accessRole !== 'all' && role !== accessRole) {
+    if (isProtected && accessRole !== 'all' && role?.toLowerCase() !== accessRole?.toLowerCase()) {
         return <NoAccess />
     }
 
