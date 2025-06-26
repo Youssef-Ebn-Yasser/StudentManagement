@@ -1,4 +1,5 @@
 using AspNetCore.JsonLocalization;
+using Hangfire;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Stripe;
@@ -67,6 +68,14 @@ builder.Services.AddCors(Options =>
 builder.Services.AddSignalR();
 #endregion
 
+
+#region     HangFire
+builder.Services.AddHangfire(config =>
+{
+    config.UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+builder.Services.AddHangfireServer();
+#endregion
 
 #region   Localization
 // Add JSON-based localization
@@ -158,6 +167,10 @@ app.UseAuthorization();
 var locOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>();
 app.UseRequestLocalization(locOptions.Value);
 //app.UseRequestLocalization();
+#endregion
+
+#region   Hangfire
+app.UseHangfireDashboard(); // URL: /hangfire
 #endregion
 
 // Map SignalR Hub
