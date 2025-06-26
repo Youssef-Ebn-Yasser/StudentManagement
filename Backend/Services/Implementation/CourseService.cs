@@ -204,7 +204,10 @@ public class CourseService : ResponseHandler, ICourseService
 
         if (isSuccessAdd > 0)
         {
-            BackgroundJob.Enqueue(() => Translate(createCourseDto.Level, createCourseDto.Title, createCourseDto.Description, course.Id, cultureInfo.TwoLetterISOLanguageName.ToLower()));
+            BackgroundJob.Enqueue<ICourseService>(x =>
+                x.Translate(createCourseDto.Level, createCourseDto.Title, createCourseDto.Description,
+                    course.Id, cultureInfo.TwoLetterISOLanguageName.ToLower()));
+
             _logger.LogInfo("Course Added Successfully");
             return Created<string>("Course created successfully");
         }
