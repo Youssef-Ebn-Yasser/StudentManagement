@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom'
 import img from '../../assets/error.png'
 import toast from 'react-hot-toast'
 import axios from 'axios'
+import { useTranslation } from 'react-i18next'
 
 function ForgetPassword() {
 
+    const { t } = useTranslation();
     const [email,setEmail]= useState('')
     const [loading, setLoading]= useState(false)
     const navigate= useNavigate()
@@ -19,11 +21,11 @@ function ForgetPassword() {
         try {
             const response = await axios.post(`https://e-learn-v1.runasp.net/api/Auth/forgot-password?email=${email}`)
             if (response.data.succeeded) {
-                toast.success('Password reset instructions sent to your email')
+                toast.success(t("instruction-sended"))
                 // Optionally navigate to a confirmation page
                 // navigate('/reset-password-confirmation')
             } else {
-                toast.error(response.data.message || 'Failed to send reset instructions')
+                toast.error(response.data.message || t("error-revieve"))
             }
         } catch (error) {
             console.log(error);
@@ -43,8 +45,8 @@ function ForgetPassword() {
                 <div className="welcome  mx-auto p-2 w-[50%] ">
                     
                     <div className='text-center py-[30px] w-full'>
-                        <h1 className='font-bold text-2xl'>Reset Your Password</h1>
-                        <p className='text-gray-400'>Please enter Your email we will send to you an code</p>
+                        <h1 className='font-bold text-2xl'>{t('reset-passwotd')}</h1>
+                        <p className='text-gray-400'>{t('enter-email')}</p>
                     </div>
                         <form onSubmit={handleSubmit}>
                             <div className="flex flex-col gap-2 ">
@@ -69,7 +71,7 @@ function ForgetPassword() {
                                         type="submit"
                                         disabled={loading}
                                     >
-                                        {loading ? 'Sending...' : 'Send'}
+                                        {loading ? t("Sending") : t("Send")}
                                     </button>
                                 </div>
                             </div>

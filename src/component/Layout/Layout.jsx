@@ -7,8 +7,9 @@ import Translate from '../Translate/Translate'
 
 function Layout() {
     return <>
-    <Translate/>
+    
     <Navbar/>
+    <Translate/>
         <Outlet></Outlet>
         <Chatbot/>
     <Footer/>

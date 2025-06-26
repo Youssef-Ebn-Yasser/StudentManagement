@@ -1,6 +1,4 @@
 {
-  "welcome": "Welcome to our application!",
-  "greeting": "Hello, world!",
   "change_language": "Change Language",
   "direction": "ltr",
   "enter_your_email": "Enter Your Email",
@@ -11,5 +9,24 @@
   "sign_up": "Sign up",
   "student_image_alt": "Student registration image",
   "google_login_failed":"Google login failed.",
-  "error_during_google_login":"Error during Google login. Please try again."
+  "error_during_google_login":"Error during Google login. Please try again.",
+  "reset-passwotd":"Reset Your Password",
+  "enter-email":"Please enter Your email we will send to you an code",
+  "instruction-sended":"Password reset instructions sent to your email",
+  "revieve-failed":"Failed to send reset instructions",
+  "error-revieve":"An error occurred. Please try again.",
+  "Sending":"Sending...",
+  "Send":"Send",
+  "as-student":"As a Student",
+  "UserName":"UserName",
+  "Email":"Email",
+  "Password":"Password",
+  "Confirm-Password":"Confirm Password",
+  "Register":"Register",
+  "be-a-teacher":"Become a Teacher",
+  "google-failed":"Google registration failed",
+  "google-success":"Google registration successful",
+  "google-failed-try-again":"Error during Google registration. Please try again.",
+  "have-account":"Already have an account?",
+  "Sign-in":"Sign in"
 }

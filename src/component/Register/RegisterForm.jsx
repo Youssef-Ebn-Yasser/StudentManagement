@@ -6,11 +6,14 @@ import { useState } from 'react'
 import { GoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next'
+
 
 export default function RegisterForm({ userType }) {
     const { handleGoBack, formik, loading } = useRegister(userType)
     const [passwordVisible, setPasswordVisible] = useState(false)
     const [confirmPassVisible, setConfirmPassVisible] = useState(false)
+    const { t } = useTranslation();
     
 
 
@@ -37,7 +40,7 @@ export default function RegisterForm({ userType }) {
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
                                     id="UserName"
-                                    placeholder="UserName"
+                                    placeholder={t("UserName")}
                                     required
                                 />
                                 {formik.touched.name && formik.errors.name ? (
@@ -55,7 +58,7 @@ export default function RegisterForm({ userType }) {
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
                                     id="Email"
-                                    placeholder="Email"
+                                    placeholder={t("Email")}
                                     required
                                 />
                                 {formik.touched.email && formik.errors.email ? (
@@ -69,13 +72,13 @@ export default function RegisterForm({ userType }) {
 
                                     <input
                                         type={passwordVisible ? 'text' : 'password'}
-                                        className="border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"
+                                        className="border-1 border-gray-400 rounded p-2 pr-10 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"
                                         value={formik.values.password}
                                         name="password"
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
                                         id="Password"
-                                        placeholder="Password"
+                                        placeholder={t("Password")}
                                         required
                                     />
                                     <i
@@ -97,13 +100,13 @@ export default function RegisterForm({ userType }) {
                                 <div className='relative'>
                                     <input
                                         type={confirmPassVisible ? 'text' : 'password'}
-                                        className="border-1 border-gray-400 rounded p-2 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"
+                                        className="border-1 border-gray-400 rounded p-2 pr-10 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"
                                         value={formik.values.confirmPassword}
                                         name="confirmPassword"
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
                                         id="ConfirmPassword"
-                                        placeholder="Confirm Password"
+                                        placeholder={t("Confirm-Password")}
                                         required
                                     />
                                     <i
@@ -126,7 +129,7 @@ export default function RegisterForm({ userType }) {
                                     className="bg-blue-700 text-white w-full p-2 rounded hover:bg-blue-500 transition-all duration-300 ease"
                                     disabled={loading}
                                 >
-                                    {loading ? 'Loading...' : 'Register'}
+                                    {loading ? 'Loading...' : t('Register')}
                                 </button>
                             </div>
                             <div className=" flex justify-center my-3">
@@ -147,7 +150,7 @@ export default function RegisterForm({ userType }) {
                                                 }
                                             );
                                             if (response.data.succeeded) {
-                                                toast.success('Google registration successful!');
+                                                toast.success(t('google-success'));
                                                 // Store the token if it's returned
                                                 if (response.data.data?.token) {
                                                     localStorage.setItem('token', response.data.data.token);
@@ -163,19 +166,19 @@ export default function RegisterForm({ userType }) {
                                                     window.location.href = '/';
                                                 }
                                             } else {
-                                                toast.error(response.data.messages?.[0] || 'Google registration failed.');
+                                                toast.error(response.data.messages?.[0] || t('google-failed'));
                                             }
                                         } catch (error) {
                                             console.error('Google registration API error:', error);
                                             if (error.response?.data?.messages?.[0]) {
                                                 toast.error(error.response.data.messages[0]);
                                             } else {
-                                                toast.error('Error during Google registration. Please try again.');
+                                                toast.error(t('google-failed-try-again'));
                                             }
                                         }
                                     }}
                                     onError={() => {
-                                        toast.error('Google registration failed. Please try again.');
+                                        toast.error(t('google-failed-try-again'));
                                     }}
                                 />
                             </div>
@@ -186,18 +189,18 @@ export default function RegisterForm({ userType }) {
                                         className="flex items-center justify-center gap-2 bg-green-600 text-white w-full p-2 rounded hover:bg-green-500 transition-all duration-300 ease"
                                     >
                                         <FaChalkboardTeacher />
-                                        Become a Teacher
+                                        {t("be-a-teacher")}
                                     </Link>
                                 </div>
                             )}
                             <div className="">
                                 <p className="m-0 text-secondary text-center">
-                                    Already have an account?{' '}
+                                    {t("have-account")}{' '}
                                     <Link
                                         to={'/auth/login'}
                                         className="text-blue-600 hover:underline transition-all duration-300 ease"
                                     >
-                                        Sign in
+                                        {t("Sign-in")}
                                     </Link>
                                 </p>
                             </div>
