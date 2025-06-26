@@ -121,7 +121,7 @@ namespace Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Content")
+                    b.Property<string>("ContentAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContentEn")
@@ -174,7 +174,7 @@ namespace Backend.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("DescriptionAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DescriptionEn")
@@ -189,7 +189,7 @@ namespace Backend.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Level")
+                    b.Property<string>("LevelAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LevelEn")
@@ -231,7 +231,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("DescriptionAr")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -268,7 +268,7 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RejectionReason")
+                    b.Property<string>("RejectionReasonAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RejectionReasonEn")
@@ -304,7 +304,7 @@ namespace Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Content")
+                    b.Property<string>("ContentAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContentEn")
@@ -461,11 +461,7 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("NameAr")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameEn")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -798,7 +794,10 @@ namespace Backend.Migrations
                     b.Property<int?>("LessonId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("NameAr")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Path")
@@ -821,6 +820,42 @@ namespace Backend.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("StudentAssignments");
+                });
+
+            modelBuilder.Entity("Backend.Entities.StudentAttendance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MeetingId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MeetingId1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MeetingId1");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("StudentAttendances");
                 });
 
             modelBuilder.Entity("Backend.Entities.StudentCourse", b =>
@@ -886,8 +921,10 @@ namespace Backend.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
+                    b.Property<string>("NameAr")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
@@ -921,14 +958,6 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasMaxLength(8)
                         .HasColumnType("nvarchar(8)");
-
-                    b.Property<string>("UserTypeAr")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserTypeEn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1106,6 +1135,12 @@ namespace Backend.Migrations
                     b.Property<string>("NationalId")
                         .HasColumnType("nvarchar(max)");
 
+                    b.ToTable("AspNetUsers", t =>
+                        {
+                            t.Property("NationalId")
+                                .HasColumnName("Admin_NationalId");
+                        });
+
                     b.HasDiscriminator().HasValue("Admin");
                 });
 
@@ -1113,11 +1148,30 @@ namespace Backend.Migrations
                 {
                     b.HasBaseType("Backend.Entities.User");
 
+                    b.Property<string>("AddressAr")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AddressEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GovernmentAr")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GovernmentEn")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NationalId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("RandomCode")
+                        .HasColumnType("bigint");
 
                     b.ToTable("AspNetUsers", t =>
                         {
@@ -1426,6 +1480,25 @@ namespace Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Lesson");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("Backend.Entities.StudentAttendance", b =>
+                {
+                    b.HasOne("Backend.Entities.Meetings.Meeting", "Meeting")
+                        .WithMany()
+                        .HasForeignKey("MeetingId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Meeting");
 
                     b.Navigation("Student");
                 });
