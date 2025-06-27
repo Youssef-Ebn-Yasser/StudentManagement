@@ -506,7 +506,7 @@ await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync
 
         return Success(profile);
     }
-    private async Task<List<Backend.DTOs.StudentDOs.StudentAttendanceDto>> GetStudentAttendance(int studentId)
+    private async Task<List<StudentAttendanceStatusDto>> GetStudentAttendance(int studentId)
     {
         // Implement this based on how you track meeting attendance
         // This is just a placeholder implementation
@@ -514,7 +514,7 @@ await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync
             .GetTableNoTracking()
             .Include(ma => ma.Meeting)
             .Where(ma => ma.StudentId == studentId)
-            .Select(ma => new StudentAttendanceDto
+            .Select(ma => new StudentAttendanceStatusDto
             {
                 StudentId = ma.StudentId,
 

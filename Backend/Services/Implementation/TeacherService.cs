@@ -69,7 +69,7 @@ public class TeacherService : ResponseHandler, ITeacherService
             return NotFound<TeacherProfileDto>($"this teacher with this {id} not exist");
         }
         var teacherProfile = _mapper.Map<TeacherProfileDto>(teacher);
-
+        _logger.LogInfo("Map Success and return teacher profile");
         return Success(teacherProfile);
     }
     public async Task<Response<GetTeacherDto>> GetByNameAsync(string name)
