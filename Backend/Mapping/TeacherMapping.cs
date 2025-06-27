@@ -22,7 +22,11 @@ public class TeacherMapping : Profile
             .ForMember(dest => dest.Title, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.TitleAr, src.TitleEn)));
 
         // Other mappings
-        CreateMap<Teacher, TeacherProfileDto>();
+        CreateMap<Teacher, TeacherProfileDto>()
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.NameAr, src.NameEn)))
+            .ForMember(dest => dest.AdditionalInfo, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.AdditionalInfoAr, src.AdditionalInfoEn)))
+            .ForMember(dest => dest.Specialization, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.SpecializationAr, src.SpecializationEn)))
+            .ForMember(dest => dest.coursesProfiles, opt => opt.MapFrom(src => src.Courses));
         CreateMap<Teacher, GetTeacherDto>()
                             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.NameAr, src.NameEn)))
                             .ForMember(dest => dest.AdditionalInfo, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.AdditionalInfoAr, src.AdditionalInfoEn)))
