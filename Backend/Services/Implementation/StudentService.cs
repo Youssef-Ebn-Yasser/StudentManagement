@@ -1,4 +1,5 @@
-﻿namespace Backend.Services.Implementation;
+﻿
+namespace Backend.Services.Implementation;
 
 public class StudentService : ResponseHandler, IStudentService
 {
@@ -412,6 +413,7 @@ public class StudentService : ResponseHandler, IStudentService
     private async Task<Student> _studentExistById(int id) =>
 await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => s.Id == id);
 
+
     public async Task<Response<StudentProfDTO>> GetStudentProfileAsync(int studentId)
     {
         var student = await _studentExistById(studentId);
@@ -421,36 +423,36 @@ await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync
         // Get student basic info
         var studentInfo = _mapper.Map<ShowStudentDto>(student);
 
-        //var listOfAssignment = _unitOfWork.Repository<Lesson>()
-        //    .GetTableNoTracking()
-        //    .Include(sa => sa.StudentAssignments)
-        //    .Include(l => l.Quizs)
-        //.Select(l => new
-        // {
-        //     AssignmentDetails = l.StudentAssignments.Where(sa => sa.LessonId == l.Id)
-        //                           .Select(sa => new
-        //                           {
-        //                               StudentDegreePercentage = sa.DegreePercentage,
-        //                               StudentAssignmentId = sa.Id,
-        //                               AssignmentName = l.materials.Where(m => m.LessonId == l.Id)
-        //                                                           .Select(m => m.Title)
-        //                                                           .FirstOrDefault(),
-        //                           }).FirstOrDefault(),
+        var listOfAssignment = _unitOfWork.Repository<Lesson>()
+            .GetTableNoTracking()
+            .Include(sa => sa.StudentAssignments)
+            .Include(l => l.Quizs)
+        .Select(l => new
+        {
+            AssignmentDetails = l.StudentAssignments.Where(sa => sa.LessonId == l.Id)
+                                   .Select(sa => new
+                                   {
+                                       StudentDegreePercentage = sa.DegreePercentage,
+                                       StudentAssignmentId = sa.Id,
+                                       AssignmentName = l.materials.Where(m => m.LessonId == l.Id)
+                                                                   .Select(m => m.TitleEn)
+                                                                   .FirstOrDefault(),
+                                   }).FirstOrDefault(),
 
-        //     numberOfQuizesInLesson = l.Quizs.Where(q => q.LessonId == l.Id).Count(),
-        //     TotalQuizesDegreeInLessons = l.Quizs.Where(q => q.LessonId == l.Id).Sum(q => q.PossiblePoints),
-        //     StudentDegreeOfQuizesInLessons = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Sum(qa => qa.GradingRating),
-        //     quizLestDetails = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Select(qa => new
-        //     {
-        //         studentQuizAnswerId = qa.Id,
-        //         quizPercentageDegree = qa.GradingRating,
-        //         IsPass = qa.IsPassed,
-        //         PossiblePoints = qa.Quiz.PossiblePoints,
-        //         NumberOfAswered = qa.NumberOfAswered,
-        //         quizName = qa.Quiz.Title,
+            numberOfQuizesInLesson = l.Quizs.Where(q => q.LessonId == l.Id).Count(),
+            TotalQuizesDegreeInLessons = l.Quizs.Where(q => q.LessonId == l.Id).Sum(q => q.PossiblePoints),
+            StudentDegreeOfQuizesInLessons = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Sum(qa => qa.GradingRating),
+            quizLestDetails = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Select(qa => new
+            {
+                studentQuizAnswerId = qa.Id,
+                quizPercentageDegree = qa.GradingRating,
+                IsPass = qa.IsPassed,
+                PossiblePoints = qa.Quiz.PossiblePoints,
+                NumberOfAswered = qa.NumberOfAswered,
+                quizName = qa.Quiz.TitleEn,
 
-        //     })
-        // });
+            })
+        });
 
 
 

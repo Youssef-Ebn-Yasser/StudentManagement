@@ -13,7 +13,7 @@ public class StudentAttendanceService : ResponseHandler, IStudentAttendanceServi
         _mapper = mapper;
     }
 
-    public async Task<Response<string>> MarkAttendanceAsync(int meetingId, List<StudentAttendanceDto> attendances)
+    public async Task<Response<string>> MarkAttendanceAsync(int meetingId, List<StudentAttendanceStatusDto> attendances)
     {
         try
         {
@@ -67,7 +67,7 @@ public class StudentAttendanceService : ResponseHandler, IStudentAttendanceServi
         }
     }
 
-    public async Task<Response<List<StudentAttendanceDto>>> GetAttendanceByMeetingAsync(int meetingId)
+    public async Task<Response<List<StudentAttendanceStatusDto>>> GetAttendanceByMeetingAsync(int meetingId)
     {
         try
         {
@@ -80,21 +80,21 @@ public class StudentAttendanceService : ResponseHandler, IStudentAttendanceServi
             if (!attendanceRecords.Any())
             {
                 _logger.LogInfo($"No attendance records found for MeetingId: {meetingId}");
-                return Success(new List<StudentAttendanceDto>(), "No attendance records found.");
+                return Success(new List<StudentAttendanceStatusDto>(), "No attendance records found.");
             }
 
-            var attendanceDtos = _mapper.Map<List<StudentAttendanceDto>>(attendanceRecords);
+            var attendanceDtos = _mapper.Map<List<StudentAttendanceStatusDto>>(attendanceRecords);
             _logger.LogInfo($"Successfully fetched {attendanceDtos.Count} attendance records for MeetingId: {meetingId}");
             return Success(attendanceDtos);
         }
         catch (Exception ex)
         {
             _logger.LogInfo($"An error occurred while fetching attendance for MeetingId: {meetingId}. Exception: {ex.Message}");
-            return BadRequest<List<StudentAttendanceDto>>($"An error occurred: {ex.Message}");
+            return BadRequest<List<StudentAttendanceStatusDto>>($"An error occurred: {ex.Message}");
         }
     }
 
-    public async Task<Response<List<StudentAttendanceDto>>> GetAttendanceByStudentAsync(int studentId)
+    public async Task<Response<List<StudentAttendanceStatusDto>>> GetAttendanceByStudentAsync(int studentId)
     {
         try
         {
@@ -107,17 +107,17 @@ public class StudentAttendanceService : ResponseHandler, IStudentAttendanceServi
             if (!attendanceRecords.Any())
             {
                 _logger.LogInfo($"No attendance records found for StudentId: {studentId}");
-                return Success(new List<StudentAttendanceDto>(), "No attendance records found.");
+                return Success(new List<StudentAttendanceStatusDto>(), "No attendance records found.");
             }
 
-            var attendanceDtos = _mapper.Map<List<StudentAttendanceDto>>(attendanceRecords);
+            var attendanceDtos = _mapper.Map<List<StudentAttendanceStatusDto>>(attendanceRecords);
             _logger.LogInfo($"Successfully fetched {attendanceDtos.Count} attendance records for StudentId: {studentId}");
             return Success(attendanceDtos);
         }
         catch (Exception ex)
         {
             _logger.LogInfo($"An error occurred while fetching attendance for StudentId: {studentId}. Exception: {ex.Message}");
-            return BadRequest<List<StudentAttendanceDto>>($"An error occurred: {ex.Message}");
+            return BadRequest<List<StudentAttendanceStatusDto>>($"An error occurred: {ex.Message}");
         }
     }
 
