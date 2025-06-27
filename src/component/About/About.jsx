@@ -2,10 +2,14 @@ import React, { useEffect } from 'react'
 import img2 from '../../assets/study.png'
 import CategorySlider from '../CategorySlider/CategorySlider';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 export default function About() {
 
+  const { t } = useTranslation();
   async function getAllStudent() {
+    
+
     let response = await axios.get('http://e-learn-v1.runasp.net/api/Teacher/Teacher/GetAll')
     console.log(response);
   }
@@ -13,81 +17,99 @@ export default function About() {
 
   return (
     <>
-      <div className='p-4 flex flex-col gap-20'>
-        <div className="flex flex-col justify-center items-center title text-center">
-          <h1 className='font-bold text-3xl text-blue-950 '>ABOUT E-LEARNING</h1>
-          <p className='text-xl text-gray-700 md:max-w-xl lg:max-w-xl sm:max-w-full '>
-            Empowering learners worldwide with flexible, accessible, and engaging online education
+       <div className="p-6 md:p-12 bg-gradient-to-br from-blue-50 via-white to-blue-100 min-h-screen">
+      {/* Header Section */}
+      <section className="flex flex-col items-center text-center mb-16">
+        <h1 className="font-extrabold text-4xl md:text-5xl text-blue-900 mb-4 tracking-tight drop-shadow-lg">
+           ABOUT E-LEARNING
+        </h1>
+        <p className="text-xl md:text-2xl text-gray-700 max-w-2xl mb-2">
+          {t('about_subtitle') || 'Empowering learners worldwide with flexible, accessible, and engaging online education'}
+        </p>
+        <div className="h-1 w-24 bg-blue-400 rounded-full my-2"></div>
+      </section>
+
+      {/* Story Section */}
+      <section className="grid md:grid-cols-2 gap-8 items-center mb-16 bg-white rounded-3xl shadow-xl p-8">
+        <div>
+          <h2 className="font-bold text-3xl text-blue-800 mb-4">{t('our_story')}</h2>
+          <p className="text-lg text-gray-700 leading-relaxed">
+            {t('about_story')}
           </p>
         </div>
-  
-        <div className='grid md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 gap-4'>
-          <div className='flex flex-col flex-wrap md:items-start lg:items-start sm:items-center justify-center'>
-            <h2 className='font-bold text-3xl text-blue-950 py-3'>Our Story</h2>
-            <p className='text-lg text-gray-700 max-w-xl'>
-            E-Learning is a global education platform dedicated to transforming traditional learning through innovative digital experiences. We connect passionate educators with motivate learners to create a dynamic, interactive, and inclusive online learning environment.
-            Our Mission is To provide top-quality, affordable education to anyone, anywhere. We aim to break down barriers by offering flexible courses, multilingual support, and a user-friendly platform accessible from any device.
-            Our instructors are industry experts and certified educators from around the globe, selected for their teaching excellence and real-world experience.
-            </p>
-          </div>
-          <div className='flex flex-row flex-wrap items-center justify-center'>
-            <img src={img2} alt="student" width={'80%'} />
-          </div>
+        <div className="flex justify-center">
+          <img src={img2} alt="student" className="rounded-2xl shadow-2xl w-4/5 hover:scale-105 transition-transform duration-300" />
         </div>
+      </section>
 
-        <div className='grid md:grid-cols-4 lg:grid-cols-4 sm:grid-cols-1 gap-4 text-center'>
-          <div className='border-1 border-gray-500 p-2 rounded-xl shadow-xl'>
-            <span><i className="fa-solid fa-building-columns border-4 border-gray-100 shadow-lg shadow-gray-300 p-2 rounded-2xl text-white bg-[#545AE8] text-2xl hover:text-[#545AE8] hover:bg-white hover:cursor-pointer transition-all duration-300 ease"></i></span>
-            <p className='font-bold text-2xl py-3'>10.5k </p>
-            <p className='text-lg'>Educational institutions partnered with us.</p>
-
-          </div>
-          <div className='border-1 border-gray-500 p-2 rounded-xl shadow-xl'>
-            <span><i className="fa-solid fa-chalkboard-user border-4 border-gray-100 shadow-lg shadow-gray-300 p-2 rounded-2xl text-white bg-[#545AE8] text-2xl hover:text-[#545AE8] hover:bg-white hover:cursor-pointer transition-all duration-300 ease"></i></span>
-            <p className='font-bold text-2xl py-3'>33k </p>
-            <p className='text-lg'>Qualified instructors sharing their expertise.</p>
-          </div>
-          <div className='border-1 border-gray-500 p-2 rounded-xl shadow-xl'>
-            <span><i className="fa-solid fa-clock border-4 border-gray-100 shadow-lg shadow-gray-300 p-2 rounded-2xl text-white bg-[#545AE8] text-2xl hover:text-[#545AE8] hover:bg-white hover:cursor-pointer transition-all duration-300 ease"></i></span>
-            <p className='font-bold text-2xl py-3'>65.5k </p>
-            <p className='text-lg'>Hours of quality educational content delivered.</p>
-          </div>
-          <div className='border-1 border-gray-500 p-2 rounded-xl shadow-xl'>
-            <span><i className="fa-solid fa-sack-dollar border-4 border-gray-100 shadow-lg shadow-gray-300 p-2 rounded-2xl text-white bg-[#545AE8] text-2xl hover:text-[#545AE8] hover:bg-white hover:cursor-pointer transition-all duration-300 ease"></i></span>
-            <p className='font-bold text-2xl py-3'>25.5k </p>
-            <p className='text-lg'>Courses purchased and enjoyed by learners.</p>
-          </div>
-        </div>
-
-        <div className="px-4"> 
-          <CategorySlider/>
-        </div>
-
-        <div className='grid md:grid-cols-3 lg:grid-cols-3 sm:grid-cols-1 gap-4 text-center'>
-          <div>
+      {/* Stats Section */}
+      <section className="grid md:grid-cols-4 gap-6 text-center mb-16">
+        {[
+          {
+            icon: "fa-building-columns",
+            value: "10.5k",
+            label: t('about_stat1') 
+          },
+          {
+            icon: "fa-chalkboard-user",
+            value: "33k",
+            label: t('about_stat2') 
+          },
+          {
+            icon: "fa-clock",
+            value: "65.5k",
+            label: t('about_stat3') 
+          },
+          {
+            icon: "fa-sack-dollar",
+            value: "25.5k",
+            label: t('about_stat4') 
+          }
+        ].map((stat, idx) => (
+          <div key={idx} className="bg-white border border-gray-200 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
             <span>
-            <i class="fa-regular fa-face-grin-squint border-4 border-gray-100 shadow-lg shadow-gray-300 p-2 rounded-3xl text-white bg-[#545AE8] text-2xl hover:text-[#545AE8] hover:bg-white hover:cursor-pointer transition-all duration-300 ease"></i>
+              <i className={`fa-solid ${stat.icon} border-4 border-blue-100 shadow-lg p-3 rounded-2xl text-white bg-blue-500 text-3xl mb-4 hover:text-blue-500 hover:bg-white transition-all duration-300`}></i>
             </span>
-            <p className='font-bold text-2xl py-3'>User Satisfication</p>
-            <p className='text-lg'>More than 95% of learners are happy with our platform and courses.</p>
-
+            <p className="font-bold text-3xl py-2 text-blue-900">{stat.value}</p>
+            <p className="text-lg text-gray-600">{stat.label}</p>
           </div>
-          <div>
-            <span><i className="fa-solid fa-headset border-4 border-gray-100 shadow-lg shadow-gray-300 p-2 rounded-3xl text-white bg-[#545AE8] text-2xl hover:text-[#545AE8] hover:bg-white hover:cursor-pointer transition-all duration-300 ease"></i></span>
-            <p className='font-bold text-2xl py-3'>24/7 Support </p>
-            <p className='text-lg'>We respond to questions and complaints quickly to keep users supported.</p>
+        ))}
+      </section>
 
-          </div>
-          
-         
-          <div>
-            <span><i className="fa-solid fa-check border-4 border-gray-100 shadow-lg shadow-gray-300  p-2 rounded-3xl text-white bg-[#545AE8] text-2xl hover:text-[#545AE8] hover:bg-white hover:cursor-pointer transition-all duration-300 ease"></i></span>
-            <p className='font-bold text-2xl py-3'>High Success Rate</p>
-            <p className='text-lg'>Thousands of learners have completed courses and achieved their goals.</p>
-          </div>
-        </div>
+      {/* Category Slider */}
+      <section className="mb-16">
+        <CategorySlider />
+      </section>
 
-      </div>
+      {/* Features Section */}
+      <section className="grid md:grid-cols-3 gap-8 text-center">
+        {[
+          {
+            icon: "fa-face-grin-squint",
+            title: t('about_feature1_title') ,
+            desc: t('about_feature1_desc')
+          },
+          {
+            icon: "fa-headset",
+            title: t('about_feature2_title') ,
+            desc: t('about_feature2_desc') 
+          },
+          {
+            icon: "fa-check",
+            title: t('about_feature3_title') ,
+            desc: t('about_feature3_desc') || "Thousands of learners have completed courses and achieved their goals."
+          }
+        ].map((feature, idx) => (
+          <div key={idx} className="bg-white border border-gray-200 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
+            <span>
+              <i className={`fa-solid ${feature.icon} border-4 border-blue-100 shadow-lg p-3 rounded-3xl text-white bg-blue-500 text-3xl mb-4 hover:text-blue-500 hover:bg-white transition-all duration-300`}></i>
+            </span>
+            <p className="font-bold text-2xl py-2 text-blue-900">{feature.title}</p>
+            <p className="text-lg text-gray-600">{feature.desc}</p>
+          </div>
+        ))}
+      </section>
+    </div>
     </>
   );
   

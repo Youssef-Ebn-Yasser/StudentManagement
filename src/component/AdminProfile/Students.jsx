@@ -7,10 +7,13 @@ import studentImg from '../../assets/student.png'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+
 
 
 function Students() {
 
+    const { t } = useTranslation();
     let dispatch= useDispatch()
     const [enrolledCourse, setEnrolledCourse]= useState({})
     const {students,loading}= useSelector((state)=>state.allStudents)
@@ -77,7 +80,7 @@ function Students() {
             <div className="container mx-auto">
                 <h1 className='text-3xl font-bold text-gray-800 mb-8 flex items-center'>
                     <img src={stuImg} alt="Students Icon" className='w-8 h-8 mr-3' />
-                    Our Students
+                    {t("our-stu")}
                 </h1>
 
                 {/* Search Section */}
@@ -85,16 +88,16 @@ function Students() {
                     <input 
                         className='flex-grow form-input rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3 w-full sm:w-auto'
                         type="text" 
-                        placeholder={`Search students by ${searchType}...`} 
+                        placeholder={`${t("search-students-by")} ${searchType}...`} 
                         onChange={(e) => setSearchItem(e.target.value)}
                     />
                     <select
                         className="form-select rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 py-3 px-4 w-full sm:w-auto"
                         value={searchType}
                         onChange={(e) => setSearchType(e.target.value)}>
-                        <option value="name">Name</option>
-                        <option value="id">ID</option>
-                        <option value="email">Email</option>
+                        <option value={t("Name")}>{t("Name")}</option>
+                        <option value={t("ID")}>{t("ID")}</option>
+                        <option value={t("Email")}>{t("Email")}</option>
                     </select>
                 </div>
 
@@ -108,7 +111,7 @@ function Students() {
                         {searchItem && searchItem.length > 0 && (
                             <h2 className="text-2xl font-semibold text-gray-700 mb-6 text-center">
                                 <i className="fa-solid fa-magnifying-glass px-2 text-violet-500 text-lg"></i>
-                                Search Results
+                                {t("search-results")}
                             </h2>
                         )}
 
@@ -137,7 +140,7 @@ function Students() {
                                         </Link>
 
                                         <div className="w-full mt-2 pt-3 border-t border-gray-200 text-left">
-                                            <h4 className="text-xs font-semibold text-gray-600 mb-1">Enrolled Courses:</h4>
+                                            <h4 className="text-xs font-semibold text-gray-600 mb-1">{t("enrolled-courses")}:</h4>
                                             {enrolledCourse[student.id] ? (
                                                 enrolledCourse[student.id].length > 0 ? (
                                                     <ul className="text-xs text-gray-500 space-y-0.5 max-h-20 overflow-y-auto">
@@ -149,10 +152,10 @@ function Students() {
                                                         ))}
                                                     </ul>
                                                 ) : (
-                                                    <p className="text-xs text-gray-400">No courses</p>
+                                                    <p className="text-xs text-gray-400">{t("no-courses")}</p>
                                                 )
                                             ) : (
-                                                <p className="text-xs text-gray-400">Loading...</p>
+                                                <p className="text-xs text-gray-400">{t("loading")}...</p>
                                             )}
                                         </div>
                                         
@@ -174,7 +177,7 @@ function Students() {
                                          <Loader />
                                     ) : (
                                         <p className='text-gray-600 text-lg'>
-                                            {searchItem && searchItem.length > 0 ? "No matching students found." : "No students available."}
+                                            {searchItem && searchItem.length > 0 ? t("no-matching-students") : "No students available."}
                                         </p>
                                     )}
                                 </div>

@@ -6,6 +6,7 @@ import img from '../../assets/avatar.png'; // Import the logo image
 import Button from './Button';
 import styles from './Navbar.module.css'; // Import the CSS module
 import SearchBar from './SearchBar';
+import { useTranslation } from 'react-i18next';
 
 function Navbar() {
     const dispatch = useDispatch();
@@ -15,6 +16,7 @@ function Navbar() {
     const [isNotificationVisible, setIsNotificationVisible] = useState(false); // State for notification dropdown
     const [isMenuOpen, setIsMenuOpen] = useState(false); // State for the toggle menu
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const toggleNotification = () => {
         setIsNotificationVisible(!isNotificationVisible);
@@ -57,31 +59,31 @@ function Navbar() {
                 <div className={`hidden lg:flex items-center gap-6 ml-[150px] ${styles.navLinks}`}>
                     <ul className="flex items-center gap-4">
                         {/* Common links for all users */}
-                        <li><NavLink to="/" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Home</NavLink></li>
-                        <li><NavLink to="/about" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>About</NavLink></li>
+                        <li><NavLink to="/" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('Home')}</NavLink></li>
+                        <li><NavLink to="/about" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('About')}</NavLink></li>
 
                         {/* Role-specific links */}
                         {isLoggedIn && userRole === 'Student' && (
                           <>
-                            <li><NavLink to="/studentdashboard" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Dashboard</NavLink></li>
-                            <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
+                            <li><NavLink to="/studentdashboard" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('Dashboard')}</NavLink></li>
+                            <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('Courses')}</NavLink></li>
 
                           </>
                         )}
                         {isLoggedIn && userRole === 'Teacher' && (
                           <>
-                            <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
-                            <li><NavLink to="/teacher/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>My Courses</NavLink></li>
+                            <li><NavLink to="/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('Courses')}</NavLink></li>
+                            <li><NavLink to="/teacher/courses" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('My Courses')}</NavLink></li>
 
                           </>
                         )}
                         {isLoggedIn && userRole === 'Admin' && (
                           <>
-                            <li><NavLink to="/admin/dashboard" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Dashboard</NavLink></li>
-                            <li><NavLink to="/admin/students" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Students</NavLink></li>
-                            <li><NavLink to="/admin/addteacher" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Teachers</NavLink></li>
-                            <li><NavLink to="/admin/addcourse" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Courses</NavLink></li>
-                            <li><NavLink to="/admin/addgategory" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>Categories</NavLink></li>
+                            <li><NavLink to="/admin/dashboard" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('Dashboard')}</NavLink></li>
+                            <li><NavLink to="/admin/students" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('Students')}</NavLink></li>
+                            <li><NavLink to="/admin/addteacher" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('Teachers')}</NavLink></li>
+                            <li><NavLink to="/admin/addcourse" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('Courses')}</NavLink></li>
+                            <li><NavLink to="/admin/addgategory" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('Categories')}</NavLink></li>
                           </>
                         )}
                     </ul>
@@ -125,7 +127,7 @@ function Navbar() {
                       onClick={handleLogout}
                       className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors duration-200"
                     >
-                      Logout
+                      {t('Logout')}
                     </button>
                   ) : (
                     <Link to="/auth/login"><Button /></Link>
@@ -155,7 +157,7 @@ function Navbar() {
                                     hover:after:scale-x-100`
                                 }
                             >
-                                Home
+                                {t('Home')}
                             </NavLink>
                         </li>
                         <li className="w-full text-center">
@@ -173,7 +175,7 @@ function Navbar() {
                                     hover:after:scale-x-100`
                                 }
                             >
-                                Courses
+                                {t('Courses')}
                             </NavLink>
                         </li>
                         <li className="w-full text-center">
@@ -191,7 +193,7 @@ function Navbar() {
                                     hover:after:scale-x-100`
                                 }
                             >
-                                About
+                                {t('About')}
                             </NavLink>
                         </li>
 
@@ -213,27 +215,10 @@ function Navbar() {
                                             hover:after:scale-x-100`
                                         }
                                     >
-                                        Dashboard
+                                        {t('Dashboard')}
                                     </NavLink>
                                 </li>
-                                <li className="w-full text-center">
-                                    <NavLink 
-                                        to="/video-call" 
-                                        className={({ isActive }) => 
-                                            `block py-2 px-4 text-lg font-medium relative
-                                            ${isActive 
-                                                ? 'text-indigo-600 after:scale-x-100' 
-                                                : 'text-gray-700 hover:text-indigo-600'
-                                            }
-                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
-                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
-                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
-                                            hover:after:scale-x-100`
-                                        }
-                                    >
-                                        Meeting
-                                    </NavLink>
-                                </li>
+                               
                             </>
                         )}
                         {isLoggedIn && userRole === 'Teacher' && (
@@ -256,24 +241,7 @@ function Navbar() {
                                         My Courses
                                     </NavLink>
                                 </li>
-                                <li className="w-full text-center">
-                                    <NavLink 
-                                        to="/video-call" 
-                                        className={({ isActive }) => 
-                                            `block py-2 px-4 text-lg font-medium relative
-                                            ${isActive 
-                                                ? 'text-indigo-600 after:scale-x-100' 
-                                                : 'text-gray-700 hover:text-indigo-600'
-                                            }
-                                            after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 
-                                            after:w-12 after:h-[2px] after:bg-indigo-600 after:scale-x-0 
-                                            after:origin-center after:transition-transform after:duration-300 after:ease-in-out
-                                            hover:after:scale-x-100`
-                                        }
-                                    >
-                                        Meeting
-                                    </NavLink>
-                                </li>
+                                
                             </>
                         )}
                         {isLoggedIn && userRole === 'Admin' && (
@@ -293,7 +261,7 @@ function Navbar() {
                                         hover:after:scale-x-100`
                                     }
                                 >
-                                    Dashboard
+                                    {t('Dashboard')}
                                 </NavLink>
                             </li>
                             <li className="w-full text-center">
@@ -311,7 +279,7 @@ function Navbar() {
                                         hover:after:scale-x-100`
                                     }
                                 >
-                                    Students
+                                    {t('Students')}
                                 </NavLink>
                             </li>
                             <li className="w-full text-center">
@@ -329,7 +297,7 @@ function Navbar() {
                                         hover:after:scale-x-100`
                                     }
                                 >
-                                    Teachers
+                                    {t('Teachers')}
                                 </NavLink>
                             </li>
                             <li className="w-full text-center">
@@ -347,7 +315,7 @@ function Navbar() {
                                         hover:after:scale-x-100`
                                     }
                                 >
-                                    Courses
+                                    {t('Courses')}
                                 </NavLink>
                             </li>
                             <li className="w-full text-center">
@@ -365,7 +333,7 @@ function Navbar() {
                                         hover:after:scale-x-100`
                                     }
                                 >
-                                    Categories
+                                    {t('Categories')}
                                 </NavLink>
                             </li>
                           </>
@@ -415,7 +383,7 @@ function Navbar() {
                                     onClick={handleLogout}
                                     className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md transition-colors duration-200"
                                 >
-                                    Logout
+                                    {t('Logout')}
                                 </button>
                             </div>
                         ) : (
