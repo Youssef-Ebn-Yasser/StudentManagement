@@ -226,6 +226,17 @@ const TChatRoom = () => { // Renamed to TChatRoom for Teacher's perspective
         scrollToBottom();
     }, [messages]);
 
+    function getMessageAlignment(msg, currentUserId) {
+  // Returns the correct Tailwind classes for alignment and color
+  if (msg.senderId === currentUserId || msg.SenderId === currentUserId) {
+    // Sender (teacher): blue, right
+    return "self-end bg-blue-500 text-white shadow-md";
+  } else {
+    // Receiver (student): grey, left
+    return "mr-auto bg-gray-200 text-gray-800 shadow-sm";
+  }
+}
+
     // --- Send Message Function ---
     const sendMessage = async () => {
         // Prevent sending if input is empty, not connected, or user not identified
@@ -287,7 +298,7 @@ const TChatRoom = () => { // Renamed to TChatRoom for Teacher's perspective
                 )}
 
                 {/* Messages Display Area */}
-                <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 h-96 overflow-y-auto mb-4 custom-scrollbar">
+                <div className="bg-gray-50 border border-gray-300 rounded-lg px-2 py-4 h-96 overflow-y-auto mb-4 custom-scrollbar flex flex-col">
                     {messages.length === 0 ? (
                         <p className="text-gray-500 text-center italic py-10">No messages yet. Start the conversation!</p>
                     ) : (
@@ -295,11 +306,8 @@ const TChatRoom = () => { // Renamed to TChatRoom for Teacher's perspective
                             <div
                                 key={msg.id || index} // Use msg.id if available, otherwise index (for newly sent messages)
                                 className={`
-                                    message mb-3 p-3 rounded-lg max-w-[80%]
-                                    ${(msg.senderId === currentUserId || msg.SenderId === currentUserId)
-                                        ? 'ml-auto bg-blue-500 text-white shadow-md' // My messages (teacher)
-                                        : 'mr-auto bg-gray-200 text-gray-800 shadow-sm' // Other messages (student)
-                                    }
+                                    message mb-3 p-3 rounded-lg max-w-[80%] w-fit
+                                    ${getMessageAlignment(msg, currentUserId)}
                                 `}
                             >
                                 <div className="font-semibold text-sm mb-1 opacity-90">

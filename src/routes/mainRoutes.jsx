@@ -46,8 +46,12 @@ import TChatRoom from '../component/TeacherProfile/TChatRoom'
 import StudentAnswers from '@/component/TeacherProfile/teacherMange/StudentAnswers'
 import StudentQuizStats from '@/component/StudentDashboard/StudentQuizStats'
 import PaymobCheckout from '@/component/CoursesDetails/PaymobCheckout'
-import Translate from '@/component/Translate/Translate'
+import RegisterAdmin from '@/component/AdminProfile/RegisterAdmin'
+import AllAdmins from '@/component/AdminProfile/AllAdmins'
+import StudentProfile3 from '@/component/StudentProfile/StudentProfile3'
 import Report from '../component/Report/report'
+import Translate from '@/component/Translate/Translate'
+
 
 
 
@@ -90,6 +94,12 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
+        path: 'admins',
+        element: <AllAdmins />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
         path: '/studentdashboard/course/:courseId/lesson/:lessonId',
         element: <LessonDetails />,
         isProtected: false,
@@ -104,6 +114,12 @@ const routesConfig = [
     {
         path: 'studentprofilee',
         element: <StudentProfile2 />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'studentprofileee',
+        element: <StudentProfile3 />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -282,7 +298,13 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
-        path: '/admin/controlCourse/:id',
+        path: 'admin/reg-admin',
+        element: <RegisterAdmin/>,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'admin/controlCourse',
         element: <ControlCourse/>,
         isProtected: false,
         accessRole: 'all',
