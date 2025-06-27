@@ -40,7 +40,7 @@ namespace Backend.DTOs.ReportDTOS
         public int AttendedMeetings { get; set; }
         public int AbsentMeetings { get; set; }
         public double AttendanceRate { get; set; }
-        public List<StudentAttendanceDto> RecentAttendance { get; set; }
+        public List<StudentDOs.StudentAttendanceStatusDto> RecentAttendance { get; set; }
     }
 
     public class AcademicPerformanceDto
