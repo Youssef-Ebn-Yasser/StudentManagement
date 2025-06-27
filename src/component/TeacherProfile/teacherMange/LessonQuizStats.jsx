@@ -156,7 +156,7 @@ const LessonQuizStats = () => {
         mb: 4,
         textAlign: 'center'
       }}>
-        {stats.lessonName} - Quiz Statistics
+        {stats.lessonName} - {t("quiz-statistics")}
       </Typography>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -199,7 +199,7 @@ const LessonQuizStats = () => {
 
       <Paper elevation={3} sx={{ p: 4, mb: 4, borderRadius: 2 }}>
         <Typography variant="h5" gutterBottom sx={{ color: theme.palette.primary.main, mb: 3 }}>
-          Performance Distribution
+          {t("performance-distribution")}
         </Typography>
         <Box height={400}>
           <ResponsiveContainer width="100%" height="100%">
@@ -231,7 +231,7 @@ const LessonQuizStats = () => {
           color: theme.palette.primary.main,
           mb: 3
         }}>
-          Quiz Details
+          {t("quiz-details")}
         </Typography>
         
         {(stats.quizzes || []).map((quiz, quizIndex) => (
@@ -243,23 +243,23 @@ const LessonQuizStats = () => {
               </Typography>
               <Grid container spacing={2}>
                 <Grid item xs={6} sm={4} md={2}>
-                  <Typography variant="subtitle2" color="text.secondary">Submissions</Typography>
+                  <Typography variant="subtitle2" color="text.secondary">{t("submissions")}</Typography>
                   <Typography variant="h6">{quiz.numberOfStudentSubmit || 0}</Typography>
                 </Grid>
                 <Grid item xs={6} sm={4} md={2}>
-                  <Typography variant="subtitle2" color="text.secondary">Submission Rate</Typography>
+                  <Typography variant="subtitle2" color="text.secondary">{t("submission-rate")}</Typography>
                   <Typography variant="h6">{(quiz.percentageOfSubmit || 0).toFixed(1)}%</Typography>
                 </Grid>
                 <Grid item xs={6} sm={4} md={2}>
-                  <Typography variant="subtitle2" color="text.secondary">Under 50%</Typography>
+                  <Typography variant="subtitle2" color="text.secondary">{t("under-50")}</Typography>
                   <Typography variant="h6">{quiz.numberOfStudentUnder50 || 0}</Typography>
                 </Grid>
                 <Grid item xs={6} sm={4} md={2}>
-                  <Typography variant="subtitle2" color="text.secondary">Over 70%</Typography>
+                  <Typography variant="subtitle2" color="text.secondary">{t("over-70")}</Typography>
                   <Typography variant="h6">{quiz.numberOfStudentOver70 || 0}</Typography>
                 </Grid>
                 <Grid item xs={6} sm={4} md={2}>
-                  <Typography variant="subtitle2" color="text.secondary">Perfect Scores</Typography>
+                  <Typography variant="subtitle2" color="text.secondary">{t("perfect-scores")}</Typography>
                   <Typography variant="h6">{quiz.numberOfStudentWith100 || 0}</Typography>
                 </Grid>
               </Grid>
@@ -268,15 +268,15 @@ const LessonQuizStats = () => {
             {/* Student Submissions for this Quiz */}
             <Box sx={{ mt: 2 }}>
               <Typography variant="subtitle1" sx={{ mb: 2, color: theme.palette.text.secondary }}>
-                Student Submissions
+                {t("student-submissions")}
               </Typography>
               <TableContainer>
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white' }}>Student Name</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white' }}>Score</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white' }}>Questions Submitted</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white' }}>{t("student-name")}</TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white' }}>{t("score")}</TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white' }}>{t("questions-submitted")}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -299,10 +299,10 @@ const LessonQuizStats = () => {
                         <TableCell colSpan={3} align="center" sx={{ py: 3 }}>
                           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
                             <Typography variant="body1" color="text.secondary">
-                              No student submissions available for this quiz
+                              {t("no-submissions")}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                              Students haven't taken this quiz yet
+                              {t("quiz-not-taken")}
                             </Typography>
                           </Box>
                         </TableCell>

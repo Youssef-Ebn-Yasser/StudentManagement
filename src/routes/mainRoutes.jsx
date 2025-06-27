@@ -47,6 +47,8 @@ import StudentAnswers from '@/component/TeacherProfile/teacherMange/StudentAnswe
 import StudentQuizStats from '@/component/StudentDashboard/StudentQuizStats'
 import PaymobCheckout from '@/component/CoursesDetails/PaymobCheckout'
 import Translate from '@/component/Translate/Translate'
+import Report from '../component/Report/report'
+
 
 
 const routesConfig = [
@@ -280,7 +282,7 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
-        path: 'admin/controlCourse',
+        path: '/admin/controlCourse/:id',
         element: <ControlCourse/>,
         isProtected: false,
         accessRole: 'all',
@@ -326,6 +328,12 @@ const routesConfig = [
         element: <CreateZoom />,
         isProtected: false,
         accessRole: 'all',
+    },
+    {
+        path: 'admin/reports',
+        element: <Report />,
+        isProtected: true,
+        accessRole: 'admin',
     },
     ...teacherRoutes,
     {

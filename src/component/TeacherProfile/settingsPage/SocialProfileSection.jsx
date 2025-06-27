@@ -20,7 +20,7 @@ const SocialProfileSection = ({ onSave }) => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Social Profiles</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">{t("social-profiles")}</h2>
       
       <form className="space-y-4">
         <div>
@@ -123,7 +123,7 @@ const SocialProfileSection = ({ onSave }) => {
             onClick={onSave}
             className="px-6 py-2 bg-[#4F39F6] hover:bg-[#432DD7] cursor-pointer text-white font-medium rounded-md  transition-colors"
           >
-            Save Changes
+            {t("save-changes")}
           </button>
         </div>
       </form>

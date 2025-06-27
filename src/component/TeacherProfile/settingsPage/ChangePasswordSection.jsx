@@ -31,18 +31,18 @@ const ChangePasswordSection = ({ onSave }) => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Change password</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">{t("change-password")}</h2>
       
       <form className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Current Password
+            {t("current-password")}
           </label>
           <div className="relative">
             <input
               type={showPassword.current ? "text" : "password"}
               name="currentPassword"
-              placeholder="Password"
+              placeholder={t('password')}
               value={passwordData.currentPassword}
               onChange={handleInputChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-0 focus:outline-none focus:border-gray-400"
@@ -59,13 +59,13 @@ const ChangePasswordSection = ({ onSave }) => {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            New Password
+            {t("new-password")}
           </label>
           <div className="relative">
             <input
               type={showPassword.new ? "text" : "password"}
               name="newPassword"
-              placeholder="Password"
+              placeholder={t('password')}
               value={passwordData.newPassword}
               onChange={handleInputChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-0 focus:outline-none focus:border-gray-400"
@@ -82,13 +82,13 @@ const ChangePasswordSection = ({ onSave }) => {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Confirm Password
+            {t("confirm-password")}
           </label>
           <div className="relative">
             <input
               type={showPassword.confirm ? "text" : "password"}
               name="confirmPassword"
-              placeholder="Confirm new password"
+              placeholder={t("confirm-new-password")}
               value={passwordData.confirmPassword}
               onChange={handleInputChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-0 focus:outline-none focus:border-gray-400"
@@ -108,7 +108,7 @@ const ChangePasswordSection = ({ onSave }) => {
             onClick={onSave}
             className="px-6 py-2 bg-[#4F39F6] hover:bg-[#432DD7] cursor-pointer text-white font-medium rounded-md transition-colors"
           >
-            Save Changes
+            {t("save-changes")}
           </button>
         </div>
       </form>

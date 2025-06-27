@@ -57,6 +57,7 @@ function Navbar() {
 
                 {/* Navbar Links (Large Screens) */}
                 <div className={`hidden lg:flex items-center gap-6 ml-[150px] ${styles.navLinks}`}>
+                    
                     <ul className="flex items-center gap-4">
                         {/* Common links for all users */}
                         <li><NavLink to="/" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('Home')}</NavLink></li>

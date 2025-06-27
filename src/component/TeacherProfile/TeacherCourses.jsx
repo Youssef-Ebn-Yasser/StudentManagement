@@ -6,8 +6,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
 const TeacherCourses = ({ setActiveTab }) => {
+
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSelector((state) => state.auth);
@@ -62,20 +65,22 @@ const TeacherCourses = ({ setActiveTab }) => {
   const filteredAndSortedCourses = useMemo(() => {
     // First, filter by search query
     let result = courses.filter(course => {
-      return course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-             course.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const title = course.title || '';
+      const description = course.description || '';
+      return title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+             description.toLowerCase().includes(searchQuery.toLowerCase());
     });
 
     // Then, sort the filtered results
     return result.sort((a, b) => {
       switch (sortBy) {
-        case 'Most Popular':
+        case `${t("most-popular")}`:
           return b.studentsCount - a.studentsCount;
-        case 'Price: Low to High':
+        case `${t("price-low-high")}`:
           return a.price - b.price;
-        case 'Price: High to Low':
+        case `${t("price-high-low")}`:
           return b.price - a.price;
-        case 'Latest':
+        case `${t("latest")}`:
         default:
           return new Date(b.createdAt) - new Date(a.createdAt);
       }
@@ -95,7 +100,7 @@ const TeacherCourses = ({ setActiveTab }) => {
   const getPageTitle = () => {
     if (isAddLessonMode) return 'Select Course for New Lesson';
     if (isAddMaterialMode) return 'Select Course for New Material';
-    return 'My Courses';
+    return `${t('My Courses')}`;
   };
 
   const handleCourseAction = (courseId) => {
@@ -119,7 +124,7 @@ const TeacherCourses = ({ setActiveTab }) => {
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              Back to Profile
+              {t("back-to-profile")}
             </button>
           </div>
 
@@ -135,7 +140,7 @@ const TeacherCourses = ({ setActiveTab }) => {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                Create New Course
+                {t("create-new-course")}
               </button>
             )}
           </div>
@@ -146,7 +151,7 @@ const TeacherCourses = ({ setActiveTab }) => {
                 <div className="scale-[2.5] mb-4">
                   <Loader />
                 </div>
-                <p className="text-gray-600">Loading teacher information...</p>
+                <p className="text-gray-600">{t("loading-teacher-info")}...</p>
               </div>
             </div>
           ) : (
@@ -156,7 +161,7 @@ const TeacherCourses = ({ setActiveTab }) => {
                 <div className="flex-1">
                   <input
                     type="text"
-                    placeholder="Search courses..."
+                    placeholder={t("search-courses")}
                     value={searchQuery}
                     onChange={handleSearchChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -168,10 +173,10 @@ const TeacherCourses = ({ setActiveTab }) => {
                     onChange={handleSortChange}
                     className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                    <option value="Latest">Latest</option>
-                    <option value="Most Popular">Most Popular</option>
-                    <option value="Price: Low to High">Price: Low to High</option>
-                    <option value="Price: High to Low">Price: High to Low</option>
+                    <option value="Latest">{t("latest")}</option>
+                    <option value="Most Popular">{t("most-popular")}</option>
+                    <option value="Price: Low to High">{t("price-low-high")}</option>
+                    <option value="Price: High to Low">{t("price-high-low")}</option>
                   </select>
                 </div>
               </div>
@@ -206,7 +211,7 @@ const TeacherCourses = ({ setActiveTab }) => {
                           <span className="text-gray-500 text-xs lg:text-sm truncate max-w-[60%]">{course?.title || 'Untitled Course'}</span>
                           {course?.level && (
                             <span className="bg-red-400 text-white py-1 px-2 rounded-xl text-xs">
-                              {course.level} Level
+                              {course.level} {t('level')}
                             </span>
                           )}
                         </div>
@@ -233,13 +238,13 @@ const TeacherCourses = ({ setActiveTab }) => {
                                 onClick={() => navigate('/teacher/course/details', { state: { courseId: course.id } })}
                                 className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 text-sm"
                               >
-                                View Details
+                                {t("view-details")}
                               </button>
                               <button 
                                 onClick={() => navigate('/teacher/course/edit', { state: { courseId: course.id } })}
                                 className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200 text-sm"
                               >
-                                Edit
+                                {t("edit")}
                               </button>
                             </>
                           )}
@@ -264,4 +269,4 @@ const TeacherCourses = ({ setActiveTab }) => {
   );
 };
 
-export default TeacherCourses; 
+export default TeacherCourses;

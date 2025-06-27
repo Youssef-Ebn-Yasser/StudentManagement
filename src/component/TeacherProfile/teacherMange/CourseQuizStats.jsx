@@ -28,6 +28,7 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
+import { BarChart as BarChartIcon } from 'lucide-react';
 
 const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD'];
 
@@ -78,8 +79,11 @@ const CourseQuizStats = () => {
 
   if (error) {
     return (
-      <Box p={3}>
-        <Alert severity="error" sx={{ fontSize: '1.1rem' }}>{error}</Alert>
+      <Box p={3} textAlign="center">
+        <Alert severity="error" sx={{ fontSize: '1.1rem', mb: 2 }}>{error}</Alert>
+        <Button variant="contained" color="primary" onClick={() => window.location.reload()}>
+          {t("retry")}
+        </Button>
       </Box>
     );
   }
@@ -87,7 +91,7 @@ const CourseQuizStats = () => {
   if (!Array.isArray(stats) || stats.length === 0) {
     return (
       <Box p={3}>
-        <Alert severity="info" sx={{ fontSize: '1.1rem' }}>No quiz statistics available for this course.</Alert>
+        <Alert severity="info" sx={{ fontSize: '1.1rem' }}>{t("no-quiz-stats")}</Alert>
       </Box>
     );
   }
@@ -142,15 +146,24 @@ const CourseQuizStats = () => {
   );
 
   return (
-    <Box p={4} sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
-      <Typography variant="h3" gutterBottom sx={{ 
-        color: theme.palette.primary.main,
-        fontWeight: 'bold',
-        mb: 4,
-        textAlign: 'center'
-      }}>
-        Course Quiz Statistics
-      </Typography>
+    <Box p={4} sx={{
+      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      minHeight: '100vh',
+    }}>
+      {error && (
+        <Alert severity="error" sx={{ fontSize: '1.1rem', mb: 2 }}>{error}</Alert>
+      )}
+      <Box display="flex" alignItems="center" justifyContent="center" mb={4}>
+        <BarChartIcon size={36} style={{ marginRight: 12, color: theme.palette.primary.main }} />
+        <Typography variant="h3" gutterBottom sx={{
+          color: theme.palette.primary.main,
+          fontWeight: 'bold',
+          textAlign: 'center',
+          letterSpacing: 1.5
+        }}>
+          {t("course-quiz-stats")}
+        </Typography>
+      </Box>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={4} lg={2.4}>
@@ -190,9 +203,9 @@ const CourseQuizStats = () => {
         </Grid>
       </Grid>
 
-      <Paper elevation={3} sx={{ p: 4, mb: 4, borderRadius: 2 }}>
-        <Typography variant="h5" gutterBottom sx={{ color: theme.palette.primary.main, mb: 3 }}>
-          Performance Distribution
+      <Paper elevation={6} sx={{ p: 4, mb: 6, borderRadius: 4, boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)' }}>
+        <Typography variant="h5" gutterBottom sx={{ color: theme.palette.primary.main, mb: 3, fontWeight: 600 }}>
+          {t("performance-distribution")}
         </Typography>
         <Box height={400}>
           <ResponsiveContainer width="100%" height="100%">
@@ -218,51 +231,52 @@ const CourseQuizStats = () => {
         </Box>
       </Paper>
 
-      {stats.map((lesson, lessonIndex) => {
-        console.log('Lesson object in CourseQuizStats:', lesson);
-        console.log('Lesson ID before Link:', lesson.id);
-        return (
+      {stats.map((lesson, lessonIndex) => (
+        <React.Fragment key={lessonIndex}>
           <Paper 
-            key={lessonIndex} 
             elevation={3} 
-            sx={{ 
-              p: 4, 
-              mb: 4, 
-              borderRadius: 2,
-              backgroundColor: '#ffffff'
+            sx={{
+              p: 4,
+              mb: 4,
+              borderRadius: 3,
+              backgroundColor: '#ffffff',
+              boxShadow: '0 4px 24px 0 rgba(31, 38, 135, 0.08)',
+              transition: 'box-shadow 0.3s',
+              '&:hover': { boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)' }
             }}
           >
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-              <Typography variant="h5" gutterBottom sx={{ 
+              <Typography variant="h5" gutterBottom sx={{
                 color: theme.palette.primary.main,
-                mb: 0
+                mb: 0,
+                fontWeight: 600
               }}>
                 {lesson.lessonName}
               </Typography>
             </Box>
-            <Typography variant="subtitle1" color="text.secondary" gutterBottom sx={{ mb: 3 }}>
-              Number of Quizzes: {lesson.numberOfQuizzes} ({lesson.percentageOfAllQuizzes?.toFixed(1) || 0}% of total)
+            <Typography variant="subtitle1" color="text.secondary" gutterBottom sx={{ mb: 3, fontWeight: 500 }}>
+             {t("number-of-quizzes")}: <span style={{ color: theme.palette.primary.main, fontWeight: 700 }}>{lesson.numberOfQuizzes}</span> ({lesson.percentageOfAllQuizzes?.toFixed(1) || 0}% of total)
             </Typography>
-            
+            <Divider sx={{ mb: 2 }} />
             <TableContainer>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white' }}>Quiz Name</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white' }}>Submissions</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white' }}>Submission Rate</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white' }}>Under 50%</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white' }}>Over 70%</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white' }}>Perfect Scores</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white', fontSize: '1rem' }}>{t("quiz-name")}</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white', fontSize: '1rem' }}>{t("submissions")}</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white', fontSize: '1rem' }}>{t("submission-rate")}</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white', fontSize: '1rem' }}>{t("under-50")}</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white', fontSize: '1rem' }}>{t("over-70")}</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 'bold', backgroundColor: theme.palette.primary.light, color: 'white', fontSize: '1rem' }}>{t("perfect-scores")}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {(lesson.quizzes || []).map((quiz, quizIndex) => (
                     <TableRow 
                       key={quizIndex}
-                      sx={{ 
+                      sx={{
                         '&:nth-of-type(odd)': { backgroundColor: '#f5f5f5' },
-                        '&:hover': { backgroundColor: '#e3f2fd' }
+                        '&:hover': { backgroundColor: '#ede7f6', cursor: 'pointer' }
                       }}
                     >
                       <TableCell>{quiz.quizName}</TableCell>
@@ -277,8 +291,9 @@ const CourseQuizStats = () => {
               </Table>
             </TableContainer>
           </Paper>
-        );
-      })}
+          {lessonIndex < stats.length - 1 && <Divider sx={{ my: 4 }} />}
+        </React.Fragment>
+      ))}
     </Box>
   );
 };

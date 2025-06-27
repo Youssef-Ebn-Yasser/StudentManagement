@@ -6,8 +6,11 @@ import Loader from '../Loader/Loader';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+
 
 const TeacherCourseDetails = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const courseId = location.state?.courseId;
@@ -96,16 +99,16 @@ const TeacherCourseDetails = () => {
 
       Course Details:
       Title: ${course.title}
-      Category: ${course.category}
-      Level: ${course.level}
+      ${t('category')}: ${course.category}
+      ${t('level')}: ${course.level}
 
-      ⚠️ Warning: This action will permanently delete:
-      - The course itself
-      - All lessons in this course
-      - All materials and assignments associated with these lessons
-      - All uploaded files and resources
+      ⚠️ ${t("delete-warning-title")}
+      - ${t("delete-warning-course")}
+      - ${t("delete-warning-lessons")}
+      - ${t("delete-warning-materials")}
+      - ${t("delete-warning-files")}
 
-      This action cannot be undone.
+      ${t("delete-warning-final")}
     `)) {
       try {
         setIsDeleting(true);
@@ -117,12 +120,12 @@ const TeacherCourseDetails = () => {
           toast.success('Course and all associated content deleted successfully');
           navigate('/teacher/courses');
         } else {
-          throw new Error(response?.message || 'Failed to delete course');
+          throw new Error(response?.message || `${t("course-delete-fail")}`);
         }
       } catch (err) {
         if (!isMounted.current) return;
 
-        let errorMessage = 'Failed to delete course';
+        let errorMessage = t("course-delete-fail");
         if (err.response?.data?.message) {
           errorMessage = err.response.data.message;
         } else if (err.message) {
@@ -137,7 +140,7 @@ const TeacherCourseDetails = () => {
   };
 
   const handleDeleteLesson = async (lessonId) => {
-    if (window.confirm('Are you sure you want to delete this lesson?')) {
+    if (window.confirm(`${t("confirm-delete-lesson")}`)) {
       try {
         const response = await courseService.deleteLesson(lessonId);
 
@@ -148,19 +151,19 @@ const TeacherCourseDetails = () => {
             ...prevCourse,
             lessonInfo: prevCourse.lessonInfo.filter(lesson => lesson.id !== lessonId)
           }));
-          toast.success('Lesson deleted successfully');
+          toast.success(`${t("lesson-deleted-success")}`);
         } else {
-          throw new Error(response.messages?.[0] || 'Failed to delete lesson');
+          throw new Error(response.messages?.[0] || `${t("lesson-delete-fail")}`);
         }
       } catch (err) {
         if (!isMounted.current) return;
-        toast.error(err.message || 'Failed to delete lesson');
+        toast.error(err.message || `${t("lesson-delete-fail")}`);
       }
     }
   };
 
   const handleDeleteMaterial = async (materialId) => {
-    if (window.confirm('Are you sure you want to delete this material?')) {
+    if (window.confirm(`${t("confirm-delete-material")}`)) {
       try {
         const response = await axios.delete(`https://e-learn-v1.runasp.net/api/Material/DeleteMaterial/DeleteMaterial/${materialId}`);
 
@@ -176,13 +179,13 @@ const TeacherCourseDetails = () => {
             });
             return updatedMaterials;
           });
-          toast.success('Material deleted successfully');
+          toast.success(`${t("material-deleted-success")}`);
         } else {
-          throw new Error(response.data.messages?.[0] || 'Failed to delete material');
+          throw new Error(response.data.messages?.[0] || `${t("material-delete-fail")}`);
         }
       } catch (err) {
         if (!isMounted.current) return;
-        toast.error(err.response?.data?.message || err.message || 'Failed to delete material');
+        toast.error(err.response?.data?.message || err.message || `${t("material-delete-fail")}`);
       }
     }
   };
@@ -221,15 +224,15 @@ const TeacherCourseDetails = () => {
           });
           return updatedMaterials;
         });
-        toast.success('Material updated successfully');
+        toast.success(`${t("material-update-success")}`);
         setEditingMaterial(null);
         setMaterialFile(null);
       } else {
-        throw new Error(response.data.messages?.[0] || 'Failed to update material');
+        throw new Error(response.data.messages?.[0] || `${t("material-update-fail")}`);
       }
     } catch (err) {
       if (!isMounted.current) return;
-      toast.error(err.response?.data?.message || err.message || 'Failed to update material');
+      toast.error(err.response?.data?.message || err.message || `${t("material-update-fail")}`);
     } finally {
       if (!isMounted.current) return;
       setIsUpdating(false);
@@ -280,7 +283,7 @@ const TeacherCourseDetails = () => {
             onClick={() => navigate(-1)}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
-            Go Back
+            {t("go-back")}
           </button>
         </div>
       </div>
@@ -291,12 +294,12 @@ const TeacherCourseDetails = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600 text-xl mb-4">Course not found</p>
+          <p className="text-gray-600 text-xl mb-4">{t("course-not-found")}</p>
           <button
             onClick={() => navigate(-1)}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
-            Go Back
+            {t("go-back")}
           </button>
         </div>
       </div>
@@ -315,7 +318,7 @@ const TeacherCourseDetails = () => {
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Back to Courses
+            {t("back-to-courses")}
           </button>
           <div className="flex flex-col md:flex-row gap-2">
             <Link
@@ -323,7 +326,7 @@ const TeacherCourseDetails = () => {
               state={{ courseId: course.id }}
               className="inline-block bg-indigo-600 text-white px-6 py-2 rounded-lg shadow hover:bg-indigo-700 transition font-semibold"
             >
-              Create Zoom Meeting
+              {t("create-zoom-meeting")}
             </Link>
             <Link
               to="/teacher/course/meetings"
@@ -331,7 +334,7 @@ const TeacherCourseDetails = () => {
               className="inline-flex items-center bg-purple-600 text-white px-6 py-2 rounded-lg shadow hover:bg-purple-700 transition font-semibold"
             >
               <FaVideo className="mr-2 text-lg" />
-              View Zoom Meetings
+              {t("view-zoom-meetings")}
             </Link>
           </div>
         </div>
@@ -351,7 +354,7 @@ const TeacherCourseDetails = () => {
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 mb-2">{course.title}</h1>
                   <div className="bg-gray-50 p-3 rounded-lg mb-4 inline-block">
-                    <p className="text-sm text-gray-500">Course ID</p>
+                    <p className="text-sm text-gray-500">{t("course-id")}</p>
                     <p className="font-semibold">{course.id || 'Not available'}</p>
                   </div>
                 </div>
@@ -361,14 +364,14 @@ const TeacherCourseDetails = () => {
                     className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                   >
                     <FaChartBar className="inline-block mr-2" />
-                    Quiz Stats
+                    {t("quiz-stats")}
                   </button>
                   <button
                     onClick={() => navigate('/teacher/course/edit', { state: { courseId: course.id } })}
                     className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                   >
                     <FaEdit className="inline-block mr-2" />
-                    Edit Course
+                    {t("edit-course")}
                   </button>
                   <button
                     onClick={handleDeleteCourse}
@@ -381,12 +384,12 @@ const TeacherCourseDetails = () => {
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        Deleting...
+                        {t("deleting")}...
                       </>
                     ) : (
                       <>
                         <FaTrash className="inline-block mr-2" />
-                        Delete Course
+                        {t("delete-course")}
                       </>
                     )}
                   </button>
@@ -399,8 +402,8 @@ const TeacherCourseDetails = () => {
                   <div className="flex items-center">
                     <FaClock className="text-green-500 mr-2" />
                     <div>
-                      <p className="text-sm text-gray-500">Duration</p>
-                      <p className="font-semibold">{course.hours || 0} hours</p>
+                      <p className="text-sm text-gray-500">{t("duration")}</p>
+                      <p className="font-semibold">{course.hours || 0} {t("hours")}</p>
                     </div>
                   </div>
                 </div>
@@ -408,7 +411,7 @@ const TeacherCourseDetails = () => {
                   <div className="flex items-center">
                     <FaBook className="text-purple-500 mr-2" />
                     <div>
-                      <p className="text-sm text-gray-500">Lessons</p>
+                      <p className="text-sm text-gray-500">{t("lessons")}</p>
                       <p className="font-semibold">{course.lessonInfo?.length || 0}</p>
                     </div>
                   </div>
@@ -420,7 +423,7 @@ const TeacherCourseDetails = () => {
                   <div className="flex items-center">
                     <FaTag className="text-indigo-500 mr-2" />
                     <div>
-                      <p className="text-sm text-gray-500">Category</p>
+                      <p className="text-sm text-gray-500">{t("category")}</p>
                       <p className="font-semibold">{course.categoryName || 'Uncategorized'}</p>
                     </div>
                   </div>
@@ -429,7 +432,7 @@ const TeacherCourseDetails = () => {
                   <div className="flex items-center">
                     <FaChartLine className="text-green-500 mr-2" />
                     <div>
-                      <p className="text-sm text-gray-500">Price</p>
+                      <p className="text-sm text-gray-500">{t("Price")}</p>
                       <p className="font-semibold">${course.price || 0}</p>
                     </div>
                   </div>
@@ -451,7 +454,7 @@ const TeacherCourseDetails = () => {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Overview
+                {t('Overview')}
               </button>
               <button
                 onClick={() => setActiveTab('lessons')}
@@ -461,7 +464,7 @@ const TeacherCourseDetails = () => {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Lessons
+                {t("lessons")}
               </button>
 
             </nav>
@@ -469,7 +472,7 @@ const TeacherCourseDetails = () => {
 
           {activeTab === 'overview' && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Course Overview</h2>
+              <h2 className="text-xl font-semibold mb-4">{t("course-overview")}</h2>
               <p className="text-gray-600 mb-4">{course.description}</p>
             </div>
           )}
@@ -478,15 +481,15 @@ const TeacherCourseDetails = () => {
             <div>
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className="text-2xl font-semibold text-gray-900">Course Lessons</h2>
-                  <p className="text-gray-600 mt-1">Total {course.lessonInfo?.length || 0} lessons</p>
+                  <h2 className="text-2xl font-semibold text-gray-900">{t("course-lessons")}</h2>
+                  <p className="text-gray-600 mt-1">{t("total")} {course.lessonInfo?.length || 0} {t("lessons")}</p>
                 </div>
                 <button
                   onClick={() => navigate('/teacher/course/lesson/new', { state: { courseId: course.id } })}
                   className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 flex items-center gap-2"
                 >
                   <FaBook className="text-lg" />
-                  Add New Lesson
+                  {t("add-new-lesson")}
                 </button>
               </div>
 
@@ -511,7 +514,7 @@ const TeacherCourseDetails = () => {
                             <p className="text-gray-600 mb-4 ml-11">{lesson.description}</p>
                             {lesson.duration && (
                               <div className="ml-11 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium inline-block mb-2">
-                                {lesson.duration} minutes
+                                {lesson.duration} {t("minutes")}
                               </div>
                             )}
                             {lesson.difficulty && (
@@ -527,7 +530,7 @@ const TeacherCourseDetails = () => {
                                 className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 flex items-center gap-2"
                               >
                                 <FaClipboardList className="text-lg" />
-                                Create Quiz
+                                {t("create-quiz")}
                               </button>
                               {lesson.id ? (
                                 <button
@@ -538,7 +541,7 @@ const TeacherCourseDetails = () => {
                                   className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center gap-2"
                                 >
                                   <FaChartBar className="text-lg" />
-                                  Quiz Statistics
+                                  {t("quiz-statistics")}
                                 </button>
                               ) : (
                                 <button
@@ -546,7 +549,7 @@ const TeacherCourseDetails = () => {
                                   className="bg-gray-400 text-white px-4 py-2 rounded cursor-not-allowed flex items-center gap-2"
                                 >
                                   <FaChartBar className="text-lg" />
-                                  Quiz Statistics (ID missing)
+                                  {t("quiz-statistics")} ({t("id-missing")}g)
                                 </button>
                               )}
                             </div>
@@ -556,14 +559,14 @@ const TeacherCourseDetails = () => {
                               <div className="flex items-center justify-between mb-3">
                                 <h4 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
                                   <FaFileAlt className="text-blue-500" />
-                                  Materials
+                                  {t("materials")}
                                 </h4>
                                 <button
                                   onClick={() => navigate('/teacher/course/lesson/material/new', { state: { courseId: course.id, lessonId: lesson.id } })}
                                   className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 flex items-center gap-2"
                                 >
                                   <FaFileAlt className="text-sm" />
-                                  Add Material
+                                  {t("add-material")}
                                 </button>
                               </div>
 
@@ -582,30 +585,30 @@ const TeacherCourseDetails = () => {
                                               value={editingMaterial.title}
                                               onChange={(e) => setEditingMaterial(prev => ({ ...prev, title: e.target.value }))}
                                               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                              placeholder="Material Title"
+                                              placeholder={t("material-title")}
                                               required
                                             />
                                             <textarea
                                               value={editingMaterial.content}
                                               onChange={(e) => setEditingMaterial(prev => ({ ...prev, content: e.target.value }))}
                                               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                              placeholder="Material Content"
+                                              placeholder={t("material-content")}
                                               rows="3"
                                               required
                                             />
                                             <div className="flex items-center gap-2">
-                                              <label className="text-sm text-gray-600">Material Type:</label>
+                                              <label className="text-sm text-gray-600">{t("material-type")}:</label>
                                               <select
                                                 value={editingMaterial.type || 1}
                                                 onChange={(e) => setEditingMaterial(prev => ({ ...prev, type: parseInt(e.target.value) }))}
                                                 className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                               >
-                                                <option value={1}>Regular Material</option>
-                                                <option value={2}>Assignment</option>
+                                                <option value={1}>{t("regular-material")}</option>
+                                                <option value={2}>{t("assignment")}</option>
                                               </select>
                                             </div>
                                             <div>
-                                              <label className="block text-sm text-gray-600 mb-1">Update File (Optional)</label>
+                                              <label className="block text-sm text-gray-600 mb-1">{t("update-file")} ({t("optional")})</label>
                                               <input
                                                 type="file"
                                                 onChange={handleFileChange}
@@ -622,14 +625,15 @@ const TeacherCourseDetails = () => {
                                                 className="px-3 py-1 text-gray-600 hover:text-gray-800"
                                                 disabled={isUpdating}
                                               >
-                                                Cancel
+                                                {t("cancel")}
+
                                               </button>
                                               <button
                                                 type="submit"
                                                 className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
                                                 disabled={isUpdating}
                                               >
-                                                {isUpdating ? 'Updating...' : 'Save Changes'}
+                                                {isUpdating ? `${t("updating")}...` : `${t("save-changes")}`}
                                               </button>
                                             </div>
                                           </div>
@@ -652,7 +656,7 @@ const TeacherCourseDetails = () => {
                                                 className="text-blue-500 hover:text-blue-600 flex items-center gap-1"
                                               >
                                                 <FaFileAlt className="text-sm" />
-                                                View
+                                                {t("view")}
                                               </a>
                                             )}
                                             <button
@@ -674,7 +678,7 @@ const TeacherCourseDetails = () => {
                                   ))}
                                 </div>
                               ) : (
-                                <p className="text-gray-500 text-sm">No materials uploaded yet</p>
+                                <p className="text-gray-500 text-sm">{t("no-materials")}</p>
                               )}
                             </div>
                           </div>
@@ -693,7 +697,7 @@ const TeacherCourseDetails = () => {
                   })}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-4">No lessons available</p>
+                <p className="text-gray-500 text-center py-4">{t("no-lessons")}</p>
               )}
             </div>
           )}

@@ -1,6 +1,11 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { c } from "vite/dist/node/moduleRunnerTransport.d-DJ_mE5sf";
 
 const NotificationsSection = ({ onSave }) => {
+
+  const { t } = useTranslation();
+
   const [notifications, setNotifications] = useState({
     buyCourse: false,
     writeReview: true,
@@ -21,7 +26,7 @@ const NotificationsSection = ({ onSave }) => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Notifications</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">{t("notifications")}</h2>
       
       <form className="space-y-4">
         <div className="flex items-center">
@@ -34,7 +39,7 @@ const NotificationsSection = ({ onSave }) => {
             className="w-5 h-5 text-orange-500 rounded focus:ring-0 focus:ring-offset-0"
           />
           <label htmlFor="buyCourse" className="ml-3 text-sm text-gray-700">
-            I want to know who buy my course.
+            {t("notify-course-purchase")}
           </label>
         </div>
 
@@ -48,7 +53,7 @@ const NotificationsSection = ({ onSave }) => {
             className="w-5 h-5 text-orange-500 rounded focus:ring-0 focus:ring-offset-0"
           />
           <label htmlFor="writeReview" className="ml-3 text-sm text-gray-700">
-            I want to know who write a review on my course.
+            {t("notify-course-review")}
           </label>
         </div>
 
@@ -62,7 +67,7 @@ const NotificationsSection = ({ onSave }) => {
             className="w-5 h-5 text-orange-500 rounded focus:ring-0 focus:ring-offset-0"
           />
           <label htmlFor="commentedOnLecture" className="ml-3 text-sm text-gray-700">
-            I want to know who commented on my lecture.
+            {t("notify-lecture-comment")}
           </label>
         </div>
 
@@ -76,7 +81,7 @@ const NotificationsSection = ({ onSave }) => {
             className="w-5 h-5 text-orange-500 rounded focus:ring-0 focus:ring-offset-0"
           />
           <label htmlFor="downloadLectureNotes" className="ml-3 text-sm text-gray-700">
-            I want to know who download my lecture notes.
+            {t("notify-note-download")}
           </label>
         </div>
 
@@ -90,7 +95,7 @@ const NotificationsSection = ({ onSave }) => {
             className="w-5 h-5 text-orange-500 rounded focus:ring-0 focus:ring-offset-0"
           />
           <label htmlFor="repliedOnComment" className="ml-3 text-sm text-gray-700">
-            I want to know who replied on my comment.
+            {t("notify-comment-reply")}
           </label>
         </div>
 
@@ -104,7 +109,7 @@ const NotificationsSection = ({ onSave }) => {
             className="w-5 h-5 text-orange-500 rounded focus:ring-0 focus:ring-offset-0"
           />
           <label htmlFor="dailyVisits" className="ml-3 text-sm text-gray-700">
-            I want to know daily how many people visited my profile.
+            {t("notify-daily-visits")}
           </label>
         </div>
 
@@ -118,7 +123,7 @@ const NotificationsSection = ({ onSave }) => {
             className="w-5 h-5 text-orange-500 rounded focus:ring-0 focus:ring-offset-0"
           />
           <label htmlFor="downloadLectureAttach" className="ml-3 text-sm text-gray-700">
-            I want to know who download my lecture attach file.
+            {t("notify-attachment-download")}
           </label>
         </div>
 
@@ -127,7 +132,7 @@ const NotificationsSection = ({ onSave }) => {
             onClick={onSave}
             className="px-6 py-2 bg-[#4F39F6] hover:bg-[#432DD7] cursor-pointer text-white font-medium rounded-md transition-colors"
           >
-            Save Changes
+           {t("save-changes")}
           </button>
         </div>
       </form>

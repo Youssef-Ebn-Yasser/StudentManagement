@@ -151,7 +151,7 @@ const StudentAnswers = () => {
                 <p className="font-medium text-gray-800">{answers?.quizTitle}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Student Name</p>
+                <p className="text-sm text-gray-600">{t("student-name")}</p>
                 <p className="font-medium text-gray-800">{answers?.studentName}</p>
               </div>
             </div>
@@ -186,7 +186,7 @@ const StudentAnswers = () => {
                 </div>
 
                 <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                  <p className="text-sm text-gray-600 mb-2">Student's Answer:</p>
+                  <p className="text-sm text-gray-600 mb-2"></p>
                   <p className="text-gray-800">{question.questionTextAnswer}</p>
                 </div>
 

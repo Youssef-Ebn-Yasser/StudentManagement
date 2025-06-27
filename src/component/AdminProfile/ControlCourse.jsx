@@ -6,10 +6,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import courseImg from '../../assets/online-lesson.png'
 import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next';
 
 
 
 function ControlCourse() {
+    const { t } = useTranslation();
     let {id}= useParams()
     let dispatch= useDispatch()
 
@@ -65,9 +67,9 @@ function ControlCourse() {
                 <div className='my-auto'>
                     <div>
                         <h2 className="text-lg font-semibold mt-2">{details?.data.title}</h2>
-                        <p className="text-lg text-red-500 font-semibold mt-2">Id : {details?.data.id}</p>
+                        <p className="text-lg text-red-500 font-semibold mt-2">{t("id")} : {details?.data.id}</p>
                         <p className="text-gray-500">{details?.data.description}</p>
-                        <p className="text-gray-500"><span className='text-black'>Category Name :</span> {details?.data.categoryName}</p>
+                        <p className="text-gray-500"><span className='text-black'>{t("category-name")} :</span> {details?.data.categoryName}</p>
                         <p className="text-violet-600 font-bold mt-1">{details?.data.price} USD</p>
                         <div className='text-red-400 absolute top-0 right-0 rounded-full p-2 hover:cursor-pointer hover:shadow-2xl hover:shadow-gray-500 transition'>
                             <button  onClick={()=>{handleRemoveCourse(details?.data.id)}}>
@@ -76,11 +78,11 @@ function ControlCourse() {
                         </div>
                     </div>
                     <div>
-                        <h2 className="text-lg font-semibold mt-2">{details?.data.lessonCount} Lessons</h2>
+                        <h2 className="text-lg font-semibold mt-2">{details?.data.lessonCount} {t("lessons")}</h2>
                         <ul className="list-disc ml-5 mt-2">
                             {details?.data.lessonInfo?.map((lesson , index) => (
                             <li key={lesson.id} className="text-gray-700">
-                                <span className='text-blue-800 font-medium'>Lesson {index + 1}:</span> {lesson.title}
+                                <span className='text-blue-800 font-medium'>{t("lesson")} {index + 1}:</span> {lesson.title}
                             </li>
                             ))}
                         </ul>

@@ -15,28 +15,23 @@ function Translate() {
 
     },[i18n.language])
 
-    return <>
-        <div
-            className=" w-full flex justify-end items-center px-4 z-50 bg-gradient-to-r from-blue-50 to-blue-100 shadow-lg"
-        >
-            <div className="flex items-center space-x-3">
-            <span className="text-blue-900 font-semibold text-base">{t('change_language')}</span>
-            <div className="relative">
-                <select
-                className="appearance-none px-4  rounded-lg border border-blue-300 bg-white text-blue-900 font-medium shadow focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={i18n.language}
-                onChange={e => changeLanguage(e.target.value)}
-                >
-                <option value="en">🇺🇸 English</option>
-                <option value="ar">🇸🇦 العربية</option>
-                </select>
-                <span className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-400">
-                ▼
-                </span>
-            </div>
-            </div>
-        </div>
-    </>
+    return (
+  <div className="mt-[-24px] w-full bg-blue-100 border-b border-blue-200 shadow flex justify-end px-6 py-2 z-30">
+    <div className="flex items-center gap-2">
+      <span className="text-blue-900 font-semibold text-sm">{t('change_language')}:</span>
+      <select
+        className="rounded-md border border-blue-300 bg-white text-blue-900 text-sm font-medium px-2 py-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+        value={i18n.language}
+        onChange={(e) => changeLanguage(e.target.value)}
+      >
+        <option value="en">🇺🇸 English</option>
+        <option value="ar">🇸🇦 العربية</option>
+      </select>
+    </div>
+  </div>
+);
+
+
 }
 
 export default Translate

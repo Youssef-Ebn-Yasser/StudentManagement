@@ -9,8 +9,12 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import Loader from '@/component/Loader/Loader';
+import { useTranslation } from 'react-i18next';
+
 
 const ManageQuiz = () => {
+
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
   const [activeTab, setActiveTab] = useState(0);
@@ -98,12 +102,12 @@ const ManageQuiz = () => {
 
   const addOption = () => {
     if (!newOption.trim()) {
-      toast.error('Option text cannot be empty');
+      toast.error(`${t("option-empty")}`);
       return;
     }
     // Check for duplicate option text
     if (questionOptions.some(opt => opt.text.toLowerCase() === newOption.trim().toLowerCase())) {
-      toast.error('This option already exists');
+      toast.error(`${t("option-duplicate")}`);
       setNewOption('');
       return;
     }
@@ -166,25 +170,25 @@ const ManageQuiz = () => {
 
   const addQuestion = () => {
     if (!newQuestion.questionText.trim()) {
-      toast.error('Question text cannot be empty');
+      toast.error(`${t("question-empty")}`);
       return;
     }
 
     if (newQuestion.questionTypeId === 1) {
       if (questionOptions.length === 0) {
-        toast.error('Please add at least one option for multiple choice question');
+        toast.error(`${t("add-one-option")}`);
         return;
       }
 
       // Check if any option is marked as correct
       const hasCorrectOption = Object.values(newQuestion.options).some(value => value === true);
       if (!hasCorrectOption) {
-        toast.error('Please mark one option as correct');
+        toast.error(`${t("mark-correct-option")}`);
         return;
       }
     } else {
       if (!newQuestion.correctAnswer.trim()) {
-        toast.error('Please provide a correct answer');
+        toast.error(`${t("provide-correct-answer")}`);
         return;
       }
     }
@@ -231,12 +235,12 @@ const ManageQuiz = () => {
     setSuccessMessage('');
     try {
       if (activeTab === 0 && !selectedLesson) {
-        toast.error('Please select a lesson');
+        toast.error(`${t("please-select-lesson")}`);
         return;
       }
 
       if (activeTab === 1 && !selectedCourse) {
-        toast.error('Please select a course');
+        toast.error(`${t("please-select-course")}`);
         return;
       }
 
@@ -276,8 +280,8 @@ const ManageQuiz = () => {
       }
 
       if (response.succeeded) {
-        toast.success('Quiz created successfully!');
-        setSuccessMessage('Quiz created successfully!');
+        toast.success(`${t("quiz-created")}`);
+        setSuccessMessage(`${t("quiz-created")}`);
         // Reset form
         if (activeTab === 0) {
           setLessonQuiz({
@@ -323,7 +327,7 @@ const ManageQuiz = () => {
           onClick={() => window.location.reload()}
           sx={{ mt: 2 }}
         >
-          Retry
+          {t('retry')}
         </Button>
       </Box>
     );
@@ -342,7 +346,7 @@ const ManageQuiz = () => {
           }
         }}
       >
-        Back to Profile
+        {t("back-to-profile")}
       </Button>
 
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
@@ -352,7 +356,7 @@ const ManageQuiz = () => {
           mb: 4,
           textAlign: 'center'
         }}>
-          Manage Quiz
+          {t("manage-quiz")}
         </Typography>
         {successMessage && <Alert severity="success" sx={{ mb: 2 }}>{successMessage}</Alert>}
         
@@ -375,8 +379,8 @@ const ManageQuiz = () => {
               }
             }}
           >
-            <Tab label="Create Quiz for Lesson" />
-            <Tab label="Create Quiz for Course" />
+            <Tab label={t("create-quiz-lesson")} />
+            <Tab label={t("create-quiz-course")} />
           </Tabs>
           <Button
             variant="contained"
@@ -384,7 +388,7 @@ const ManageQuiz = () => {
             onClick={() => navigate('/teacher/review-student-answers')}
             sx={{ ml: 2 }}
           >
-            Review Student Answers
+            {t("review-answers")}
           </Button>
         </Box>
 
@@ -392,10 +396,10 @@ const ManageQuiz = () => {
           <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Paper elevation={1} sx={{ p: 3, borderRadius: 2, bgcolor: '#f8f9fa' }}>
               <Typography variant="h6" sx={{ mb: 2, color: 'var(--primary-color)' }}>
-                Course & Lesson Selection
+                {t("course-lesson-selection")}
               </Typography>
               <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel>Select Course</InputLabel>
+                <InputLabel>{t("select-course")}</InputLabel>
                 <Select
                   value={selectedCourse}
                   onChange={(e) => {
@@ -416,7 +420,7 @@ const ManageQuiz = () => {
                   }}
                 >
                   <MenuItem value="">
-                    <em>Select a course</em>
+                    <em>{t("select-course")}</em>
                   </MenuItem>
                   {courses.map((course) => (
                     <MenuItem key={course.id} value={course.id}>
@@ -428,7 +432,7 @@ const ManageQuiz = () => {
 
               {selectedCourse && (
                 <FormControl fullWidth>
-                  <InputLabel>Select Lesson</InputLabel>
+                  <InputLabel>{t('select-lesson')}</InputLabel>
                   <Select
                     value={selectedLesson}
                     onChange={(e) => {
@@ -450,7 +454,7 @@ const ManageQuiz = () => {
                     }}
                   >
                     <MenuItem value="">
-                      <em>Select a lesson</em>
+                      <em>{t('select-lesson')}</em>
                     </MenuItem>
                     {lessons.map((lesson) => (
                       <MenuItem key={lesson.id} value={lesson.id}>
@@ -464,7 +468,7 @@ const ManageQuiz = () => {
 
             <Paper elevation={1} sx={{ p: 3, borderRadius: 2, bgcolor: '#f8f9fa' }}>
               <Typography variant="h6" sx={{ mb: 2, color: 'var(--primary-color)' }}>
-                Quiz Details
+                {t("quiz-details")}
               </Typography>
               <TextField
                 label="Title"
@@ -517,10 +521,10 @@ const ManageQuiz = () => {
           <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Paper elevation={1} sx={{ p: 3, borderRadius: 2, bgcolor: '#f8f9fa' }}>
               <Typography variant="h6" sx={{ mb: 2, color: 'var(--primary-color)' }}>
-                Course Selection
+                {t("course-selection")}
               </Typography>
               <FormControl fullWidth>
-                <InputLabel>Select Course</InputLabel>
+                <InputLabel>{t("select-course")}</InputLabel>
                 <Select
                   value={selectedCourse}
                   onChange={(e) => setSelectedCourse(e.target.value)}
@@ -538,7 +542,7 @@ const ManageQuiz = () => {
                   }}
                 >
                   <MenuItem value="">
-                    <em>Select a course</em>
+                    <em>{t("select-course")}</em>
                   </MenuItem>
                   {courses.map((course) => (
                     <MenuItem key={course.id} value={course.id}>
@@ -565,7 +569,7 @@ const ManageQuiz = () => {
 
         <Paper elevation={1} sx={{ p: 3, borderRadius: 2, bgcolor: '#f8f9fa', mt: 3 }}>
           <Typography variant="h6" sx={{ mb: 2, color: 'var(--primary-color)' }}>
-            Add Questions
+            {t("add-questions")}
           </Typography>
           
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}>
@@ -579,14 +583,14 @@ const ManageQuiz = () => {
             />
             <Box sx={{ display: 'flex', gap: 2 }}>
               <FormControl sx={{ flex: 1 }}>
-                <InputLabel>Question Type</InputLabel>
+                <InputLabel>{t("question-type")}</InputLabel>
                 <Select
                   value={newQuestion.questionTypeId}
                   onChange={(e) => handleQuestionTypeChange(e.target.value)}
                   label="Question Type"
                 >
-                  <MenuItem value={1}>Multiple Choice</MenuItem>
-                  <MenuItem value={3}>Short Answer</MenuItem>
+                  <MenuItem value={1}>{t("multiple-choice")}</MenuItem>
+                  <MenuItem value={3}>{t("short-answer")}</MenuItem>
                 </Select>
               </FormControl>
               <TextField
@@ -601,10 +605,10 @@ const ManageQuiz = () => {
             {newQuestion.questionTypeId === 3 ? (
               <Paper elevation={0} sx={{ p: 2, bgcolor: 'rgba(76, 175, 80, 0.1)', borderRadius: 1 }}>
                 <Typography variant="subtitle1" sx={{ mb: 2, color: 'success.main' }}>
-                  Correct Answer
+                  {t("correct-answer")}
                 </Typography>
                 <TextField
-                  label="Enter Correct Answer"
+                  label={t("enter-correct-answer")}
                   value={newQuestion.correctAnswer}
                   onChange={(e) => setNewQuestion({ ...newQuestion, correctAnswer: e.target.value })}
                   fullWidth
@@ -620,7 +624,7 @@ const ManageQuiz = () => {
             ) : (
               <Paper elevation={0} sx={{ p: 2, bgcolor: 'white', borderRadius: 1 }}>
                 <Typography variant="subtitle1" sx={{ mb: 2, color: 'var(--primary-color)' }}>
-                  Question Options
+                  {t("question-options")}
                 </Typography>
                 
                 <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
@@ -642,7 +646,7 @@ const ManageQuiz = () => {
                       }
                     }}
                   >
-                    Add
+                    {t("add")}
                   </Button>
                 </Box>
 
@@ -681,14 +685,14 @@ const ManageQuiz = () => {
                 }
               }}
             >
-              Add Question
+              {t("add-question")}
             </Button>
           </Box>
 
           <Divider sx={{ my: 3 }} />
 
           <Typography variant="h6" sx={{ mb: 2, color: 'var(--primary-color)' }}>
-            Added Questions
+            {t("added-questions")}
           </Typography>
           
           {(activeTab === 0 ? lessonQuiz.questionListDtos : courseQuiz.questionListDtos).map((question, index) => (
@@ -729,7 +733,7 @@ const ManageQuiz = () => {
                 {question.questionTypeId === 1 ? (
                   <>
                     <Typography sx={{ color: 'success.main', fontWeight: 'bold', mb: 1 }}>
-                      Correct Answer: {question.correctAnswer}
+                      {t("correct-answer")}: {question.correctAnswer}
                     </Typography>
                     {Object.entries(question.options).map(([key, isCorrect]) => (
                       <Typography
@@ -750,7 +754,7 @@ const ManageQuiz = () => {
                   </>
                 ) : (
                   <Typography sx={{ color: 'success.main', fontWeight: 'bold' }}>
-                    Correct Answer: {question.correctAnswer}
+                    {t("correct-answer")}: {question.correctAnswer}
                   </Typography>
                 )}
               </Box>
@@ -773,7 +777,7 @@ const ManageQuiz = () => {
           fullWidth
           disabled={isLoading || (activeTab === 0 ? lessonQuiz.questionListDtos.length === 0 : courseQuiz.questionListDtos.length === 0)}
         >
-          Create Quiz
+          {t("create-quiz")}
         </Button>
       </Paper>
     </Box>
