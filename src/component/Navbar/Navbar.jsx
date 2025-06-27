@@ -17,6 +17,8 @@ function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false); // State for the toggle menu
     const navigate = useNavigate();
     const { t } = useTranslation();
+    const { i18n } = useTranslation();
+    const isRTL = i18n.dir() === 'rtl';
 
     const toggleNotification = () => {
         setIsNotificationVisible(!isNotificationVisible);
@@ -42,7 +44,13 @@ function Navbar() {
             <div className={`fixed top-0 left-0 right-0 h-[56px] bg-white shadow-xs flex items-center px-4 sm:px-6 ${styles.navbar} z-50`}>
 
                 {/* Logo */}
-                <div className={`absolute top-[10px] left-[24px] w-[106px] h-[36px] text-black text-center text-lg font-extrabold flex items-center justify-center rounded-md ${styles.logo}`}>
+                <div
+                  className={`
+                     top-[10px] 
+                    ${isRTL ? 'right-[24px] left-auto' : 'left-[24px] right-auto'} 
+                    w-[106px] h-[36px] text-black text-center text-lg font-extrabold flex items-center justify-center rounded-md
+                  `}
+                >
                     E-learning
                 </div>
 
