@@ -62,8 +62,10 @@ const TeacherCourses = ({ setActiveTab }) => {
   const filteredAndSortedCourses = useMemo(() => {
     // First, filter by search query
     let result = courses.filter(course => {
-      return course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-             course.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const title = course.title || '';
+      const description = course.description || '';
+      return title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+             description.toLowerCase().includes(searchQuery.toLowerCase());
     });
 
     // Then, sort the filtered results
@@ -264,4 +266,4 @@ const TeacherCourses = ({ setActiveTab }) => {
   );
 };
 
-export default TeacherCourses; 
+export default TeacherCourses;

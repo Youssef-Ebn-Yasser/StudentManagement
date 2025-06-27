@@ -49,6 +49,7 @@ import PaymobCheckout from '@/component/CoursesDetails/PaymobCheckout'
 import RegisterAdmin from '@/component/AdminProfile/RegisterAdmin'
 import AllAdmins from '@/component/AdminProfile/AllAdmins'
 import StudentProfile3 from '@/component/StudentProfile/StudentProfile3'
+import Report from '../component/Report/report'
 
 
 const routesConfig = [
@@ -346,6 +347,12 @@ const routesConfig = [
         element: <CreateZoom />,
         isProtected: false,
         accessRole: 'all',
+    },
+    {
+        path: 'admin/reports',
+        element: <Report />,
+        isProtected: true,
+        accessRole: 'admin',
     },
     ...teacherRoutes,
 ]
