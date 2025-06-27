@@ -250,12 +250,9 @@ const ManageQuiz = () => {
         questionTypeId: question.questionTypeId,
         points: question.points,
         correctAnswer: question.correctAnswer,
-        options: question.questionTypeId === 1 
-          ? Object.entries(question.options).reduce((acc, [key, value]) => {
-              acc[key] = value;
-              return acc;
-            }, {})
-          : {}
+        options: question.questionTypeId === 1
+          ? Object.keys(question.options)
+          : []
       }));
 
       let response;
@@ -265,6 +262,7 @@ const ManageQuiz = () => {
         // Create Lesson Quiz
         const quizToSubmit = {
           ...lessonQuiz,
+          startsAt: lessonQuiz.startsAt instanceof Date ? lessonQuiz.startsAt.toISOString() : lessonQuiz.startsAt,
           questionListDtos: formattedQuestions,
           isAutoCorrect: lessonQuiz.isAutoCorrect
         };
@@ -303,9 +301,17 @@ const ManageQuiz = () => {
           setSelectedCourse('');
         }
       } else {
+        if (response.response && response.response.data && response.response.data.errors) {
+          console.error('Validation errors:', response.response.data.errors);
+          alert(JSON.stringify(response.response.data.errors, null, 2));
+        }
         toast.error(response.messages?.[0] || 'Failed to create quiz');
       }
     } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        console.error('Validation errors:', error.response.data.errors);
+        alert(JSON.stringify(error.response.data.errors, null, 2));
+      }
       console.error('Error creating quiz:', error);
       toast.error(error.message || 'Error creating quiz');
     }

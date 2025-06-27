@@ -116,9 +116,9 @@ const MainInfo = ({ teacherData }) => {
       </div>
       <div className="text-center">
         <h3 className="text-2xl text-gray-800 font-bold mb-1">{teacherData?.name || 'Teacher Name'}</h3>
-        <p className="text-xs text-gray-400 mb-1">{t("teacher-id")}: {teacherData?.id || 'Not available'}</p>
-        <p className="text-sm text-gray-400 mb-3">
-          {teacherData.specialization || 'Teacher'}
+        <p className="text-xs text-gray-400 mb-1">Teacher ID: {teacherData?.id || 'Not available'}</p>
+        <p className="text-sm text-gray-600 mb-3">
+          <span className="font-medium">Specialization:</span> {teacherData.specialization || 'Not provided'}
         </p>
         <p className="text-sm text-gray-600 mb-3">
           {t("age")}: {teacherData?.age || 'Not provided'}
