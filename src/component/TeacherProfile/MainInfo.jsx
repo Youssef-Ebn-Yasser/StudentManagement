@@ -8,6 +8,9 @@ import { useTranslation } from "react-i18next";
 const MainInfo = ({ teacherData }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
+  const isRTL = i18n.dir() === 'rtl';
+
 
   const handleSettingsClick = () => {
     navigate('/teacher/settings');
@@ -77,31 +80,34 @@ const MainInfo = ({ teacherData }) => {
 
   return (
     <aside className="relative top-0 bg-white md:mx-8 lg:mx-4 mb-8 p-6 shadow-md rounded-md -mt-40 ">
-      <button
-        onClick={handleStudentsClick}
-        className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 
-        text-white font-semibold 
-        py-3 px-6 
-        rounded-xl 
-        shadow-lg hover:shadow-xl 
-        transition-all duration-300 ease-in-out 
-        inline-flex items-center justify-center
-        space-x-3 
-        focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-75 
-        max-w-xs mx-auto 
-        transform hover:scale-105 "
-      >
-      <Users size={24} className="mr-2" /> {/* Users icon from lucide-react */}
-      <span>{t("view-students")}</span>
-      </button>
-      <button
-        onClick={handleSettingsClick}
-        className="absolute  top-4 right-4 inline-flex items-center px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-50"
-      >
-        <FaCog className="mr-2" />
-        {t("edit-profile")}
-
-      </button>
+        
+        <button
+          onClick={handleStudentsClick}
+          className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 
+          text-white font-semibold 
+          py-3 px-6 
+          rounded-xl 
+          shadow-lg hover:shadow-xl 
+          transition-all duration-300 ease-in-out 
+          inline-flex items-center justify-center
+          space-x-3 
+          focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-75 
+          max-w-xs mx-auto 
+          transform hover:scale-105 "
+        >
+          <Users size={24} className={isRTL ? "ml-2" : "mr-2"} />
+          <span>{t("view-students")}</span>
+        </button>
+        <button
+          onClick={handleSettingsClick}
+          className={`absolute top-4 ${isRTL ? "left-4" : "right-4"} 
+            inline-flex items-center px-4 py-2 bg-violet-600 text-white rounded-lg 
+            hover:bg-violet-700 transition-colors duration-200 focus:outline-none 
+            focus:ring-2 focus:ring-violet-500 focus:ring-opacity-50`}
+        >
+          <FaCog className={isRTL ? "ml-2" : "mr-2"} />
+          {t("edit-profile")}
+        </button>
    
       <div className="w-64 h-64 rounded-md overflow-hidden mx-auto mb-5">
         <img 
@@ -117,8 +123,8 @@ const MainInfo = ({ teacherData }) => {
       <div className="text-center">
         <h3 className="text-2xl text-gray-800 font-bold mb-1">{teacherData?.name || 'Teacher Name'}</h3>
         <p className="text-xs text-gray-400 mb-1">{t("teacher-id")}: {teacherData?.id || 'Not available'}</p>
-        <p className="text-sm text-gray-400 mb-3">
-          {teacherData.specialization || 'Teacher'}
+        <p className="text-sm text-gray-600 mb-3">
+          <span className="font-medium">{t("specialization")}:</span> {teacherData.specialization || 'Not provided'}
         </p>
         <p className="text-sm text-gray-600 mb-3">
           {t("age")}: {teacherData?.age || 'Not provided'}

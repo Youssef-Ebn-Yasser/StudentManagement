@@ -7,7 +7,7 @@ export const quizService = {
   createLessonQuiz: async (quizData) => {
     try {
       console.log('Creating lesson quiz with data:', quizData);
-      const response = await axiosInstance.post(`${API_URL}/Quize/CreateQuizWithLesson`, quizData);
+      const response = await axiosInstance.post('/api/Quize/CreateQuizWithLesson', quizData);
       console.log('Quiz creation response:', response.data);
       return response.data;
     } catch (error) {
@@ -20,7 +20,7 @@ export const quizService = {
   createCourseQuiz: async (quizData) => {
     try {
       console.log('Creating course quiz with data:', quizData);
-      const response = await axiosInstance.post(`${API_URL}/Quize/CreateQuizWithCourse`, quizData);
+      const response = await axiosInstance.post('/api/Quize/CreateQuizWithCourse', quizData);
       console.log('Quiz creation response:', response.data);
       return response.data;
     } catch (error) {
@@ -32,7 +32,7 @@ export const quizService = {
   // Get all quizzes for a lesson
   getLessonQuizzes: async (lessonId) => {
     try {
-      const response = await axiosInstance.get(`${API_URL}/Quize/GetLessonQuizzes/${lessonId}`);
+      const response = await axiosInstance.get(`/api/Quize/GetLessonQuizzes/${lessonId}`);
       return response.data;
     } catch (error) {
       throw error;
@@ -42,7 +42,7 @@ export const quizService = {
   // Get all quizzes for a course
   getCourseQuizzes: async (courseId) => {
     try {
-      const response = await axiosInstance.get(`${API_URL}/Quize/GetQuizzesByCourseId/${courseId}`);
+      const response = await axiosInstance.get(`/api/Quize/GetQuizzesByCourseId/${courseId}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching course quizzes:', error.response?.data || error.message);
@@ -53,7 +53,7 @@ export const quizService = {
   // Delete a quiz
   deleteQuiz: async (quizId) => {
     try {
-      const response = await axiosInstance.delete(`${API_URL}/Quize/${quizId}`);
+      const response = await axiosInstance.delete(`/api/Quize/${quizId}`);
       return response.data;
     } catch (error) {
       console.error('Error deleting quiz:', error.response?.data || error.message);
@@ -64,7 +64,7 @@ export const quizService = {
   // Get a specific quiz by ID
   getQuizById: async (quizId) => {
     try {
-      const response = await axiosInstance.get(`${API_URL}/Quize/GetQuizById/${quizId}`);
+      const response = await axiosInstance.get(`/api/Quize/GetQuizById/${quizId}`);
       return response.data;
     } catch (error) {
       throw error;
@@ -75,7 +75,7 @@ export const quizService = {
   submitQuiz: async (quizData) => {
     try {
       console.log('Submitting quiz with data:', quizData);
-      const response = await axiosInstance.post(`${API_URL}/Quize/SubmitQuiz`, quizData, {
+      const response = await axiosInstance.post('/api/Quize/SubmitQuiz', quizData, {
         headers: {
           'Content-Type': 'application/json'
         }

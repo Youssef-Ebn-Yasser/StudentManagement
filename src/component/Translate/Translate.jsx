@@ -16,7 +16,7 @@ function Translate() {
     },[i18n.language])
 
     return (
-  <div className="mt-[-24px] w-full bg-blue-100 border-b border-blue-200 shadow flex justify-end px-6 py-2 z-30">
+  <div className="mt-[-24px] w-full bg-transparent border-0 flex justify-end px-6 pt-6 z-30">
     <div className="flex items-center gap-2">
       <span className="text-blue-900 font-semibold text-sm">{t('change_language')}:</span>
       <select

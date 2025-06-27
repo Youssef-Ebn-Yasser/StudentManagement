@@ -19,21 +19,24 @@ const useLogin = () => {
     const handleLgin = async (formsData) => {
         dispatch(loginUser(formsData))
             .then((response) => {
-                setAuthToken()
-                // Redirect based on role
-                const isAdmin = response?.payload?.isAdmin;
-                const isTeacher = response?.payload?.isTeacher;
-                if (isAdmin) {
-                    navigate('/admin/dashboard');
-                } else if (isTeacher) {
-                    navigate('/teacher/profile');
-                } else {
-                    navigate('/');
+                // Only redirect if login is successful and user/token exists
+                if (response?.payload?.user && response?.payload?.token) {
+                    setAuthToken();
+                    const isAdmin = response?.payload?.isAdmin;
+                    const isTeacher = response?.payload?.isTeacher;
+                    if (isAdmin) {
+                        navigate('/admin/dashboard');
+                    } else if (isTeacher) {
+                        navigate('/teacher/profile');
+                    } else {
+                        navigate('/');
+                    }
                 }
+                // If not, do nothing (error will be shown by error state)
             })
             .catch((error) => {
-                // Error handling is kept in catch block but without logging
-            })
+                // Do not redirect on error
+            });
     }
 
     let validationSchema = Yup.object({

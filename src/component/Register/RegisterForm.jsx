@@ -44,10 +44,11 @@ export default function RegisterForm({ userType }) {
                                     required
                                 />
                                 {formik.touched.name && formik.errors.name ? (
-                                    <div className="text-red-500">{formik.errors.name}</div>
-                                ) : (
-                                    ''
-                                )}
+                                    <div className="flex items-center gap-2 mt-1 text-sm font-semibold text-red-600 bg-red-100 border border-red-300 rounded px-2 py-1 animate-shake">
+                                        <i className="fas fa-exclamation-circle"></i>
+                                        {formik.errors.name}
+                                    </div>
+                                ) : ''}
                             </div>
                             <div className="mb-3">
                                 <input
@@ -62,10 +63,11 @@ export default function RegisterForm({ userType }) {
                                     required
                                 />
                                 {formik.touched.email && formik.errors.email ? (
-                                    <div className="text-red-500">{formik.errors.email}</div>
-                                ) : (
-                                    ''
-                                )}
+                                    <div className="flex items-center gap-2 mt-1 text-sm font-semibold text-red-600 bg-red-100 border border-red-300 rounded px-2 py-1 animate-shake">
+                                        <i className="fas fa-exclamation-circle"></i>
+                                        {formik.errors.email}
+                                    </div>
+                                ) : ''}
                             </div>
                             <div className="mb-3">
                                 <div className='relative'>
@@ -84,16 +86,17 @@ export default function RegisterForm({ userType }) {
                                     <i
                                     id="showPass"
                                     className={`fas ${
-                                        passwordVisible ? 'fa-eye-slash' : 'fa-eye'
-                                    } absolute text-xl right-3 bottom-1.5 transform -translate-y-1 text-gray-500 cursor-pointer`}
+                                        passwordVisible ? 'fa-eye' : 'fa-eye-slash'
+                                    } absolute text-2xl right-3 bottom-1/2 transform -translate-y-1 text-gray-500 cursor-pointer`}
                                     onClick={() => setPasswordVisible(!passwordVisible)}
                                     ></i>
                                 </div>
                                     {formik.touched.password && formik.errors.password ? (
-                                        <div className="text-red-500">{formik.errors.password}</div>
-                                    ) : (
-                                        ''
-                                    )}
+                                        <div className="flex items-center gap-2 mt-1 text-sm font-semibold text-red-600 bg-red-100 border border-red-300 rounded px-2 py-1 animate-shake">
+                                            <i className="fas fa-exclamation-circle"></i>
+                                            {formik.errors.password}
+                                        </div>
+                                    ) : ''}
                             </div>
                             
                             <div className="mb-3">
@@ -112,16 +115,17 @@ export default function RegisterForm({ userType }) {
                                     <i
                                     id="showPass"
                                     className={`fas ${
-                                        confirmPassVisible ? 'fa-eye-slash' : 'fa-eye'
-                                    } absolute text-xl right-3 bottom-1.5 transform -translate-y-1 text-gray-500 cursor-pointer`}
-                                    onClick={() => setConfirmPassVisible(!confirmPassVisible)}
+                                        passwordVisible ? 'fa-eye' : 'fa-eye-slash'
+                                    } absolute text-2xl right-3 bottom-1/2 transform -translate-y-1 text-gray-500 cursor-pointer`}
+                                    onClick={() => setPasswordVisible(!passwordVisible)}
                                     ></i>
                                 </div>
                                {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
-                                    <div className="text-red-500">{formik.errors.confirmPassword}</div>
-                                ) : (
-                                    ''
-                                )}
+                                    <div className="flex items-center gap-2 mt-1 text-sm font-semibold text-red-600 bg-red-100 border border-red-300 rounded px-2 py-1 animate-shake">
+                                        <i className="fas fa-exclamation-circle"></i>
+                                        {formik.errors.confirmPassword}
+                                    </div>
+                                ) : ''}
                             </div>
                             <div className="mb-3">
                                 <button
@@ -137,7 +141,7 @@ export default function RegisterForm({ userType }) {
                                     onSuccess={async (credentialResponse) => {
                                         try {
                                             console.log('Google credential response:', credentialResponse);
-                                            const requestData = { idToken: credentialResponse.credential };
+                                            const requestData = { token: credentialResponse.credential };
                                             console.log('Sending request with data:', requestData);
                                             
                                             const response = await axios.post('https://e-learn-v1.runasp.net/api/Auth/Googlelogin', 

@@ -29,6 +29,12 @@ function Login() {
                 <div className="flex flex-col-reverse  sm:flex-col-reverse  md:flex-col-reverse lg:flex-row justify-between items-center content-center w-[100%] h-full">
                     <div className="welcome  mx-auto p-2 w-[50%] ">
                         <form onSubmit={formik.handleSubmit}>
+                            {error && (
+                                <div className="flex items-center gap-2 mb-4 text-base font-semibold text-red-700 bg-red-100 border border-red-300 rounded px-3 py-2 animate-shake">
+                                    <i className="fas fa-exclamation-triangle"></i>
+                                    {error?.messages?.[0] || 'Email or password is incorrect.'}
+                                </div>
+                            )}
                             <div className="flex flex-col gap-2 ">
                                 <div className=" mb-3">
                                     <input
@@ -42,14 +48,12 @@ function Login() {
                                         required
                                         placeholder={t('enter_your_email')}
                                     />
-                                    {formik.touched.Email &&
-                                    formik.errors.Email ? (
-                                        <div className="text-red-500">
+                                    {formik.touched.Email && formik.errors.Email ? (
+                                        <div className="flex items-center gap-2 mt-1 text-sm font-semibold text-red-600 bg-red-100 border border-red-300 rounded px-2 py-1 animate-shake">
+                                            <i className="fas fa-exclamation-circle"></i>
                                             {formik.errors.Email}
                                         </div>
-                                    ) : (
-                                        ''
-                                    )}
+                                    ) : ''}
                                 </div>
 
                                 <div className="mb-3">
@@ -67,21 +71,17 @@ function Login() {
                                         />
                                         <i
                                             id="showPass"
-                                            className={`fas ${
-                                                passwordVisible ? 'fa-eye-slash' : 'fa-eye'
-                                            } absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 cursor-pointer`}
+                                            className={`fas ${passwordVisible ? 'fa-eye' : 'fa-eye-slash'} absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 cursor-pointer`}
                                             onClick={() => setPasswordVisible(!passwordVisible)}
                                         ></i>
                                     </div>
                                     
-                                    {formik.touched.Password &&
-                                    formik.errors.Password ? (
-                                        <div className="text-red-500">
+                                    {formik.touched.Password && formik.errors.Password ? (
+                                        <div className="flex items-center gap-2 mt-1 text-sm font-semibold text-red-600 bg-red-100 border border-red-300 rounded px-2 py-1 animate-shake">
+                                            <i className="fas fa-exclamation-circle"></i>
                                             {formik.errors.Password}
                                         </div>
-                                    ) : (
-                                        ''
-                                    )}
+                                    ) : ''}
                                     <button className="text-gray-400 hover:cursor-pointer hover:underline transition-all duration-300 ease">
                                         <Link to={'/auth/forgetpassword'}>
                                             {t('forget_my_password')}
@@ -147,6 +147,16 @@ function Login() {
                                             toast.error(t('error_during_google_login'));
                                         }}
                                     />
+                                </div>
+
+                                <div className=" flex justify-center my-3">
+                                    <button
+                                        type="button"
+                                        className="bg-gray-400 text-white px-6 py-2 rounded text-xl hover:bg-gray-600 transition-all duration-300 ease ml-2"
+                                        onClick={() => window.location.href = '/'}
+                                    >
+                                        Continue as Guest
+                                    </button>
                                 </div>
 
                                 <div className="">

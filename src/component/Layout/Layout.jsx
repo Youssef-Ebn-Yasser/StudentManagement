@@ -9,7 +9,6 @@ function Layout() {
     return <>
     
     <Navbar/>
-    <Translate/>
         <Outlet></Outlet>
         <Chatbot/>
     <Footer/>

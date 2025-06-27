@@ -108,6 +108,7 @@ function AdminProfile() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-8 px-8">
+                        <>
                         <Link to="/admin/addteacher" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
                             <img src={teaImg} alt="teaImg" className="w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-indigo-600">{t('add-teacher')} </h3>
@@ -127,12 +128,12 @@ function AdminProfile() {
                         <Link to="/admin/reg-admin" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
                             <img src={stuImg} alt="stuImg" className="w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-indigo-600">Add Admin</h3>
-                        
                         </Link>
                         <Link to="/admin/reports" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
                             <img src={gateImg} alt="reportImg" className="w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-indigo-600">Reports</h3>
                         </Link>
+                        </>
                     </div>
                 </div>
             </div>

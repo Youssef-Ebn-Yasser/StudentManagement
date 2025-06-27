@@ -7,6 +7,7 @@ import Button from './Button';
 import styles from './Navbar.module.css'; // Import the CSS module
 import SearchBar from './SearchBar';
 import { useTranslation } from 'react-i18next';
+import Translate from '../Translate/Translate';
 
 function Navbar() {
     const dispatch = useDispatch();
@@ -127,6 +128,9 @@ function Navbar() {
                       <img src={img} alt="user profile" className="w-full h-full object-cover" />
                     </div>
                   </Link>
+                </div>
+                <div>
+                    <Translate/>
                 </div>
 
                 {/* Auth Button (Large Screens) */}

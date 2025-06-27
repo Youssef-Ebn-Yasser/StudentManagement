@@ -14,12 +14,25 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
     age: teacherData?.age || '',
     specialization: teacherData?.specialization || '',
     phone: teacherData?.phone || '',
+    additionalInfo: teacherData?.additionalInfo || '',
     image: null
   });
 
   const [previewUrl, setPreviewUrl] = useState(teacherData?.image || null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  const guestId = localStorage.getItem('guestId');
+  if (!guestId) {
+    console.error('guestId is missing. Please log in again.');
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-red-600 text-center">
+          <p className="text-xl font-semibold">Teacher ID is missing. Please log in again.</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -78,17 +91,13 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
     try {
       setLoading(true);
       
-      // Ensure we have a valid teacher ID
-      if (!teacherData?.id) {
-        throw new Error('Teacher ID is missing');
-      }
-
       const response = await courseService.updateTeacher({
-        Id: teacherData.id,
+        Id: guestId,
         Name: formData.name.trim(),
         Age: formData.age || '',
         Specialization: formData.specialization.trim(),
         Phone: formData.phone.trim(),
+        AdditionalInfo: formData.additionalInfo,
         Image: formData.image
       });
       
@@ -97,10 +106,12 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
         toast.success('Profile updated successfully!');
         
         // Update local state and trigger parent callback
-        onUpdate({
-          ...formData,
-          image: previewUrl
-        });
+        if (typeof onUpdate === 'function') {
+          onUpdate({
+            ...formData,
+            image: previewUrl
+          });
+        }
         
         // Navigate back to profile
         window.location.href = '/teacher/profile';
@@ -234,6 +245,21 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
               )}
             </div>
 
+            {/* Additional Info Field */}
+            <div>
+              <label htmlFor="additionalInfo" className="block text-sm font-medium text-gray-700 mb-1">
+                Additional Info
+              </label>
+              <textarea
+                id="additionalInfo"
+                name="additionalInfo"
+                value={formData.additionalInfo}
+                onChange={handleChange}
+                placeholder="Enter any additional information"
+                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3 min-h-[80px]"
+              />
+            </div>
+
             {/* Submit and Cancel Buttons */}
             <div className="flex justify-end space-x-4">
               <button
@@ -256,6 +282,10 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
       </div>
     </div>
   );
+};
+
+AccountSettings.defaultProps = {
+  onUpdate: () => {},
 };
 
 export default AccountSettings; 
