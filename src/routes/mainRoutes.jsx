@@ -46,6 +46,9 @@ import TChatRoom from '../component/TeacherProfile/TChatRoom'
 import StudentAnswers from '@/component/TeacherProfile/teacherMange/StudentAnswers'
 import StudentQuizStats from '@/component/StudentDashboard/StudentQuizStats'
 import PaymobCheckout from '@/component/CoursesDetails/PaymobCheckout'
+import RegisterAdmin from '@/component/AdminProfile/RegisterAdmin'
+import AllAdmins from '@/component/AdminProfile/AllAdmins'
+import StudentProfile3 from '@/component/StudentProfile/StudentProfile3'
 
 
 const routesConfig = [
@@ -87,6 +90,12 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
+        path: 'admins',
+        element: <AllAdmins />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
         path: '/studentdashboard/course/:courseId/lesson/:lessonId',
         element: <LessonDetails />,
         isProtected: false,
@@ -101,6 +110,12 @@ const routesConfig = [
     {
         path: 'studentprofilee',
         element: <StudentProfile2 />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'studentprofileee',
+        element: <StudentProfile3 />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -275,6 +290,12 @@ const routesConfig = [
     {
         path: 'admin/addcourse',
         element: <AddCourse/>,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'admin/reg-admin',
+        element: <RegisterAdmin/>,
         isProtected: false,
         accessRole: 'all',
     },

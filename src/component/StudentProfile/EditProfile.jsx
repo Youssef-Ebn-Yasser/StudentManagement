@@ -77,7 +77,7 @@ export default function EditProfile() {
     setLoading(true);
     setSuccess(false);
     try {
-      const studentId = localStorage.getItem('studentId');
+      const studentId = localStorage.getItem('guestId');
       if (!studentId) {
         setError('No student ID found. Please log in again.');
         setLoading(false);
