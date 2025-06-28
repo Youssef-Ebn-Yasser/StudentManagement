@@ -770,7 +770,7 @@ public class QuizService : ResponseHandler, IQuizService
                 int numSubmitted = studentAnswers.Count;
                 double percentageOfSubmit = totalStudents > 0 ? Math.Min(Math.Round((double)numSubmitted / totalStudents * 100, 2), 100) : 0;
                 double percentageWithDegree = quiz.PossiblePoints > 0 && numSubmitted > 0
-                    ? Math.Round(studentAnswers.Sum(a => (double?)a.GradingRating ?? 0) / (quiz.PossiblePoints * numSubmitted) * 100, 2)
+                    ? Math.Min(Math.Round(studentAnswers.Sum(a => (double?)a.GradingRating ?? 0) / (quiz.PossiblePoints * numSubmitted) * 100, 2),100)
                     : 0;
                 int numUnder50 = studentAnswers.Count(a => (double)(a.GradingRating ?? 0) < (quiz.PossiblePoints * 0.5));
                 int numOver70 = studentAnswers.Count(a => (double)(a.GradingRating ?? 0) >= (quiz.PossiblePoints * 0.7));
