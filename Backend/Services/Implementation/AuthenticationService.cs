@@ -269,7 +269,10 @@ public class AuthenticationService : IAuthenticationService
 
         return _responseHandler.Success("Password reset link has been sent");
     }
-
+    public class ApplicationSettings
+    {
+        public string BaseUrl { get; set; }
+    }
     public async Task<Response<string>> ResetPasswordAsync(string email, string token, string newPassword)
     {
         var user = await _userManager.FindByEmailAsync(email);
