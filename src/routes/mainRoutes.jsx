@@ -28,7 +28,6 @@ import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
 import CourseDashDetails from '@/component/StudentDashboard/CourseDashDetailes'
 import AddMaterial from '@/component/TeacherProfile/AddMaterial'
 import TeacherProfileView from '@/component/StudentDashboard/TeacherProfileView'
-import CreateQuiz from '@/component/CreateQuiz/CreateQuiz'
 import Quiz from '@/component/StudentDashboard/Quiz'
 import TeacherRequest from '@/component/Register/TeacherRequest'
 import TeacherDashboard from '@/component/TeacherDashboard/TeacherDashboard'
@@ -84,12 +83,6 @@ const routesConfig = [
     {
         path: 'studentdashboard',
         element: <StudentDashboard />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'createquiz',
-        element: <CreateQuiz />,
         isProtected: false,
         accessRole: 'all',
     },

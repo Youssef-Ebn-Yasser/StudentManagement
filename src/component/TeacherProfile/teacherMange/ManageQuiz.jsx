@@ -245,35 +245,105 @@ const ManageQuiz = () => {
       }
 
       // Format the questions data
-      const formattedQuestions = (activeTab === 0 ? lessonQuiz.questionListDtos : courseQuiz.questionListDtos).map(question => ({
-        questionText: question.questionText,
-        questionTypeId: question.questionTypeId,
-        points: question.points,
-        correctAnswer: question.correctAnswer,
-        options: question.questionTypeId === 1
-          ? Object.keys(question.options)
-          : []
-      }));
+      const formattedQuestions = (activeTab === 0 ? lessonQuiz.questionListDtos : courseQuiz.questionListDtos).map(question => {
+        if (activeTab === 0) {
+          // For lesson quizzes
+          return {
+            questionText: question.questionText,
+            questionTypeId: question.questionTypeId,
+            points: question.points,
+            correctAnswer: question.correctAnswer,
+            options: question.questionTypeId === 1
+              ? Object.keys(question.options)
+              : []
+          };
+        } else {
+          // For course quizzes - format options as key-value pairs
+          let options = null;
+          if (question.questionTypeId === 1) {
+            options = {};
+            Object.keys(question.options).forEach(optionKey => {
+              options[optionKey] = question.options[optionKey];
+            });
+          }
+          return {
+            questionText: question.questionText,
+            questionTypeId: question.questionTypeId,
+            points: question.points,
+            correctAnswer: question.correctAnswer,
+            options: options
+          };
+        }
+      });
 
       let response;
 
       if (activeTab === 0) {
         console.log('Lesson Quiz Data before submission:', lessonQuiz.lessonId);
         // Create Lesson Quiz
+        // Format questions for lesson quiz exactly as required by API
+        const lessonQuestions = lessonQuiz.questionListDtos.map(question => {
+          let options = null;
+          if (question.questionTypeId === 1) {
+            options = {};
+            Object.keys(question.options).forEach(optionKey => {
+              options[optionKey] = question.options[optionKey];
+            });
+          }
+          
+          return {
+            questionText: question.questionText,
+            questionTypeId: question.questionTypeId,
+            points: question.points,
+            correctAnswer: question.correctAnswer,
+            options: options
+          };
+        });
+        
         const quizToSubmit = {
-          ...lessonQuiz,
+          lessonId: Number(lessonQuiz.lessonId),
+          title: lessonQuiz.title,
+          description: lessonQuiz.description,
           startsAt: lessonQuiz.startsAt instanceof Date ? lessonQuiz.startsAt.toISOString() : lessonQuiz.startsAt,
-          questionListDtos: formattedQuestions,
+          durationMinutes: lessonQuiz.durationMinutes,
+          questionListDtos: lessonQuestions,
           isAutoCorrect: lessonQuiz.isAutoCorrect
         };
+        
+        console.log('Submitting lesson quiz with lessonId:', quizToSubmit.lessonId);
+        console.log('Full lesson quiz payload:', JSON.stringify(quizToSubmit, null, 2));
         response = await quizService.createLessonQuiz(quizToSubmit);
       } else {
         // Create Course Quiz
+        console.log('Debug - selectedCourse:', selectedCourse);
+        console.log('Debug - courseQuiz.courseId:', courseQuiz.courseId);
+        
+        // Format questions for course quiz exactly as required by API
+        const courseQuestions = courseQuiz.questionListDtos.map(question => {
+          let options = null;
+          if (question.questionTypeId === 1) {
+            options = {};
+            Object.keys(question.options).forEach(optionKey => {
+              options[optionKey] = question.options[optionKey];
+            });
+          }
+          
+          return {
+            questionText: question.questionText,
+            questionTypeId: question.questionTypeId,
+            points: question.points,
+            correctAnswer: question.correctAnswer,
+            options: options
+          };
+        });
+        
         const quizToSubmit = {
-          ...courseQuiz,
-          questionListDtos: formattedQuestions,
-          isAutoCorrect: courseQuiz.isAutoCorrect
+          courseId: Number(selectedCourse),
+          questionListDtos: courseQuestions
         };
+        
+        console.log('Submitting course quiz with courseId:', quizToSubmit.courseId);
+        console.log('Full payload:', JSON.stringify(quizToSubmit, null, 2));
         response = await quizService.createCourseQuiz(quizToSubmit);
       }
 
@@ -533,7 +603,14 @@ const ManageQuiz = () => {
                 <InputLabel>{t("select-course")}</InputLabel>
                 <Select
                   value={selectedCourse}
-                  onChange={(e) => setSelectedCourse(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedCourse(e.target.value);
+                    setCourseQuiz(prev => {
+                      const updated = { ...prev, courseId: e.target.value };
+                      console.log('Course selected for course quiz:', updated.courseId);
+                      return updated;
+                    });
+                  }}
                   label="Select Course"
                   sx={{
                     '& .MuiOutlinedInput-notchedOutline': {

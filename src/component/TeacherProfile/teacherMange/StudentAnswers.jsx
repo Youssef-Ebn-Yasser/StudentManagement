@@ -3,8 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useTranslation } from 'react-i18next';
 
 const StudentAnswers = () => {
+  const { t } = useTranslation();
   const [answers, setAnswers] = useState(null);
   const [loading, setLoading] = useState(false);
   const [grading, setGrading] = useState(false);

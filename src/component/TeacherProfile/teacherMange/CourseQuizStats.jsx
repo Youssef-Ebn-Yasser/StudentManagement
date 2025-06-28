@@ -29,6 +29,7 @@ import {
   Legend,
 } from 'recharts';
 import { BarChart as BarChartIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD'];
 
@@ -38,6 +39,7 @@ const CourseQuizStats = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const theme = useTheme();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -120,9 +122,9 @@ const CourseQuizStats = () => {
 
   // Prepare data for the pie chart
   const performanceData = [
-    { name: 'Under 50%', value: totalStats.totalStudentsUnder50 },
-    { name: 'Over 70%', value: totalStats.totalStudentsOver70 },
-    { name: 'Perfect Score', value: totalStats.totalStudentsWith100 }
+    { name: t('under-50'), value: totalStats.totalStudentsUnder50 },
+    { name: t('over-70'), value: totalStats.totalStudentsOver70 },
+    { name: t('perfect-score'), value: totalStats.totalStudentsWith100 }
   ];
 
   const StatCard = ({ title, value, color }) => (
@@ -136,7 +138,7 @@ const CourseQuizStats = () => {
     }}>
       <CardContent>
         <Typography variant="h6" color="text.secondary" gutterBottom>
-          {title}
+          {t(title)}
         </Typography>
         <Typography variant="h3" component="div" sx={{ color: color || theme.palette.primary.main }}>
           {value}
@@ -168,35 +170,35 @@ const CourseQuizStats = () => {
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={4} lg={2.4}>
           <StatCard 
-            title="Total Quizzes" 
+            title="total-quizzes" 
             value={totalStats.totalQuizzes}
             color={COLORS[0]}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4} lg={2.4}>
           <StatCard 
-            title="Total Submissions" 
+            title="total-submissions" 
             value={totalStats.totalSubmissions}
             color={COLORS[1]}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4} lg={2.4}>
           <StatCard 
-            title="Students Under 50%" 
+            title="students-under-50" 
             value={totalStats.totalStudentsUnder50}
             color={COLORS[2]}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4} lg={2.4}>
           <StatCard 
-            title="Students Over 70%" 
+            title="students-over-70" 
             value={totalStats.totalStudentsOver70}
             color={COLORS[3]}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4} lg={2.4}>
           <StatCard 
-            title="Perfect Scores" 
+            title="students-perfect-score" 
             value={totalStats.totalStudentsWith100}
             color={COLORS[4]}
           />
