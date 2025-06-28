@@ -1,9 +1,9 @@
-﻿using Backend.Wrapper;
-
-namespace Backend.Services.Interfaces;
+﻿namespace Backend.Services.Interfaces;
 
 public interface ICourseService
 {
+
+    Task Translate(string level, string title, string desc, int courseId, string language);
     public Task<Response<ShowCourseDto>> GetCourseByIdAsync(int id);
     public Task<Response<List<ShowAllCoursesDto>>> GetAllAsync();
     public Task<Response<List<HomeCourses>>> GetAllByCategoryAsync(int categoryId);
@@ -15,6 +15,8 @@ public interface ICourseService
     public Task<Response<List<ShowCourseInfoByCategoryDto>>> GetCourseInfoByCategoryAsync(string category);
 
     public Task<Response<List<ShowCourseDto>>> GetAllCoursesOfTeacherAsync(int teacherId);
+
+    public Task<Response<List<ShowStudentAndCourse>>> GetAllStudentAndCourse();
 }
 
 public enum enOrderBy { noOrder = 0, Price = 1, CreatedAt = 2, }

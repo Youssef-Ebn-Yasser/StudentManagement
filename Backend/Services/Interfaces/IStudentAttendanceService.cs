@@ -1,11 +1,11 @@
-﻿using Backend.DTOs.StudentDOs;
-
+﻿
 namespace Backend.Services.Interfaces
 {
+    using Backend.DTOs.StudentDOs;
     public interface IStudentAttendanceService
     {
-        Task MarkAttendanceAsync(int meetingId, List<DTOs.StudentDOs.StudentAttendanceDto> attendances);
-        Task<Response<List<DTOs.StudentDOs.StudentAttendanceDto>>> GetAttendanceByMeetingAsync(int meetingId);
-        Task<Response<List<DTOs.StudentDOs.StudentAttendanceDto>>> GetAttendanceByStudentAsync(int studentId);
+        public Task<Response<string>> MarkAttendanceAsync(int meetingId, List<StudentAttendanceStatusDto> attendances);
+        public Task<Response<List<StudentAttendanceStatusDto>>> GetAttendanceByMeetingAsync(int meetingId);
+        public Task<Response<List<StudentAttendanceStatusDto>>> GetAttendanceByStudentAsync(int studentId);
     }
 }

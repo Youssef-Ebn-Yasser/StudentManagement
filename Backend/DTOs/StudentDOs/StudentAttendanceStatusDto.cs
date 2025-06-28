@@ -1,6 +1,6 @@
 ﻿namespace Backend.DTOs.StudentDOs
 {
-    public class StudentAttendanceDto
+    public class StudentAttendanceStatusDto
     {
         public int StudentId { get; set; }
         public StudentStatusType Status { get; set; }

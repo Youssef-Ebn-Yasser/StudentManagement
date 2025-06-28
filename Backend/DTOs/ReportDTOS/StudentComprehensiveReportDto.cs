@@ -1,5 +1,3 @@
-using Backend.DTOs.StudentProfileDto;
-
 namespace Backend.DTOs.ReportDTOS
 {
     public class StudentComprehensiveReportDto
@@ -40,7 +38,8 @@ namespace Backend.DTOs.ReportDTOS
         public int AttendedMeetings { get; set; }
         public int AbsentMeetings { get; set; }
         public double AttendanceRate { get; set; }
-        public List<Backend.DTOs.StudentProfileDto. StudentAttendanceDto> RecentAttendance { get; set; }
+        //public List<StudentDOs.StudentAttendanceStatusDto> RecentAttendance { get; set; }
+        public List<StudentAttendanceReportDto> RecentAttendance { get; set; }
     }
 
     public class AcademicPerformanceDto
@@ -60,4 +59,4 @@ namespace Backend.DTOs.ReportDTOS
         public double PassRate { get; set; }
         public List<StudentQuizDto> RecentQuizzes { get; set; }
     }
-} 
+}

@@ -1,7 +1,5 @@
 ﻿using Backend.DTOs.ReportDTOS;
-using Backend.DTOs.StudentProfileDto;
 using StudentAssignmentDto = Backend.DTOs.StudentProfileDto.StudentAssignmentDto;
-
 namespace Backend.Services.Implementation
 {
     public class ReportServices : IReportServices
@@ -237,7 +235,7 @@ namespace Backend.Services.Implementation
                 RecentAttendance = attendance
                     .OrderByDescending(a => a.AttendanceDate)
                     .Take(5)
-                    .Select(a => new Backend.DTOs.StudentProfileDto.StudentAttendanceDto
+                    .Select(a => new StudentAttendanceReportDto
                     {
                         Id = a.Id,
                         MeetingTopic = a.Meeting.TopicEn,

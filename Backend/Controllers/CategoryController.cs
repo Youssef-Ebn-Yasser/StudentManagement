@@ -1,5 +1,6 @@
 ﻿using Backend.DTOs.CategoryDTOOS;
 using Backend.Resources;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Localization;
 
 namespace Backend.Controllers;
@@ -34,7 +35,7 @@ public class CategoryController : AppControllerBase
     }
 
 
-
+    [Authorize]
     [HttpGet("GetAll")]
     public async Task<IActionResult> GetAll()
     {

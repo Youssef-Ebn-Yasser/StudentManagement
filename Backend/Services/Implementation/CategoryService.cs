@@ -10,18 +10,22 @@ public class CategoryService : ResponseHandler, ICategoryService
     private readonly IMapper _mapper;
     private readonly IStringLocalizer _localizer;
     private readonly IStructuredLogger _logger;
+    private readonly IGeminiObjectTranslator _translator;
+    CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
     #endregion
 
     #region   Constructor
     public CategoryService(IUnitOfWork unitOfWork,
                            IMapper mapper,
                            IStringLocalizer stringLocalizer,
-                           IStructuredLogger logger)
+                           IStructuredLogger logger,
+                           IGeminiObjectTranslator translator)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _localizer = stringLocalizer;
         _logger = logger;
+        _translator = translator;
     }
     #endregion
 
@@ -29,7 +33,8 @@ public class CategoryService : ResponseHandler, ICategoryService
     public async Task<Response<List<CategoryDto>>> GetAllAsync()
     {
         var allCategories = await _unitOfWork.Repository<Category>()
-                                                          .GetTableNoTracking()
+                                                            .GetTableAsTracking()
+                                                          //.GetTableNoTracking()
                                                           .Where(c => !c.IsDeleted)
                                                           .ToListAsync();
 
@@ -38,6 +43,7 @@ public class CategoryService : ResponseHandler, ICategoryService
             _logger.LogInfo("No Category Exist");
             return BadRequest<List<CategoryDto>>("No Category Found");
         }
+        var lang = cultureInfo.TwoLetterISOLanguageName.ToLower();
 
         var mapped = _mapper.Map<List<CategoryDto>>(allCategories);
         return Success(mapped);
@@ -50,6 +56,16 @@ public class CategoryService : ResponseHandler, ICategoryService
         {
             _logger.LogInfo($"No Category with this Id = {id} found");
             return NotFound<CategoryDto>("Category not found");
+        }
+
+        var lang = cultureInfo.TwoLetterISOLanguageName.ToLower();
+
+
+        if (lang == "ar" && string.IsNullOrEmpty(category.CategoryNameAr))
+        {
+            var nameAr = await _translator.TranslateWordAsync(category.CategoryNameEn, "English", "Arabic");
+            category.CategoryNameAr = nameAr;
+            _unitOfWork.Complete();
         }
 
         var mapped = _mapper.Map<CategoryDto>(category);

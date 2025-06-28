@@ -43,6 +43,20 @@ public class GeminiObjectTranslator : IGeminiObjectTranslator
             return default;
         }
     }
+
+    public async Task<string> TranslateWordAsync<T>(T obj, string fromLang, string toLang)
+    {
+        var p = GenerateStringTranslationPrompt(obj, fromLang, toLang);
+        var result = await _geminiService.GetResponseAsync(p);
+
+        result = result
+         .Replace("\\n", "")   // in case the token is literally “\n”
+         .Replace("\r", "")
+         .Replace("\n", "")
+         .Trim();
+
+        return result;
+    }
     private static string GenerateTranslationPrompt<T>(T obj, string fromLang, string toLang)
     {
         var objectJson = JsonConvert.SerializeObject(obj, Formatting.Indented);
@@ -50,6 +64,18 @@ public class GeminiObjectTranslator : IGeminiObjectTranslator
                     You are a translation engine. Translate all values in the following JSON object from {fromLang} to {toLang}.
                     DO NOT translate keys or structure. DO NOT add any explanation or comments.
                     Return only the JSON object, starting with '{{' and ending with '}}'.
+                    
+                    {objectJson}
+                    ";
+    }
+    private static string GenerateStringTranslationPrompt<T>(T obj, string fromLang, string toLang)
+    {
+        var objectJson = JsonConvert.SerializeObject(obj, Formatting.Indented);
+        return $@"
+                    You are a translation engine. Translate value in the following  from {fromLang} to {toLang}.
+                    DO NOT translate keys or structure. DO NOT add any explanation or comments.
+                    Return only the translated word. and return only word without any new line or any thing just a word
+                    without /n     if result like this ( وحدة\n ) i want it like this ( وحدة )
                     
                     {objectJson}
                     ";
