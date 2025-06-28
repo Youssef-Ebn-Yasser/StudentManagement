@@ -15,6 +15,8 @@ public interface ICourseService
     public Task<Response<List<ShowCourseInfoByCategoryDto>>> GetCourseInfoByCategoryAsync(string category);
 
     public Task<Response<List<ShowCourseDto>>> GetAllCoursesOfTeacherAsync(int teacherId);
+
+    public Task<Response<List<ShowStudentAndCourse>>> GetAllStudentAndCourse();
 }
 
 public enum enOrderBy { noOrder = 0, Price = 1, CreatedAt = 2, }

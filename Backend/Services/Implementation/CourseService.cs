@@ -280,6 +280,33 @@ public class CourseService : ResponseHandler, ICourseService
             .ToListAsync();
         return Success(courses);
     }
+
+    public async Task<Response<List<ShowStudentAndCourse>>> GetAllStudentAndCourse()
+    {
+        // all students that pay for the course ant the course that they pay for it
+        var studentCourses = await _unitOfWork.Repository<StudentCourse>()
+            .GetTableNoTracking()
+            .Include(sc => sc.Student)
+            .Include(sc => sc.Course)
+            .Where(sc => sc.IsDeleted == false)
+            .Select(sc => new ShowStudentAndCourse
+            {
+                StudentId = sc.Student.Id,
+                StudentName = sc.Student.NameEn,
+                CourseId = sc.Course.Id,
+                CourseTitle = GeneralLocalizableEntity.Localized(sc.Course.TitleAr, sc.Course.TitleEn),
+               
+            })
+            .ToListAsync();
+        if (studentCourses == null || !studentCourses.Any())
+        {
+            _logger.LogInfo("No Students and Courses found in GetAllStudentAndCourse");
+            return NotFound<List<ShowStudentAndCourse>>("No students and courses found");
+        }
+        return Success(studentCourses);
+
+    }
+
     private IQueryable<Course> GetCourseQuerable()
     {
         var result = _unitOfWork.Repository<Course>().GetTableNoTracking().Where(c => c.IsDeleted == false);
