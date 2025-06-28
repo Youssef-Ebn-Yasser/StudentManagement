@@ -3,6 +3,7 @@ using Hangfire;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Stripe;
+using static Backend.Services.Implementation.AuthenticationService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -106,6 +107,12 @@ builder.Services.AddSingleton<IStringLocalizer>(sp =>
 #endregion
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<ApplicationSettings>(builder.Configuration.GetSection("ApplicationSettings"));
+
+//public class ApplicationSettings
+//{
+//    public string BaseUrl { get; set; }
+//}
 
 
 #region authorize
