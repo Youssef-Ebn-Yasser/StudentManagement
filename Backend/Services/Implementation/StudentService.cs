@@ -514,7 +514,7 @@ await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync
             .GetTableNoTracking()
             .Include(ma => ma.Meeting)
             .Where(ma => ma.StudentId == studentId)
-            .Select(ma => new StudentAttendanceDto
+            .Select(ma => new StudentAttendanceStatusDto
             {
                 StudentId = ma.StudentId,
 
