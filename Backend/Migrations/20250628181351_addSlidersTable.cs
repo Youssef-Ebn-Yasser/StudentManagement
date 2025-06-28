@@ -6,15 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class testreport : Migration
+    public partial class addSlidersTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Name",
-                table: "AspNetUsers");
-
             migrationBuilder.DropColumn(
                 name: "UserTypeAr",
                 table: "AspNetUsers");
@@ -28,56 +24,27 @@ namespace Backend.Migrations
                 table: "StudentAssignments",
                 newName: "NameEn");
 
-            migrationBuilder.RenameColumn(
-                name: "Content",
-                table: "Materials",
-                newName: "ContentAr");
-
-            migrationBuilder.RenameColumn(
-                name: "RejectionReason",
-                table: "ManualPayments",
-                newName: "RejectionReasonAr");
-
-            migrationBuilder.RenameColumn(
-                name: "Title",
-                table: "Lessons",
-                newName: "TitleAr");
-
-            migrationBuilder.RenameColumn(
-                name: "Description",
-                table: "Lessons",
-                newName: "DescriptionAr");
-
-            migrationBuilder.RenameColumn(
-                name: "Title",
-                table: "Courses",
-                newName: "TitleAr");
-
-            migrationBuilder.RenameColumn(
-                name: "Level",
-                table: "Courses",
-                newName: "LevelAr");
-
-            migrationBuilder.RenameColumn(
-                name: "Description",
-                table: "Courses",
-                newName: "DescriptionAr");
-
-            migrationBuilder.RenameColumn(
-                name: "Title",
-                table: "Comment",
-                newName: "TitleAr");
-
-            migrationBuilder.RenameColumn(
-                name: "Content",
-                table: "Comment",
-                newName: "ContentAr");
-
             migrationBuilder.AddColumn<string>(
                 name: "NameAr",
                 table: "StudentAssignments",
                 type: "nvarchar(max)",
                 nullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "NameEn",
+                table: "AspNetUsers",
+                type: "nvarchar(max)",
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(max)");
+
+            migrationBuilder.AlterColumn<string>(
+                name: "NameAr",
+                table: "AspNetUsers",
+                type: "nvarchar(max)",
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(max)");
 
             migrationBuilder.AddColumn<string>(
                 name: "AddressAr",
@@ -109,23 +76,27 @@ namespace Backend.Migrations
                 type: "nvarchar(max)",
                 nullable: true);
 
-            migrationBuilder.AddColumn<string>(
-                name: "NameAr",
-                table: "AspNetUsers",
-                type: "nvarchar(max)",
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "NameEn",
-                table: "AspNetUsers",
-                type: "nvarchar(max)",
-                nullable: true);
-
             migrationBuilder.AddColumn<long>(
                 name: "RandomCode",
                 table: "AspNetUsers",
                 type: "bigint",
                 nullable: true);
+
+            migrationBuilder.CreateTable(
+                name: "Sliders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ContentAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ContentEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Path = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Link = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sliders", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "StudentAttendances",
@@ -172,6 +143,9 @@ namespace Backend.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Sliders");
+
+            migrationBuilder.DropTable(
                 name: "StudentAttendances");
 
             migrationBuilder.DropColumn(
@@ -199,14 +173,6 @@ namespace Backend.Migrations
                 table: "AspNetUsers");
 
             migrationBuilder.DropColumn(
-                name: "NameAr",
-                table: "AspNetUsers");
-
-            migrationBuilder.DropColumn(
-                name: "NameEn",
-                table: "AspNetUsers");
-
-            migrationBuilder.DropColumn(
                 name: "RandomCode",
                 table: "AspNetUsers");
 
@@ -215,57 +181,25 @@ namespace Backend.Migrations
                 table: "StudentAssignments",
                 newName: "Name");
 
-            migrationBuilder.RenameColumn(
-                name: "ContentAr",
-                table: "Materials",
-                newName: "Content");
-
-            migrationBuilder.RenameColumn(
-                name: "RejectionReasonAr",
-                table: "ManualPayments",
-                newName: "RejectionReason");
-
-            migrationBuilder.RenameColumn(
-                name: "TitleAr",
-                table: "Lessons",
-                newName: "Title");
-
-            migrationBuilder.RenameColumn(
-                name: "DescriptionAr",
-                table: "Lessons",
-                newName: "Description");
-
-            migrationBuilder.RenameColumn(
-                name: "TitleAr",
-                table: "Courses",
-                newName: "Title");
-
-            migrationBuilder.RenameColumn(
-                name: "LevelAr",
-                table: "Courses",
-                newName: "Level");
-
-            migrationBuilder.RenameColumn(
-                name: "DescriptionAr",
-                table: "Courses",
-                newName: "Description");
-
-            migrationBuilder.RenameColumn(
-                name: "TitleAr",
-                table: "Comment",
-                newName: "Title");
-
-            migrationBuilder.RenameColumn(
-                name: "ContentAr",
-                table: "Comment",
-                newName: "Content");
-
-            migrationBuilder.AddColumn<string>(
-                name: "Name",
+            migrationBuilder.AlterColumn<string>(
+                name: "NameEn",
                 table: "AspNetUsers",
                 type: "nvarchar(max)",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: "",
+                oldClrType: typeof(string),
+                oldType: "nvarchar(max)",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "NameAr",
+                table: "AspNetUsers",
+                type: "nvarchar(max)",
+                nullable: false,
+                defaultValue: "",
+                oldClrType: typeof(string),
+                oldType: "nvarchar(max)",
+                oldNullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "UserTypeAr",

@@ -201,7 +201,7 @@ namespace Backend.Migrations
                     b.Property<int?>("TecherId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("TitleAr")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -780,6 +780,35 @@ namespace Backend.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
+            modelBuilder.Entity("Backend.Entities.Slider", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContentAr")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContentEn")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Link")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Sliders");
+                });
+
             modelBuilder.Entity("Backend.Entities.StudentAssignment", b =>
                 {
                     b.Property<int>("Id")
@@ -794,7 +823,7 @@ namespace Backend.Migrations
                     b.Property<int?>("LessonId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("NameAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NameEn")

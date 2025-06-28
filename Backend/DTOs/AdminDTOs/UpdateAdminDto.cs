@@ -1,5 +1,5 @@
 namespace Backend.DTOs.AdminDTOs;
-
+ 
 public class UpdateAdminDto
 {
     public int Id { get; set; }

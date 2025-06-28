@@ -49,6 +49,8 @@ public static class ClassesDependencies
 
         services.AddTransient<GeminiService>();
 
+        services.AddTransient<ISliderService, SliderService>();
+
 
 
 
