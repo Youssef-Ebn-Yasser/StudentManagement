@@ -824,7 +824,7 @@ public class QuizService : ResponseHandler, IQuizService
             foreach (var lesson in lessons)
             {
                 int totalQuizzes = lesson.Quizs.Count;
-                double percentageOfAllQuizzes = totalQuizzesInCourse > 0 ? (double)totalQuizzes / totalQuizzesInCourse * 100 : 0;
+                double percentageOfAllQuizzes = totalQuizzesInCourse > 0 ? ((double)totalQuizzes / totalQuizzesInCourse) * 100 : 0;
                 var quizAnalyticsList = new List<QuizAnalyticsDto>();
                 int totalStudents = await _unitOfWork.Repository<StudentCourse>()
                     .GetTableNoTracking()
@@ -834,9 +834,9 @@ public class QuizService : ResponseHandler, IQuizService
                 {
                     var studentAnswers = quiz.StudentQuizeAnswers ?? new List<StudentQuizeAnswer>();
                     int numSubmitted = studentAnswers.Count;
-                    double percentageOfSubmit = totalStudents > 0 ? (double)numSubmitted / totalStudents * 100 : 0;
+                    double percentageOfSubmit = totalStudents > 0 ? ((double)numSubmitted / totalStudents) * 100 : 0;
                     double percentageWithDegree = quiz.PossiblePoints > 0 && numSubmitted > 0
-                        ? studentAnswers.Sum(a => (double?)a.GradingRating ?? 0) / (quiz.PossiblePoints * numSubmitted) * 100
+                        ? (studentAnswers.Sum(a => (double?)a.GradingRating ?? 0) / (quiz.PossiblePoints * numSubmitted)) * 100
                         : 0;
                     int numUnder50 = studentAnswers.Count(a => (double)(a.GradingRating ?? 0) < (quiz.PossiblePoints * 0.5));
                     int numOver70 = studentAnswers.Count(a => (double)(a.GradingRating ?? 0) >= (quiz.PossiblePoints * 0.7));
