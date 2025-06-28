@@ -1,7 +1,12 @@
+import { t } from 'i18next';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const Footer = () => {
+
+    const { t } = useTranslation();
+
     return (
         <footer className="bg-gray-50 py-8 md:py-12 absolute right-0 left-0 shadow-sm">
             <div className="container mx-auto px-4 lg:px-8">
@@ -15,40 +20,40 @@ const Footer = () => {
 
                     {/* Product Section */}
                     <div className="col-span-1 md:col-span-2">
-                        <h6 className="font-semibold text-gray-700 mb-2 text-sm md:text-base">Product</h6>
+                        <h6 className="font-semibold text-gray-700 mb-2 text-sm md:text-base">{t("product")}</h6>
                         <ul className="text-gray-600 text-sm">
-                            <li className="mb-1"><a href="#" className="hover:text-indigo-500">Features</a></li>
-                            <li className="mb-1"><a href="#" className="hover:text-indigo-500">Pricing</a></li>
+                            <li className="mb-1"><a href="#" className="hover:text-indigo-500">{t("features")}</a></li>
+                            <li className="mb-1"><a href="#" className="hover:text-indigo-500">{t("pricing")}</a></li>
                         </ul>
                     </div>
 
                     {/* Resources Section */}
                     <div className="col-span-1 md:col-span-2">
-                        <h6 className="font-semibold text-gray-700 mb-2 text-sm md:text-base">Resources</h6>
+                        <h6 className="font-semibold text-gray-700 mb-2 text-sm md:text-base">{t("resources")}</h6>
                         <ul className="text-gray-600 text-sm">
-                            <li className="mb-1"><a href="#" className="hover:text-indigo-500">Blog</a></li>
-                            <li className="mb-1"><a href="#" className="hover:text-indigo-500">User Guides</a></li>
-                            <li className="mb-1"><a href="#" className="hover:text-indigo-500">Webinars</a></li>
+                            <li className="mb-1"><a href="#" className="hover:text-indigo-500">{t("blog")}</a></li>
+                            <li className="mb-1"><a href="#" className="hover:text-indigo-500">{t("user-guides")}</a></li>
+                            <li className="mb-1"><a href="#" className="hover:text-indigo-500">{t("webinars")}</a></li>
                         </ul>
                     </div>
 
                     {/* Company Section */}
                     <div className="col-span-1 md:col-span-2">
-                        <h6 className="font-semibold text-gray-700 mb-2 text-sm md:text-base">Company</h6>
+                        <h6 className="font-semibold text-gray-700 mb-2 text-sm md:text-base">{t("company")}</h6>
                         <ul className="text-gray-600 text-sm">
                             <Link to="/about">
-                                <li className="mb-1"><a href="#" className="hover:text-indigo-500">About</a></li>
+                                <li className="mb-1"><a href="#" className="hover:text-indigo-500">{t('About')}</a></li>
                             </Link>
                             
-                            <li className="mb-1"><a href="#" className="hover:text-indigo-500">Join Us</a></li>
+                            <li className="mb-1"><a href="#" className="hover:text-indigo-500">{t("join-us")}</a></li>
                         </ul>
                     </div>
 
                     {/* Subscribe Section */}
                     <div className="col-span-1 sm:col-span-2 md:col-span-4">
-                        <h6 className="font-semibold text-indigo-500 mb-4 text-base md:text-lg">Subscribe to our newsletter</h6>
+                        <h6 className="font-semibold text-indigo-500 mb-4 text-base md:text-lg">{t("subscribe-newsletter")}</h6>
                         <p className="text-gray-600 text-xs md:text-sm mb-4">
-                            Stay updated with the latest courses and exclusive insights.
+                            {t("newsletter-description")}
                         </p>
                         <div className="flex flex-col md:flex-row items-center">
                             <div className="relative flex-grow w-full md:w-auto mb-4 md:mb-0">
@@ -58,14 +63,14 @@ const Footer = () => {
                                 <input
                                     type="email"
                                     className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 py-2 text-sm border-gray-300 rounded-md text-black"
-                                    placeholder="Enter your email"
+                                    placeholder={t("enter_your_email")}
                                 />
                             </div>
                             <button
                                 type="button"
                                 className="w-full ms-4 md:w-auto inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             >
-                                Subscribe
+                                {t("subscribe")}
                             </button>
                         </div>
                     </div>
@@ -77,15 +82,15 @@ const Footer = () => {
                         <div className="flex items-center mt-2 md:mt-0">
                             <span className="mx-2 hidden md:inline">•</span>
                             <a href="#" className="hover:text-indigo-500">
-                                Privacy
+                                {t("privacy")}
                             </a>
                             <span className="mx-2">•</span>
                             <a href="#" className="hover:text-indigo-500">
-                                Terms
+                                {t("terms")}
                             </a>
                             <span className="mx-2">•</span>
                             <a href="#" className="hover:text-indigo-500">
-                                Sitemap
+                                {t("sitemap")}
                             </a>
                         </div>
                     </div>

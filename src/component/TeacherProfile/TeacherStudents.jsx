@@ -77,19 +77,19 @@ function TeacherStudents() {
 
   // Render a loading message while fetching data
   if (loading) {
-    return <div className="text-center p-10">Loading students...</div>;
+    return <div className="text-center p-10">{t("loading-students")}...</div>;
   }
 
   // Render an error message if the fetch failed
   if (error) {
-    return <div className="text-center p-10 text-red-500">Error: {error}</div>;
+    return <div className="text-center p-10 text-red-500">{t('error')}: {error}</div>;
   }
   
   // Render the main component
   return (
     <div className="bg-gray-100 min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">Enrolled Students</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">{t("enrolled-students")}</h1>
         
         {/* Check if there are any courses with students to display */}
         {courses.length > 0 ? (
@@ -123,7 +123,7 @@ function TeacherStudents() {
         ) : (
           // Message to show if no students are found in any course
           <div className="text-center p-10 bg-white rounded-lg shadow-md">
-            <p className="text-gray-600">No students are currently enrolled in any courses.</p>
+            <p className="text-gray-600">{t("no-enrolled-students")}</p>
           </div>
         )}
       </div>

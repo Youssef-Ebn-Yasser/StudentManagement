@@ -1,5 +1,4 @@
 import ProtectedRoutes from '@/component/ProductedRoutes'
-import Dashboard from '../component/Dashboard/Dashboard'
 import Home from '../component/Home/Home'
 import Layout from '../component/Layout/Layout'
 import Teachers from './../component/Teachers/Teachers'
@@ -75,12 +74,7 @@ const routesConfig = [
         isProtected: false,
         accessRole: 'all',
     },
-    {
-        path: 'dashboard',
-        element: <Dashboard />,
-        isProtected: false,
-        accessRole: 'all',
-    },
+   
     {
         path: 'studentdashboard',
         element: <StudentDashboard />,

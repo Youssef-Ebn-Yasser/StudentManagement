@@ -1,8 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
 
 const Button = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -14,7 +17,7 @@ const Button = () => {
         }}
         className="cta"
       >
-        <span>Sign in</span>
+        <span>{t("sign-in")}</span>
         <svg width="12px" height="8px" viewBox="0 0 13 10">
           <path d="M1,5 L11,5" />
           <polyline points="8 1 12 5 8 9" />

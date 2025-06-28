@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
 
 export default function CreateQuiz() {
+
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [lessonId, setLessonId] = useState('');
@@ -122,14 +126,14 @@ export default function CreateQuiz() {
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          Back to Profile
+          {t("back-to-profile")}
         </button>
-        <h2 className="text-2xl font-bold">Create a Quiz</h2>
+        <h2 className="text-2xl font-bold">{t("create-quiz")}</h2>
       </div>
       <form onSubmit={handleSubmit}>
         {/* Lesson ID is handled in state and sent in the request, but not shown to the user */}
 
-        <label className="block mt-2">Title</label>
+        <label className="block mt-2">{t('title')}</label>
         <input
           type="text"
           className="border rounded p-2 w-full"
@@ -138,7 +142,7 @@ export default function CreateQuiz() {
           required
         />
 
-        <label className="block mt-2">Description</label>
+        <label className="block mt-2">{t('description')}</label>
         <textarea
           className="border rounded p-2 w-full"
           value={description}
@@ -146,7 +150,7 @@ export default function CreateQuiz() {
           required
         />
 
-        <label className="block mt-2">Start Time</label>
+        <label className="block mt-2">{t("start-time")}</label>
         <input
           type="datetime-local"
           className="border rounded p-2 w-full"
@@ -155,7 +159,7 @@ export default function CreateQuiz() {
           required
         />
 
-        <label className="block mt-2">Duration (minutes)</label>
+        <label className="block mt-2">{t("duration")} ({t('minutes')})</label>
         <input
           type="number"
           className="border rounded p-2 w-full"
@@ -164,10 +168,10 @@ export default function CreateQuiz() {
           required
         />
 
-        <h3 className="text-lg font-semibold mt-6 mb-2">Questions</h3>
+        <h3 className="text-lg font-semibold mt-6 mb-2">{t("questions")}</h3>
         {questions.map((q, idx) => (
           <div key={idx} className="p-4 border rounded mb-4 bg-gray-50">
-            <label>Question Text</label>
+            <label>{t("question-text")}</label>
             <textarea
               className="border rounded p-2 w-full"
               value={q.questionText}
@@ -175,17 +179,17 @@ export default function CreateQuiz() {
               required
             />
 
-            <label>Question Type</label>
+            <label>{t("question-type")}</label>
             <select
               className="border rounded p-2 w-full"
               value={q.questionTypeId}
               onChange={(e) => handleQuestionChange(idx, 'questionTypeId', Number(e.target.value))}
             >
-              <option value={1}>MCQ</option>
-              <option value={2}>Text</option>
+              <option value={1}>{t("mcq")}</option>
+              <option value={2}>{t("text")}</option>
             </select>
 
-            <label>Points</label>
+            <label>{t("points")}</label>
             <input
               type="number"
               className="border rounded p-2 w-full"
@@ -194,7 +198,7 @@ export default function CreateQuiz() {
               required
             />
 
-            <label>Correct Answer</label>
+            <label>{t("correct-answer")}</label>
             <input
               type="text"
               className="border rounded p-2 w-full"
@@ -205,7 +209,7 @@ export default function CreateQuiz() {
 
             {q.questionTypeId === 1 && (
               <div className="mt-2">
-                <label>Options</label>
+                <label>{t("options")}</label>
                 {q.options.map((opt, oIdx) => (
                   <div key={oIdx} className="flex gap-2 mt-1 items-center">
                     <input
@@ -223,7 +227,7 @@ export default function CreateQuiz() {
                         checked={opt.value}
                         onChange={() => handleOptionRadioChange(idx, oIdx)}
                       />
-                      Correct Answer
+                      {t("correct-answer")}
                     </label>
                   </div>
                 ))}
@@ -232,7 +236,7 @@ export default function CreateQuiz() {
                   className="mt-2 px-3 py-1 bg-blue-100 rounded text-blue-700"
                   onClick={() => addOption(idx)}
                 >
-                  Add Option
+                  {t("add-option")}
                 </button>
               </div>
             )}
@@ -243,7 +247,7 @@ export default function CreateQuiz() {
           className="mt-2 px-4 py-2 bg-green-600 text-white rounded"
           onClick={addQuestion}
         >
-          ➕ Add Question
+          ➕ {t("add-question")}
         </button>
 
         <hr className="my-6" />
@@ -251,7 +255,7 @@ export default function CreateQuiz() {
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded text-lg"
         >
-          📤 Submit Quiz
+          📤 {t("submit-quiz")}
         </button>
       </form>
     </div>

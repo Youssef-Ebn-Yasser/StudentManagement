@@ -260,13 +260,13 @@ const TChatRoom = () => { // Renamed to TChatRoom for Teacher's perspective
     if (loading) return <Loader />;
     if (error) return <div className="text-center text-red-500 mt-8 p-4 bg-red-100 rounded-lg">{error}</div>;
     // Show a loading message if chatRoomId is not yet available
-    if (!chatRoomId) return <div className="text-center text-gray-500 mt-8">Initializing chat...</div>;
+    if (!chatRoomId) return <div className="text-center text-gray-500 mt-8">{t("initializing-chat")}...</div>;
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-2xl">
             <div className="bg-white rounded-lg shadow-xl p-6 border border-gray-200">
                 <h2 className="text-3xl font-extrabold text-gray-800 mb-6 text-center">
-                    Teacher-Student Chat Room
+                    {t("chat-room")}
                 </h2>
 
                 {/* Connection Status / Info */}
@@ -277,14 +277,14 @@ const TChatRoom = () => { // Renamed to TChatRoom for Teacher's perspective
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                             </span>
-                            Connected to Chat (Room ID: {chatRoomId})
+                            {t("connected-chat")} (Room ID: {chatRoomId})
                         </span>
                     ) : (
                         <span className="text-red-500 flex items-center justify-center space-x-2">
                             <span className="relative flex h-3 w-3">
                                 <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
                             </span>
-                            Connecting...
+                            {t("connecting")}...
                         </span>
                     )}
                 </div>
@@ -293,14 +293,14 @@ const TChatRoom = () => { // Renamed to TChatRoom for Teacher's perspective
                 {currentUserId && currentUserName && (
                     <div className="flex items-center justify-center mb-4 text-gray-700 text-lg font-semibold">
                         <FaUserCircle className="text-blue-500 mr-2 text-2xl" />
-                        You are: <span className="ml-1 text-blue-700">{currentUserName} (ID: {currentUserId})</span>
+                        {t("you-are")}: <span className="ml-1 text-blue-700">{currentUserName} (ID: {currentUserId})</span>
                     </div>
                 )}
 
                 {/* Messages Display Area */}
                 <div className="bg-gray-50 border border-gray-300 rounded-lg px-2 py-4 h-96 overflow-y-auto mb-4 custom-scrollbar flex flex-col">
                     {messages.length === 0 ? (
-                        <p className="text-gray-500 text-center italic py-10">No messages yet. Start the conversation!</p>
+                        <p className="text-gray-500 text-center italic py-10">{t("no-messages")}</p>
                     ) : (
                         messages.map((msg, index) => (
                             <div
@@ -330,7 +330,7 @@ const TChatRoom = () => { // Renamed to TChatRoom for Teacher's perspective
                         type="text"
                         id="messageInput"
                         className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-                        placeholder="Type your message here..."
+                        placeholder={t("type-message")}
                         value={messageInput}
                         onChange={(e) => setMessageInput(e.target.value)}
                         onKeyPress={(e) => {
@@ -354,7 +354,7 @@ const TChatRoom = () => { // Renamed to TChatRoom for Teacher's perspective
                         disabled={!isConnected} // Disable button if not connected
                     >
                         <FaPaperPlane className="text-xl" />
-                        <span className="hidden md:inline">Send</span>
+                        <span className="hidden md:inline">{t("Send")}</span>
                     </button>
                 </div>
             </div>

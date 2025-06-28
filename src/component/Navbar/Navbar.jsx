@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import Translate from '../Translate/Translate';
 
 function Navbar() {
+
     const dispatch = useDispatch();
     const authStore = useSelector((state) => state.auth || {});
     const userRole = authStore.role;
@@ -45,11 +46,12 @@ function Navbar() {
             <div className={`fixed top-0 left-0 right-0 h-[56px] bg-white shadow-xs flex items-center px-4 sm:px-6 ${styles.navbar} z-50`}>
 
                 {/* Logo */}
+
                 <div
                   className={`
                      top-[10px] 
                     ${isRTL ? 'right-[24px] left-auto' : 'left-[24px] right-auto'} 
-                    w-[106px] h-[36px] text-black text-center text-lg font-extrabold flex items-center justify-center rounded-md
+                    w-[106px] h-[36px] text-black text-center text-lg font-extrabold flex items-center justify-center rounded-md ms-5 pt-2
                   `}
                 >
                     E-learning
@@ -58,7 +60,7 @@ function Navbar() {
                 {/* Mobile Menu Toggle Button */}
                 <button 
                     onClick={toggleMenu}
-                    className="lg:hidden absolute right-4 top-4 p-2 text-gray-600 hover:text-gray-900 focus:outline-none z-[60]"
+                    className="lg:hidden absolute right-5 top-4 p-2 text-gray-600 hover:text-gray-900 focus:outline-none z-[60]"
                     aria-label="Toggle menu"
                 >
                     <i className={`fa-solid ${isMenuOpen ? 'fa-xmark' : 'fa-bars'} text-xl`}></i>
