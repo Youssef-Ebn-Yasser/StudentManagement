@@ -1,4 +1,4 @@
-﻿using Backend.Wrapper;
+﻿using Hangfire;
 
 
 namespace Backend.Services.Implementation;
@@ -10,18 +10,22 @@ public class CourseService : ResponseHandler, ICourseService
     private readonly IMapper _mapper;
     private readonly IPhysicalFileUpload _physicalFileUpload;
     private readonly IStructuredLogger _logger;
+    private readonly IGeminiObjectTranslator _translator;
+    CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
     #endregion
 
     #region   Counstructor
     public CourseService(IUnitOfWork unitOfWork,
                          IMapper mapper,
                          IPhysicalFileUpload physicalFileUpload,
-                         IStructuredLogger logger)
+                         IStructuredLogger logger,
+                         IGeminiObjectTranslator translator)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _physicalFileUpload = physicalFileUpload;
         _logger = logger;
+        _translator = translator;
     }
     #endregion
 
@@ -135,6 +139,35 @@ public class CourseService : ResponseHandler, ICourseService
         return Success(result);
     }
 
+
+    public async Task Translate(string level, string title, string desc, int courseId, string language)
+    {
+        var course = await _unitOfWork.Repository<Course>().GetByIdAsync(courseId);
+        _logger.LogInfo("Start hangfire service");
+        if (language == "en")
+        {
+            level = await _translator.TranslateObjectAsync<string>(level, "English", "Arabic");
+            title = await _translator.TranslateObjectAsync<string>(title, "English", "Arabic");
+            desc = await _translator.TranslateObjectAsync<string>(desc, "English", "Arabic");
+
+
+            course.LevelAr = level;
+            course.TitleAr = title;
+            course.DescriptionAr = desc;
+        }
+        else
+        {
+            level = await _translator.TranslateObjectAsync<string>(level, "Arabic", "English");
+            title = await _translator.TranslateObjectAsync<string>(title, "Arabic", "English");
+            desc = await _translator.TranslateObjectAsync<string>(desc, "Arabic", "English");
+            course.LevelEn = level;
+            course.TitleEn = title;
+            course.DescriptionEn = desc;
+        }
+        _unitOfWork.Repository<Course>().Update(course);
+        _unitOfWork.Complete();
+    }
+
     public async Task<Response<string>> CreateAsync(CreateCourseDto createCourseDto)
     {
         if (createCourseDto == null)
@@ -171,6 +204,10 @@ public class CourseService : ResponseHandler, ICourseService
 
         if (isSuccessAdd > 0)
         {
+            BackgroundJob.Enqueue<ICourseService>(x =>
+                x.Translate(createCourseDto.Level, createCourseDto.Title, createCourseDto.Description,
+                    course.Id, cultureInfo.TwoLetterISOLanguageName.ToLower()));
+
             _logger.LogInfo("Course Added Successfully");
             return Created<string>("Course created successfully");
         }
@@ -243,6 +280,33 @@ public class CourseService : ResponseHandler, ICourseService
             .ToListAsync();
         return Success(courses);
     }
+
+    public async Task<Response<List<ShowStudentAndCourse>>> GetAllStudentAndCourse()
+    {
+        // all students that pay for the course ant the course that they pay for it
+        var studentCourses = await _unitOfWork.Repository<StudentCourse>()
+            .GetTableNoTracking()
+            .Include(sc => sc.Student)
+            .Include(sc => sc.Course)
+            .Where(sc => sc.IsDeleted == false)
+            .Select(sc => new ShowStudentAndCourse
+            {
+                StudentId = sc.Student.Id,
+                StudentName = sc.Student.NameEn,
+                CourseId = sc.Course.Id,
+                CourseTitle = GeneralLocalizableEntity.Localized(sc.Course.TitleAr, sc.Course.TitleEn),
+               
+            })
+            .ToListAsync();
+        if (studentCourses == null || !studentCourses.Any())
+        {
+            _logger.LogInfo("No Students and Courses found in GetAllStudentAndCourse");
+            return NotFound<List<ShowStudentAndCourse>>("No students and courses found");
+        }
+        return Success(studentCourses);
+
+    }
+
     private IQueryable<Course> GetCourseQuerable()
     {
         var result = _unitOfWork.Repository<Course>().GetTableNoTracking().Where(c => c.IsDeleted == false);

@@ -7,6 +7,6 @@ namespace Backend.DTOs.StudentProfileDto
         public ShowStudentDto StudentInfo { get; set; }
         public List<StudentAssignmentDto> Assignments { get; set; }
         public List<StudentQuizDto> Quizzes { get; set; }
-        public List<StudentAttendanceDto> Attendance { get; set; }
+        public List<StudentAttendanceStatusDto> Attendance { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250622134237_TitleAr-Nullable")]
+    partial class TitleArNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -201,8 +204,7 @@ namespace Backend.Migrations
                     b.Property<int?>("TecherId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
+                    b.Property<string>("TitleAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TitleEn")
@@ -243,8 +245,7 @@ namespace Backend.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
+                    b.Property<string>("TitleAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TitleEn")
@@ -463,7 +464,11 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -647,9 +652,11 @@ namespace Backend.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("TitleAr")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TitleEn")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -797,9 +804,6 @@ namespace Backend.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NameEn")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Path")
                         .HasColumnType("nvarchar(max)");
 
@@ -820,42 +824,6 @@ namespace Backend.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("StudentAssignments");
-                });
-
-            modelBuilder.Entity("Backend.Entities.StudentAttendance", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("MeetingId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MeetingId1")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MeetingId1");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("StudentAttendances");
                 });
 
             modelBuilder.Entity("Backend.Entities.StudentCourse", b =>
@@ -1135,12 +1103,6 @@ namespace Backend.Migrations
                     b.Property<string>("NationalId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("AspNetUsers", t =>
-                        {
-                            t.Property("NationalId")
-                                .HasColumnName("Admin_NationalId");
-                        });
-
                     b.HasDiscriminator().HasValue("Admin");
                 });
 
@@ -1148,30 +1110,11 @@ namespace Backend.Migrations
                 {
                     b.HasBaseType("Backend.Entities.User");
 
-                    b.Property<string>("AddressAr")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AddressEn")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("GovernmentAr")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("GovernmentEn")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NationalId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("RandomCode")
-                        .HasColumnType("bigint");
 
                     b.ToTable("AspNetUsers", t =>
                         {
@@ -1480,25 +1423,6 @@ namespace Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Lesson");
-
-                    b.Navigation("Student");
-                });
-
-            modelBuilder.Entity("Backend.Entities.StudentAttendance", b =>
-                {
-                    b.HasOne("Backend.Entities.Meetings.Meeting", "Meeting")
-                        .WithMany()
-                        .HasForeignKey("MeetingId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Backend.Entities.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Meeting");
 
                     b.Navigation("Student");
                 });

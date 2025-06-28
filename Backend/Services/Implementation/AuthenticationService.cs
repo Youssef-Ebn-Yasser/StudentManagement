@@ -149,6 +149,7 @@ public class AuthenticationService : IAuthenticationService
             string mailTo = model.Email;
             string subject = "Congratulation you added";
             string message = $"welcome in our sit you can now login to your account update your data or upload courses with email := {model.Email} and password := {model.Password} keep your password secret";
+
             response = await _emailSender.SendEmailAsync(mailTo, subject, message);
         }
 
@@ -268,7 +269,10 @@ public class AuthenticationService : IAuthenticationService
 
         return _responseHandler.Success("Password reset link has been sent");
     }
-
+    public class ApplicationSettings
+    {
+        public string BaseUrl { get; set; }
+    }
     public async Task<Response<string>> ResetPasswordAsync(string email, string token, string newPassword)
     {
         var user = await _userManager.FindByEmailAsync(email);

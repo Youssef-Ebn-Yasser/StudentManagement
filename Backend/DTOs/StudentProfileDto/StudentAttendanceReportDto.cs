@@ -1,6 +1,6 @@
 ﻿namespace Backend.DTOs.StudentProfileDto
 {
-    public class StudentAttendanceDto
+    public class StudentAttendanceReportDto
     {
         public int Id { get; set; }
         public string MeetingTopic { get; set; }
