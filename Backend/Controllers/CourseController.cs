@@ -91,6 +91,21 @@ public class CourseController : AppControllerBase
             return NewResult(ErrorHappen.ErrorInServer());
         }
     }
+    [HttpGet("Course/GetAllStudentAndCourse")]
+    public async Task<IActionResult> GetAllStudentAndCourse()
+    {
+        try
+        {
+            var result = await _courseService.GetAllStudentAndCourse();
+            return NewResult(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
+    }
+
     [HttpPost("Course/Create")]
     public async Task<IActionResult> Create(CreateCourseDto createCourseDto)
     {

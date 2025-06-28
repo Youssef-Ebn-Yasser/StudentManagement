@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text.Json;
 
 namespace Backend.Controllers;
@@ -18,10 +17,10 @@ public class ZoomController : AppControllerBase
     #endregion
 
     #region Constructor
-    public ZoomController(IMeetingService meetService, 
-                          IConfiguration configuration, 
-                          IHttpClientFactory httpClientFactory, 
-                          ApplicationDbContext context, 
+    public ZoomController(IMeetingService meetService,
+                          IConfiguration configuration,
+                          IHttpClientFactory httpClientFactory,
+                          ApplicationDbContext context,
                           IUnitOfWork unitOfWork,
                           IStructuredLogger logger)
     {
@@ -235,7 +234,7 @@ public class ZoomController : AppControllerBase
             .EnumerateArray()
             .Select(p => new ZoomParticipant
             {
-                NameAr = p.GetProperty("name").GetString(),
+                Name = p.GetProperty("name").GetString(),
                 Email = p.GetProperty("user_email").GetString(),
                 JoinTime = p.GetProperty("join_time").GetDateTime(),
                 LeaveTime = p.GetProperty("leave_time").GetDateTime(),
@@ -251,7 +250,6 @@ public class ZoomController : AppControllerBase
             .EnumerateArray()
             .Select(p => new ZoomParticipant
             {
-                NameEn = p.GetProperty("name").GetString(),
                 Email = p.GetProperty("user_email").GetString(),
                 JoinTime = p.GetProperty("join_time").GetDateTime(),
                 LeaveTime = p.GetProperty("leave_time").GetDateTime(),

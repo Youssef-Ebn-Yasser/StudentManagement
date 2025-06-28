@@ -149,6 +149,7 @@ public class AuthenticationService : IAuthenticationService
             string mailTo = model.Email;
             string subject = "Congratulation you added";
             string message = $"welcome in our sit you can now login to your account update your data or upload courses with email := {model.Email} and password := {model.Password} keep your password secret";
+
             response = await _emailSender.SendEmailAsync(mailTo, subject, message);
         }
 
