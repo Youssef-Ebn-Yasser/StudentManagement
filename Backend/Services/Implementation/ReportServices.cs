@@ -237,7 +237,7 @@ namespace Backend.Services.Implementation
                 RecentAttendance = attendance
                     .OrderByDescending(a => a.AttendanceDate)
                     .Take(5)
-                    .Select(a => new StudentAttendanceDto
+                    .Select(a => new Backend.DTOs.StudentProfileDto.StudentAttendanceDto
                     {
                         Id = a.Id,
                         MeetingTopic = a.Meeting.TopicEn,
