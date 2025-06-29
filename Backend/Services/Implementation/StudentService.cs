@@ -185,6 +185,13 @@ public class StudentService : ResponseHandler, IStudentService
             _logger.LogInfo($"Student with id : {studentEnrollDto.StudentId} is enroll in course with id :{studentEnrollDto.CourseId}");
             return BadRequest<string>($"this student Already in this course");
         }
+        //i want to assign the courseId to the StudentEnrollDto to be assigned by default
+        studentEnrollDto.CourseId = _unitOfWork.Repository<Course>()
+            .GetTableNoTracking()
+            .Where(c => c.Id == studentEnrollDto.CourseId)
+            .Select(c => c.Id)
+            .FirstOrDefault();
+
 
         var mapper = _mapper.Map<StudentCourse>(studentEnrollDto);
 

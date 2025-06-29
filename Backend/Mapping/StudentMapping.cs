@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using Backend.DTOs.StudentDOs;
+using System.Text.RegularExpressions;
 
 namespace Backend.Mapping;
 
@@ -32,6 +33,10 @@ public class StudentMapping : Profile
           });
         CreateMap<Student, ShowStudentDto>()
         .ForMember(dest => dest.Name, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.NameAr, src.NameEn)));
+
+        CreateMap<StudentCourse, StudentEnrollDto>()
+            .ForMember(dest => dest.CourseId, opt => opt.MapFrom(src => src.CourseId));
+            
 
         CreateMap<Student, ShowStudentWithCoursesDto>()
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.NameAr, src.NameEn)))
