@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { courseService } from '../../services/courseService';
-import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook, FaClipboardList, FaTrash, FaEdit, FaChartLine, FaCalendarAlt, FaTag, FaFileAlt, FaVideo, FaChartBar } from 'react-icons/fa';
+import {  FaClock, FaBook, FaClipboardList, FaTrash, FaEdit, FaChartLine, FaTag, FaFileAlt, FaVideo, FaChartBar } from 'react-icons/fa';
 import Loader from '../Loader/Loader';
 import { toast } from 'react-toastify';
 import axios from 'axios';
