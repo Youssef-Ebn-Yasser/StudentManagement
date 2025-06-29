@@ -4,8 +4,10 @@ import axios from 'axios';
 import Loader from '../Loader/Loader';
 import { FaVideo } from 'react-icons/fa';
 import { FaGraduationCap } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 export default function CourseDashDetails() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
@@ -21,17 +23,17 @@ export default function CourseDashDetails() {
         if (response.data.succeeded) {
           setCourse(response.data.data);
         } else {
-          throw new Error(response.data.massage || 'Failed to load course details');
+          throw new Error(response.data.massage || t('failed_to_load_course_details'));
         }
       } catch (err) {
-        setError(err.message || 'Failed to load course details');
+        setError(err.message || t('failed_to_load_course_details'));
         console.error('Error fetching course details:', err);
       } finally {
         setLoading(false);
       }
     };
     fetchCourseDetails();
-  }, [id]);
+  }, [id, t]);
 
   const lessonsCount = course?.lessonInfo?.length || 0;
 
@@ -58,7 +60,7 @@ export default function CourseDashDetails() {
             onClick={() => navigate(-1)}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
-            Go Back
+            {t('go_back')}
           </button>
         </div>
       </div>
@@ -69,12 +71,12 @@ export default function CourseDashDetails() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600 text-xl mb-4">Course not found</p>
+          <p className="text-gray-600 text-xl mb-4">{t('course_not_found')}</p>
           <button
             onClick={() => navigate(-1)}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
-            Go Back
+            {t('go_back')}
           </button>
         </div>
       </div>
@@ -103,25 +105,25 @@ export default function CourseDashDetails() {
 
               <div className="flex items-center gap-4 mb-6">
                 <div className="flex items-center">
-                  <span className="ml-2 text-gray-600">{lessonsCount} lessons</span>
+                  <span className="ml-2 text-gray-600">{lessonsCount} {t('lessons')}</span>
                 </div>
                 <div className="flex items-center">
                   <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                   </svg>
-                  <span className="ml-1 text-gray-600">{course.hours} hours</span>
+                  <span className="ml-1 text-gray-600">{course.hours} {t('hours')}</span>
                 </div>
                 <div className="flex items-center">
                   <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
                   </svg>
                   <span className="ml-1 text-gray-600">
-                    Teacher:{' '}
+                    {t('teacher')}:{' '}
                     <button
                       onClick={() => navigate(`/courses/teacher/${course.teacherName}`)}
                       className="text-blue-600 hover:text-blue-800 hover:underline"
                     >
-                      {course.teacherName || 'Not specified'}
+                      {course.teacherName || t('not_specified')}
                     </button>
                   </span>
                 </div>
@@ -133,7 +135,7 @@ export default function CourseDashDetails() {
                   className="inline-flex items-center bg-purple-600 text-white px-6 py-2 rounded-lg shadow hover:bg-purple-700 transition font-semibold"
                 >
                   <FaVideo className="mr-2 text-lg" />
-                  View Zoom Meetings
+                  {t('view_zoom_meetings')}
                 </button>
                 {/* Show Quiz Results Button */}
                 <button
@@ -141,7 +143,7 @@ export default function CourseDashDetails() {
                   className="inline-flex items-center bg-green-600 text-white px-6 py-2 rounded-lg shadow hover:bg-green-700 transition font-semibold"
                 >
                   <FaGraduationCap className="mr-2 text-lg" />
-                  Show Quiz Results
+                  {t('show_quiz_results')}
                 </button>
               </div>
             </div>
@@ -160,7 +162,7 @@ export default function CourseDashDetails() {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
               >
-                Description
+                {t('description')}
               </button>
               <button
                 onClick={() => setActiveTab('curriculum')}
@@ -170,7 +172,7 @@ export default function CourseDashDetails() {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
               >
-                Lessons
+                {t('curriculum')}
               </button>
             </nav>
           </div>
@@ -194,12 +196,12 @@ export default function CourseDashDetails() {
                     >
                       <div className="flex items-center justify-between p-4">
                         <span className="text-gray-900">{lesson.title}</span>
-                        <span className="text-xs text-blue-600 ml-2">View Assignments</span>
+                        <span className="text-xs text-blue-600 ml-2">{t('view_assignments')}</span>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="text-gray-500">No lessons available for this course.</div>
+                  <p className="text-gray-500 text-center py-8">{t('no_lessons_available')}</p>
                 )}
               </div>
             )}
@@ -208,7 +210,7 @@ export default function CourseDashDetails() {
 
         {/* Comments Section */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Student Comments</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">{t('student_comments')}</h2>
           {course.commentInfo && course.commentInfo.length > 0 ? (
             <div className="space-y-6">
               {[...course.commentInfo]
@@ -226,7 +228,7 @@ export default function CourseDashDetails() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-semibold text-indigo-700">{comment.studentName || 'Student'}</span>
+                        <span className="font-semibold text-indigo-700">{comment.studentName || t('student')}</span>
                         <span className="text-xs text-gray-400">{formatDate(comment.createdAt)}</span>
                       </div>
                       <p className="text-gray-700 text-base">{comment.content}</p>
@@ -235,7 +237,7 @@ export default function CourseDashDetails() {
                 ))}
             </div>
           ) : (
-            <p className="text-gray-500">No comments yet for this course.</p>
+            <p className="text-gray-500">{t('no_comments_yet')}</p>
           )}
         </div>
       </div>

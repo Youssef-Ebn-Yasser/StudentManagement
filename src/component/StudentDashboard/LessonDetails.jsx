@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 export default function LessonDetails() {
+    const { t } = useTranslation();
     const { courseId, lessonId } = useParams()
     const navigate = useNavigate()
     const [materials, setMaterials] = useState([])
@@ -80,14 +82,14 @@ export default function LessonDetails() {
                     setAssignments([])
                 }
             } catch (err) {
-                setErrorMsg('Failed to load lesson data.')
+                setErrorMsg(t('failed_to_load_lesson_data'))
                 setMaterials([])
                 setAssignments([])
             }
             setLoading(false)
         }
         fetchData()
-    }, [lessonId])
+    }, [lessonId, t])
 
     // Fetch comments for this lesson
     const fetchComments = async () => {
@@ -103,7 +105,7 @@ export default function LessonDetails() {
                 setComments([])
             }
         } catch (err) {
-            setCommentError('Failed to load comments.')
+            setCommentError(t('failed_to_load_comments'))
             setComments([])
         }
         setCommentLoading(false)
@@ -111,7 +113,7 @@ export default function LessonDetails() {
 
     useEffect(() => {
         fetchComments()
-    }, [lessonId])
+    }, [lessonId, t])
 
     // Fetch quiz for this lesson
     useEffect(() => {
@@ -159,13 +161,13 @@ export default function LessonDetails() {
         setSuccessMsg('')
         setErrorMsg('')
         if (!studentId) {
-            setErrorMsg('You must be logged in as a student to upload.')
+            setErrorMsg(t('you_must_be_logged_in'))
             setUploadingId(null)
             return
         }
         const file = selectedFile[assignmentId]
         if (!file) {
-            setErrorMsg('Please select a file to upload.')
+            setErrorMsg(t('please_select_file'))
             setUploadingId(null)
             return
         }
@@ -183,7 +185,7 @@ export default function LessonDetails() {
                 }
             )
             if (res.data.succeeded) {
-                setSuccessMsg('Assignment uploaded successfully!')
+                setSuccessMsg(t('assignment_uploaded_success'))
                 setSubmittedAssignments((prev) => ({
                     ...prev,
                     [assignmentId]: true,
@@ -193,10 +195,10 @@ export default function LessonDetails() {
                     [assignmentId]: null,
                 }))
             } else {
-                setErrorMsg(res.data.massage || 'Upload failed.')
+                setErrorMsg(res.data.massage || t('upload_failed'))
             }
         } catch (err) {
-            setErrorMsg('Upload failed. Please try again.')
+            setErrorMsg(t('upload_failed_try_again'))
         }
         setUploadingId(null)
     }
@@ -207,15 +209,15 @@ export default function LessonDetails() {
         setCommentError('')
         setCommentSuccess('')
         if (!studentId) {
-            setCommentError('You must be logged in as a student to comment.')
+            setCommentError(t('must_be_logged_in'))
             return
         }
         if (!commentContent.trim()) {
-            setCommentError('Comment cannot be empty.')
+            setCommentError(t('comment_cannot_be_empty'))
             return
         }
         if (!courseId) {
-            setCommentError('Course ID is missing.')
+            setCommentError(t('course_id_missing'))
             return
         }
         try {
@@ -230,14 +232,14 @@ export default function LessonDetails() {
                 }
             )
             if (res.data.succeeded) {
-                setCommentSuccess('Comment added successfully!')
+                setCommentSuccess(t('comment_added_success'))
                 setCommentContent('')
                 fetchComments()
             } else {
-                setCommentError(res.data.massage || 'Failed to add comment.')
+                setCommentError(res.data.massage || t('failed_to_add_comment'))
             }
         } catch (err) {
-            setCommentError('Failed to add comment.')
+            setCommentError(t('failed_to_add_comment'))
         }
         setCommentLoading(false)
     }
@@ -252,23 +254,22 @@ export default function LessonDetails() {
     return (
         <div className="max-w-3xl mx-auto py-10 px-4">
             <h1 className="text-3xl font-bold mb-8 text-indigo-700 text-center">
-                Lesson Materials & Assignments
+                {t('lesson_materials_assignments')}
             </h1>
             {loading ? (
                 <div className="text-center text-gray-500">
-                    Loading lesson data...
+                    {t('loading_lesson_data')}
                 </div>
             ) : (
                 <div className="space-y-10">
                     {/* Materials */}
                     <section className="bg-white border rounded-xl p-6 shadow-sm">
                         <h2 className="text-2xl font-semibold mb-4 text-indigo-600 flex items-center">
-                            <i className="fa fa-file-alt mr-2" /> Lesson
-                            Materials
+                            <i className="fa fa-file-alt mr-2" /> {t('lesson_materials')}
                         </h2>
                         {materials.length === 0 ? (
                             <div className="text-gray-500">
-                                No materials for this lesson.
+                                {t('no_materials_for_lesson')}
                             </div>
                         ) : (
                             <div className="space-y-4">
@@ -282,7 +283,7 @@ export default function LessonDetails() {
                                                 {material.title}
                                             </span>
                                             <span className="ml-2 px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
-                                                Material
+                                                {t('material')}
                                             </span>
                                         </div>
                                         <div className="mb-2 text-gray-700">
@@ -306,7 +307,7 @@ export default function LessonDetails() {
                                                             rel="noopener noreferrer"
                                                             className="text-indigo-600 hover:underline text-sm"
                                                         >
-                                                            Open in new tab
+                                                            {t('open_in_new_tab')}
                                                         </a>
                                                     </div>
                                                 </div>
@@ -320,11 +321,11 @@ export default function LessonDetails() {
                     {/* Assignments */}
                     <section className="bg-white border rounded-xl p-6 shadow-sm">
                         <h2 className="text-2xl font-semibold mb-4 text-indigo-600 flex items-center">
-                            <i className="fa fa-tasks mr-2" /> Assignments
+                            <i className="fa fa-tasks mr-2" /> {t('assignments')}
                         </h2>
                         {assignments.length === 0 ? (
                             <div className="text-gray-500">
-                                No assignments for this lesson.
+                                {t('no_assignments_for_lesson')}
                             </div>
                         ) : (
                             <div className="space-y-6">
@@ -338,7 +339,7 @@ export default function LessonDetails() {
                                                 {assignment.title}
                                             </span>
                                             <span className="ml-2 px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
-                                                Assignment
+                                                {t('assignment')}
                                             </span>
                                         </div>
                                         <div className="mb-2 text-gray-700">
@@ -354,7 +355,7 @@ export default function LessonDetails() {
                                                     rel="noopener noreferrer"
                                                     className="inline-block mb-2 text-indigo-600 hover:underline text-sm"
                                                 >
-                                                    View/Download Assignment
+                                                    {t('view_download_assignment')}
                                                 </a>
                                             )}
                                         <div className="flex flex-col sm:flex-row items-center gap-3 mt-2">
@@ -362,7 +363,7 @@ export default function LessonDetails() {
                                                 assignment.id
                                             ] ? (
                                                 <span className="text-green-600 font-semibold">
-                                                    Submitted
+                                                    {t('submitted')}
                                                 </span>
                                             ) : (
                                                 <>
@@ -396,8 +397,8 @@ export default function LessonDetails() {
                                                     >
                                                         {uploadingId ===
                                                         assignment.id
-                                                            ? 'Uploading...'
-                                                            : 'Submit'}
+                                                            ? t('uploading')
+                                                            : t('submit')}
                                                     </button>
                                                 </>
                                             )}
@@ -411,7 +412,7 @@ export default function LessonDetails() {
                     {/* Quiz Section */}
                     <section className="bg-white border rounded-xl p-6 shadow-sm">
                         <h2 className="text-2xl font-semibold mb-4 text-indigo-600 flex items-center">
-                            <i className="fa fa-question-circle mr-2" /> Quiz
+                            <i className="fa fa-question-circle mr-2" /> {t('quiz')}
                         </h2>
                         <div className="flex gap-4 mt-4 items-start justify-start">
                             <button
@@ -422,41 +423,41 @@ export default function LessonDetails() {
                                 }
                                 className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
                             >
-                                Take Quiz
+                                {t('take_quiz')}
                             </button>
                         </div>
                         {quizLoading ? (
-                            <div className="text-gray-500">Loading quiz...</div>
+                            <div className="text-gray-500">{t('loading_quiz')}</div>
                         ) : quiz ? (
                             <div>
                                 <div className="mb-2">
                                     <span className="font-semibold">
-                                        Title:
+                                        {t('title')}:
                                     </span>{' '}
                                     {quiz.title}
                                 </div>
                                 <div className="mb-2">
                                     <span className="font-semibold">
-                                        Description:
+                                        {t('description')}:
                                     </span>{' '}
                                     {quiz.description}
                                 </div>
                                 <div className="mb-2">
                                     <span className="font-semibold">
-                                        Duration:
+                                        {t('duration')}:
                                     </span>{' '}
-                                    {quiz.durationMinutes} minutes
+                                    {quiz.durationMinutes} {t('minutes')}
                                 </div>
                                 {isQuizSubmitted ? (
                                     <span className="text-green-600 font-semibold">
-                                        Submitted
+                                        {t('submitted')}
                                     </span>
                                 ) : (
                                     <button
                                         className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition mt-2"
                                         onClick={handleStartQuiz}
                                     >
-                                        Start Quiz
+                                        {t('start_quiz')}
                                     </button>
                                 )}
                             </div>
@@ -468,14 +469,14 @@ export default function LessonDetails() {
                     {/* Comments Section */}
                     <section className="bg-white border rounded-xl p-6 shadow-sm">
                         <h2 className="text-2xl font-semibold mb-4 text-indigo-600 flex items-center">
-                            <i className="fa fa-comments mr-2" /> Comments
+                            <i className="fa fa-comments mr-2" /> {t('comments')}
                         </h2>
                         {/* Add Comment */}
                         <form onSubmit={handleCommentSubmit} className="mb-6">
                             <textarea
                                 className="w-full border rounded-md p-3 text-gray-700 focus:ring-2 focus:ring-indigo-200 focus:outline-none resize-none"
                                 rows={3}
-                                placeholder="Add a comment about this lesson..."
+                                placeholder={t('add_comment_placeholder')}
                                 value={commentContent}
                                 onChange={(e) =>
                                     setCommentContent(e.target.value)
@@ -489,8 +490,8 @@ export default function LessonDetails() {
                                     disabled={commentLoading}
                                 >
                                     {commentLoading
-                                        ? 'Posting...'
-                                        : 'Post Comment'}
+                                        ? t('posting')
+                                        : t('post_comment')}
                                 </button>
                             </div>
                             {commentError && (
@@ -508,11 +509,11 @@ export default function LessonDetails() {
                         <div>
                             {commentLoading && comments.length === 0 ? (
                                 <div className="text-gray-500">
-                                    Loading comments...
+                                    {t('loading_comments')}
                                 </div>
                             ) : comments.length === 0 ? (
                                 <div className="text-gray-500">
-                                    No comments yet for this lesson.
+                                    {t('no_comments_yet_lesson')}
                                 </div>
                             ) : (
                                 <div className="space-y-4">

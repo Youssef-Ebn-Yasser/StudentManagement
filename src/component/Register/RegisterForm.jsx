@@ -71,7 +71,6 @@ export default function RegisterForm({ userType }) {
                             </div>
                             <div className="mb-3">
                                 <div className='relative'>
-
                                     <input
                                         type={passwordVisible ? 'text' : 'password'}
                                         className="border-1 border-gray-400 rounded p-2 pr-10 hover:shadow-lg hover:shadow-gray-400 w-full transition-all duration-300 ease"
@@ -84,19 +83,17 @@ export default function RegisterForm({ userType }) {
                                         required
                                     />
                                     <i
-                                    id="showPass"
-                                    className={`fas ${
-                                        passwordVisible ? 'fa-eye' : 'fa-eye-slash'
-                                    } absolute text-2xl right-3 bottom-1/2 transform -translate-y-1 text-gray-500 cursor-pointer`}
-                                    onClick={() => setPasswordVisible(!passwordVisible)}
+                                        id="showPass"
+                                        className={`fas ${passwordVisible ? 'fa-eye' : 'fa-eye-slash'} absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 cursor-pointer`}
+                                        onClick={() => setPasswordVisible(!passwordVisible)}
                                     ></i>
                                 </div>
-                                    {formik.touched.password && formik.errors.password ? (
-                                        <div className="flex items-center gap-2 mt-1 text-sm font-semibold text-red-600 bg-red-100 border border-red-300 rounded px-2 py-1 animate-shake">
-                                            <i className="fas fa-exclamation-circle"></i>
-                                            {formik.errors.password}
-                                        </div>
-                                    ) : ''}
+                                {formik.touched.password && formik.errors.password ? (
+                                    <div className="flex items-center gap-2 mt-1 text-sm font-semibold text-red-600 bg-red-100 border border-red-300 rounded px-2 py-1 animate-shake">
+                                        <i className="fas fa-exclamation-circle"></i>
+                                        {formik.errors.password}
+                                    </div>
+                                ) : ''}
                             </div>
                             
                             <div className="mb-3">
@@ -113,14 +110,12 @@ export default function RegisterForm({ userType }) {
                                         required
                                     />
                                     <i
-                                    id="showPass"
-                                    className={`fas ${
-                                        passwordVisible ? 'fa-eye' : 'fa-eye-slash'
-                                    } absolute text-2xl right-3 bottom-1/2 transform -translate-y-1 text-gray-500 cursor-pointer`}
-                                    onClick={() => setPasswordVisible(!passwordVisible)}
+                                        id="showPass"
+                                        className={`fas ${confirmPassVisible ? 'fa-eye' : 'fa-eye-slash'} absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 cursor-pointer`}
+                                        onClick={() => setConfirmPassVisible(!confirmPassVisible)}
                                     ></i>
                                 </div>
-                               {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
+                                {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
                                     <div className="flex items-center gap-2 mt-1 text-sm font-semibold text-red-600 bg-red-100 border border-red-300 rounded px-2 py-1 animate-shake">
                                         <i className="fas fa-exclamation-circle"></i>
                                         {formik.errors.confirmPassword}
