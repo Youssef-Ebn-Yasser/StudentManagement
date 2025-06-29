@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250628181351_addSlidersTable")]
-    partial class addSlidersTable
+    [Migration("20250629160405_addSlidersTSafe")]
+    partial class addSlidersTSafe
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -146,7 +146,6 @@ namespace Backend.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TitleAr")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TitleEn")
@@ -206,7 +205,6 @@ namespace Backend.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TitleAr")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TitleEn")
@@ -248,7 +246,6 @@ namespace Backend.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("TitleAr")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TitleEn")
@@ -329,7 +326,6 @@ namespace Backend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TitleAr")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TitleEn")
@@ -468,11 +464,7 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("NameAr")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameEn")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -656,11 +648,9 @@ namespace Backend.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("TitleAr")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TitleEn")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -847,7 +837,6 @@ namespace Backend.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TitleAr")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TitleEn")

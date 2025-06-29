@@ -202,7 +202,6 @@ namespace Backend.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TitleAr")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TitleEn")
@@ -243,8 +242,7 @@ namespace Backend.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
+                    b.Property<string>("TitleAr")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TitleEn")
