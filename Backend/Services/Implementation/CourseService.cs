@@ -228,22 +228,24 @@ public class CourseService : ResponseHandler, ICourseService
         if (course == null)
             return NotFound<string>("Course not found");
 
-
         string? imageUrl = null;
+
+        _mapper.Map(updateCourseDto, course);
 
         if (updateCourseDto.Image != null)
         {
             _logger.LogInfo("start upload physical image in update");
             imageUrl = await _physicalFileUpload.UploadFileAsync("Courses", updateCourseDto.Image);
+            if (!string.IsNullOrEmpty(imageUrl))
+                course.ImagePath = imageUrl;
         }
-
-        _mapper.Map(updateCourseDto, course);
-        course.ImagePath = imageUrl;
 
         _unitOfWork.Repository<Course>().Update(course);
         _unitOfWork.Complete();
+
         return Success("Course updated successfully");
     }
+
 
     public async Task<Response<string>> DeleteAsync(int id)
     {
