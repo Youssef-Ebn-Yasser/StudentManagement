@@ -261,6 +261,7 @@ public class AuthenticationService : IAuthenticationService
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
         var callbackUrl = $"{_baseUrl}/reset-password?email={user.Email}&token={encodedToken}";
+        _logger.LogInformation($"[ForgotPassword] Reset URL: {callbackUrl}");
 
         await _emailSender.SendEmailAsync(
             user.Email,

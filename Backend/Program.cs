@@ -144,7 +144,7 @@ builder.Services.AddSwaggerGen(c =>
 
 
 #endregion
-
+Console.WriteLine("Running in: " + builder.Environment.EnvironmentName);
 
 var app = builder.Build();
 
