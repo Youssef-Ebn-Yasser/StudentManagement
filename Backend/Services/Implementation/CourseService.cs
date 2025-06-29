@@ -94,20 +94,24 @@ public class CourseService : ResponseHandler, ICourseService
     public async Task<Response<ShowCourseDto>> GetCourseByIdAsync(int id)
     {
         var course = await _unitOfWork.Repository<Course>()
-                                                       .GetTableNoTracking()
-                                                       .Where(c => c.IsDeleted == false)
-                                                       .Include(c => c.Category)!
-                                                       .Include(c => c.Teacher)
-                                                       .Include(c => c.lessons)!
-                                                       .Include(c => c.StudentCourses)!
-                                                       .ThenInclude(sc => sc.Student)!
-                                                       .FirstOrDefaultAsync(c => c.Id == id);
+            .GetTableNoTracking()
+            .Where(c => c.IsDeleted == false)
+            .Include(c => c.Category)!
+            .Include(c => c.Teacher)
+            .Include(c => c.lessons)! 
+            .Include(c => c.StudentCourses)!
+                .ThenInclude(sc => sc.Student)!
+            .FirstOrDefaultAsync(c => c.Id == id);
 
         if (course == null)
         {
             _logger.LogInfo($"No Course with this id => {id} in GetCourseByIdAsync");
             return NotFound<ShowCourseDto>("Course not found");
         }
+
+       
+        course.lessons = course.lessons?.Where(l => !l.IsDeleted).ToList();
+
         var result = _mapper.Map<ShowCourseDto>(course);
         return Success(result);
     }
@@ -224,30 +228,38 @@ public class CourseService : ResponseHandler, ICourseService
         if (course == null)
             return NotFound<string>("Course not found");
 
-
         string? imageUrl = null;
+
+        _mapper.Map(updateCourseDto, course);
 
         if (updateCourseDto.Image != null)
         {
             _logger.LogInfo("start upload physical image in update");
             imageUrl = await _physicalFileUpload.UploadFileAsync("Courses", updateCourseDto.Image);
+            if (!string.IsNullOrEmpty(imageUrl))
+                course.ImagePath = imageUrl;
         }
-
-        _mapper.Map(updateCourseDto, course);
-        course.ImagePath = imageUrl;
 
         _unitOfWork.Repository<Course>().Update(course);
         _unitOfWork.Complete();
+
         return Success("Course updated successfully");
     }
 
+
     public async Task<Response<string>> DeleteAsync(int id)
     {
-        var course = await _unitOfWork.Repository<Course>().GetByIdAsync(id);
+        var course = await _unitOfWork.Repository<Course>()
+                                       .GetTableAsTracking()
+                                       .Include(c => c.lessons)
+                                       .FirstOrDefaultAsync(c => c.Id == id);
+
         if (course == null)
             return NotFound<string>("Course not found");
 
-        //soft delete using IsDeleted flag and checking if the course is already deleted and there is lessons in the course make them Isdeleted true
+        if (course.IsDeleted.GetValueOrDefault())
+            return BadRequest<string>("Course is already deleted");
+
         if (course.lessons != null && course.lessons.Any())
         {
             foreach (var lesson in course.lessons)
@@ -255,8 +267,8 @@ public class CourseService : ResponseHandler, ICourseService
                 lesson.IsDeleted = true;
             }
         }
-        course.IsDeleted = true;
 
+        course.IsDeleted = true;
 
         _unitOfWork.Repository<Course>().Update(course);
         _unitOfWork.Complete();
