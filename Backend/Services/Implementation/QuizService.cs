@@ -196,12 +196,14 @@ public class QuizService : ResponseHandler, IQuizService
                 var studentAnswers = studentQuizAnswers.Where(sqa => sqa.StudentId == student.Id).ToList();
                 int totalQuizzes = quizIds.Count;
                 int submittedQuizzes = studentAnswers.Count;
-                double percentageSubmitted = totalQuizzes > 0 ? (double)submittedQuizzes / totalQuizzes * 100 : 0;
+                double percentageSubmitted = totalQuizzes > 0 ? Math.Min(Math.Round((double)submittedQuizzes / totalQuizzes * 100, 2), 100) : 0;
                 double totalDegree = studentAnswers.Sum(a => (double?)a.GradingRating ?? 0);
-                double maxDegree = lessons.SelectMany(l => l.Quizs).Sum(q => (double)q.PossiblePoints);
-                double percentageDegree = maxDegree > 0 ? totalDegree / maxDegree * 100 : 0;
+                double maxDegree = lessons.SelectMany(l => l.Quizs)
+                                         .Where(q => quizIds.Contains(q.Id))
+                                         .Sum(q => (double)q.PossiblePoints);
+                double percentageDegree = maxDegree > 0 ? Math.Min(Math.Round(totalDegree / maxDegree * 100, 2), 100) : 0;
                 int passedQuizzes = studentAnswers.Count(a => a.IsPassed == true);
-                double percentagePassed = submittedQuizzes > 0 ? (double)passedQuizzes / submittedQuizzes * 100 : 0;
+                double percentagePassed = submittedQuizzes > 0 ? Math.Min(Math.Round((double)passedQuizzes / submittedQuizzes * 100, 2), 100) : 0;
 
                 var lessonStats = new List<LessonQuizStatsDto>();
                 foreach (var lesson in lessons)
@@ -210,15 +212,17 @@ public class QuizService : ResponseHandler, IQuizService
                     var lessonQuizIds = lessonQuizzes.Select(q => q.Id).ToList();
                     int numQuizzesInLesson = lessonQuizzes.Count;
                     double lessonDegree = studentAnswers.Where(a => lessonQuizIds.Contains(a.QuizId)).Sum(a => (double?)a.GradingRating ?? 0);
-                    double lessonMaxDegree = lessonQuizzes.Sum(q => (double)q.PossiblePoints);
-                    double lessonPercentageDegree = lessonMaxDegree > 0 ? lessonDegree / lessonMaxDegree * 100 : 0;
+                    double lessonMaxDegree = lessonQuizzes.Where(q => lessonQuizIds.Contains(q.Id)).Sum(q => (double)q.PossiblePoints);
+                    double lessonPercentageDegree = lessonMaxDegree > 0 ? Math.Min(Math.Round(lessonDegree / lessonMaxDegree * 100, 2), 100) : 0;
 
                     var quizStats = new List<QuizStatsDto>();
                     foreach (var quiz in lessonQuizzes)
                     {
                         var answer = studentAnswers.FirstOrDefault(a => a.QuizId == quiz.Id);
                         double studentDegree = (double)(answer?.GradingRating ?? 0);
-                        double studentPercentage = quiz.PossiblePoints > 0 ? studentDegree / quiz.PossiblePoints * 100 : 0;
+                        double studentPercentage = (answer != null && quiz.PossiblePoints > 0)
+                            ? Math.Min(Math.Round(studentDegree / quiz.PossiblePoints * 100, 2), 100)
+                            : 0;
                         quizStats.Add(new QuizStatsDto
                         {
                             QuizName = GeneralLocalizableEntity.Localized(quiz.TitleAr, quiz.TitleEn),
@@ -292,12 +296,14 @@ public class QuizService : ResponseHandler, IQuizService
 
             int totalQuizzes = quizIds.Count;
             int submittedQuizzes = studentQuizAnswers.Count;
-            double percentageSubmitted = totalQuizzes > 0 ? (double)submittedQuizzes / totalQuizzes * 100 : 0;
+            double percentageSubmitted = totalQuizzes > 0 ? Math.Min(Math.Round((double)submittedQuizzes / totalQuizzes * 100, 2), 100) : 0;
             double totalDegree = studentQuizAnswers.Sum(a => (double?)a.GradingRating ?? 0);
-            double maxDegree = lessons.SelectMany(l => l.Quizs).Sum(q => (double)q.PossiblePoints);
-            double percentageDegree = maxDegree > 0 ? totalDegree / maxDegree * 100 : 0;
+            double maxDegree = lessons.SelectMany(l => l.Quizs)
+                                     .Where(q => quizIds.Contains(q.Id))
+                                     .Sum(q => (double)q.PossiblePoints);
+            double percentageDegree = maxDegree > 0 ? Math.Min(Math.Round(totalDegree / maxDegree * 100, 2), 100) : 0;
             int passedQuizzes = studentQuizAnswers.Count(a => a.IsPassed == true);
-            double percentagePassed = submittedQuizzes > 0 ? (double)passedQuizzes / submittedQuizzes * 100 : 0;
+            double percentagePassed = submittedQuizzes > 0 ? Math.Min(Math.Round((double)passedQuizzes / submittedQuizzes * 100, 2), 100) : 0;
 
             var lessonStats = new List<LessonQuizStatsDto>();
             foreach (var lesson in lessons)
@@ -306,15 +312,17 @@ public class QuizService : ResponseHandler, IQuizService
                 var lessonQuizIds = lessonQuizzes.Select(q => q.Id).ToList();
                 int numQuizzesInLesson = lessonQuizzes.Count;
                 double lessonDegree = studentQuizAnswers.Where(a => lessonQuizIds.Contains(a.QuizId)).Sum(a => (double?)a.GradingRating ?? 0);
-                double lessonMaxDegree = lessonQuizzes.Sum(q => (double)q.PossiblePoints);
-                double lessonPercentageDegree = lessonMaxDegree > 0 ? lessonDegree / lessonMaxDegree * 100 : 0;
+                double lessonMaxDegree = lessonQuizzes.Where(q => lessonQuizIds.Contains(q.Id)).Sum(q => (double)q.PossiblePoints);
+                double lessonPercentageDegree = lessonMaxDegree > 0 ? Math.Min(Math.Round(lessonDegree / lessonMaxDegree * 100, 2), 100) : 0;
 
                 var quizStats = new List<QuizStatsDto>();
                 foreach (var quiz in lessonQuizzes)
                 {
                     var answer = studentQuizAnswers.FirstOrDefault(a => a.QuizId == quiz.Id);
                     double studentDegree = (double)(answer?.GradingRating ?? 0);
-                    double studentPercentage = quiz.PossiblePoints > 0 ? studentDegree / quiz.PossiblePoints * 100 : 0;
+                    double studentPercentage = (answer != null && quiz.PossiblePoints > 0)
+                        ? Math.Min(Math.Round(studentDegree / quiz.PossiblePoints * 100, 2), 100)
+                        : 0;
                     quizStats.Add(new QuizStatsDto
                     {
                         QuizName = GeneralLocalizableEntity.Localized(quiz.TitleAr, quiz.TitleEn),
@@ -760,9 +768,9 @@ public class QuizService : ResponseHandler, IQuizService
             {
                 var studentAnswers = quiz.StudentQuizeAnswers ?? new List<StudentQuizeAnswer>();
                 int numSubmitted = studentAnswers.Count;
-                double percentageOfSubmit = totalStudents > 0 ? (double)numSubmitted / totalStudents * 100 : 0;
+                double percentageOfSubmit = totalStudents > 0 ? Math.Min(Math.Round((double)numSubmitted / totalStudents * 100, 2), 100) : 0;
                 double percentageWithDegree = quiz.PossiblePoints > 0 && numSubmitted > 0
-                    ? studentAnswers.Sum(a => (double?)a.GradingRating ?? 0) / (quiz.PossiblePoints * numSubmitted) * 100
+                    ? Math.Min(Math.Round(studentAnswers.Sum(a => (double?)a.GradingRating ?? 0) / (quiz.PossiblePoints * numSubmitted) * 100, 2),100)
                     : 0;
                 int numUnder50 = studentAnswers.Count(a => (double)(a.GradingRating ?? 0) < (quiz.PossiblePoints * 0.5));
                 int numOver70 = studentAnswers.Count(a => (double)(a.GradingRating ?? 0) >= (quiz.PossiblePoints * 0.7));
@@ -824,7 +832,7 @@ public class QuizService : ResponseHandler, IQuizService
             foreach (var lesson in lessons)
             {
                 int totalQuizzes = lesson.Quizs.Count;
-                double percentageOfAllQuizzes = totalQuizzesInCourse > 0 ? (double)totalQuizzes / totalQuizzesInCourse * 100 : 0;
+                double percentageOfAllQuizzes = totalQuizzesInCourse > 0 ? Math.Min(Math.Round((double)totalQuizzes / totalQuizzesInCourse * 100, 2), 100) : 0;
                 var quizAnalyticsList = new List<QuizAnalyticsDto>();
                 int totalStudents = await _unitOfWork.Repository<StudentCourse>()
                     .GetTableNoTracking()
@@ -834,13 +842,14 @@ public class QuizService : ResponseHandler, IQuizService
                 {
                     var studentAnswers = quiz.StudentQuizeAnswers ?? new List<StudentQuizeAnswer>();
                     int numSubmitted = studentAnswers.Count;
-                    double percentageOfSubmit = totalStudents > 0 ? (double)numSubmitted / totalStudents * 100 : 0;
-                    double percentageWithDegree = quiz.PossiblePoints > 0 && numSubmitted > 0
-                        ? studentAnswers.Sum(a => (double?)a.GradingRating ?? 0) / (quiz.PossiblePoints * numSubmitted) * 100
-                        : 0;
-                    int numUnder50 = studentAnswers.Count(a => (double)(a.GradingRating ?? 0) < (quiz.PossiblePoints * 0.5));
-                    int numOver70 = studentAnswers.Count(a => (double)(a.GradingRating ?? 0) >= (quiz.PossiblePoints * 0.7));
-                    int numWith100 = studentAnswers.Count(a => (a.GradingRating ?? 0) == quiz.PossiblePoints);
+                    double percentageOfSubmit = totalStudents > 0 ? Math.Min(Math.Round((double)numSubmitted / totalStudents * 100, 2), 100) : 0;
+                    double totalDegree = studentAnswers.Sum(a => (double?)a.GradingRating ?? 0);
+                    double maxDegree = lessons.SelectMany(l => l.Quizs)
+                                             .Where(q => q.Id == quiz.Id)
+                                             .Sum(q => (double)q.PossiblePoints);
+                    double percentageDegree = maxDegree > 0 ? Math.Min(Math.Round(totalDegree / maxDegree * 100, 2), 100) : 0;
+                    int passedQuizzes = studentAnswers.Count(a => a.IsPassed == true);
+                    double percentagePassed = numSubmitted > 0 ? Math.Min(Math.Round((double)passedQuizzes / numSubmitted * 100, 2), 100) : 0;
 
                     var studentSubmissions = studentAnswers.Select(a => new StudentQuizSubmissionDto
                     {
@@ -852,14 +861,14 @@ public class QuizService : ResponseHandler, IQuizService
                     quizAnalyticsList.Add(new QuizAnalyticsDto
                     {
                         QuizName = quiz.TitleEn,
-                        PercentageWithDegree = percentageWithDegree,
+                        PercentageWithDegree = percentageDegree,
                         NumberOfStudentSubmit = numSubmitted,
                         PercentageOfSubmit = percentageOfSubmit,
-                        NumberOfStudentUnder50 = numUnder50,
-                        NumberOfStudentOver70 = numOver70,
-                        NumberOfStudentWith100 = numWith100,
+                        NumberOfStudentUnder50 = studentAnswers.Count(a => (double)(a.GradingRating ?? 0) < (quiz.PossiblePoints * 0.5)),
+                        NumberOfStudentOver70 = studentAnswers.Count(a => (double)(a.GradingRating ?? 0) >= (quiz.PossiblePoints * 0.7)),
+                        NumberOfStudentWith100 = studentAnswers.Count(a => (a.GradingRating ?? 0) == quiz.PossiblePoints),
                         StudentSubmissions = studentSubmissions
-                });
+                    });
                 }
                 result.Add(new LessonQuizesStatsDto
                 {
