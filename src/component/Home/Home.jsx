@@ -4,6 +4,7 @@ import img from '../../assets/sliderpic.jpg';
 import styles from './Home.module.css';
 import { getPaginatedCourses } from '../../services/courseService';
 import Loader from '../Loader/Loader';
+import axios from 'axios';
 
 const CourseCard = ({ course }) => (
   <Link
@@ -21,29 +22,28 @@ const CourseCard = ({ course }) => (
         }}
       />
     </div>
-   <div className='p-3 lg:p-4 flex-1 flex flex-col'>
-  <div className="flex justify-between items-center mb-2">
-    <span className="text-gray-500 text-xs lg:text-sm truncate max-w-[60%]">{course.title}</span>
-    {course.level && (
-      <span className="bg-red-400 text-white py-1 px-2 rounded-xl text-xs">
-        {course.level} Level
-      </span>
-    )}
-  </div>
-  <h3 className="mt-0 mb-2 text-sm lg:text-lg font-semibold text-black line-clamp-2 flex-1">
-    {course.description}
-  </h3>
-  <div className="flex items-center justify-between mt-auto">
-    <span className="text-base lg:text-xl font-bold text-black">${course.price}</span>
-  </div>
-</div>
+    <div className='p-3 lg:p-4 flex-1 flex flex-col'>
+      <div className="flex justify-between items-center mb-2">
+        <span className="text-gray-500 text-xs lg:text-sm truncate max-w-[60%]">{course.title}</span>
+        {course.level && (
+          <span className="bg-red-400 text-white py-1 px-2 rounded-xl text-xs">
+            {course.level} Level
+          </span>
+        )}
+      </div>
+      <h3 className="mt-0 mb-2 text-sm lg:text-lg font-semibold text-black line-clamp-2 flex-1">
+        {course.description}
+      </h3>
+      <div className="flex items-center justify-between mt-auto">
+        <span className="text-base lg:text-xl font-bold text-black">${course.price}</span>
+      </div>
+    </div>
   </Link>
 );
 
 const Pagination = ({ currentPage, totalPages, onPageChange, hasNextPage, hasPreviousPage }) => {
   if (totalPages <= 1) return null;
 
-  // Show only 5 page numbers at a time
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
@@ -107,7 +107,6 @@ const Pagination = ({ currentPage, totalPages, onPageChange, hasNextPage, hasPre
   );
 };
 
-// Custom hook for fetching courses
 const useCourseFetch = (initialPage = 1, enOrderBy = 0) => {
   const [courses, setCourses] = useState([]);
   const [page, setPage] = useState(initialPage);
@@ -124,13 +123,10 @@ const useCourseFetch = (initialPage = 1, enOrderBy = 0) => {
       try {
         setLoading(true);
         setError(null);
-        console.log('Fetching page:', page, 'with enOrderBy:', enOrderBy); // Debug log
         const response = await getPaginatedCourses(page, enOrderBy);
-        
         if (!isMounted) return;
 
         if (response?.succeeded && response?.data?.data) {
-          console.log('Received data:', response.data.data); // Debug log
           setCourses(response.data.data);
           setTotalPages(response.data.totalPage);
           setHasNextPage(response.data.hasNextPage);
@@ -140,7 +136,6 @@ const useCourseFetch = (initialPage = 1, enOrderBy = 0) => {
         }
       } catch (error) {
         if (!isMounted) return;
-        console.error('Error fetching courses:', error);
         setError(error.message || 'An unexpected error occurred');
       } finally {
         if (isMounted) {
@@ -154,11 +149,10 @@ const useCourseFetch = (initialPage = 1, enOrderBy = 0) => {
     return () => {
       isMounted = false;
     };
-  }, [page, enOrderBy]); // Added enOrderBy to dependencies
+  }, [page, enOrderBy]);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
-      console.log('Changing to page:', newPage); // Debug log
       setPage(newPage);
     }
   };
@@ -177,28 +171,30 @@ const useCourseFetch = (initialPage = 1, enOrderBy = 0) => {
 
 function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  
+
+  // Fetch sliders from API
+  const [sliders, setSliders] = useState([]);
+  const [sliderLoading, setSliderLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSliders = async () => {
+      setSliderLoading(true);
+      try {
+        const res = await axios.get('https://e-learn-v1.runasp.net/api/Slider');
+        setSliders(res.data || []);
+      } catch (err) {
+        setSliders([]);
+      } finally {
+        setSliderLoading(false);
+      }
+    };
+    fetchSliders();
+  }, []);
+
   // Use the custom hook for each course section with different enOrderBy values
   const recommendedCourses = useCourseFetch(1, 0); // Recommended courses
   const popularCourses = useCourseFetch(1, 2);    // Popular courses
   const trendingCourses = useCourseFetch(1, 1);   // Trending courses
-
-  const slides = [
-    {
-      title: 'Digital Illustrations',
-      description:
-        'Qui aliquip quis magna non sint voluptate officia qui. Laborum sit mollit id sint et dolore conseq.',
-      buttonText: 'Explore more',
-      img: img,
-    },
-    {
-      title: 'Creative Designs',
-      description:
-        'Explore the world of creative designs with our expert tutorials and resources.',
-      buttonText: 'Learn More',
-      img: img,
-    },
-  ];
 
   const goToSlide = (index) => {
     setCurrentSlide(index);
@@ -280,56 +276,67 @@ function Home() {
           <div className="py-6 sm:py-8">
             {/* Slider Section */}
             <div className="mt-4 sm:mt-8 relative overflow-hidden">
-              <div
-                className="flex transition-transform duration-500"
-                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-                role="region"
-                aria-label="Featured courses slider"
-              >
-                {slides.map((slide, index) => (
+              {sliderLoading ? (
+                <div className="flex justify-center items-center h-48 sm:h-64">
+                  <Loader />
+                </div>
+              ) : sliders.length === 0 ? (
+                <div className="flex justify-center items-center h-48 sm:h-64">
+                  <p className="text-gray-500 text-base sm:text-lg">No sliders available</p>
+                </div>
+              ) : (
+                <>
                   <div
-                    key={index}
-                    className="flex flex-col sm:flex-row items-center justify-between py-8 sm:py-16 px-4 sm:px-8 md:px-16 lg:px-24 min-w-full"
+                    className="flex transition-transform duration-500"
+                    style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                    role="region"
+                    aria-label="Featured sliders"
                   >
-                    <div className="w-full sm:w-2/5 flex-shrink-0 mb-6 sm:mb-0">
-                      <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">
-                        {slide.title}
-                      </h2>
-                      <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">{slide.description}</p>
-                      <button 
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 sm:py-3 px-4 sm:px-6 rounded-md text-sm sm:text-base"
-                        aria-label={slide.buttonText}
+                    {sliders.map((slide, index) => (
+                      <div
+                        key={slide.id}
+                        className="flex flex-col sm:flex-row items-center justify-between py-8 sm:py-16 px-4 sm:px-8 md:px-16 lg:px-24 min-w-full"
                       >
-                        {slide.buttonText}
-                      </button>
-                    </div>
-                    <div className="w-full sm:w-2/5 sm:ml-8 rounded-lg overflow-hidden shadow-lg">
-                      <img
-                        src={slide.img}
-                        alt={slide.title}
-                        className="w-full h-auto object-cover"
-                      />
-                    </div>
+                        <div className="w-full sm:w-2/5 flex-shrink-0 mb-6 sm:mb-0">
+                          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">
+                            {slide.content}
+                          </h2>
+                          <button
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 sm:py-3 px-4 sm:px-6 rounded-md text-sm sm:text-base transition"
+                            aria-label="Go to slider link"
+                            onClick={() => window.open(slide.link, '_blank')}
+                          >
+                            Visit Link
+                          </button>
+                        </div>
+                        <div className="w-full sm:w-2/5 sm:ml-8 rounded-lg overflow-hidden shadow-lg flex justify-center">
+                          <img
+                            src={slide.path || img}
+                            alt={slide.content}
+                            className="w-full h-56 sm:h-64 object-cover rounded-lg border"
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-
-              <div className="flex justify-center mt-4 mb-4" role="tablist">
-                {slides.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => goToSlide(index)}
-                    className={`w-2 h-2 sm:w-3 sm:h-3 mx-1 sm:mx-2 rounded-full ${
-                      currentSlide === index
-                        ? 'bg-indigo-600'
-                        : 'bg-gray-300 hover:bg-gray-400'
-                    }`}
-                    role="tab"
-                    aria-selected={currentSlide === index}
-                    aria-label={`Slide ${index + 1}`}
-                  ></button>
-                ))}
-              </div>
+                  <div className="flex justify-center mt-4 mb-4" role="tablist">
+                    {sliders.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => goToSlide(index)}
+                        className={`w-2 h-2 sm:w-3 sm:h-3 mx-1 sm:mx-2 rounded-full ${
+                          currentSlide === index
+                            ? 'bg-indigo-600'
+                            : 'bg-gray-300 hover:bg-gray-400'
+                        }`}
+                        role="tab"
+                        aria-selected={currentSlide === index}
+                        aria-label={`Slide ${index + 1}`}
+                      ></button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
 

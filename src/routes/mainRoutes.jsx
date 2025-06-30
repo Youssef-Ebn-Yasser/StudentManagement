@@ -50,6 +50,11 @@ import RegisterAdmin from '@/component/AdminProfile/RegisterAdmin'
 import AllAdmins from '@/component/AdminProfile/AllAdmins'
 import StudentProfile3 from '@/component/StudentProfile/StudentProfile3'
 import Report from '../component/Report/report'
+import EnrollStudentCourse from '@/component/AdminProfile/EnrollStudentCourse'
+import StudentAndCourses from '@/component/AdminProfile/StudentAndCourses'
+import AdminsClaims from '@/component/AdminProfile/AdminsClaims'
+import AddSlider from '@/component/AdminProfile/AddSlider'
+import AllSliders from '@/component/AdminProfile/AllSliders'
 
 
 const routesConfig = [
@@ -91,8 +96,14 @@ const routesConfig = [
         accessRole: 'all',
     },
     {
-        path: 'admins',
-        element: <AllAdmins />,
+        path: 'enrollment',
+        element: <EnrollStudentCourse />,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'student-and-courses',
+        element: <StudentAndCourses />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -297,6 +308,30 @@ const routesConfig = [
     {
         path: 'admin/reg-admin',
         element: <RegisterAdmin/>,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'admin/all-admins',
+        element: <AllAdmins/>,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'admin/addslider',
+        element: <AddSlider/>,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'admin/all-sliders',
+        element: <AllSliders/>,
+        isProtected: false,
+        accessRole: 'all',
+    },
+    {
+        path: 'admin-claims',
+        element: <AdminsClaims/>,
         isProtected: false,
         accessRole: 'all',
     },
