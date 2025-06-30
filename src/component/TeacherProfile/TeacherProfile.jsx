@@ -14,12 +14,14 @@ import TeacherDashboard from '../TeacherDashboard/TeacherDashboard';
 import { useSelector } from 'react-redux';
 
 function TeacherProfile() {
+  console.log('TeacherProfile component mounted');
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('profile');
   const [teacherData, setTeacherData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user } = useSelector((state) => state.auth);
+  const localTeacherId = user?.id || Number(localStorage.getItem('guestId'));
 
   useEffect(() => {
     // Check for tab parameter in URL
@@ -35,11 +37,11 @@ function TeacherProfile() {
       try {
         setIsLoading(true);
         console.log('Current user object:', user);
-        if (!user?.id) {
-          console.error('Teacher ID not found in user object');
+        if (!localTeacherId) {
+          console.error('Teacher ID not found in user object or localStorage');
           throw new Error('Teacher ID not found');
         }
-        const response = await courseService.getTeacherStats(user.id);
+        const response = await courseService.getTeacherStats(localTeacherId);
         console.log('Teacher data response:', response);
         if (response.succeeded) {
           setTeacherData(response.data);
@@ -55,7 +57,7 @@ function TeacherProfile() {
     };
 
     fetchTeacherData();
-  }, [user?.id]);
+  }, [localTeacherId]);
 
   const handleProfileUpdate = (updatedData) => {
     setTeacherData(prev => ({
@@ -65,6 +67,7 @@ function TeacherProfile() {
   };
 
   const renderContent = () => {
+    console.log('renderContent called, activeTab:', activeTab);
     console.log('Rendering content with teacherData:', teacherData);
     switch (activeTab) {
       case 'dashboard':
@@ -91,16 +94,24 @@ function TeacherProfile() {
           </>
         );
       case 'courses':
-        console.log('Rendering TeacherCourses with teacherId:', user?.id);
+        console.log('Rendering TeacherCourses with teacherId:', localTeacherId);
         return <TeacherCourses setActiveTab={setActiveTab} />;
       case 'create-course':
-        return <CreateCourse teacherId={user?.id} />;
+        return <CreateCourse teacherId={localTeacherId} />;
       case 'lessons':
-        return <AddLesson teacherId={user?.id} />;
+        return <AddLesson teacherId={localTeacherId} />;
       case 'materials':
-        return <AddMaterial teacherId={user?.id} />;
+        return <AddMaterial teacherId={localTeacherId} />;
       case 'settings':
-        return <AccountSettings teacherData={{...teacherData, id: user?.id}} onUpdate={handleProfileUpdate} />;
+        console.log('teacherData:', teacherData);
+        console.log('localTeacherId:', localTeacherId);
+        if (isLoading) {
+          return <Loader />;
+        }
+        if (!teacherData || !localTeacherId) {
+          return <div className="text-red-600 text-center mt-10">Teacher ID is missing. Please log in again.</div>;
+        }
+        return <AccountSettings teacherData={{...teacherData, id: localTeacherId}} onUpdate={handleProfileUpdate} />;
       default:
         return null;
     }

@@ -15,9 +15,11 @@ import { Link } from 'react-router-dom'
 import styles from './AdminDashboard.module.css' // Unused import
 import allLessons from '@/Redux/features/allLessons/allLessons'
 import allGategory from '@/Redux/features/allGategory/allGategory'
+import { useTranslation } from 'react-i18next'
 
 function AdminDashboard() {
 
+    const { t } = useTranslation();
     let dispatch= useDispatch()
     const {students,loading}= useSelector((state)=>state.allStudents)
     const {teachers}= useSelector((state)=>state.allTeachers)
@@ -63,13 +65,13 @@ function AdminDashboard() {
             <aside className='lg:col-span-3'>
               <div className="lg:sticky lg:top-6">
                 <div className='bg-white shadow-xl rounded-xl p-4'>
-                    <h2 className='text-2xl font-semibold text-gray-800 text-center pb-4 mb-4 border-b border-gray-300'>Overview</h2>
+                    <h2 className='text-2xl font-semibold text-gray-800 text-center pb-4 mb-4 border-b border-gray-300'>{t("Overview")}</h2>
                     <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3'>
                         {[
-                            { id: "students", title: "Students", count: students?.length, icon: stuImg, alt: "Students overview icon" },
-                            { id: "teachers", title: "Teachers", count: teachers?.length, icon: teaImg, alt: "Teachers overview icon" },
-                            { id: "courses", title: "Courses", count: courses?.length, icon: courseImg, alt: "Courses overview icon" },
-                            { id: "gategory", title: "Categories", count: gategory?.length, icon: gateImg, alt: "Categories overview icon" },
+                            { id: "students", title: t("Students"), count: students?.length, icon: stuImg, alt: "Students overview icon" },
+                            { id: "teachers", title: t("Teachers"), count: teachers?.length, icon: teaImg, alt: "Teachers overview icon" },
+                            { id: "courses", title: t("Courses"), count: courses?.length, icon: courseImg, alt: "Courses overview icon" },
+                            { id: "gategory", title: t("Categories"), count: gategory?.length, icon: gateImg, alt: "Categories overview icon" },
                         ].map(item => (
                             <a key={item.id} href={`#${item.id}`} className={overviewCardBaseClasses}>
                                 <div className={overviewCardInnerClasses}>
@@ -92,7 +94,7 @@ function AdminDashboard() {
             {/* Main Content Area */}
             <main className='lg:col-span-9'>
             <section id='students' className={sectionBaseClasses}>
-            <h2 className={sectionTitleClasses}>Our Students</h2>
+            <h2 className={sectionTitleClasses}>{t("our-stu")}</h2>
                 <div  className={sectionGridClasses}>
                 {!loading?
                 (
@@ -108,20 +110,20 @@ function AdminDashboard() {
                                 </div>
                             )
                         })
-                    ): <p className="col-span-full text-gray-500 py-10">No Students Found</p>
+                    ): <p className="col-span-full text-gray-500 py-10">{t("no-students-found")}</p>
                     }
                     </>
                 ): <div className="col-span-full flex justify-center py-10"><Loader /></div>}
                 </div>
                 <div className='flex flex-row justify-center items-center mt-6'>
                 <Link to={'/admin/students'}>
-                    <button className={viewMoreButtonClasses}>View More Students</button>
+                    <button className={viewMoreButtonClasses}>{t("view-mstu")}</button>
                 </Link>
                 </div>
             </section>
 
             <section id='teachers' className={sectionBaseClasses}>
-            <h2 className={sectionTitleClasses}>Our Teachers</h2>
+            <h2 className={sectionTitleClasses}>{t("our-teach")}</h2>
                 <div  className={sectionGridClasses}>
                 {!loading?
                 (
@@ -137,20 +139,20 @@ function AdminDashboard() {
                                 </div>
                             )
                         })
-                    ): <p className="col-span-full text-gray-500 py-10">No Teachers Found</p>
+                    ): <p className="col-span-full text-gray-500 py-10">{t('no-teachers-found')}</p>
                     }
                     </>
                 ): <div className="col-span-full flex justify-center py-10"><Loader /></div>}
                 </div>
                 <div className='flex flex-row justify-center items-center mt-6'>
                 <Link to={'/admin/addteacher'}>
-                    <button className={viewMoreButtonClasses}>View More Teachers</button>
+                    <button className={viewMoreButtonClasses}>{t("view-mtech")}</button>
                 </Link>
                 </div>
             </section>
 
             <section id='courses' className={sectionBaseClasses}>
-            <h2 className={sectionTitleClasses}>Our Courses</h2>
+            <h2 className={sectionTitleClasses}>{t("our-cour")}</h2>
                 <div  className={sectionGridClasses}>
                 {!loading?
                 (
@@ -166,21 +168,21 @@ function AdminDashboard() {
                                 </div>
                             )
                         })
-                    ): <p className="col-span-full text-gray-500 py-10">No Courses Found</p>
+                    ): <p className="col-span-full text-gray-500 py-10">{t("no-courses-found")}</p>
                     }
                     </>
                 ): <div className="col-span-full flex justify-center py-10"><Loader /></div>}
                 </div>
                 <div className='flex flex-row justify-center items-center mt-6'>
                 <Link to={'/admin/addcourse'}>
-                    <button className={viewMoreButtonClasses}>View More Courses</button>
+                    <button className={viewMoreButtonClasses}>{t("view-mcour")}</button>
                 </Link>
                 </div>
             </section>
 
 
             <section id='gategory' className={sectionBaseClasses}>
-            <h2 className={sectionTitleClasses}>Our Categories</h2>
+            <h2 className={sectionTitleClasses}>{t("Our-Cate")}</h2>
                 <div  className={sectionGridClasses}>
                 {!loading?
                 (
@@ -196,14 +198,14 @@ function AdminDashboard() {
                                 </div>
                             )
                         })
-                    ): <p className="col-span-full text-gray-500 py-10">No Categories Found</p>
+                    ): <p className="col-span-full text-gray-500 py-10">{t("no-categories-found")}</p>
                     }
                     </>
                 ): <div className="col-span-full flex justify-center py-10"><Loader /></div>}
                 </div>
                 <div className='flex flex-row justify-center items-center mt-6'>
                 <Link to={'/admin/addgategory'}>
-                    <button className={viewMoreButtonClasses}>View More Categories</button>
+                    <button className={viewMoreButtonClasses}>{t('view-mCate')}</button>
                 </Link>
                 </div>
             </section>

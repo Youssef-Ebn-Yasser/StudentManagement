@@ -4,7 +4,11 @@ import img from '../../assets/sliderpic.jpg';
 import styles from './Home.module.css';
 import { getPaginatedCourses } from '../../services/courseService';
 import Loader from '../Loader/Loader';
+<<<<<<< HEAD
 import axios from 'axios';
+=======
+import { useTranslation } from 'react-i18next';
+>>>>>>> df1764070c3c24a21dd448c63ea74bba25258beb
 
 const CourseCard = ({ course }) => (
   <Link
@@ -59,6 +63,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, hasNextPage, hasPre
     }
     return pages;
   };
+  
 
   return (
     <div className="flex items-center justify-center gap-2" role="navigation" aria-label="Pagination">
@@ -115,6 +120,7 @@ const useCourseFetch = (initialPage = 1, enOrderBy = 0) => {
   const [error, setError] = useState(null);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [hasPreviousPage, setHasPreviousPage] = useState(false);
+  
 
   useEffect(() => {
     let isMounted = true;
@@ -171,6 +177,7 @@ const useCourseFetch = (initialPage = 1, enOrderBy = 0) => {
 
 function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
+<<<<<<< HEAD
 
   // Fetch sliders from API
   const [sliders, setSliders] = useState([]);
@@ -191,6 +198,10 @@ function Home() {
     fetchSliders();
   }, []);
 
+=======
+  const { t } = useTranslation();
+  
+>>>>>>> df1764070c3c24a21dd448c63ea74bba25258beb
   // Use the custom hook for each course section with different enOrderBy values
   const recommendedCourses = useCourseFetch(1, 0); // Recommended courses
   const popularCourses = useCourseFetch(1, 2);    // Popular courses
@@ -209,7 +220,7 @@ function Home() {
           className={`${styles.primary} group flex items-center`}
           aria-label={`View all ${title.toLowerCase()}`}
         >
-          View More
+          {t('View-More')}
           <i className="fa-solid fa-angle-right ml-2 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true"></i>
         </Link>
       </div>
@@ -231,7 +242,7 @@ function Home() {
         </div>
       ) : courses.length === 0 ? (
         <div className="flex justify-center items-center h-48 sm:h-64">
-          <p className="text-gray-500 text-base sm:text-lg">No courses available</p>
+          <p className="text-gray-500 text-base sm:text-lg">{t('No-courses-available')}</p>
         </div>
       ) : (
         <>
@@ -262,7 +273,7 @@ function Home() {
         <div className="py-4 sm:py-8">
           {/* Recommended Courses Section */}
           <CourseSection
-            title="Recommended for you"
+            title={t("recommend-for-you")}
             courses={recommendedCourses.courses}
             loading={recommendedCourses.loading}
             error={recommendedCourses.error}
@@ -342,7 +353,7 @@ function Home() {
 
           {/* Popular Courses Section */}
           <CourseSection
-            title="Some of the first courses"
+            title={t("first-courses")}
             courses={popularCourses.courses}
             loading={popularCourses.loading}
             error={popularCourses.error}
@@ -356,7 +367,7 @@ function Home() {
           <div className="py-6 sm:py-8">
             {/* Trending Courses Section */}
             <CourseSection
-              title="Affordable to Premium Courses"
+              title={t('Affordable-to-PremiumCourses')}
               courses={trendingCourses.courses}
               loading={trendingCourses.loading}
               error={trendingCourses.error}

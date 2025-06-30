@@ -13,8 +13,11 @@ import { allTeachers } from '@/Redux/features/allTeachers/allTeachers'
 import { allCourses } from '@/Redux/features/allCourses/allCourses'
 import toast from 'react-hot-toast'
 import Loader from '../Loader/Loader'
+import { useTranslation } from 'react-i18next'
 
 function AdminProfile() {
+
+    const { t } = useTranslation();
     let dispatch = useDispatch()
     const [adminData, setAdminData] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -61,7 +64,7 @@ function AdminProfile() {
                             <h1 className="text-3xl font-bold text-gray-800">{adminData?.name || user?.name || 'Admin'}</h1>
                             <p className="text-gray-600 mt-2">E-learning Admin Owner</p>
                             {adminData?.nationalId && (
-                                <p className="text-gray-500 mt-1">National ID: {adminData.nationalId}</p>
+                                <p className="text-gray-500 mt-1">{t("national-id")}: {adminData.nationalId}</p>
                             )}
                         </div>
 
@@ -69,19 +72,19 @@ function AdminProfile() {
                             <div className="flex items-center">
                                 <img src={stuImg} alt="stuImg" className="w-6 h-6 mr-2" />
                                 <span className="text-indigo-500 font-medium text-lg">
-                                    {!loading ? <>{students && students.length}</> : <Loader />} Students
+                                    {!loading ? <>{students && students.length}</> : <Loader />} {t('Students')}
                                 </span>
                             </div>
                             <div className="flex items-center">
                                 <img src={teaImg} alt="teaImg" className="w-6 h-6 mr-2" />
                                 <span className="text-indigo-500 font-medium text-lg">
-                                    {!loading ? <>{teachers && teachers.length}</> : <Loader />} Teachers
+                                    {!loading ? <>{teachers && teachers.length}</> : <Loader />} {t('Teachers')}
                                 </span>
                             </div>
                             <div className="flex items-center">
                                 <img src={courseImg} alt="courseImg" className="w-6 h-6 mr-2" />
                                 <span className="text-indigo-500 font-medium text-lg">
-                                    {!loading ? <>{courses && courses.length}</> : <Loader />} Courses
+                                    {!loading ? <>{courses && courses.length}</> : <Loader />} {t('Courses')}
                                 </span>
                             </div>
                         </div>
@@ -98,34 +101,35 @@ function AdminProfile() {
                     </div>
 
                     <div className="py-8 px-8 border-t border-gray-200">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4">About Me</h2>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4">{t("about-me")} </h2>
                         <p className="text-gray-600 text-lg">
-                        As the platform admin, I oversee course management, user access, and system settings to ensure everything runs smoothly. I regularly monitor content quality, respond to support issues, and coordinate with instructors and developers to maintain a seamless learning experience.
-                        Let me know if you'd like it to include reminders or a more casual tone.
+                        {t("admin-description")}
                         </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-8 px-8">
+                        <>
                         <Link to="/admin/addteacher" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
                             <img src={teaImg} alt="teaImg" className="w-12 h-12 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-indigo-600">Add Teacher</h3>
+                            <h3 className="text-xl font-semibold text-indigo-600">{t('add-teacher')} </h3>
                         </Link>
                         <Link to="/admin/addgategory" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
                             <img src={gateImg} alt="gateImg" className="w-12 h-12 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-indigo-600">Add Category</h3>
+                            <h3 className="text-xl font-semibold text-indigo-600">{t('add-category')}</h3>
                         </Link>
                         <Link to="/admin/addcourse" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
                             <img src={courseImg} alt="courseImg" className="w-12 h-12 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-indigo-600">Add Course</h3>
+                            <h3 className="text-xl font-semibold text-indigo-600">{t('add-course')}</h3>
                         </Link>
                         <Link to="/admin/students" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
                             <img src={stuImg} alt="stuImg" className="w-12 h-12 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-indigo-600">Students</h3>
+                            <h3 className="text-xl font-semibold text-indigo-600">{t('Students')}</h3>
                         </Link>
                         <Link to="/admin/reg-admin" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
                             <img src={stuImg} alt="stuImg" className="w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-indigo-600">Add Admin</h3>
                         </Link>
+<<<<<<< HEAD
                         <Link to="/admin/all-admins" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
                             <img src={stuImg} alt="stuImg" className="w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-indigo-600">All Admins</h3>
@@ -137,7 +141,13 @@ function AdminProfile() {
                         <Link to="/admin/addslider" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
                             <img src={gateImg} alt="reportImg" className="w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-indigo-600">Add Slider</h3>
+=======
+                        <Link to="/admin/reports" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
+                            <img src={gateImg} alt="reportImg" className="w-12 h-12 mx-auto mb-4" />
+                            <h3 className="text-xl font-semibold text-indigo-600">Reports</h3>
+>>>>>>> df1764070c3c24a21dd448c63ea74bba25258beb
                         </Link>
+                        </>
                     </div>
                 </div>
             </div>

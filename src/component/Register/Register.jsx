@@ -6,8 +6,11 @@ import { useSelector } from 'react-redux'
 import { useEffect } from 'react'
 import Loader from '../Loader/Loader'
 import NoAccess from '../NoAccess/NoAccess'
+import { useTranslation } from 'react-i18next'
 
 function Register() {
+
+    const { t } = useTranslation();
     const navigate = useNavigate()
     const { role, loading } = useSelector((state) => state.auth || {})
 
@@ -49,7 +52,7 @@ function Register() {
                                 className="bg-blue-700 shadow-lg shadow-blue-300 rounded-3xl py-2 px-3 text-white hover:bg-blue-500 transition-all duration-300 ease"
                             >
                                 <button className="hover:cursor-pointer transition-all duration-300 ease">
-                                    As a Student
+                                    {t("as-student")}
                                 </button>
                             </Link>
                            

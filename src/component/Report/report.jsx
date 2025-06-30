@@ -1,15 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import reportService from '../../services/reportService';
+import { useTranslation } from 'react-i18next'
 
-const summaryCards = [
-  { key: 'totalUsers', label: 'Total Users', color: 'bg-blue-600', icon: '👥' },
-  { key: 'totalStudents', label: 'Students', color: 'bg-green-600', icon: '🎓' },
-  { key: 'totalTeachers', label: 'Teachers', color: 'bg-yellow-500', icon: '🧑‍🏫' },
-  { key: 'totalCourses', label: 'Courses', color: 'bg-purple-600', icon: '📚' },
-  { key: 'newUsersLast7Days', label: 'New Users (7d)', color: 'bg-pink-600', icon: '🆕' },
-  { key: 'revenueThisMonth', label: 'Revenue (This Month)', color: 'bg-indigo-600', icon: '💰', isCurrency: true },
-  { key: 'totalPayments', label: 'Total Payments', color: 'bg-orange-600', icon: '💳' },
-];
+
+
 
 const SectionDivider = ({ icon }) => (
   <div className="flex items-center my-10">
@@ -50,6 +44,7 @@ const EnhancedTable = ({ columns, data, rowKey, emptyMessage, ariaLabel, highlig
   if (highlightKey && data.length > 0) {
     maxValue = Math.max(...data.map(row => Number(row[highlightKey]) || 0));
   }
+  
   return (
     <div className="overflow-x-auto rounded-2xl border border-gray-200 shadow-lg">
       <table className="min-w-full text-left text-sm font-sans font-medium">
@@ -111,6 +106,8 @@ const EnhancedTable = ({ columns, data, rowKey, emptyMessage, ariaLabel, highlig
 };
 
 const Report = () => {
+  const { t } = useTranslation();
+
   const [summary, setSummary] = useState(null);
   const [averageScores, setAverageScores] = useState([]);
   const [courseEnrollments, setCourseEnrollments] = useState([]);
@@ -118,6 +115,16 @@ const Report = () => {
   const [courseRevenues, setCourseRevenues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  const summaryCards = [
+  { key: 'totalUsers', label: t("total-users"), color: 'bg-blue-600', icon: '👥' },
+  { key: 'totalStudents', label: t('Students'), color: 'bg-green-600', icon: '🎓' },
+  { key: 'totalTeachers', label: t('Teachers'), color: 'bg-yellow-500', icon: '🧑‍🏫' },
+  { key: 'totalCourses', label: t('Courses'), color: 'bg-purple-600', icon: '📚' },
+  { key: 'newUsersLast7Days', label: t("new-users-7d"), color: 'bg-pink-600', icon: '🆕' },
+  { key: 'revenueThisMonth', label: t("revenue-this-month"), color: 'bg-indigo-600', icon: '💰', isCurrency: true },
+  { key: 'totalPayments', label: t("total-payments"), color: 'bg-orange-600', icon: '💳' },
+];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -154,9 +161,9 @@ const Report = () => {
       <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
         <div>
           <h1 className="text-4xl font-extrabold text-indigo-700 flex items-center gap-3">
-            <span>📊</span> Admin Reports
+            <span>📊</span> {t("admin-reports")}
           </h1>
-          <p className="text-gray-500 mt-2 text-lg">Platform analytics and insights for administrators</p>
+          <p className="text-gray-500 mt-2 text-lg">{t("platform-analytics-description")}</p>
         </div>
       </div>
 
@@ -179,67 +186,67 @@ const Report = () => {
       )}
 
       <SectionDivider icon="📈" />
-      <SectionTitle icon="📈">Average Student Scores</SectionTitle>
+      <SectionTitle icon="📈">{t("average-student-scores")}</SectionTitle>
       <Card>
         <EnhancedTable
           columns={[
-            { key: 'studentId', label: 'Student ID', icon: '🆔' },
-            { key: 'studentName', label: 'Student Name', icon: '👤' },
-            { key: 'averageScore', label: 'Average Score', icon: '📊' },
+            { key: 'studentId', label: t("student-id"), icon: '🆔' },
+            { key: 'studentName', label: t("student-name"), icon: '👤' },
+            { key: 'averageScore', label: t("average-score"), icon: '📊' },
           ]}
           data={averageScores}
           rowKey="studentId"
-          emptyMessage="No student score data available."
+          emptyMessage={t("no-student-score-data")}
           ariaLabel="Average Student Scores Table"
           highlightKey="averageScore"
         />
       </Card>
 
       <SectionDivider icon="📝" />
-      <SectionTitle icon="📝">Course Enrollments</SectionTitle>
+      <SectionTitle icon="📝">{t("course-enrollments")}</SectionTitle>
       <Card>
         <EnhancedTable
           columns={[
-            { key: 'courseId', label: 'Course ID', icon: '🆔' },
-            { key: 'courseName', label: 'Course Name', icon: '📚' },
-            { key: 'studentsCount', label: 'Students Count', icon: '👥' },
+            { key: 'courseId', label: t("course-id"), icon: '🆔' },
+            { key: 'courseName', label: t("course-name"), icon: '📚' },
+            { key: 'studentsCount', label: t("students-count"), icon: '👥' },
           ]}
           data={courseEnrollments}
           rowKey="courseId"
-          emptyMessage="No course enrollment data available."
+          emptyMessage={t("no-course-enrollment-data")}
           ariaLabel="Course Enrollments Table"
           highlightKey="studentsCount"
         />
       </Card>
 
       <SectionDivider icon="📅" />
-      <SectionTitle icon="📅">Weekly New Students</SectionTitle>
+      <SectionTitle icon="📅">{t("weekly-new-students")}</SectionTitle>
       <Card>
         <EnhancedTable
           columns={[
-            { key: 'week', label: 'Week', icon: '📆' },
-            { key: 'studentCount', label: 'Student Count', icon: '👨‍🎓' },
+            { key: 'week', label: t("week"), icon: '📆' },
+            { key: 'studentCount', label: t("student-count"), icon: '👨‍🎓' },
           ]}
           data={weeklyNewStudents}
           rowKey="week"
-          emptyMessage="No weekly new student data available."
+          emptyMessage={t("no-weekly-student-data")}
           ariaLabel="Weekly New Students Table"
           highlightKey="studentCount"
         />
       </Card>
 
       <SectionDivider icon="💵" />
-      <SectionTitle icon="💵">Course Revenues</SectionTitle>
+      <SectionTitle icon="💵">{t("course-revenues")} </SectionTitle>
       <Card>
         <EnhancedTable
           columns={[
-            { key: 'courseId', label: 'Course ID', icon: '🆔' },
-            { key: 'courseName', label: 'Course Name', icon: '📚' },
-            { key: 'revenue', label: 'Revenue', icon: '💰' },
+            { key: 'courseId', label: t("course-id"), icon: '🆔' },
+            { key: 'courseName', label: t("course-name"), icon: '📚' },
+            { key: 'revenue', label: t("revenue"), icon: '💰' },
           ]}
           data={courseRevenues}
           rowKey="courseId"
-          emptyMessage="No course revenue data available."
+          emptyMessage={t("no-course-revenue-data")}
           ariaLabel="Course Revenues Table"
           highlightKey="revenue"
         />

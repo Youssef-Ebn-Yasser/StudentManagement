@@ -35,7 +35,7 @@ const ProfilePhotoUpload = () => {
         </div>
         <label htmlFor="profile-upload" className="absolute bottom-4 left-0 right-0 mx-auto w-36 bg-gray-800 bg-opacity-70 text-white py-2 px-3 rounded flex items-center justify-center cursor-pointer hover:bg-opacity-80 transition-all">
           <Upload size={16} className="mr-2" />
-          <span className="text-sm font-medium">Upload Photo</span>
+          <span className="text-sm font-medium">{t("upload-photo")}</span>
           <input
             id="profile-upload"
             type="file"
@@ -46,7 +46,7 @@ const ProfilePhotoUpload = () => {
         </label>
       </div>
       <p className="text-gray-500 text-xs text-center">
-        Image size should be under 1MB and image ratio needs to be 1:1
+        {t("image-upload-guidelines")}
       </p>
     </div>
   );

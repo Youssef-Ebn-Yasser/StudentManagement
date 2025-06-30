@@ -5,6 +5,7 @@ import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook } from 'react-icons/f
 import Loader from '../Loader/Loader';
 import styles from '../Courses/Courses.module.css';
 import { loadStripe } from '@stripe/stripe-js';
+import { useTranslation } from 'react-i18next';
 
 // Initialize Stripe with your publishable key
 const stripePromise = loadStripe('pk_test_51RQUrPPvFWprxsdQEzZeC02EVBdbrFpeEeg12WteirJS2O6E4vShxYn6mejMdRsQItdS4p2uQCNwKznka3TKHtoM00OAEt28tT');
@@ -24,6 +25,7 @@ const mockGallery = [
 ];
 
 export default function CoursesDetails() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
@@ -330,7 +332,7 @@ export default function CoursesDetails() {
 
         {/* Comments Section */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Student Comments</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">{t('student_comments')}</h2>
           {course.commentInfo && course.commentInfo.length > 0 ? (
             <div className="space-y-6">
               {course.commentInfo.slice(0, 3).map((comment) => (
@@ -345,7 +347,7 @@ export default function CoursesDetails() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-indigo-700">{comment.studentName || 'Student'}</span>
+                      <span className="font-semibold text-indigo-700">{comment.studentName || t('student')}</span>
                       <span className="text-xs text-gray-400">{formatDate(comment.createdAt)}</span>
                     </div>
                     <p className="text-gray-700 text-base">{comment.content}</p>
@@ -354,7 +356,7 @@ export default function CoursesDetails() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500">No comments yet for this course.</p>
+            <p className="text-gray-500">{t('no_comments_yet')}</p>
           )}
         </div>
 

@@ -4,8 +4,10 @@ import { courseService } from '../../services/courseService';
 import Loader from '../Loader/Loader';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
 const EditCourse = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
@@ -136,10 +138,10 @@ const EditCourse = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow">
-        <h2 className="text-2xl font-bold mb-6">Edit Course</h2>
+        <h2 className="text-2xl font-bold mb-6">{t("edit-course")}</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block mb-1 font-semibold">Title</label>
+            <label className="block mb-1 font-semibold">{t("title")}</label>
             <input
               type="text"
               name="title"
@@ -150,7 +152,7 @@ const EditCourse = () => {
             />
           </div>
           <div>
-            <label className="block mb-1 font-semibold">Description</label>
+            <label className="block mb-1 font-semibold">{t("description")}</label>
             <textarea
               name="description"
               value={form.description}
@@ -161,7 +163,7 @@ const EditCourse = () => {
             />
           </div>
           <div>
-            <label className="block mb-1 font-semibold">Category</label>
+            <label className="block mb-1 font-semibold">{t("category")}</label>
             <select
               name="categoryId"
               value={form.categoryId}
@@ -169,7 +171,7 @@ const EditCourse = () => {
               className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
               required
             >
-              <option value="">Select a category</option>
+              <option value="">{t("select-category")}</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
@@ -178,7 +180,7 @@ const EditCourse = () => {
             </select>
           </div>
           <div>
-            <label className="block mb-1 font-semibold">Price</label>
+            <label className="block mb-1 font-semibold">{t("price")}</label>
             <input
               type="number"
               name="price"
@@ -191,7 +193,7 @@ const EditCourse = () => {
             />
           </div>
           <div>
-            <label className="block mb-1 font-semibold">Level</label>
+            <label className="block mb-1 font-semibold">{t("level")}</label>
             <input
               type="text"
               name="level"
@@ -202,7 +204,7 @@ const EditCourse = () => {
             />
           </div>
           <div>
-            <label className="block mb-1 font-semibold">Hours</label>
+            <label className="block mb-1 font-semibold">{t("hours")}</label>
             <input
               type="text"
               name="hours"
@@ -213,7 +215,7 @@ const EditCourse = () => {
             />
           </div>
           <div>
-            <label className="block mb-1 font-semibold">Image (optional)</label>
+            <label className="block mb-1 font-semibold">{t("image")} ({t("optional")})</label>
             <input
               type="file"
               name="image"
@@ -228,14 +230,14 @@ const EditCourse = () => {
               className="bg-[var(--primary-color)] text-white px-6 py-2 rounded hover:bg-[var(--primary-dark)] transition-colors duration-200"
               disabled={isLoading}
             >
-              {isLoading ? 'Updating...' : 'Update Course'}
+              {isLoading ? `${t('updating')}...` : `${t("update-course")}`}
             </button>
             <button 
               type="button" 
               onClick={() => navigate(-1)} 
               className="bg-gray-300 px-6 py-2 rounded hover:bg-gray-400 transition-colors duration-200"
             >
-              Cancel
+              {t('cancel')}
             </button>
           </div>
         </form>

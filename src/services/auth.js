@@ -75,3 +75,17 @@ export const getUser = async (exRefreshToken) => {
     )
     return res.data
 }
+
+export const forgotPassword = async (email) => {
+    const res = await axiosInstance.post(`/api/Auth/forgot-password?email=${email}`)
+    return res.data
+}
+
+export const resetPassword = async (data) => {
+    const res = await axiosInstance.post('/api/Auth/reset-password', data, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    return res.data
+}

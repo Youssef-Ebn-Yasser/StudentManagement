@@ -9,7 +9,7 @@ import allCoursesReducer from './features/allCourses/allCourses'
 import allLessonsReducer from './features/allLessons/allLessons'
 import allGategoryReducer from './features/allGategory/allGategory'
 import authSlice from './auth/authSlice';
-import teacherStatsReducer from '@/redux/features/teacherStats/teacherStats';
+import teacherStatsReducer from '@/Redux/features/teacherStats/teacherStats';
 
 let store = configureStore({
     reducer: {

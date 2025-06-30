@@ -3,8 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useTranslation } from 'react-i18next';
 
 const StudentAnswers = () => {
+  const { t } = useTranslation();
   const [answers, setAnswers] = useState(null);
   const [loading, setLoading] = useState(false);
   const [grading, setGrading] = useState(false);
@@ -151,7 +153,7 @@ const StudentAnswers = () => {
                 <p className="font-medium text-gray-800">{answers?.quizTitle}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Student Name</p>
+                <p className="text-sm text-gray-600">{t("student-name")}</p>
                 <p className="font-medium text-gray-800">{answers?.studentName}</p>
               </div>
             </div>
@@ -186,7 +188,7 @@ const StudentAnswers = () => {
                 </div>
 
                 <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                  <p className="text-sm text-gray-600 mb-2">Student's Answer:</p>
+                  <p className="text-sm text-gray-600 mb-2"></p>
                   <p className="text-gray-800">{question.questionTextAnswer}</p>
                 </div>
 

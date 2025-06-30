@@ -6,8 +6,11 @@ import { useState } from 'react'
 import { GoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+
 
 function Login() {
+    const { t } = useTranslation();
     const { loading, formik, error, handleGoBack } = useLogin()
     const [passwordVisible, setPasswordVisible] = useState(false)
 
@@ -26,6 +29,12 @@ function Login() {
                 <div className="flex flex-col-reverse  sm:flex-col-reverse  md:flex-col-reverse lg:flex-row justify-between items-center content-center w-[100%] h-full">
                     <div className="welcome  mx-auto p-2 w-[50%] ">
                         <form onSubmit={formik.handleSubmit}>
+                            {error && (
+                                <div className="flex items-center gap-2 mb-4 text-base font-semibold text-red-700 bg-red-100 border border-red-300 rounded px-3 py-2 animate-shake">
+                                    <i className="fas fa-exclamation-triangle"></i>
+                                    {error?.messages?.[0] || 'Email or password is incorrect.'}
+                                </div>
+                            )}
                             <div className="flex flex-col gap-2 ">
                                 <div className=" mb-3">
                                     <input
@@ -36,17 +45,15 @@ function Login() {
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
                                         id="Email"
-                                        placeholder="Enter your email"
                                         required
+                                        placeholder={t('enter_your_email')}
                                     />
-                                    {formik.touched.Email &&
-                                    formik.errors.Email ? (
-                                        <div className="text-red-500">
+                                    {formik.touched.Email && formik.errors.Email ? (
+                                        <div className="flex items-center gap-2 mt-1 text-sm font-semibold text-red-600 bg-red-100 border border-red-300 rounded px-2 py-1 animate-shake">
+                                            <i className="fas fa-exclamation-circle"></i>
                                             {formik.errors.Email}
                                         </div>
-                                    ) : (
-                                        ''
-                                    )}
+                                    ) : ''}
                                 </div>
 
                                 <div className="mb-3">
@@ -59,29 +66,25 @@ function Login() {
                                             onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
                                             id="Password"
-                                            placeholder="Password"
+                                            placeholder={t('password')}
                                             required
                                         />
                                         <i
                                             id="showPass"
-                                            className={`fas ${
-                                                passwordVisible ? 'fa-eye-slash' : 'fa-eye'
-                                            } absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 cursor-pointer`}
+                                            className={`fas ${passwordVisible ? 'fa-eye' : 'fa-eye-slash'} absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 cursor-pointer`}
                                             onClick={() => setPasswordVisible(!passwordVisible)}
                                         ></i>
                                     </div>
                                     
-                                    {formik.touched.Password &&
-                                    formik.errors.Password ? (
-                                        <div className="text-red-500">
+                                    {formik.touched.Password && formik.errors.Password ? (
+                                        <div className="flex items-center gap-2 mt-1 text-sm font-semibold text-red-600 bg-red-100 border border-red-300 rounded px-2 py-1 animate-shake">
+                                            <i className="fas fa-exclamation-circle"></i>
                                             {formik.errors.Password}
                                         </div>
-                                    ) : (
-                                        ''
-                                    )}
+                                    ) : ''}
                                     <button className="text-gray-400 hover:cursor-pointer hover:underline transition-all duration-300 ease">
                                         <Link to={'/auth/forgetpassword'}>
-                                            Forget my password?
+                                            {t('forget_my_password')}
                                         </Link>
                                     </button>
                                 </div>
@@ -91,7 +94,7 @@ function Login() {
                                         className="bg-blue-600 text-white px-6 py-2 rounded text-xl  hover:cursor-pointer hover:shadow-sm hover:shadow-blue-500 transition-all duration-300 ease"
                                         type="submit"
                                     >
-                                        {loading ? <Loader /> : 'Login'}
+                                        {loading ? <Loader /> : t('login')}
                                     </button>
                                 </div>
 
@@ -129,31 +132,41 @@ function Login() {
                                                         window.location.href = '/';
                                                     }
                                                 } else {
-                                                    toast.error(response.data.messages?.[0] || 'Google login failed.');
+                                                    toast.error(response.data.messages?.[0] || t('google_login_failed'));
                                                 }
                                             } catch (error) {
                                                 console.error('Google login API error:', error);
                                                 if (error.response?.data?.messages?.[0]) {
                                                     toast.error(error.response.data.messages[0]);
                                                 } else {
-                                                    toast.error('Error during Google login. Please try again.');
+                                                    toast.error(t('error_during_google_login'));
                                                 }
                                             }
                                         }}
                                         onError={() => {
-                                            toast.error('Google login failed. Please try again.');
+                                            toast.error(t('error_during_google_login'));
                                         }}
                                     />
                                 </div>
 
+                                <div className=" flex justify-center my-3">
+                                    <button
+                                        type="button"
+                                        className="bg-gray-400 text-white px-6 py-2 rounded text-xl hover:bg-gray-600 transition-all duration-300 ease ml-2"
+                                        onClick={() => window.location.href = '/'}
+                                    >
+                                        Continue as Guest
+                                    </button>
+                                </div>
+
                                 <div className="">
                                     <p className="m-0 text-secondary text-center">
-                                        Not Register Yet?{' '}
+                                        {t('not_register_yet')}{' '}
                                         <Link
                                             to={'/auth/register'}
                                             className="text-blue-600 hover:underline transition-all duration-300 ease"
                                         >
-                                            Sign up
+                                            {t('sign_up')}
                                         </Link>
                                     </p>
                                 </div>

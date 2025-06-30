@@ -10,11 +10,14 @@ import {allTeachers} from '@/Redux/features/allTeachers/allTeachers'
 import Loader from '../Loader/Loader'
 import toast from 'react-hot-toast'
 import * as Yup from 'yup';
+import { useTranslation } from 'react-i18next';
+
 
 
 
 function AddTeacher() {
 
+    const {t} = useTranslation()
     const dispatch= useDispatch()
     const [imagePreview, setImagePreview]= useState(img)
     const [addedTeacher, setAddedTeacher]= useState([])
@@ -111,21 +114,21 @@ function AddTeacher() {
                 <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl max-w-2xl mx-auto">
                     <h2 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-8 flex items-center justify-center'>
                         <img src={addImg} alt="Add Teacher Icon" className='w-8 h-8 mr-3' />
-                        Add New Teacher
+                        {t("add-new-teacher")}
                     </h2>
                     <form className='space-y-6' onSubmit={formik.handleSubmit}>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div>
-                                <label htmlFor="name" className='block text-sm font-medium text-gray-700 mb-1'>Teacher Name <span className='text-red-500'>*</span></label>
+                                <label htmlFor="name" className='block text-sm font-medium text-gray-700 mb-1'>{t('teacher-name')} <span className='text-red-500'>*</span></label>
                                 <input type="text" name="name" id="name" value={formik.values.name} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                                placeholder='Enter Teacher Name'
+                                placeholder={t('enter-teacher-name')}
                                 className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
                                 <div>{formik.errors.name && formik.touched.name && <p className='text-red-500'>{formik.errors.name}</p>}</div>
                             </div>
                             <div>
-                                <label htmlFor="email" className='block text-sm font-medium text-gray-700 mb-1'>Teacher Email <span className='text-red-500'>*</span></label>
+                                <label htmlFor="email" className='block text-sm font-medium text-gray-700 mb-1'>{t('teacher-email')}<span className='text-red-500'>*</span></label>
                                 <input type="email" name="email" id="email" value={formik.values.email} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                                placeholder='Enter Teacher Email'
+                                placeholder={t('enter-teacher-email')}
                                 className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
                                 <div>{formik.errors.email && formik.touched.email && <p className='text-red-500'>{formik.errors.email}</p>}</div>
                             </div>
@@ -133,9 +136,9 @@ function AddTeacher() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div>
                             <div className='relative'>
-                                <label htmlFor="password" className='block text-sm font-medium text-gray-700 mb-1'>Password <span className='text-red-500'>*</span></label>
+                                <label htmlFor="password" className='block text-sm font-medium text-gray-700 mb-1'>{t('Password')} <span className='text-red-500'>*</span></label>
                                 <input type={passwordVisible ? 'text' : 'password'} name="password" id="password" value={formik.values.password} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                                placeholder='Enter Password'
+                                placeholder={t('enter-password')}
                                 className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
                                 <i
                                     id="showPass"
@@ -149,9 +152,9 @@ function AddTeacher() {
                             </div>
                             <div>
                             <div className='relative'>
-                                <label htmlFor="confirmPassword" className='block text-sm font-medium text-gray-700 mb-1'>Confirm Password <span className='text-red-500'>*</span></label>
+                                <label htmlFor="confirmPassword" className='block text-sm font-medium text-gray-700 mb-1'>{t('confirm-password')}<span className='text-red-500'>*</span></label>
                                 <input type={confirmPassVisible ? 'text' : 'password'} name="confirmPassword" id="confirmPassword" value={formik.values.confirmPassword} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                                placeholder='Enter confirmPassword'
+                                placeholder={t('enter-confirm-password')}
                                 className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"/>
                                 <i
                                     id="showPass"
@@ -168,7 +171,7 @@ function AddTeacher() {
                         <div className='mt-8 flex justify-center'>
                             <button type='submit'
                             className="bg-violet-600 text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-50 transition-all duration-300 ease-in-out transform hover:scale-105"
-                            >Add Teacher</button>
+                            >{t('add-teacher')}</button>
                         </div>
                     </form>
                 </div>
@@ -177,7 +180,7 @@ function AddTeacher() {
                 <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl">
                     <h1 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-8 flex items-center'>
                         <img src={teaImg} alt="Teachers Icon" className='w-8 h-8 mr-3' />
-                        Our Teachers
+                        {t('our-teach')}
                     </h1>
 
                     {/* Search Section */}
@@ -185,16 +188,16 @@ function AddTeacher() {
                         <input 
                             className='flex-grow form-input rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3 w-full sm:w-auto'
                             type="text" 
-                            placeholder={`Search teachers by ${searchType}...`} 
+                            placeholder={`${t('search-teachers-by')} ${searchType}...`} 
                             onChange={(e)=>setSearchItem(e.target.value)}
                         />
                         <select
                             className="form-select rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 py-3 px-4 w-full sm:w-auto"
                             value={searchType}
                             onChange={(e) => setSearchType(e.target.value)}>
-                            <option value="name">Name</option>
-                            <option value="id">ID</option>
-                            <option value="email">Email</option>
+                            <option value={t("Name")}>{t("Name")}</option>
+                            <option value={t("ID")}>{t("ID")}</option>
+                            <option value={t("Email")}>{t("Email")}</option>
                         </select>
                     </div>
 
@@ -208,7 +211,7 @@ function AddTeacher() {
                             {searchItem && searchItem.length > 0 && (
                                 <h2 className="text-xl font-semibold text-gray-700 mb-6 text-center">
                                     <i className="fa-solid fa-magnifying-glass px-2 text-violet-500"></i>
-                                    Search Results
+                                    {t("search-results")}
                                 </h2>
                             )}
 
@@ -251,7 +254,7 @@ function AddTeacher() {
                                             <Loader />
                                         ) : (
                                             <p className='text-gray-600 text-lg'>
-                                                {searchItem && searchItem.length > 0 ? "No matching teachers found." : "No teachers available."}
+                                                {searchItem && searchItem.length > 0 ? t("no-matching-teachers") : t("no-teachers-available")}
                                             </p>
                                         )}
                                     </div>

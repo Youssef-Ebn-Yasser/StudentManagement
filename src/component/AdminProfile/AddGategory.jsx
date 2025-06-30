@@ -7,9 +7,12 @@ import gateImg from '../../assets/gategory.png'
 import {allGategory} from '@/Redux/features/allGategory/allGategory';
 import Loader from '../Loader/Loader';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+
 
 function AddGategory() {
 
+    const { t } = useTranslation();
     let dispatch= useDispatch()
     // let [gategories, setGategories]=useState([]) // This state seems unused, gategory from Redux is used.
     let {gategory, loading}= useSelector((state)=>state.allGategory)
@@ -70,11 +73,11 @@ function AddGategory() {
                 <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl max-w-lg mx-auto">
                     <h2 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-8 flex items-center justify-center'>
                         <img src={addImg} alt="Add Category Icon" className='w-8 h-8 mr-3' />
-                        Add New Category
+                        {t("add-new-category")}
                     </h2>
                     <form className='space-y-6' onSubmit={formik.handleSubmit}>
                         <div>
-                            <label htmlFor="name" className='block text-sm font-medium text-gray-700 mb-1'>Category Name <span className='text-red-500'>*</span></label>
+                            <label htmlFor="name" className='block text-sm font-medium text-gray-700 mb-1'>{t("category-name")} <span className='text-red-500'>*</span></label>
                             <input 
                                 type="text" 
                                 name='name' 
@@ -82,7 +85,7 @@ function AddGategory() {
                                 value={formik.values.name} 
                                 onChange={formik.handleChange} 
                                 onBlur={formik.handleBlur}
-                                placeholder='e.g., Web Development, Data Science'
+                                placeholder={t("category-name-placeholder")}
                                 className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3" 
                             />
                             {formik.touched.name && formik.errors.name ? (
@@ -95,7 +98,7 @@ function AddGategory() {
                                 className="bg-violet-600 text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-50 transition-all duration-300 ease-in-out transform hover:scale-105"
                                 disabled={loading || !formik.isValid || !formik.dirty} // Disable if loading, invalid or not dirty
                             >
-                                {loading ? 'Adding...' : 'Add Category'}
+                                {loading ? `${t("adding")}...` : t("add-category")}
                             </button>
                         </div>
                     </form>
@@ -105,7 +108,7 @@ function AddGategory() {
                 <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl">
                     <h2 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-8 flex items-center'>
                         <img src={gateImg} alt="Categories Icon" className='w-8 h-8 mr-3' />
-                        Our Categories
+                        {t("our-categories")}
                     </h2>
 
                     {loading && (!gategory || gategory.length === 0) ? (
@@ -119,7 +122,7 @@ function AddGategory() {
                                     <div key={gategory.id} className="relative flex items-center justify-between bg-gray-100 p-4 rounded-lg shadow hover:shadow-md transition-shadow duration-200 ease-in-out">
                                         <div>
                                             <h3 className="text-lg font-semibold text-gray-800">{gategory.name}</h3>
-                                            <p className="text-xs text-gray-500">ID: {gategory.id}</p>
+                                            <p className="text-xs text-gray-500">{t("id")}: {gategory.id}</p>
                                         </div>
                                         <button 
                                             onClick={() => handleRemoveGategory(gategory.id)}
@@ -131,7 +134,7 @@ function AddGategory() {
                                     </div>
                                 ))
                             ) : (   
-                                <p className='text-gray-600 text-center py-8 text-lg'>No categories available.</p>
+                                <p className='text-gray-600 text-center py-8 text-lg'>{t("no-categories-available")}</p>
                             )}
                         </div>
                     )}

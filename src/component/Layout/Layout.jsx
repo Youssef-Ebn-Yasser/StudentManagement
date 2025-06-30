@@ -3,12 +3,14 @@ import Navbar from '../Navbar/Navbar'
 import Footer from '../Footer/Footer'
 import {Outlet} from 'react-router-dom'
 import Chatbot from '../Chatbot/Chatbot'
+import Translate from '../Translate/Translate'
 
 function Layout() {
     return <>
+    
     <Navbar/>
         <Outlet></Outlet>
-        <Chatbot />
+        <Chatbot/>
     <Footer/>
     </>
 }

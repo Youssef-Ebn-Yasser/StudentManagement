@@ -30,7 +30,8 @@ export default function StudentProfile() {
         setLoading(true);
 
         if (!studentId) {
-          throw new Error('No student ID found. Please log in again.');
+          setError('NO_STUDENT_ID');
+          return;
         }
 
         // Fetch student details
@@ -97,6 +98,21 @@ export default function StudentProfile() {
   }
 
   if (error) {
+    if (error === 'NO_STUDENT_ID') {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-[#f4f7fa]">
+          <div className="text-red-600 text-center">
+            <p className="text-xl font-semibold">You have to login to show your profile</p>
+            <button
+              className="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-lg font-semibold shadow hover:bg-indigo-700 transition-all"
+              onClick={() => navigate('/auth/login')}
+            >
+              Go to Login
+            </button>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f4f7fa]">
         <div className="text-red-600 text-center">

@@ -1,22 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { courseService } from '../../../services/courseService';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import Loader from '../../Loader/Loader';
+import { useTranslation } from 'react-i18next';
+
 
 const AccountSettings = ({ teacherData, onUpdate }) => {
+
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: teacherData?.name || '',
     age: teacherData?.age || '',
     specialization: teacherData?.specialization || '',
     phone: teacherData?.phone || '',
+    additionalInfo: teacherData?.additionalInfo || '',
     image: null
   });
 
   const [previewUrl, setPreviewUrl] = useState(teacherData?.image || null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  const guestId = localStorage.getItem('guestId');
+  if (!guestId) {
+    console.error('guestId is missing. Please log in again.');
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-red-600 text-center">
+          <p className="text-xl font-semibold">Teacher ID is missing. Please log in again.</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -75,17 +91,13 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
     try {
       setLoading(true);
       
-      // Ensure we have a valid teacher ID
-      if (!teacherData?.id) {
-        throw new Error('Teacher ID is missing');
-      }
-
       const response = await courseService.updateTeacher({
-        Id: teacherData.id,
+        Id: guestId,
         Name: formData.name.trim(),
         Age: formData.age || '',
         Specialization: formData.specialization.trim(),
         Phone: formData.phone.trim(),
+        AdditionalInfo: formData.additionalInfo,
         Image: formData.image
       });
       
@@ -94,10 +106,12 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
         toast.success('Profile updated successfully!');
         
         // Update local state and trigger parent callback
-        onUpdate({
-          ...formData,
-          image: previewUrl
-        });
+        if (typeof onUpdate === 'function') {
+          onUpdate({
+            ...formData,
+            image: previewUrl
+          });
+        }
         
         // Navigate back to profile
         window.location.href = '/teacher/profile';
@@ -116,12 +130,12 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Account Settings</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("account-settings")}</h2>
           
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Profile Image Section */}
             <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Profile Image</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">{t("profile-image")}</h3>
               <div className="flex items-center space-x-6">
                 <div className="shrink-0">
                   <img
@@ -132,7 +146,7 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
                 </div>
                 <div>
                   <label className="block">
-                    <span className="sr-only">Choose profile photo</span>
+                    <span className="sr-only">{t("choose-profile-photo")}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -155,7 +169,7 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
             {/* Name Field */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name <span className="text-red-500">*</span>
+                {t("full-name")} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -163,7 +177,7 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="Enter your full name"
+                placeholder={t("enter-full-name")}
                 className={`form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3 ${
                   errors.name ? 'border-red-500' : ''
                 }`}
@@ -176,7 +190,7 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
             {/* Age Field */}
             <div>
               <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-1">
-                Age
+                {t('age')}
               </label>
               <input
                 type="number"
@@ -184,7 +198,7 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
                 name="age"
                 value={formData.age}
                 onChange={handleChange}
-                placeholder="Enter your age"
+                placeholder={t("enter-age")}
                 className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"
               />
             </div>
@@ -192,7 +206,7 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
             {/* Specialization Field */}
             <div>
               <label htmlFor="specialization" className="block text-sm font-medium text-gray-700 mb-1">
-                Specialization <span className="text-red-500">*</span>
+                {t("specialization")} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -200,7 +214,7 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
                 name="specialization"
                 value={formData.specialization}
                 onChange={handleChange}
-                placeholder="Enter your specialization"
+                placeholder={t("enter-specialization")}
                 className={`form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3 ${
                   errors.specialization ? 'border-red-500' : ''
                 }`}
@@ -213,7 +227,7 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
             {/* Phone Field */}
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number <span className="text-red-500">*</span>
+                {t("phone-number")} <span className="text-red-500">*</span>
               </label>
               <input
                 type="tel"
@@ -221,7 +235,7 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder="+1234567890"
+                placeholder={t("phone-placeholder")}
                 className={`form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3 ${
                   errors.phone ? 'border-red-500' : ''
                 }`}
@@ -231,6 +245,21 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
               )}
             </div>
 
+            {/* Additional Info Field */}
+            <div>
+              <label htmlFor="additionalInfo" className="block text-sm font-medium text-gray-700 mb-1">
+                Additional Info
+              </label>
+              <textarea
+                id="additionalInfo"
+                name="additionalInfo"
+                value={formData.additionalInfo}
+                onChange={handleChange}
+                placeholder="Enter any additional information"
+                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3 min-h-[80px]"
+              />
+            </div>
+
             {/* Submit and Cancel Buttons */}
             <div className="flex justify-end space-x-4">
               <button
@@ -238,14 +267,14 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
                 onClick={() => window.location.href = '/teacher/profile'}
                 className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
               >
-                Cancel
+                {t('cancel')}
               </button>
               <button
                 type="submit"
                 disabled={loading}
                 className="bg-violet-600 text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-50 transition-all duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Saving...' : 'Save Changes'}
+                {loading ? `${t("saving")}...` : `${'save-changes'}`}
               </button>
             </div>
           </form>
@@ -253,6 +282,10 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
       </div>
     </div>
   );
+};
+
+AccountSettings.defaultProps = {
+  onUpdate: () => {},
 };
 
 export default AccountSettings; 
