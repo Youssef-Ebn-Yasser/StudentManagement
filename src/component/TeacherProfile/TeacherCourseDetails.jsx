@@ -303,10 +303,12 @@ const TeacherCourseDetails = () => {
               <div className="flex justify-between items-start">
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 mb-2">{course.title}</h1>
+                  {/*
                   <div className="bg-gray-50 p-3 rounded-lg mb-4 inline-block">
                     <p className="text-sm text-gray-500">{t('course-id')}</p>
                     <p className="font-semibold">{course.id || t('not-available')}</p>
                   </div>
+                  */}
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -347,7 +349,7 @@ const TeacherCourseDetails = () => {
               </div>
               <p className="text-gray-600 mb-4">{course.description}</p>
               {/* Course Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div className="bg-gray-50 p-3 rounded-lg">
                   <div className="flex items-center">
                     <FaClock className="text-green-500 mr-2" />

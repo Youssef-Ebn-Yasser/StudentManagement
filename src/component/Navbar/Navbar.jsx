@@ -129,7 +129,7 @@ function Navbar() {
                     </div>
                   </Link>
                 </div>
-                <div>
+                <div className="ml-4">
                     <Translate/>
                 </div>
 

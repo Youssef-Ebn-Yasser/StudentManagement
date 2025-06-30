@@ -51,6 +51,7 @@ import StudentProfile3 from '@/component/StudentProfile/StudentProfile3'
 import Report from '../component/Report/report'
 import Translate from '@/component/Translate/Translate'
 import ResetPassword from '@/component/ResetPassword/ResetPassword'
+import NotFound from '../component/NotFound/NotFound'
 
 
 
@@ -62,6 +63,7 @@ const routesConfig = [
     {
         path: '',
         element: <Layout />,
+        errorElement: <NotFound />,
         children: [
             { path: '', element: <Home />, isProtected: false, accessRole: 'all' },
             { path: 'courses', element: <Courses />, isProtected: false, accessRole: 'all' },
@@ -115,6 +117,7 @@ const routesConfig = [
             { path: 'admin/reports', element: <Report />, isProtected: true, accessRole: 'admin' },
             ...teacherRoutes,
             { path: 'translate', element: <Translate/>, isProtected: false, accessRole: 'all' },
+            { path: '*', element: <NotFound /> }
         ]
     }
 ];
