@@ -3,19 +3,10 @@ import { loginBuilder } from './loginActions'
 import { registerBuilder } from './registerActions'
 import { authorizeBuilder } from './authorizeAcions'
 import { confirmBuilder } from './confirmationAcions'
+import { authStorage } from '@/utils/authStorage'
 
 // Initial state
-const initialState = {
-    user: null,
-    refreshToken: null,
-    expirationDate: null,
-    token: null,
-    isLogedin: false,
-    role: null,
-    isAdmin: false,
-    loading: true,
-    error: null,
-}
+const initialState = authStorage.getInitialAuthState();
 
 // Slice
 const authSlice = createSlice({
@@ -28,10 +19,14 @@ const authSlice = createSlice({
             state.expirationDate = null
             state.token = null
             state.isLogedin = false
+            state.role = null
             state.isAdmin = false
-            localStorage.removeItem('refreshToken')
-            localStorage.removeItem('expirationDate')
-            localStorage.removeItem('isAdmin')
+            state.isTeacher = false
+            state.loading = false
+            state.error = null
+            
+            // Clear all authentication-related localStorage items
+            authStorage.clearAuthData()
         },
     },
     extraReducers: (builder) => {

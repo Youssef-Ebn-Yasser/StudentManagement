@@ -4,11 +4,8 @@ import img from '../../assets/sliderpic.jpg';
 import styles from './Home.module.css';
 import { getPaginatedCourses } from '../../services/courseService';
 import Loader from '../Loader/Loader';
-<<<<<<< HEAD
 import axios from 'axios';
-=======
 import { useTranslation } from 'react-i18next';
->>>>>>> df1764070c3c24a21dd448c63ea74bba25258beb
 
 const CourseCard = ({ course }) => (
   <Link
@@ -177,7 +174,7 @@ const useCourseFetch = (initialPage = 1, enOrderBy = 0) => {
 
 function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
-<<<<<<< HEAD
+  const { t } = useTranslation();
 
   // Fetch sliders from API
   const [sliders, setSliders] = useState([]);
@@ -198,10 +195,6 @@ function Home() {
     fetchSliders();
   }, []);
 
-=======
-  const { t } = useTranslation();
-  
->>>>>>> df1764070c3c24a21dd448c63ea74bba25258beb
   // Use the custom hook for each course section with different enOrderBy values
   const recommendedCourses = useCourseFetch(1, 0); // Recommended courses
   const popularCourses = useCourseFetch(1, 2);    // Popular courses

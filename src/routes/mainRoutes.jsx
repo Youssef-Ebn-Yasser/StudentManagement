@@ -49,12 +49,14 @@ import RegisterAdmin from '@/component/AdminProfile/RegisterAdmin'
 import AllAdmins from '@/component/AdminProfile/AllAdmins'
 import StudentProfile3 from '@/component/StudentProfile/StudentProfile3'
 import Report from '../component/Report/report'
-<<<<<<< HEAD
 import EnrollStudentCourse from '@/component/AdminProfile/EnrollStudentCourse'
 import StudentAndCourses from '@/component/AdminProfile/StudentAndCourses'
 import AdminsClaims from '@/component/AdminProfile/AdminsClaims'
 import AddSlider from '@/component/AdminProfile/AddSlider'
 import AllSliders from '@/component/AdminProfile/AllSliders'
+import Translate from '@/component/Translate/Translate'
+import ResetPassword from '@/component/ResetPassword/ResetPassword'
+import NotFound from '../component/NotFound/NotFound'
 
 
 const routesConfig = [
@@ -86,12 +88,6 @@ const routesConfig = [
     {
         path: 'studentdashboard',
         element: <StudentDashboard />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'createquiz',
-        element: <CreateQuiz />,
         isProtected: false,
         accessRole: 'all',
     },
@@ -393,19 +389,6 @@ const routesConfig = [
 ]
 
 const mainRoutes = [
-=======
-import Translate from '@/component/Translate/Translate'
-import ResetPassword from '@/component/ResetPassword/ResetPassword'
-import NotFound from '../component/NotFound/NotFound'
-
-
-
-
-const routesConfig = [
-    // Top-level route: no Layout, no Navbar/Chatbot
-    { path: 'reset-password', element: <ResetPassword />, isProtected: false, accessRole: 'all' },
-    // All other routes wrapped in Layout
->>>>>>> df1764070c3c24a21dd448c63ea74bba25258beb
     {
         path: '',
         element: <Layout />,
@@ -468,4 +451,4 @@ const routesConfig = [
     }
 ];
 
-export default routesConfig;
+export default mainRoutes;

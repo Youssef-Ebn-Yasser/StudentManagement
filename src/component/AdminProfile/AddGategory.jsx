@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useFormik } from 'formik';
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -8,6 +7,7 @@ import {allGategory} from '@/Redux/features/allGategory/allGategory';
 import Loader from '../Loader/Loader';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import axiosInstance from '@/services/axiosInstance';
 
 
 function AddGategory() {
@@ -18,16 +18,15 @@ function AddGategory() {
     let {gategory, loading}= useSelector((state)=>state.allGategory)
 
     async function handleRemoveGategory(id) {
-        axios.delete(`https://e-learn-v1.runasp.net/api/Category/Delete`,
+        axiosInstance.delete(`/api/Category/Delete`,
             {
-                data :id ,
-                // 👈 This sends a raw value as body
+                data: id,
                 headers: {
                     'Content-Type': 'application/json'
-        }
+                }
             })
         .then((response)=>{
-            console.log("Lesson deleted");
+            console.log("Category deleted");
             toast.success('Category Deleted Successfully!')
             dispatch(allGategory())
         }).catch((error)=>{
@@ -39,9 +38,9 @@ function AddGategory() {
     }
 
     async function handleAddGategory(formsData){
-        console.log('Added Gategory: ',formsData);
+        console.log('Added Category: ',formsData);
 
-        axios.post('https://e-learn-v1.runasp.net/api/Category/Create',formsData)
+        axiosInstance.post('/api/Category/Create',formsData)
         .then((response)=>{
             console.log(response);
             toast.success('Category Added Successfully!')

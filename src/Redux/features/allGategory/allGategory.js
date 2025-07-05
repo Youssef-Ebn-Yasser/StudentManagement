@@ -1,13 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-import { act } from "react";
+import axiosInstance from "@/services/axiosInstance";
 
 
 export const allGategory = createAsyncThunk(
     'allGategory',
     async(_,thunkAPI)=>{
         try{
-            const response = await axios.get('https://e-learn-v1.runasp.net/api/Category/GetAll')
+            const response = await axiosInstance.get('/api/Category/GetAll')
             return response.data.data
         }catch(error){
             console.log(error)

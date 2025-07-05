@@ -1,12 +1,29 @@
 /* Default NavLink styles */
 .navlink {
   color: #565E6C; /* Neutral color */
-  font-size: 1rem; /* Text size */
+  font-size: 0.875rem; /* Smaller text for better fit */
   font-weight: 500; /* Medium font weight */
   text-decoration: none; /* Remove underline */
-  padding: 15px 12px; /* Add padding */
+  padding: 8px 12px; /* Reduced padding for better spacing */
   position: relative; /* For the bottom border */
   transition: color 0.3s ease; /* Smooth color transition */
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+/* Medium screens */
+@media (min-width: 768px) {
+  .navlink {
+    font-size: 0.9rem;
+    padding: 10px 12px;
+  }
+}
+
+/* Large screens */
+@media (min-width: 1024px) {
+  .navlink {
+    font-size: 1rem;
+    padding: 15px 12px;
+  }
 }
 
 /* Hover state */
@@ -53,4 +70,26 @@
   -moz-transform: scaleY(1);
   -ms-transform: scaleY(1);
   -o-transform: scaleY(1);
+}
+
+/* Admin NavLink styles */
+.adminNavLink {
+  font-size: 0.75rem; /* Smaller for admin links */
+  padding: 6px 8px; /* Reduced padding */
+}
+
+/* Medium screens */
+@media (min-width: 768px) {
+  .adminNavLink {
+    font-size: 0.8rem;
+    padding: 8px 10px;
+  }
+}
+
+/* Large screens */
+@media (min-width: 1024px) {
+  .adminNavLink {
+    font-size: 0.85rem;
+    padding: 10px 12px;
+  }
 }

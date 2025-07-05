@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
+import axiosInstance from '@/services/axiosInstance'
 import { useNavigate } from 'react-router-dom'
 
 export default function AllAdmins() {
@@ -13,7 +13,7 @@ export default function AllAdmins() {
     const fetchAdmins = async () => {
       try {
         setLoading(true)
-        const res = await axios.get('https://e-learn-v1.runasp.net/api/Authorize/admins')
+        const res = await axiosInstance.get('/api/Authorize/admins')
         setAdmins(res.data?.data || [])
       } catch (err) {
         setError('Failed to fetch admins.')
@@ -28,7 +28,7 @@ export default function AllAdmins() {
   const handleGetClaims = async (adminId) => {
     setGettingId(adminId)
     try {
-      const res = await axios.get(`https://e-learn-v1.runasp.net/api/Authorize?userId=${adminId}`)
+      const res = await axiosInstance.get(`/api/Authorize?userId=${adminId}`)
       if (res.data && res.data.succeeded) {
         // Pass the data to the next page using state
         navigate('/admin-claims', { state: { adminClaims: res.data.data } })
