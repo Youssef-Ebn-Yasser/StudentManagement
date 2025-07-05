@@ -173,6 +173,10 @@ const useCourseFetch = (initialPage = 1, enOrderBy = 0) => {
 function Home() {
   const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
+<<<<<<< HEAD
+=======
+  const { t } = useTranslation();
+>>>>>>> bd347609c5b23abb7d7d126a2dec15f27060feeb
 
   // Fetch sliders from API
   const [sliders, setSliders] = useState([]);

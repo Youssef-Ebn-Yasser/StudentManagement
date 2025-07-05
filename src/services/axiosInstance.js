@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { authStorage } from '@/utils/authStorage'
 
 const isDevelopment = import.meta.env.DEV;
 const baseURL = isDevelopment ? 'https://e-learn-v1.runasp.net' : 'https://e-learn-v1.runasp.net';
@@ -16,7 +17,7 @@ const axiosInstance = axios.create({
 // Add a request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = authStorage.getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -33,13 +34,20 @@ axiosInstance.interceptors.request.use(
 // Add a response interceptor to handle errors
 axiosInstance.interceptors.response.use(
   (response) => response,
-    (error) => {
+  (error) => {
     if (error.message === 'Network Error') {
       console.error('Network Error:', error);
       // You can add custom handling for network errors here
-        }
-    return Promise.reject(error);
     }
+    
+    // Handle authentication errors
+    if (error.response?.status === 401) {
+      console.error('Authentication error:', error.response.data);
+      // Don't automatically logout on 401, let the component handle it
+    }
+    
+    return Promise.reject(error);
+  }
 );
 
 export default axiosInstance

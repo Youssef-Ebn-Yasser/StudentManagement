@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '@/services/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 
 export default function AddSlider() {
@@ -33,7 +33,7 @@ export default function AddSlider() {
     formData.append('Image', image);
 
     try {
-      const res = await axios.post('https://e-learn-v1.runasp.net/api/Slider', formData, {
+      const res = await axiosInstance.post('/api/Slider', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setSuccessMsg('Slider added successfully!');

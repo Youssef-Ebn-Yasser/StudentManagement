@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '@/services/axiosInstance';
 import { FaTrash } from 'react-icons/fa';
 
 export default function AllSliders() {
@@ -12,7 +12,7 @@ export default function AllSliders() {
     setLoading(true);
     setErrorMsg('');
     try {
-      const res = await axios.get('https://e-learn-v1.runasp.net/api/Slider');
+      const res = await axiosInstance.get('/api/Slider');
       setSliders(res.data || []);
     } catch (err) {
       setErrorMsg('Failed to fetch sliders.');
@@ -30,7 +30,7 @@ export default function AllSliders() {
     setDeletingId(id);
     setErrorMsg('');
     try {
-      await axios.delete(`https://e-learn-v1.runasp.net/api/Slider/${id}`);
+      await axiosInstance.delete(`/api/Slider/${id}`);
       setSliders((prev) => prev.filter((slider) => slider.id !== id));
     } catch (err) {
       setErrorMsg('Failed to delete slider.');
