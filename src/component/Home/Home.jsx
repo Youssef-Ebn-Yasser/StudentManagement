@@ -4,11 +4,8 @@ import img from '../../assets/sliderpic.jpg';
 import styles from './Home.module.css';
 import { getPaginatedCourses } from '../../services/courseService';
 import Loader from '../Loader/Loader';
-<<<<<<< HEAD
 import axios from 'axios';
-=======
 import { useTranslation } from 'react-i18next';
->>>>>>> df1764070c3c24a21dd448c63ea74bba25258beb
 
 const CourseCard = ({ course }) => (
   <Link
@@ -63,7 +60,6 @@ const Pagination = ({ currentPage, totalPages, onPageChange, hasNextPage, hasPre
     }
     return pages;
   };
-  
 
   return (
     <div className="flex items-center justify-center gap-2" role="navigation" aria-label="Pagination">
@@ -120,7 +116,6 @@ const useCourseFetch = (initialPage = 1, enOrderBy = 0) => {
   const [error, setError] = useState(null);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [hasPreviousPage, setHasPreviousPage] = useState(false);
-  
 
   useEffect(() => {
     let isMounted = true;
@@ -176,8 +171,8 @@ const useCourseFetch = (initialPage = 1, enOrderBy = 0) => {
 };
 
 function Home() {
+  const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
-<<<<<<< HEAD
 
   // Fetch sliders from API
   const [sliders, setSliders] = useState([]);
@@ -198,10 +193,6 @@ function Home() {
     fetchSliders();
   }, []);
 
-=======
-  const { t } = useTranslation();
-  
->>>>>>> df1764070c3c24a21dd448c63ea74bba25258beb
   // Use the custom hook for each course section with different enOrderBy values
   const recommendedCourses = useCourseFetch(1, 0); // Recommended courses
   const popularCourses = useCourseFetch(1, 2);    // Popular courses
@@ -293,7 +284,7 @@ function Home() {
                 </div>
               ) : sliders.length === 0 ? (
                 <div className="flex justify-center items-center h-48 sm:h-64">
-                  <p className="text-gray-500 text-base sm:text-lg">No sliders available</p>
+                  <p className="text-gray-500 text-base sm:text-lg">{t('No-sliders-available') || "No sliders available"}</p>
                 </div>
               ) : (
                 <>
@@ -306,25 +297,25 @@ function Home() {
                     {sliders.map((slide, index) => (
                       <div
                         key={slide.id}
-                        className="flex flex-col sm:flex-row items-center justify-between py-8 sm:py-16 px-4 sm:px-8 md:px-16 lg:px-24 min-w-full"
+                        className="flex flex-col sm:flex-row items-center justify-between py-8 sm:py-16 px-4 sm:px-8 md:px-16 lg:px-24 min-w-full bg-gradient-to-r from-indigo-50 via-blue-100 to-indigo-100 rounded-2xl shadow-xl border border-indigo-100"
                       >
                         <div className="w-full sm:w-2/5 flex-shrink-0 mb-6 sm:mb-0">
-                          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">
+                          <h2 className="text-2xl sm:text-3xl font-extrabold text-indigo-700 mb-3 sm:mb-4 drop-shadow">
                             {slide.content}
                           </h2>
                           <button
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 sm:py-3 px-4 sm:px-6 rounded-md text-sm sm:text-base transition"
+                            className="bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 text-white font-bold py-2 sm:py-3 px-4 sm:px-6 rounded-lg text-sm sm:text-base shadow transition"
                             aria-label="Go to slider link"
                             onClick={() => window.open(slide.link, '_blank')}
                           >
-                            Visit Link
+                            {t('Visit-Link') || "Visit Link"}
                           </button>
                         </div>
-                        <div className="w-full sm:w-2/5 sm:ml-8 rounded-lg overflow-hidden shadow-lg flex justify-center">
+                        <div className="w-full sm:w-2/5 sm:ml-8 rounded-xl overflow-hidden shadow-lg flex justify-center border-4 border-indigo-100 bg-white">
                           <img
                             src={slide.path || img}
                             alt={slide.content}
-                            className="w-full h-56 sm:h-64 object-cover rounded-lg border"
+                            className="w-full h-56 sm:h-64 object-cover rounded-xl"
                           />
                         </div>
                       </div>
@@ -335,10 +326,10 @@ function Home() {
                       <button
                         key={index}
                         onClick={() => goToSlide(index)}
-                        className={`w-2 h-2 sm:w-3 sm:h-3 mx-1 sm:mx-2 rounded-full ${
+                        className={`w-3 h-3 sm:w-4 sm:h-4 mx-1 sm:mx-2 rounded-full border-2 border-indigo-300 transition-all duration-200 ${
                           currentSlide === index
-                            ? 'bg-indigo-600'
-                            : 'bg-gray-300 hover:bg-gray-400'
+                            ? 'bg-indigo-600 border-indigo-600 scale-110 shadow'
+                            : 'bg-gray-200 hover:bg-indigo-200'
                         }`}
                         role="tab"
                         aria-selected={currentSlide === index}

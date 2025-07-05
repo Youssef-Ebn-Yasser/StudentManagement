@@ -29,7 +29,7 @@
     "downshift": "^9.0.9",
     "formik": "^2.4.6",
     "generate-react-cli": "^8.4.9",
-    "i18next": "^25.2.1",
+    "i18next": "^25.3.0",
     "i18next-browser-languagedetector": "^8.2.0",
     "i18next-http-backend": "^3.0.2",
     "lucide-react": "^0.503.0",
