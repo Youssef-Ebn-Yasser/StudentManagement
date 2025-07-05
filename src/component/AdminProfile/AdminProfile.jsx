@@ -140,13 +140,6 @@ function AdminProfile() {
                         <Link to="/admin/addslider" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
                             <img src={gateImg} alt="reportImg" className="w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-indigo-600">Add Slider</h3>
-<<<<<<< HEAD
-                        </Link>
-                        <Link to="/admin/reports" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
-                            <img src={gateImg} alt="reportImg" className="w-12 h-12 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-indigo-600">Reports</h3>
-=======
->>>>>>> bd347609c5b23abb7d7d126a2dec15f27060feeb
                         </Link>
                         
                     </div>
