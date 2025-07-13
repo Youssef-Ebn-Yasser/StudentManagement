@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using Microsoft.AspNetCore.Authorization;
+using System.Security.Cryptography;
 using System.Text.Json;
 
 namespace Backend.Controllers;
@@ -141,6 +142,7 @@ public class ZoomController : AppControllerBase
         public bool IsAttendedEnough { get; set; }
     }
 
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpPost("create-meeting")]
     public async Task<IActionResult> CreateMeeting([FromBody] MeetingRequestDto request)
     {

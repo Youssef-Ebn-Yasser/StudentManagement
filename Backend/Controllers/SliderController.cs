@@ -1,9 +1,9 @@
 using Backend.DTOs.SliderDTOs;
-using Backend.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers;
 
+[Authorize(Roles = "Admin")]
 [Route("api/[controller]")]
 [ApiController]
 public class SliderController : ControllerBase
@@ -14,6 +14,7 @@ public class SliderController : ControllerBase
         _sliderService = sliderService;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -42,4 +43,4 @@ public class SliderController : ControllerBase
         if (!result) return NotFound();
         return Ok();
     }
-} 
+}

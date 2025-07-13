@@ -1,4 +1,5 @@
 using Backend.DTOs.LessonDTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers;
 
@@ -51,7 +52,7 @@ public class LessonController : AppControllerBase
         }
     }
 
-
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpPost("CreateLesson")]
     public async Task<IActionResult> CreateLesson([FromBody] CreateLessonDto createLessonDto)
     {
@@ -67,7 +68,7 @@ public class LessonController : AppControllerBase
         }
     }
 
-
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpPut("UpdateLesson")]
     public async Task<IActionResult> UpdateLesson([FromBody] UpdateLessonDto updateLessonDto)
     {
@@ -83,7 +84,7 @@ public class LessonController : AppControllerBase
         }
     }
 
-
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpDelete("DeleteLesson/{lessonId}")]
     public async Task<IActionResult> DeleteLesson(int lessonId)
     {

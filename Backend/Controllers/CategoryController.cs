@@ -35,7 +35,7 @@ public class CategoryController : AppControllerBase
     }
 
 
-    [Authorize]
+
     [HttpGet("GetAll")]
     public async Task<IActionResult> GetAll()
     {
@@ -65,7 +65,7 @@ public class CategoryController : AppControllerBase
             return NewResult(ErrorHappen.ErrorInServer());
         }
     }
-
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoryDto dto)
     {
@@ -80,7 +80,7 @@ public class CategoryController : AppControllerBase
             return NewResult(ErrorHappen.ErrorInServer());
         }
     }
-
+    [Authorize(Roles = "Admin")]
     [HttpDelete("Delete")]
     public async Task<IActionResult> Delete([FromBody] int id)
     {
@@ -95,7 +95,7 @@ public class CategoryController : AppControllerBase
             return NewResult(ErrorHappen.ErrorInServer());
         }
     }
-
+    [Authorize(Roles = "Admin")]
     [HttpPost("Create")]
     public async Task<IActionResult> Create([FromBody] CreateCategoryDto dto)
     {

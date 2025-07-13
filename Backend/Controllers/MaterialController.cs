@@ -1,4 +1,5 @@
 using Backend.DTOs.MaterialDTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers;
 
@@ -34,7 +35,7 @@ public class MaterialController : AppControllerBase
             return NewResult(ErrorHappen.ErrorInServer());
         }
     }
-
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpPost("CreateMaterial")]
     public async Task<IActionResult> CreateMaterial([FromForm] CreateMaterialDto createMaterialDto)
     {
@@ -49,7 +50,7 @@ public class MaterialController : AppControllerBase
             return NewResult(ErrorHappen.ErrorInServer());
         }
     }
-
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpPut("UpdateMaterial")]
     public async Task<IActionResult> UpdateMaterial([FromForm] UpdateMaterialDto updateMaterialDto)
     {
@@ -64,7 +65,7 @@ public class MaterialController : AppControllerBase
             return NewResult(ErrorHappen.ErrorInServer());
         }
     }
-
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpDelete("DeleteMaterial/{materialId}")]
     public async Task<IActionResult> DeleteMaterial(int materialId)
     {

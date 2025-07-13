@@ -25,7 +25,7 @@ public class QuizService : ResponseHandler, IQuizService
         try
         {
             _logger.LogInfo($"Getting quizzes to correct for LessonId: {lessonId}");
-            
+
             var quizzesToCorrect = _unitOfWork.Repository<StudentQuizeAnswer>()
                 .GetTableNoTracking()
                 .Where(sqa => sqa.Quiz.LessonId == lessonId && !sqa.Quiz.IsAutoCorrect)
@@ -36,7 +36,7 @@ public class QuizService : ResponseHandler, IQuizService
                     StudentName = sqa.Student.NameEn
                 })
                 .ToList();
-                
+
             _logger.LogInfo($"Successfully retrieved {quizzesToCorrect.Count} quizzes to correct for LessonId: {lessonId}");
             return quizzesToCorrect;
         }
@@ -52,7 +52,7 @@ public class QuizService : ResponseHandler, IQuizService
         try
         {
             _logger.LogInfo($"Getting student quiz answer for AnswerId: {answerId}");
-            
+
             var result = await _unitOfWork.Repository<StudentQuizeAnswer>()
                                                        .GetTableNoTracking()
                                                        .Where(a => a.Id == answerId)
@@ -75,7 +75,7 @@ public class QuizService : ResponseHandler, IQuizService
                 _logger.LogInfo($"No text question found for AnswerId: {answerId}");
                 return BadRequest<StudentQuizAnswerDto>("No Text question");
             }
-            
+
             _logger.LogInfo($"Successfully retrieved student quiz answer for AnswerId: {answerId}");
             return Success(result);
         }
@@ -155,7 +155,7 @@ public class QuizService : ResponseHandler, IQuizService
             return Success("Quiz Correct successfully");
         }
 
-       
+
     }
 
     public List<CourseStudentQuizStatsDto> GetCourseStudentQuizStats(int courseId)
@@ -163,7 +163,7 @@ public class QuizService : ResponseHandler, IQuizService
         try
         {
             _logger.LogInfo($"Getting course student quiz stats for CourseId: {courseId}");
-            
+
             // Get all students enrolled in the course
             var students = _unitOfWork.Repository<StudentCourse>()
                 .GetTableNoTracking()
@@ -266,7 +266,7 @@ public class QuizService : ResponseHandler, IQuizService
         try
         {
             _logger.LogInfo($"Getting student course quiz stats for StudentId: {studentId}, CourseId: {courseId}");
-            
+
             // Get the student
             var student = _unitOfWork.Repository<Student>()
                 .GetTableNoTracking()
@@ -360,15 +360,12 @@ public class QuizService : ResponseHandler, IQuizService
         }
     }
 
-
-
-
     public async Task<Response<GetQuizeDto>> GetQuizById(int quizId)
     {
         try
         {
             _logger.LogInfo($"Getting quiz by ID: {quizId}");
-            
+
             // Get quiz with questions and options
             var quiz = await _unitOfWork.Repository<Quiz>()
                                          .GetTableAsTracking()
@@ -413,7 +410,7 @@ public class QuizService : ResponseHandler, IQuizService
                 Massage = "Quiz retrieved successfully",
                 Data = quizDto
             };
-            
+
             _logger.LogInfo($"Successfully retrieved quiz for QuizId: {quizId}");
             return result;
         }
@@ -428,7 +425,7 @@ public class QuizService : ResponseHandler, IQuizService
         try
         {
             _logger.LogInfo($"Getting lesson quizzes for LessonId: {lessonId}");
-            
+
             // Verify lesson exists
             var lesson = await _unitOfWork.Repository<Lesson>()
                                                 .GetTableAsTracking()
@@ -475,7 +472,7 @@ public class QuizService : ResponseHandler, IQuizService
         try
         {
             _logger.LogInfo($"Creating quiz with course for CourseId: {dto.CourseId}");
-            
+
             // Verify course exists
             var course = await _unitOfWork.Repository<Course>()
                 .GetTableNoTracking()
@@ -528,7 +525,7 @@ public class QuizService : ResponseHandler, IQuizService
         try
         {
             _logger.LogInfo($"Creating quiz with lesson for LessonId: {dto.LessonId}");
-            
+
             // Map DTO to Quiz entity using the existing helper method
             var quiz = MapToEntity(dto);
 
@@ -656,7 +653,7 @@ public class QuizService : ResponseHandler, IQuizService
         try
         {
             _logger.LogInfo($"Getting student emails for LessonId: {lessonId}");
-            
+
             var studentEmails = await _unitOfWork.Repository<Lesson>()
                                                          .GetTableNoTracking()
                                                          .Include(l => l.Course)
@@ -665,7 +662,7 @@ public class QuizService : ResponseHandler, IQuizService
                                                          .Where(l => l.Id == lessonId)
                                                          .SelectMany(l => l.Course!.StudentCourses!.Select(sc => sc.Student!.Email))
                                                          .ToListAsync();
-            
+
             _logger.LogInfo($"Found {studentEmails.Count} student emails for LessonId: {lessonId}");
             return studentEmails;
         }
@@ -680,7 +677,7 @@ public class QuizService : ResponseHandler, IQuizService
         try
         {
             _logger.LogInfo($"Sending email notifications for quiz {quiz.Id} in LessonId: {lessonId}");
-            
+
             // Send email notification to students
             string emailSubject = $"New Quiz: \"{GeneralLocalizableEntity.Localized(quiz.TitleAr, quiz.TitleEn)}\" Scheduled for {quiz.StartsAt:MMMM d, yyyy 'at' h:mm tt}";
             string emailMessage = $@"
@@ -743,7 +740,7 @@ public class QuizService : ResponseHandler, IQuizService
         try
         {
             _logger.LogInfo($"Getting lesson quiz stats for LessonId: {lessonId}");
-            
+
             var lesson = await _unitOfWork.Repository<Lesson>()
                 .GetTableNoTracking()
                 .Include(l => l.Quizs)
@@ -770,7 +767,7 @@ public class QuizService : ResponseHandler, IQuizService
                 int numSubmitted = studentAnswers.Count;
                 double percentageOfSubmit = totalStudents > 0 ? Math.Min(Math.Round((double)numSubmitted / totalStudents * 100, 2), 100) : 0;
                 double percentageWithDegree = quiz.PossiblePoints > 0 && numSubmitted > 0
-                    ? Math.Min(Math.Round(studentAnswers.Sum(a => (double?)a.GradingRating ?? 0) / (quiz.PossiblePoints * numSubmitted) * 100, 2),100)
+                    ? Math.Min(Math.Round(studentAnswers.Sum(a => (double?)a.GradingRating ?? 0) / (quiz.PossiblePoints * numSubmitted) * 100, 2), 100)
                     : 0;
                 int numUnder50 = studentAnswers.Count(a => (double)(a.GradingRating ?? 0) < (quiz.PossiblePoints * 0.5));
                 int numOver70 = studentAnswers.Count(a => (double)(a.GradingRating ?? 0) >= (quiz.PossiblePoints * 0.7));
@@ -803,7 +800,7 @@ public class QuizService : ResponseHandler, IQuizService
                 PercentageOfAllQuizzes = 100, // For a single lesson, always 100%
                 Quizzes = quizAnalyticsList
             };
-            
+
             _logger.LogInfo($"Successfully retrieved lesson quiz stats for LessonId: {lessonId}. Found {totalQuizzes} quizzes");
             return Success(result);
         }
@@ -819,7 +816,7 @@ public class QuizService : ResponseHandler, IQuizService
         try
         {
             _logger.LogInfo($"Getting course lesson quiz stats for CourseId: {courseId}");
-            
+
             var lessons = await _unitOfWork.Repository<Lesson>()
                 .GetTableNoTracking()
                 .Where(l => l.CourseId == courseId && !l.IsDeleted)
@@ -878,7 +875,7 @@ public class QuizService : ResponseHandler, IQuizService
                     Quizzes = quizAnalyticsList
                 });
             }
-            
+
             _logger.LogInfo($"Successfully retrieved course lesson quiz stats for CourseId: {courseId}. Found {result.Count} lessons with {totalQuizzesInCourse} total quizzes");
             return Success(result);
         }
