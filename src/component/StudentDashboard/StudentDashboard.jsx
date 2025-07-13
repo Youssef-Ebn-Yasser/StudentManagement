@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../services/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 
 // It's good practice to include necessary external CSS/icon libraries.
 // For Font Awesome icons used in this component, you would typically link it
@@ -10,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 
 export default function StudentDashboard() {
   const { t } = useTranslation();
+  const { user } = useSelector((state) => state.auth);
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,8 +31,11 @@ export default function StudentDashboard() {
       try {
         setLoading(true);
 
-        // Get studentId from localStorage
-        const studentId = localStorage.getItem('guestId');
+        // Get studentId from Redux store
+        const studentId = user?.id;
+        console.log('StudentDashboard - User from Redux:', user);
+        console.log('StudentDashboard - Student ID:', studentId);
+        
         if (!studentId) {
           setError(t('student-not-logged-in'));
           setLoading(false);
@@ -38,8 +43,9 @@ export default function StudentDashboard() {
         }
 
         // Fetch enrolled courses for the logged-in student
-        const coursesResponse = await axios.get(
-          `https://e-learn-v1.runasp.net/api/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses?studentId=${studentId}`
+        console.log('StudentDashboard - Making API call with studentId:', studentId);
+        const coursesResponse = await axiosInstance.get(
+          `/api/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses?studentId=${studentId}`
         );
 
         // Check if the API call was successful and data is an array
@@ -76,15 +82,25 @@ export default function StudentDashboard() {
           },
         });
       } catch (err) {
+        console.error('StudentDashboard - Error fetching data:', err);
+        
         // More specific error message based on the error object
-        setError(t('fetch-dashboard-fail') + ': ' + (err.message || t('unknown-error')));
+        if (err.response?.status === 403) {
+          setError('Access denied. You do not have permission to view this data. Please check your account type.');
+        } else if (err.response?.status === 401) {
+          setError('Authentication failed. Please log in again.');
+        } else if (err.response?.data?.message) {
+          setError(t('fetch-dashboard-fail') + ': ' + err.response.data.message);
+        } else {
+          setError(t('fetch-dashboard-fail') + ': ' + (err.message || t('unknown-error')));
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchDashboardData();
-  }, []); // Empty dependency array means this effect runs once after the initial render
+  }, [user?.id, t]); // Add user?.id as dependency to refetch when user changes
 
   // Loading spinner component
   if (loading) {

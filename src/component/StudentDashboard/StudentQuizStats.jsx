@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../services/axiosInstance';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
@@ -24,14 +24,10 @@ const StudentQuizStats = () => {
         const studentId = user.id;
         console.log('Fetching quiz stats with:', { studentId, courseId });
 
-        const response = await axios.get(`https://e-learn-v1.runasp.net/api/Quize/StudentCourseStats`, {
+        const response = await axiosInstance.get(`/api/Quize/StudentCourseStats`, {
           params: {
             studentId: studentId,
             courseId: courseId
-          },
-          headers: {
-            'accept': '*/*',
-            'Content-Type': 'application/json'
           }
         });
 

@@ -9,7 +9,7 @@ import {
   FaTasks,
   FaQuestionCircle,
 } from 'react-icons/fa';
-import axios from 'axios';
+import axiosInstance from '../../services/axiosInstance';
 
 // --- New ProgressCircle Component ---
 const ProgressCircle = ({ percentage, color = '#6366f1', size = 50, strokeWidth = 5 }) => {
@@ -83,18 +83,18 @@ export default function StudentProfile2() {
         }
 
         // Fetch student details
-        const studentResponse = await axios.get(
-          `https://e-learn-v1.runasp.net/api/Student/GetById/GetById/${studentId}`
+        const studentResponse = await axiosInstance.get(
+          `/api/Student/GetById/GetById/${studentId}`
         );
 
         // Fetch enrolled courses
-        const coursesResponse = await axios.get(
-          `https://e-learn-v1.runasp.net/api/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses?studentId=${studentId}`
+        const coursesResponse = await axiosInstance.get(
+          `/api/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses?studentId=${studentId}`
         );
 
         // --- New API Call for get/forTest ---
-        const testDetailsResponse = await axios.get(
-          `https://e-learn-v1.runasp.net/api/Student/get/forTest?studentId=${studentId}`
+        const testDetailsResponse = await axiosInstance.get(
+          `/api/Student/get/forTest?studentId=${studentId}`
         );
         // --- End New API Call ---
 

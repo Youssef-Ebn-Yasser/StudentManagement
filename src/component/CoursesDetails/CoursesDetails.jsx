@@ -6,6 +6,7 @@ import Loader from '../Loader/Loader';
 import styles from '../Courses/Courses.module.css';
 import { loadStripe } from '@stripe/stripe-js';
 import { useTranslation } from 'react-i18next';
+import { convertToEgyptTime } from '../../utils/timeUtils';
 
 // Initialize Stripe with your publishable key
 const stripePromise = loadStripe('pk_test_51RQUrPPvFWprxsdQEzZeC02EVBdbrFpeEeg12WteirJS2O6E4vShxYn6mejMdRsQItdS4p2uQCNwKznka3TKHtoM00OAEt28tT');
@@ -35,10 +36,9 @@ export default function CoursesDetails() {
   const [relatedCourses, setRelatedCourses] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Helper to format date
+  // Helper to format date in Egypt timezone
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+    return convertToEgyptTime(dateString);
   };
   
   const handlePaymobPayment = () => {

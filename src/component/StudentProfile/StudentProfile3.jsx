@@ -12,10 +12,12 @@ import {
   FaChevronDown,
   FaChevronUp,
 } from 'react-icons/fa';
-import axios from 'axios';
+import axiosInstance from '../../services/axiosInstance';
+import { useSelector } from 'react-redux';
 
 export default function StudentProfile3() {
   const { t } = useTranslation();
+  const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,15 +27,22 @@ export default function StudentProfile3() {
   const [showAllAssignments, setShowAllAssignments] = useState(false);
   const [showAllQuizzes, setShowAllQuizzes] = useState(false);
 
-  const studentId = localStorage.getItem('guestId') || 160;
+  const studentId = user?.id;
 
   useEffect(() => {
     const fetchProfile = async () => {
+      if (!studentId) {
+        setError('Student ID not found. Please log in again.');
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
-        const res = await axios.get(
-          `https://e-learn-v1.runasp.net/api/Student/GetStudentProfile/profile/${studentId}`
+        console.log('StudentProfile3 - Fetching profile for studentId:', studentId);
+        const res = await axiosInstance.get(
+          `/api/Student/GetStudentProfile/profile/${studentId}`
         );
         if (res.data && res.data.succeeded) {
           setProfile(res.data.data);
@@ -41,7 +50,16 @@ export default function StudentProfile3() {
           setError(t('fetch-profile-fail'));
         }
       } catch (err) {
-        setError(t('fetch-profile-fail'));
+        console.error('StudentProfile3 - Error fetching profile:', err);
+        if (err.response?.status === 401) {
+          setError('Authentication failed. Please log in again.');
+        } else if (err.response?.status === 403) {
+          setError('Access denied. You do not have permission to view this profile.');
+        } else if (err.response?.data?.message) {
+          setError(err.response.data.message);
+        } else {
+          setError(t('fetch-profile-fail'));
+        }
       } finally {
         setLoading(false);
       }

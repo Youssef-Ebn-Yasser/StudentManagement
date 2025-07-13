@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Loader from '../Loader/Loader';
 import "./CreateCourse.css";
 import { useSelector } from 'react-redux';
-import axios from 'axios';
+import axiosInstance from '../../services/axiosInstance';
 import { FaFileUpload } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
@@ -113,8 +113,8 @@ const AddMaterial = () => {
         FileName: data.name
       });
 
-      const response = await axios.post(
-        'https://e-learn-v1.runasp.net/api/Material/CreateMaterial/CreateMaterial',
+      const response = await axiosInstance.post(
+        '/api/Material/CreateMaterial/CreateMaterial',
         formData,
         {
           headers: {
