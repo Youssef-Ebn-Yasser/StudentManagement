@@ -187,7 +187,7 @@ public class StudentController : AppControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin,Teacher")]
+    [Authorize(Roles = "Student")]
     [HttpGet("GetAllEnrolledStudentCourses")]
     public async Task<IActionResult> GetAllEnrolledStudentCourses(int studentId)
     {
