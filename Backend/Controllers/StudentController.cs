@@ -1,4 +1,6 @@
-﻿namespace Backend.Controllers;
+﻿using Microsoft.AspNetCore.Authorization;
+
+namespace Backend.Controllers;
 
 [Route("api/[controller]/[action]")]
 [ApiController]
@@ -104,7 +106,7 @@ public class StudentController : AppControllerBase
 
 
 
-
+    [Authorize(Roles = "Admin")]
     [HttpGet("GetAll")]
     public async Task<IActionResult> GetAll()
     {
@@ -120,7 +122,7 @@ public class StudentController : AppControllerBase
         }
     }
 
-
+    [Authorize]
     [HttpGet("GetById/{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -136,7 +138,7 @@ public class StudentController : AppControllerBase
         }
     }
 
-
+    [Authorize]
     [HttpGet("GetByName/{name}")]
     public async Task<IActionResult> GetByName(string name)
     {
@@ -152,7 +154,7 @@ public class StudentController : AppControllerBase
         }
     }
 
-
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpGet("GetAllInCourseByCourseName/{courseName}")]
     public async Task<IActionResult> GetAllInCourseByCourseName(string courseName)
     {
@@ -169,7 +171,7 @@ public class StudentController : AppControllerBase
 
     }
 
-
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpGet("GetPaginatedCourses/{pageNumber}/{pageSize}")]
     public async Task<IActionResult> GetAllInCourseByCourseName(int pageNumber, int pageSize)
     {
@@ -185,6 +187,7 @@ public class StudentController : AppControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpGet("GetAllEnrolledStudentCourses")]
     public async Task<IActionResult> GetAllEnrolledStudentCourses(int studentId)
     {
@@ -200,6 +203,7 @@ public class StudentController : AppControllerBase
         }
     }
 
+    [Authorize]
     [HttpGet("profile/{studentId}")]
     public async Task<IActionResult> GetStudentProfile(int studentId)
     {
@@ -231,6 +235,7 @@ public class StudentController : AppControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpPost("EnrollToCourse")]
     public async Task<IActionResult> EnrollToCourse(StudentEnrollDto studentEnrollDto)
     {
@@ -262,7 +267,7 @@ public class StudentController : AppControllerBase
         }
     }
 
-
+    [Authorize]
     [HttpPut("Update")]
     public async Task<IActionResult> Update(UpdateStudentDto updateStudentDto)
     {
@@ -278,7 +283,7 @@ public class StudentController : AppControllerBase
         }
     }
 
-
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpDelete("Delete/{id}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -294,7 +299,7 @@ public class StudentController : AppControllerBase
         }
     }
 
-
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpDelete("DeleteStudentFromCourse")]
     public async Task<IActionResult> DeleteStudentFromCourse([FromBody] DeleteStudentFromCourseDto deleteStudentFromCourseDto)
     {

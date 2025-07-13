@@ -82,7 +82,10 @@ public class CourseMapping : Profile
                            : null))
             .ForMember(dest => dest.TeacherName,
                        opt => opt.MapFrom(src =>
-                           GeneralLocalizableEntity.Localized(src.Teacher.NameAr, src.Teacher.NameEn)));
+                           GeneralLocalizableEntity.Localized(src.Teacher.NameAr, src.Teacher.NameEn)))
+
+            .ForMember(dest => dest.TeacherId,
+                       opt => opt.MapFrom(src => src.Teacher.Id));
 
         // Lesson → LessonInfo
         CreateMap<Lesson, LessonInfo>()

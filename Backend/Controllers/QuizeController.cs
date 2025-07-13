@@ -1,4 +1,6 @@
-﻿namespace Backend.Controllers;
+﻿using Microsoft.AspNetCore.Authorization;
+
+namespace Backend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -15,11 +17,11 @@ public class QuizeController : AppControllerBase
     #endregion
 
     #region Constructor
-    public QuizeController(IUnitOfWork unitOfWork, 
-                           IMapper mapper, 
-                           IEmailSender emailSender, 
-                           GeminiService geminiService, 
-                           IQuizService service, 
+    public QuizeController(IUnitOfWork unitOfWork,
+                           IMapper mapper,
+                           IEmailSender emailSender,
+                           GeminiService geminiService,
+                           IQuizService service,
                            ApplicationDbContext context,
                            IStructuredLogger logger)
     {
@@ -34,15 +36,16 @@ public class QuizeController : AppControllerBase
     #endregion
 
     #region Method
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpPost("CorrectAnswer")]
     public async Task<IActionResult> CorrectAnswer(int quizeAnserId, [FromBody] List<CorrectQuizDto> dto)
     {
         try
         {
             _logger.LogInfo($"Correcting quiz answer for QuizAnswerId: {quizeAnserId}");
-            
+
             var result = await _service.CorrectQuiz(quizeAnserId, dto);
-            
+
             _logger.LogInfo($"Successfully corrected quiz answer for QuizAnswerId: {quizeAnserId}");
             return NewResult(result);
         }
@@ -58,16 +61,16 @@ public class QuizeController : AppControllerBase
             });
         }
     }
-
+    [Authorize]
     [HttpGet("ToCorrect")]
     public IActionResult GetQuizzesToCorrect([FromQuery] int lessonId)
     {
         try
         {
             _logger.LogInfo($"Getting quizzes to correct for LessonId: {lessonId}");
-            
+
             var result = _service.GetQuizzesToCorrectByLessonId(lessonId);
-            
+
             _logger.LogInfo($"Successfully retrieved {result.Count} quizzes to correct for LessonId: {lessonId}");
             return Ok(result);
         }
@@ -84,15 +87,16 @@ public class QuizeController : AppControllerBase
         }
     }
 
+    [Authorize]
     [HttpGet("StudentAnswers")]
     public async Task<IActionResult> GetStudentAnswers([FromQuery] int studentQuizAnswerId)
     {
         try
         {
             _logger.LogInfo($"Getting student answers for StudentQuizAnswerId: {studentQuizAnswerId}");
-            
+
             var result = await _service.GetStudentQuizAnswer(studentQuizAnswerId);
-            
+
             _logger.LogInfo($"Successfully retrieved student answers for StudentQuizAnswerId: {studentQuizAnswerId}");
             return Ok(result);
         }
@@ -109,13 +113,14 @@ public class QuizeController : AppControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpPost("CreateQuizWithLesson")]
     public async Task<IActionResult> CreateQuizWithLesson([FromBody] CreateQuizeWithQuestionDto dto)
     {
         try
         {
             _logger.LogInfo($"Creating quiz with lesson for LessonId: {dto.LessonId}");
-            
+
             var result = await _service.CreateQuizWithLesson(dto);
 
             _logger.LogInfo($"Successfully created quiz with lesson for LessonId: {dto.LessonId}");
@@ -134,13 +139,14 @@ public class QuizeController : AppControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpPost("CreateQuizWithCourse")]
     public async Task<IActionResult> CreateQuizWithCourse([FromBody] CreateQuizQuestionBankDto dto)
     {
         try
         {
             _logger.LogInfo($"Creating quiz with course for CourseId: {dto.CourseId}");
-            
+
             var result = await _service.CreateQuizWithCourse(dto);
 
             _logger.LogInfo($"Successfully created quiz with course for CourseId: {dto.CourseId}");
@@ -158,14 +164,14 @@ public class QuizeController : AppControllerBase
             });
         }
     }
-
+    [Authorize(Roles = "Student,Teacher")]
     [HttpGet("GetLessonQuizzes/{lessonId}")]
     public async Task<ActionResult<Response<List<LessonQuizListDto>>>> GetLessonQuizzes(int lessonId)
     {
         try
         {
             _logger.LogInfo($"Getting lesson quizzes for LessonId: {lessonId}");
-            
+
             var result = await _service.GetLessonQuizzes(lessonId);
 
             _logger.LogInfo($"Successfully retrieved lesson quizzes for LessonId: {lessonId}");
@@ -183,14 +189,14 @@ public class QuizeController : AppControllerBase
             });
         }
     }
-
+    [Authorize(Roles = "Student,Teacher")]
     [HttpGet("GetQuizById/{quizId}")]
     public async Task<ActionResult<Response<GetQuizeDto>>> GetQuizById(int quizId)
     {
         try
         {
             _logger.LogInfo($"Getting quiz by ID: {quizId}");
-            
+
             var result = await _service.GetQuizById(quizId);
 
             _logger.LogInfo($"Successfully retrieved quiz for QuizId: {quizId}");
@@ -209,13 +215,14 @@ public class QuizeController : AppControllerBase
         }
     }
 
+    [Authorize(Roles = "Student")]
     [HttpPost("SubmitQuiz")]
     public async Task<ActionResult<Response<string>>> SubmitQuiz([FromBody] SubmitQuizDto submission)
     {
         try
         {
             _logger.LogInfo($"Submitting quiz for StudentId: {submission.StudentId}, QuizId: {submission.QuizId}");
-            
+
             // 1. Get student & quiz
             var student = await _context.Users.FindAsync(submission.StudentId);
             if (student == null)
@@ -226,6 +233,22 @@ public class QuizeController : AppControllerBase
                     httpStatusCode = HttpStatusCode.NotFound,
                     Succeeded = false,
                     Massage = "Student not found"
+                });
+            }
+            // if already quiz submited return submited 
+            var submitedQuiz = await _unitOfWork.Repository<StudentQuizeAnswer>()
+                                                               .GetTableNoTracking()
+                                                               .Where(sq => sq.QuizId == submission.QuizId &&
+                                                                                     sq.StudentId == submission.StudentId)
+                                                               .FirstOrDefaultAsync();
+
+            if (submitedQuiz != null)
+            {
+                return BadRequest(new Response<string>
+                {
+                    httpStatusCode = HttpStatusCode.NotFound,
+                    Succeeded = false,
+                    Massage = "Student Submitted already..."
                 });
             }
 
@@ -383,15 +406,16 @@ public class QuizeController : AppControllerBase
         }
     }
 
+    [Authorize]
     [HttpGet("CourseStudentStats")]
     public IActionResult GetCourseStudentStats([FromQuery] int courseId)
     {
         try
         {
             _logger.LogInfo($"Getting course student stats for CourseId: {courseId}");
-            
+
             var result = _service.GetCourseStudentQuizStats(courseId);
-            
+
             _logger.LogInfo($"Successfully retrieved course student stats for CourseId: {courseId}");
             return Ok(result);
         }
@@ -407,21 +431,21 @@ public class QuizeController : AppControllerBase
             });
         }
     }
-
+    [Authorize]
     [HttpGet("StudentCourseStats")]
     public IActionResult GetStudentCourseStats([FromQuery] int studentId, [FromQuery] int courseId)
     {
         try
         {
             _logger.LogInfo($"Getting student course stats for StudentId: {studentId}, CourseId: {courseId}");
-            
+
             var result = _service.GetStudentCourseQuizStats(studentId, courseId);
             if (result == null)
             {
                 _logger.LogInfo($"Student course stats not found for StudentId: {studentId}, CourseId: {courseId}");
                 return NotFound();
             }
-            
+
             _logger.LogInfo($"Successfully retrieved student course stats for StudentId: {studentId}, CourseId: {courseId}");
             return Ok(result);
         }
@@ -437,16 +461,16 @@ public class QuizeController : AppControllerBase
             });
         }
     }
-
+    [Authorize]
     [HttpGet("LessonQuizStats/{lessonId}")]
     public async Task<IActionResult> GetLessonQuizStats(int lessonId)
     {
         try
         {
             _logger.LogInfo($"Getting lesson quiz stats for LessonId: {lessonId}");
-            
+
             var result = await _service.GetLessonQuizStats(lessonId);
-            
+
             _logger.LogInfo($"Successfully retrieved lesson quiz stats for LessonId: {lessonId}");
             return NewResult(result);
         }
@@ -462,16 +486,16 @@ public class QuizeController : AppControllerBase
             });
         }
     }
-
+    [Authorize]
     [HttpGet("CourseLessonQuizStats/{courseId}")]
     public async Task<IActionResult> GetCourseLessonQuizStats(int courseId)
     {
         try
         {
             _logger.LogInfo($"Getting course lesson quiz stats for CourseId: {courseId}");
-            
+
             var result = await _service.GetCourseLessonQuizStats(courseId);
-            
+
             _logger.LogInfo($"Successfully retrieved course lesson quiz stats for CourseId: {courseId}");
             return NewResult(result);
         }

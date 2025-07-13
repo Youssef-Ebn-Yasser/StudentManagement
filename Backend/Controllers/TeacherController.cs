@@ -1,4 +1,5 @@
-﻿using static Backend.Services.Interfaces.ITeacherService;
+﻿using Microsoft.AspNetCore.Authorization;
+using static Backend.Services.Interfaces.ITeacherService;
 
 namespace Backend.Controllers;
 
@@ -35,6 +36,7 @@ public class TeacherController : AppControllerBase
         }
     }
 
+
     [HttpGet("Teacher/All")]
     public async Task<IActionResult> GetAll()
     {
@@ -50,6 +52,7 @@ public class TeacherController : AppControllerBase
         }
     }
 
+
     [HttpGet("Teacher/GetPaginated")]
     public async Task<IActionResult> GetAllPaginated(int pageNumber, int pageSize, enTeacherOrderBy enTeacherOrderBy)
     {
@@ -64,6 +67,7 @@ public class TeacherController : AppControllerBase
             return NewResult(ErrorHappen.ErrorInServer());
         }
     }
+
 
     [HttpGet("Teacher/ByName/{name}")]
     public async Task<IActionResult> GetTeacherByName(string name)
@@ -81,6 +85,7 @@ public class TeacherController : AppControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpPut("Teacher/Update")]
     public async Task<IActionResult> Update(UpdateTeacherDto updateTeacherDto)
     {
@@ -97,6 +102,7 @@ public class TeacherController : AppControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("Teacher/Delete")]
     public async Task<IActionResult> DeleteAll(int id)
     {

@@ -1,4 +1,6 @@
-﻿namespace Backend.Controllers;
+﻿using Microsoft.AspNetCore.Authorization;
+
+namespace Backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -18,6 +20,7 @@ public class ChatRoomsController : AppControllerBase
     #endregion
 
     #region   Methods
+    [Authorize(Roles = "Student,Teacher")]
     [HttpPost("GetChatRoomID")]
     public async Task<ActionResult<ChatRoomDto>> GetChatRoomID(CreateChatRoomDto createDto)
     {
@@ -31,6 +34,7 @@ public class ChatRoomsController : AppControllerBase
             return BadRequest("error happen");
         }
     }
+    [Authorize(Roles = "Student,Teacher")]
     [HttpGet("{id}/messages")]
     public async Task<ActionResult<IEnumerable<MessageDto>>> GetChatMessages(int id)
     {
@@ -44,6 +48,7 @@ public class ChatRoomsController : AppControllerBase
             return BadRequest("error happen");
         }
     }
+    [Authorize(Roles = "Student,Teacher")]
     [HttpGet("student/EnroolWithTeacher")]
     public async Task<ActionResult<IEnumerable<MessageDto>>> StudentWithTeacher(int id)
     {

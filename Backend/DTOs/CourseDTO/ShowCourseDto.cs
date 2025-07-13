@@ -12,6 +12,8 @@ public class ShowCourseDto
     public string? Hours { get; set; }
     public List<LessonInfo>? LessonInfo { get; set; }
 
+    public int TeacherId { get; set; }
+
     public string? CategoryName { get; set; }
 }
 public class LessonInfo

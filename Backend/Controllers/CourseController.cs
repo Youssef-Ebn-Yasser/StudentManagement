@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authorization;
+
 namespace Backend.Controllers;
 
 [ApiController]
@@ -106,6 +108,8 @@ public class CourseController : AppControllerBase
         }
     }
 
+
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpPost("Course/Create")]
     public async Task<IActionResult> Create(CreateCourseDto createCourseDto)
     {
@@ -121,6 +125,7 @@ public class CourseController : AppControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpPut("Course/Update/{id}")]
     public async Task<IActionResult> Update([FromBody] UpdateCourseDto updateCourseDto)
     {
@@ -136,6 +141,7 @@ public class CourseController : AppControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpDelete("Course/Delete/")]
     public async Task<IActionResult> Delete([FromQuery] int id)
     {
