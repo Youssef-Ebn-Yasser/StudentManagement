@@ -378,12 +378,7 @@ const mainRoutes = [
                 isProtected: false,
                 accessRole: 'all',
             },
-            {
-                path: 'become-teacher',
-                element: <TeacherRequest />,
-                isProtected: false,
-                accessRole: 'all',
-            },
+
             {
                 path: 'teacher/dashboard',
                 element: <TeacherDashboard />,
@@ -417,6 +412,12 @@ const mainRoutes = [
             },
             { path: '*', element: <NotFound /> },
         ],
+    },
+    {
+        path: 'become-teacher',
+        element: <TeacherRequest />,
+        isProtected: false,
+        accessRole: 'all',
     },
 ]
 

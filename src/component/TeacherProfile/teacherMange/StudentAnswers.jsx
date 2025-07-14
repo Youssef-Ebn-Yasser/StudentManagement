@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useTranslation } from 'react-i18next';
+import axiosInstance from '../../../services/axiosInstance';
 
 const StudentAnswers = () => {
   const { t } = useTranslation();
@@ -24,7 +24,7 @@ const StudentAnswers = () => {
     try {
       setLoading(true);
       console.log('Fetching answers for ID:', id);
-      const response = await axios.get(`https://e-learn-v1.runasp.net/api/Quize/StudentAnswers`, {
+      const response = await axiosInstance.get(`/api/Quize/StudentAnswers`, {
         params: {
           studentQuizAnswerId: id
         }
@@ -44,7 +44,13 @@ const StudentAnswers = () => {
       }
     } catch (error) {
       console.error('Error fetching student answers:', error);
-      toast.error('Error fetching student answers');
+      if (error.response?.status === 401) {
+        toast.error('Unauthorized: Please log in again');
+      } else if (error.response?.status === 403) {
+        toast.error('Forbidden: You do not have permission to access this resource');
+      } else {
+        toast.error('Error fetching student answers');
+      }
     } finally {
       setLoading(false);
     }
@@ -67,7 +73,7 @@ const StudentAnswers = () => {
 
       console.log('Request Body:', gradesArray);
 
-      const response = await axios.post('https://e-learn-v1.runasp.net/api/Quize/CorrectAnswer', gradesArray, {
+      const response = await axiosInstance.post('/api/Quize/CorrectAnswer', gradesArray, {
         params: {
           quizeAnserId: answerId
         },
@@ -113,10 +119,22 @@ const StudentAnswers = () => {
         message: error.message,
         response: error.response?.data
       });
-      toast.error(error.response?.data?.massage || 'Error submitting grades', {
-        position: "bottom-center",
-        theme: "colored"
-      });
+      if (error.response?.status === 401) {
+        toast.error('Unauthorized: Please log in again', {
+          position: "bottom-center",
+          theme: "colored"
+        });
+      } else if (error.response?.status === 403) {
+        toast.error('Forbidden: You do not have permission to submit grades', {
+          position: "bottom-center",
+          theme: "colored"
+        });
+      } else {
+        toast.error(error.response?.data?.massage || 'Error submitting grades', {
+          position: "bottom-center",
+          theme: "colored"
+        });
+      }
     } finally {
       setGrading(false);
     }
