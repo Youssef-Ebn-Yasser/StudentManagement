@@ -1,31 +1,59 @@
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect } from 'react';
 import { courseService } from '../../../services/courseService';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-
-const AccountSettings = ({ teacherData, onUpdate }) => {
-
+const AccountSettings = ({ onUpdate }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: teacherData?.name || '',
-    age: teacherData?.age || '',
-    specialization: teacherData?.specialization || '',
-    phone: teacherData?.phone || '',
-    education: teacherData?.education || '',
-    additionalInfo: teacherData?.additionalInfo || '',
+    name: '',
+    age: '',
+    specialization: '',
+    phone: '',
+    education: '',
+    additionalInfo: '',
     image: null
   });
-
-  const [previewUrl, setPreviewUrl] = useState(teacherData?.image || null);
-  const [loading, setLoading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState({});
 
   const guestId = localStorage.getItem('guestId');
+  useEffect(() => {
+    const fetchTeacher = async () => {
+      if (!guestId) {
+        setLoading(false);
+        return;
+      }
+      try {
+        setLoading(true);
+        const response = await courseService.getTeacherStats(guestId);
+        if (response.succeeded && response.data) {
+          setFormData({
+            name: response.data.name || '',
+            age: response.data.age || '',
+            specialization: response.data.specialization || '',
+            phone: response.data.phone || '',
+            education: response.data.education || '',
+            additionalInfo: response.data.additionalInfo || '',
+            image: null
+          });
+          setPreviewUrl(response.data.image || null);
+        } else {
+          toast.error(response.message || 'Failed to load teacher data');
+        }
+      } catch (err) {
+        toast.error('Failed to load teacher data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTeacher();
+  }, [guestId]);
+
   if (!guestId) {
-    console.error('guestId is missing. Please log in again.');
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-red-600 text-center">
@@ -33,6 +61,9 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
         </div>
       </div>
     );
+  }
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
   const handleChange = (e) => {

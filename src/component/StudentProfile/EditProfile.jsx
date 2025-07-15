@@ -8,7 +8,7 @@ import {
   FaTimes,
   FaCheckCircle,
 } from 'react-icons/fa';
-import axios from 'axios';
+import axiosInstance from '@/services/axiosInstance';
 
 export default function EditProfile() {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ export default function EditProfile() {
           setLoading(false);
           return;
         }
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://e-learn-v1.runasp.net/api/Student/GetById/GetById/${studentId}`
         );
         if (response.data.succeeded) {
@@ -91,7 +91,7 @@ export default function EditProfile() {
         }
       });
 
-      const response = await axios.put(
+      const response = await axiosInstance.put(
         `https://e-learn-v1.runasp.net/api/Student/Update/Update?Id=${studentId}`,
         formDataToSend,
         {
