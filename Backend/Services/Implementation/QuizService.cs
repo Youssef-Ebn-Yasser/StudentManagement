@@ -789,7 +789,7 @@ public class QuizService : ResponseHandler, IQuizService
                     NumberOfStudentUnder50 = numUnder50,
                     NumberOfStudentOver70 = numOver70,
                     NumberOfStudentWith100 = numWith100,
-                    StudentSubmissions = studentSubmissions
+                    StudentSubmissions = studentSubmissions,
                 });
             }
 

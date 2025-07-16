@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers;
 
@@ -10,14 +11,16 @@ public class StudentController : AppControllerBase
     private readonly IStudentService _studentService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IStructuredLogger _logger;
+    private UserManager<User> _userManager;
     #endregion
 
     #region Constructor
-    public StudentController(IStudentService studentService, IUnitOfWork unitOfWork, IStructuredLogger logger)
+    public StudentController(IStudentService studentService, IUnitOfWork unitOfWork, IStructuredLogger logger, UserManager<User> userManager)
     {
         _studentService = studentService;
         _unitOfWork = unitOfWork;
         _logger = logger;
+        _userManager = userManager;
     }
     #endregion
 
@@ -313,6 +316,100 @@ public class StudentController : AppControllerBase
             _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
             return NewResult(ErrorHappen.ErrorInServer());
         }
+    }
+
+
+
+    [HttpGet("download/sample")]
+    public IActionResult DownloadExcel()
+    {
+        using var workbook = new XLWorkbook();
+        var worksheet = workbook.Worksheets.Add("Employees");
+
+        // Add headers
+        worksheet.Cell(1, 1).Value = "NameAr";
+        worksheet.Cell(1, 2).Value = "NameEn";
+        worksheet.Cell(1, 3).Value = "Email";
+        worksheet.Cell(1, 4).Value = "NationalId";
+        worksheet.Cell(1, 5).Value = "password";
+        worksheet.Cell(1, 6).Value = "Phone"; worksheet.Cell(1, 1).Value = "Name";
+        worksheet.Cell(1, 7).Value = "AddressAr";
+        worksheet.Cell(1, 8).Value = "AddressEn";
+        worksheet.Cell(1, 9).Value = "GovernmentAr";
+        worksheet.Cell(1, 10).Value = "GovernmentEn";
+
+        // Add data for first 3 rows
+        // Row 2
+        worksheet.Cell(2, 1).Value = "أحمد علي";
+        worksheet.Cell(2, 2).Value = "Ahmed Ali";
+        worksheet.Cell(2, 3).Value = "ahmed.ali@example.com";
+        worksheet.Cell(2, 4).Value = "29807153400213";
+        worksheet.Cell(2, 5).Value = "Pass123!";
+        worksheet.Cell(2, 6).Value = "01012345678";
+        worksheet.Cell(2, 7).Value = "شارع التحرير";
+        worksheet.Cell(2, 8).Value = "Tahrir Street";
+        worksheet.Cell(2, 9).Value = "القاهرة";
+        worksheet.Cell(2, 10).Value = "Cairo";
+
+        // Row 3
+        worksheet.Cell(3, 1).Value = "سارة محمد";
+        worksheet.Cell(3, 2).Value = "Sara Mohamed";
+        worksheet.Cell(3, 3).Value = "sara.m@example.com";
+        worksheet.Cell(3, 4).Value = "29901122300451";
+        worksheet.Cell(3, 5).Value = "Welcome1!";
+        worksheet.Cell(3, 6).Value = "01098765432";
+        worksheet.Cell(3, 7).Value = "شارع النيل";
+        worksheet.Cell(3, 8).Value = "Nile Street";
+        worksheet.Cell(3, 9).Value = "الجيزة";
+        worksheet.Cell(3, 10).Value = "Giza";
+
+        // Export to memory stream
+        var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        stream.Position = 0;
+
+        var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        var fileName = "StudentsSample.xlsx";
+
+        return File(stream, contentType, fileName);
+    }
+
+    public class StudentExcelDto
+    {
+        public string? NameAr { get; set; }
+        public string? NameEn { get; set; }
+        public string Email { get; set; }
+        public string NationalId { get; set; }
+        public string Password { get; set; }
+        public string? Phone { get; set; }
+        public string? AddressAr { get; set; }
+        public string? AddressEn { get; set; }
+        public string? GovernmentAr { get; set; }
+        public string? GovernmentEn { get; set; }
+    }
+
+
+    [HttpPost("upload")]
+    public async Task<IActionResult> UploadExcel(IFormFile file)
+    {
+        try
+        {
+            var result = await _studentService.SaveFromExcel(file);
+            return NewResult(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
+    }
+
+    private async Task<bool> isEmailExist(string email)
+    {
+        var userExists = await _unitOfWork.Repository<User>().GetTableNoTracking().FirstOrDefaultAsync(u => u.Email == email);
+
+        if (userExists != null && userExists.UserType == "Student") return true;
+        return false;
     }
     #endregion
 }

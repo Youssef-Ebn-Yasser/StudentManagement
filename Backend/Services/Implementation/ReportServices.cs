@@ -16,11 +16,11 @@ namespace Backend.Services.Implementation
         public async Task<List<AverageAssignmentScoreDto>> GetAverageStudentScoresAsync()
         {
             var data = await _context.StudentAssignments
-                                     .GroupBy(s => new { s.StudentId, s.TitleEn })
+                                     .GroupBy(s => new { s.StudentId, s.Student.NameEn })
                                      .Select(g => new AverageAssignmentScoreDto
                                      {
                                          StudentId = g.Key.StudentId,
-                                         StudentName = $"{g.Key}",
+                                         StudentName = $"{g.Key.NameEn}",
                                          AverageScore = g.Average(x => x.DegreePercentage)
                                      })
         .ToListAsync();

@@ -99,5 +99,5 @@ public class LessonController : AppControllerBase
             return NewResult(ErrorHappen.ErrorInServer());
         }
     }
+    #endregion
 }
-#endregion
