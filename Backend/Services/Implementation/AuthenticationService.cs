@@ -50,7 +50,7 @@ public class AuthenticationService : IAuthenticationService
     #region Method
     public async Task<Response<TokenDto>> LoginAsync(LoginDto model)
     {
-        //var user = await _userManager.FindByEmailAsync(model.Email);
+        // var user = await _userManager.FindByEmailAsync(model.Email);
         var user = await _unitOfWork.Repository<User>().GetTableNoTracking().FirstOrDefaultAsync(u => u.Email == model.Email && u.IsDeleted == false);
         if (user == null)
         {
@@ -353,7 +353,6 @@ public class AuthenticationService : IAuthenticationService
             IsUsed = false,
             IsRevoked = false,
             CreatedAt = DateTime.Now,
-
         };
 
         // Save to database

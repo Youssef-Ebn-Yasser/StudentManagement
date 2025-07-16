@@ -1,12 +1,10 @@
-﻿using System.Security.Cryptography;
-
-namespace Backend.Entities;
+﻿namespace Backend.Entities;
 public class Student : User
 {
     public string? ImageUrl { get; set; }
     public string? Phone { get; set; }
     [Required]
-    public string NationalId { get; set; } 
+    public string NationalId { get; set; }
     public string? AddressAr { get; set; }
     public string? AddressEn { get; set; }
 
@@ -28,9 +26,4 @@ public class Student : User
         return number;
     }
 
-
-
 }
-
-
-

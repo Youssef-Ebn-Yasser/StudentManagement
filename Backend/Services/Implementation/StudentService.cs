@@ -1,4 +1,5 @@
-﻿
+﻿using ClosedXML.Excel;
+
 namespace Backend.Services.Implementation;
 
 public class StudentService : ResponseHandler, IStudentService
@@ -8,23 +9,62 @@ public class StudentService : ResponseHandler, IStudentService
     private readonly IMapper _mapper;
     private readonly IPhysicalFileUpload _physicalFileUpload;
     private readonly IStructuredLogger _logger;
+    private UserManager<User> _userManager;
     CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+    private ApplicationDbContext _ApplicationDbContext;
     #endregion
 
     #region Constructor
     public StudentService(IUnitOfWork unitOfWork,
                           IMapper mapper,
                           IPhysicalFileUpload physicalFileUpload,
-                          IStructuredLogger logger)
+                          IStructuredLogger logger,
+                          UserManager<User> userManager,
+                          ApplicationDbContext applicationDbContext)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _physicalFileUpload = physicalFileUpload;
         _logger = logger;
+        _userManager = userManager;
+        _ApplicationDbContext = applicationDbContext;
     }
     #endregion
 
     #region Handle Methods
+    public async Task<Response<string>> SaveFromExcel(IFormFile file)
+    {
+        var response = new Response<string>();
+
+        var (isSuccess, message, students, users) = await FetchDataFromExcel(file);
+
+        if (!isSuccess || users == null || students == null)
+        {
+            response.Massage = message;
+            response.httpStatusCode = HttpStatusCode.BadRequest;
+
+            return response;
+        }
+
+        (isSuccess, response) = await SaveStudents(response, users);
+        isSuccess = await UpdateStudentData(students);
+
+
+        if (!isSuccess)
+        {
+            response.httpStatusCode = HttpStatusCode.BadRequest;
+            response.Massage = "Error happen show errors...";
+
+            return response;
+        }
+        else
+        {
+            response.httpStatusCode = HttpStatusCode.Created;
+            response.Massage = "Create all Success";
+            response.Succeeded = true;
+            return response;
+        }
+    }
     public async Task<Response<List<ShowStudentDto>>> GetAllAsync()
     {
         var students = await _unitOfWork.Repository<Student>()
@@ -230,7 +270,7 @@ public class StudentService : ResponseHandler, IStudentService
         var newStudent = _mapper.Map<Student>(createStudent);
 
 
-
+        newStudent.UserType = "Student";
         await _unitOfWork.Repository<Student>().AddAsync(newStudent);
         var result = _unitOfWork.Complete();
 
@@ -418,8 +458,7 @@ public class StudentService : ResponseHandler, IStudentService
         return student;
     }
     private async Task<Student> _studentExistById(int id) =>
-await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => s.Id == id);
-
+    await _unitOfWork.Repository<Student>().GetTableAsTracking().FirstOrDefaultAsync(s => s.Id == id);
 
     public async Task<Response<StudentProfDTO>> GetStudentProfileAsync(int studentId)
     {
@@ -528,5 +567,121 @@ await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync
             })
             .ToListAsync();
     }
+    private async Task<bool> isEmailExist(string email)
+    {
+        var userExists = await _unitOfWork.Repository<User>().GetTableNoTracking().FirstOrDefaultAsync(u => u.Email == email);
+
+        if (userExists != null && userExists.UserType == "Student") return true;
+        return false;
+    }
+    private async Task<(bool, string, List<Student>?, List<User>?)> GetStudentAndUserList(IEnumerable<IXLRangeRow> rows)
+    {
+        var students = new List<Student>();
+        var users = new List<User>();
+
+        foreach (var row in rows)
+        {
+            if (await isEmailExist(row.Cell(3).GetString()))
+                return (false, $"this email is already exist {row.Cell(3).GetString()}", null, null);
+
+            var student = new Student
+            {
+                NameAr = row.Cell(1).GetString(),
+                NameEn = row.Cell(2).GetString(),
+                Email = row.Cell(3).GetString(),
+                NationalId = row.Cell(4).GetString(),
+                Phone = row.Cell(6).GetString(),
+                AddressAr = row.Cell(7).GetString(),
+                AddressEn = row.Cell(8).GetString(),
+                GovernmentAr = row.Cell(9).GetString(),
+                GovernmentEn = row.Cell(10).GetString(),
+            };
+
+            Random rand = new Random();
+            var user = new User
+            {
+                NameAr = row.Cell(1).GetString(),
+                NameEn = row.Cell(2).GetString(),
+                Email = row.Cell(3).GetString(),
+                UserName = rand.Next(100000).ToString(),
+                UserType = "Student",
+            };
+
+            users.Add(user);
+            students.Add(student);
+        }
+
+        return (true, "Success", students, users);
+    }
+    private async Task<(bool, string, List<Student>?, List<User>?)> FetchDataFromExcel(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return (false, "No file uploaded.", null, null);
+
+        using var stream = new MemoryStream();
+        await file.CopyToAsync(stream);
+        stream.Position = 0;
+
+        using var workbook = new XLWorkbook(stream);
+        var worksheet = workbook.Worksheet(1); // first worksheet
+        IEnumerable<IXLRangeRow>? rows = worksheet.RangeUsed()?.RowsUsed().Skip(1); // Skip header
+
+        if (rows is null) return (false, "Enter a valid sheet", null, null);
+
+        return await GetStudentAndUserList(rows);
+    }
+
+    private async Task<(bool, Response<string>)> SaveStudents(Response<string> response, List<User> users)
+    {
+        var success = true;
+
+        foreach (var user in users)
+        {
+            var result = await _userManager.CreateAsync(user, "123_Abc");
+            await _userManager.AddToRoleAsync(user, "Student");
+            if (!result.Succeeded)
+            {
+                response.Errors?.Add($"this student with this email {user.Email} not  added error occure");
+                success = false;
+            }
+        }
+
+        return (success, response);
+    }
+
+    private async Task<bool> UpdateStudentData(List<Student> students)
+    {
+        var success = true;
+
+        // Detach all entities
+        var entries = _ApplicationDbContext.ChangeTracker.Entries().ToList();
+        foreach (var entry in entries)
+        {
+            entry.State = EntityState.Detached;
+        }
+
+        foreach (var student in students)
+        {
+            var updatedStudent = await _unitOfWork.Repository<Student>()
+                                                         .GetTableAsTracking()
+                                                         .FirstOrDefaultAsync(s => s.Email == student.Email);
+            if (updatedStudent == null)
+            {
+                // response.Errors?.Add($"this student with this email {student.Email} can not  Updated");
+                success = false;
+                continue;
+            }
+            updatedStudent.NationalId = student.NationalId;
+            updatedStudent.Phone = student.Phone;
+            updatedStudent.AddressEn = student.AddressEn;
+            updatedStudent.AddressAr = student.AddressAr;
+            updatedStudent.GovernmentAr = student.GovernmentAr;
+            updatedStudent.GovernmentEn = student.GovernmentEn;
+
+        }
+        _unitOfWork.Complete();
+
+        return success;
+    }
+    #endregion
 }
-#endregion

@@ -126,8 +126,8 @@ public class CourseController : AppControllerBase
     }
 
     [Authorize(Roles = "Admin,Teacher")]
-    [HttpPut("Course/Update/{id}")]
-    public async Task<IActionResult> Update([FromBody] UpdateCourseDto updateCourseDto)
+    [HttpPut("Course/Update")]
+    public async Task<IActionResult> Update(UpdateCourseDto updateCourseDto)
     {
         try
         {
