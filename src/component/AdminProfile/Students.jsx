@@ -4,11 +4,11 @@ import { allStudent } from '@/Redux/features/allStudents/allStudents'
 import stuImg from '../../assets/audience.png'
 import Loader from '../Loader/Loader'
 import studentImg from '../../assets/student.png'
-import axios from 'axios'
+import axiosInstance from '@/services/axiosInstance'
 import toast from 'react-hot-toast'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-
+import UploadStudentExcel from './UploadStudentExcel';
 
 
 function Students() {
@@ -34,7 +34,7 @@ function Students() {
       }):[];
 
     async function handleRemovestudent(id) {
-        axios.delete(`https://e-learn-v1.runasp.net/api/Student/Delete/Delete/${id}`)
+        axiosInstance.delete(`https://e-learn-v1.runasp.net/api/Student/Delete/Delete/${id}`)
         .then((response)=>{
             toast.success('Student Deleted')
             console.log("Student deleted");
@@ -49,7 +49,7 @@ function Students() {
     }
 
     async function handleEnrolledCourse(studentId){
-        axios.get('https://e-learn-v1.runasp.net/api/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses',{
+        axiosInstance.get('https://e-learn-v1.runasp.net/api/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses',{
             params: { studentId }
         }).then(response => {
             console.log(`Courses for student ${studentId}:`, response.data);
@@ -82,6 +82,11 @@ function Students() {
                     <img src={stuImg} alt="Students Icon" className='w-8 h-8 mr-3' />
                     {t("our-stu")}
                 </h1>
+
+                {/* Excel Upload Section */}
+                <div className="mb-8">
+                  <UploadStudentExcel />
+                </div>
 
                 {/* Search Section */}
                 <div className="mb-8 p-4 bg-white rounded-lg shadow-md flex flex-col sm:flex-row items-center gap-4">
