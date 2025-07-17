@@ -319,12 +319,12 @@ public class StudentController : AppControllerBase
     }
 
 
-
+    [Authorize(Roles = "Admin")]
     [HttpGet("download/sample")]
     public IActionResult DownloadExcel()
     {
         using var workbook = new XLWorkbook();
-        var worksheet = workbook.Worksheets.Add("Employees");
+        var worksheet = workbook.Worksheets.Add("StudentsSample");
 
         // Add headers
         worksheet.Cell(1, 1).Value = "NameAr";
@@ -374,21 +374,8 @@ public class StudentController : AppControllerBase
         return File(stream, contentType, fileName);
     }
 
-    public class StudentExcelDto
-    {
-        public string? NameAr { get; set; }
-        public string? NameEn { get; set; }
-        public string Email { get; set; }
-        public string NationalId { get; set; }
-        public string Password { get; set; }
-        public string? Phone { get; set; }
-        public string? AddressAr { get; set; }
-        public string? AddressEn { get; set; }
-        public string? GovernmentAr { get; set; }
-        public string? GovernmentEn { get; set; }
-    }
 
-
+    [Authorize(Roles = "Admin")]
     [HttpPost("upload")]
     public async Task<IActionResult> UploadExcel(IFormFile file)
     {
@@ -402,14 +389,6 @@ public class StudentController : AppControllerBase
             _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
             return NewResult(ErrorHappen.ErrorInServer());
         }
-    }
-
-    private async Task<bool> isEmailExist(string email)
-    {
-        var userExists = await _unitOfWork.Repository<User>().GetTableNoTracking().FirstOrDefaultAsync(u => u.Email == email);
-
-        if (userExists != null && userExists.UserType == "Student") return true;
-        return false;
     }
     #endregion
 }
