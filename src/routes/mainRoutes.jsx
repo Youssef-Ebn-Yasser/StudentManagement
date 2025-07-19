@@ -349,6 +349,12 @@ const mainRoutes = [
                 accessRole: 'all',
             },
             {
+                path: 'admin/controlCourse/:id',
+                element: <ControlCourse />,
+                isProtected: false,
+                accessRole: 'all',
+            },
+            {
                 path: 'admin/controlCourse',
                 element: <ControlCourse />,
                 isProtected: false,
