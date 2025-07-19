@@ -42,7 +42,15 @@ function AddTeacher() {
 
 
     async function handleRemoveTeacher(id) {
-        axios.delete(`https://e-learn-v1.runasp.net/api/Teacher/Teacher/Delete?id=${id}`)
+        const token = localStorage.getItem('token') || localStorage.getItem('JWTToken');
+        axios.delete(
+          `https://e-learn-v1.runasp.net/api/Teacher/Teacher/Delete?id=${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            }
+          }
+        )
         .then((response)=>{
             console.log(response);
             console.log("Teacher deleted");
@@ -52,8 +60,6 @@ function AddTeacher() {
             console.log(error||'invalid id');
             toast.error('Invalid Id')
         })
-        
-        
     }
     
     let validationSchema=Yup.object({
