@@ -54,7 +54,7 @@ export default function Teachers() {
       <h1 className="text-3xl font-bold mb-8">Our Teachers</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {teachers.map((teacher) => (
-          <div key={teacher.id} className="bg-white rounded-lg shadow-md p-6">
+          <div key={teacher.id} className="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-xl transition" onClick={() => window.location.href = `/courses/teacher/${teacher.id}`}>
             <div className="flex items-center space-x-4">
               <img
                 src={teacher.image || '../../../public/teacher-photo.avif'}

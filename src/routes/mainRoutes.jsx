@@ -265,7 +265,7 @@ const mainRoutes = [
                 accessRole: 'all',
             },
             {
-                path: 'courses/teacher/:teacherName',
+                path: 'courses/teacher/:teacherId',
                 element: <TeacherProfileView />,
                 isProtected: false,
                 accessRole: 'all',

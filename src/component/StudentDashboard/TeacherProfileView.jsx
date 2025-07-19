@@ -6,7 +6,7 @@ import Loader from '../Loader/Loader';
 import toast from 'react-hot-toast';
 
 const TeacherProfileView = () => {
-  const { teacherName } = useParams();
+  const { teacherId } = useParams();
   const navigate = useNavigate();
   const [teacher, setTeacher] = useState(null);
   const [courses, setCourses] = useState([]);
@@ -20,7 +20,7 @@ const TeacherProfileView = () => {
         setError(null);
 
         // Fetch teacher profile by name
-        const teacherResponse = await axios.get(`https://e-learn-v1.runasp.net/api/Teacher/Teacher/ByName/${teacherName}`);
+        const teacherResponse = await axios.get(`https://e-learn-v1.runasp.net/api/Teacher/Teacher/ById/${teacherId}`);
         console.log('Teacher Response:', teacherResponse.data);
         if (!teacherResponse.data.succeeded) {
           throw new Error(teacherResponse.data.message || 'Failed to load teacher information');
@@ -48,7 +48,7 @@ const TeacherProfileView = () => {
     };
 
     fetchTeacherData();
-  }, [teacherName]);
+  }, [teacherId]);
 
   // Add console log to check courses state
   useEffect(() => {
