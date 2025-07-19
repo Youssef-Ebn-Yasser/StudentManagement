@@ -26,6 +26,34 @@ export default function StudentDashboard() {
 
   const navigate = useNavigate();
 
+  // Function to get teacher ID by name
+  const getTeacherIdByName = async (teacherName) => {
+    try {
+      const response = await axiosInstance.get('/api/Teacher/Teacher/All');
+      if (response.data.succeeded && response.data.data) {
+        const teacher = response.data.data.find(t => 
+          t.name && t.name.toLowerCase() === teacherName.toLowerCase()
+        );
+        return teacher ? teacher.id : null;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error fetching teacher ID by name:', error);
+      return null;
+    }
+  };
+
+  // Function to handle teacher navigation
+  const handleTeacherNavigation = async (teacherName) => {
+    const teacherId = await getTeacherIdByName(teacherName);
+    if (teacherId) {
+      navigate(`/courses/teacher/${teacherId}`);
+    } else {
+      console.error('Could not find teacher ID for:', teacherName);
+      // Fallback: show an error or navigate to a different page
+    }
+  };
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
@@ -186,7 +214,7 @@ export default function StudentDashboard() {
                 <div
                   key={teacherName + idx}
                   className="bg-white rounded-xl p-6 flex items-center shadow-lg cursor-pointer hover:shadow-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:border-indigo-400 border-2 border-transparent"
-                  onClick={() => navigate(`/courses/teacher/${teacherName}`)}
+                  onClick={async () => await handleTeacherNavigation(teacherName)}
                 >
                   <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-extrabold text-2xl mr-5 flex-shrink-0">
                     {teacherName
@@ -315,7 +343,7 @@ export default function StudentDashboard() {
                 <div
                   key={teacherName + idx}
                   className="bg-white rounded-xl p-6 flex items-center shadow-lg cursor-pointer hover:shadow-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:border-indigo-400 border-2 border-transparent"
-                  onClick={() => navigate(`/courses/teacher/${teacherName}`)}
+                  onClick={async () => await handleTeacherNavigation(teacherName)}
                 >
                   <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-extrabold text-2xl mr-5 flex-shrink-0">
                     {teacherName

@@ -251,7 +251,7 @@ export default function CoursesDetails() {
                   <span className="ml-1 text-gray-600">
                     {t("Teachers")}:{' '}
                     <button
-                      onClick={() => navigate(`/courses/teacher/${course.teacherName}`)}
+                      onClick={() => navigate(`/courses/teacher/${course.teacherId}`)}
                       className="text-blue-600 hover:text-blue-800 hover:underline"
                     >
                       {course.teacherName || 'Not specified'}

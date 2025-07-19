@@ -47,7 +47,7 @@ function AddCourse() {
             }
           }
         )
-        .then((response)=>{            
+            .then((response)=>{            
             toast.success('Course Added Successfully!')
             dispatch(allCourses())
             formik.resetForm()
