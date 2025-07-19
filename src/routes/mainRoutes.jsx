@@ -57,7 +57,7 @@ import AllSliders from '@/component/AdminProfile/AllSliders'
 import Translate from '@/component/Translate/Translate'
 import ResetPassword from '@/component/ResetPassword/ResetPassword'
 import NotFound from '../component/NotFound/NotFound'
-
+import Attendance from '@/component/Attendance/Attendance'
 
 
 const mainRoutes = [
@@ -87,6 +87,12 @@ const mainRoutes = [
             {
                 path: 'about',
                 element: <About />,
+                isProtected: false,
+                accessRole: 'all',
+            },
+            {
+                path: 'teacher/attendance',
+                element: <Attendance />,
                 isProtected: false,
                 accessRole: 'all',
             },
@@ -151,7 +157,7 @@ const mainRoutes = [
                 accessRole: 'all',
             },
             {
-                path: 'studentprofile',
+                path: 'studentprofileee',
                 element: <StudentProfile />,
                 isProtected: false,
                 accessRole: 'all',
@@ -163,7 +169,7 @@ const mainRoutes = [
                 accessRole: 'all',
             },
             {
-                path: 'studentprofileee',
+                path: 'studentprofile',
                 element: <StudentProfile3 />,
                 isProtected: false,
                 accessRole: 'all',

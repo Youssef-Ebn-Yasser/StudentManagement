@@ -242,14 +242,14 @@ const TChatRoom = () => {
     }, [messages]);
 
     function getMessageAlignment(msg, currentUserId) {
-  // Returns the correct Tailwind classes for alignment and color
-  if (msg.senderId === currentUserId || msg.SenderId === currentUserId) {
-    // Sender (teacher): blue, right
-    return "self-end bg-blue-500 text-white shadow-md";
-  } else {
-    // Receiver (student): grey, left
-    return "mr-auto bg-gray-200 text-gray-800 shadow-sm";
-  }
+    // Returns the correct Tailwind classes for alignment and color
+    if (msg.senderId === currentUserId || msg.SenderId === currentUserId) {
+        // Sender (teacher): blue, right
+        return "self-end bg-blue-500 text-white shadow-md";
+    } else {
+        // Receiver (student): grey, left
+        return "mr-auto bg-gray-200 text-gray-800 shadow-sm";
+    }
 }
 
     // --- Send Message Function ---
@@ -292,7 +292,7 @@ const TChatRoom = () => {
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                             </span>
-                            Connected to Chat (Room ID: {chatRoomId})
+                            Connected to Chat
                         </span>
                     ) : (
                         <span className="text-red-500 flex items-center justify-center space-x-2">
@@ -304,11 +304,11 @@ const TChatRoom = () => {
                     )}
                 </div>
 
-                {/* User Identity Display */}
+                {/* User Identity Display - Removed ID display */}
                 {currentUserId && currentUserName && (
                     <div className="flex items-center justify-center mb-4 text-gray-700 text-lg font-semibold">
                         <FaUserCircle className="text-blue-500 mr-2 text-2xl" />
-                        You are: <span className="ml-1 text-blue-700">{currentUserName} (ID: {currentUserId})</span>
+                        You are: <span className="ml-1 text-blue-700">{currentUserName}</span>
                     </div>
                 )}
 
