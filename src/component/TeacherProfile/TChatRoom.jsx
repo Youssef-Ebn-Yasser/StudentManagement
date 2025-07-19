@@ -196,7 +196,7 @@ const TChatRoom = () => {
             }
 
             const teacherUserId = parseInt(user.id, 10);
-            const teacherUserName = user.name || user.userName || `Teacher ${teacherUserId}`;
+            const teacherUserName = user.name || user.userName || `Teacher `;
 
             // Validate the teacher's ID from Redux store (current user)
             if (isNaN(teacherUserId) || teacherUserId <= 0) {
