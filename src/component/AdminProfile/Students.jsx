@@ -6,15 +6,17 @@ import Loader from '../Loader/Loader'
 import studentImg from '../../assets/student.png'
 import axiosInstance from '@/services/axiosInstance'
 import toast from 'react-hot-toast'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import UploadStudentExcel from './UploadStudentExcel';
+import EnrollStudentCourse from './EnrollStudentCourse';
 
 
 function Students() {
 
     const { t } = useTranslation();
     let dispatch= useDispatch()
+    const navigate = useNavigate();
     const [enrolledCourse, setEnrolledCourse]= useState({})
     const {students,loading}= useSelector((state)=>state.allStudents)
     let [searchItem, setSearchItem]=useState('')
@@ -82,6 +84,17 @@ function Students() {
                     <img src={stuImg} alt="Students Icon" className='w-8 h-8 mr-3' />
                     {t("our-stu")}
                 </h1>
+
+                {/* Enroll Student Button */}
+                <div className="mb-6 flex justify-end">
+                    <button
+                        onClick={() => navigate('/enrollment')}
+                        className="bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center gap-2"
+                    >
+                        <i className="fas fa-user-plus"></i>
+                        {t("enroll-student-to-course") || "Enroll Student to Course"}
+                    </button>
+                </div>
 
                 {/* Excel Upload Section */}
                 <div className="mb-8">
