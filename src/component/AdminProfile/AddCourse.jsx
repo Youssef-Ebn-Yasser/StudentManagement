@@ -37,7 +37,16 @@ function AddCourse() {
         const formData = new FormData();
         formData.append("image", formsData.image);
         
-        axios.post(`https://e-learn-v1.runasp.net/Course/Create?${params.toString()}`, formData)
+        const token = localStorage.getItem('token') || localStorage.getItem('JWTToken');
+        axios.post(
+          `https://e-learn-v1.runasp.net/Course/Create?${params.toString()}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            }
+          }
+        )
             .then((response)=>{            
             toast.success('Course Added Successfully!')
             dispatch(allCourses())
@@ -53,7 +62,15 @@ function AddCourse() {
     }
 
     async function handleRemoveCourse(id) {
-        axios.delete(`https://e-learn-v1.runasp.net/Course/Delete?id=${id}`)
+        const token = localStorage.getItem('token') || localStorage.getItem('JWTToken');
+        axios.delete(
+          `https://e-learn-v1.runasp.net/Course/Delete?id=${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            }
+          }
+        )
         .then((response)=>{
             console.log("Course deleted");
             toast.success('Course Deleted')
@@ -61,10 +78,7 @@ function AddCourse() {
         }).catch((error)=>{
             console.log(error||'invalid id');
             toast.error(error.response?.data?.message || 'Failed to delete course.')
-            
         })
-        
-        
     }
 
     let formik = useFormik({

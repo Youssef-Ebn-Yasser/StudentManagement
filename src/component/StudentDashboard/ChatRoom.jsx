@@ -55,9 +55,14 @@ const ChatRoom = () => {
       setLoading(true);
       setError(null);
       console.log(`Attempting to get/create chat room for Student ID: ${studentIdNum} (will send as string), Teacher ID: ${teacherIdNum} (will send as string)`);
+      const token = localStorage.getItem('token') || localStorage.getItem('JWTToken');
       const response = await axios.post(GET_CHAT_ROOM_ID_API, {
         studentId: String(studentIdNum),
         teacherId: String(teacherIdNum),
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
       });
 
       if (response.data.succeeded) {
@@ -97,7 +102,12 @@ const ChatRoom = () => {
   const loadHistoricalMessages = useCallback(async (roomId) => {
     if (!roomId) return;
     try {
-      const response = await axios.get(`${GET_MESSAGES_API_BASE}/${roomId}/messages`);
+      const token = localStorage.getItem('token') || localStorage.getItem('JWTToken');
+      const response = await axios.get(`${GET_MESSAGES_API_BASE}/${roomId}/messages`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
       if (response.data.succeeded) {
         setMessages(response.data.data || []);
       } else {

@@ -271,7 +271,7 @@ const mainRoutes = [
                 accessRole: 'all',
             },
             {
-                path: 'courses/teacher/:teacherName',
+                path: 'courses/teacher/:teacherId',
                 element: <TeacherProfileView />,
                 isProtected: false,
                 accessRole: 'all',
@@ -351,6 +351,12 @@ const mainRoutes = [
             {
                 path: 'admin/reg-admin',
                 element: <RegisterAdmin />,
+                isProtected: false,
+                accessRole: 'all',
+            },
+            {
+                path: 'admin/controlCourse/:id',
+                element: <ControlCourse />,
                 isProtected: false,
                 accessRole: 'all',
             },
