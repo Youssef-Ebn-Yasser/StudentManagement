@@ -479,28 +479,37 @@ export const courseService = {
       // Validate required fields
       if (!teacherData.Id) throw new Error('Teacher ID is required');
       if (!teacherData.Name?.trim()) throw new Error('Name is required');
-      if (!teacherData.Specialization?.trim()) throw new Error('Specialization is required');
-      if (!teacherData.Phone?.trim()) throw new Error('Phone number is required');
-      if (!teacherData.Phone.match(/^\+?[1-9]\d{1,14}$/)) throw new Error('Invalid phone number format');
 
-      // Create FormData object
-      const formData = new FormData();
-      formData.append('Id', teacherData.Id);
-      formData.append('Name', teacherData.Name.trim());
-      formData.append('Age', teacherData.Age || '');
-      formData.append('Specialization', teacherData.Specialization.trim());
-      formData.append('Phone', teacherData.Phone.trim());
-      
-      // Add image if provided
-      if (teacherData.Image) {
-        formData.append('Image', teacherData.Image);
+      // Create query parameters like the working example
+      const params = new URLSearchParams();
+      params.append('Id', teacherData.Id);
+      params.append('Name', teacherData.Name.trim());
+      if (teacherData.Age !== null && teacherData.Age !== undefined) {
+        params.append('Age', teacherData.Age.toString());
+      }
+      if (teacherData.Specialization) {
+        params.append('Specialization', teacherData.Specialization);
+      }
+      if (teacherData.Phone) {
+        params.append('Phone', teacherData.Phone);
+      }
+      if (teacherData.Education) {
+        params.append('Education', teacherData.Education);
+      }
+      if (teacherData.AdditionalInfo) {
+        params.append('AdditionalInfo', teacherData.AdditionalInfo);
       }
 
-      const response = await axiosInstance.put('/api/Teacher/Teacher/Update', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        }
+      // Log data being sent for debugging
+      console.log('Sending teacher update data:', {
+        Id: teacherData.Id,
+        Name: teacherData.Name.trim(),
+        Age: teacherData.Age,
+        Education: teacherData.Education,
+        AdditionalInfo: teacherData.AdditionalInfo
       });
+
+      const response = await axiosInstance.put(`/api/Teacher/Teacher/Update?${params.toString()}`);
       
       return response.data;
     } catch (error) {
@@ -508,8 +517,15 @@ export const courseService = {
         console.error('Update failed:', {
           status: error.response.status,
           data: error.response.data,
-          headers: error.response.headers
+          headers: error.response.headers,
+          message: error.response.data?.message,
+          errors: error.response.data?.errors
         });
+        
+        // Don't throw authentication errors that might cause logout
+        if (error.response.status === 401) {
+          throw new Error('Authentication failed. Please log in again.');
+        }
         
         const errorMessage = error.response.data?.message || 
                            error.response.data?.error || 

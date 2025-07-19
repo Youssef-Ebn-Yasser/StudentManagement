@@ -1,5 +1,5 @@
 import { logout } from '../../Redux/auth/authSlice';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import img from '../../assets/avatar.png'; // Import the logo image
@@ -8,6 +8,7 @@ import styles from './Navbar.module.css'; // Import the CSS module
 import SearchBar from './SearchBar';
 import { useTranslation } from 'react-i18next';
 import Translate from '../Translate/Translate';
+import { authStorage } from '@/utils/authStorage';
 
 function Navbar() {
 
@@ -21,6 +22,8 @@ function Navbar() {
     const { t } = useTranslation();
     const { i18n } = useTranslation();
     const isRTL = i18n.dir() === 'rtl';
+    const menuRef = useRef(null);
+    const buttonRef = useRef(null);
 
     const toggleNotification = () => {
         setIsNotificationVisible(!isNotificationVisible);
@@ -30,20 +33,44 @@ function Navbar() {
         setIsMenuOpen(!isMenuOpen);
     };
 
+    const closeMenu = () => {
+        setIsMenuOpen(false);
+    };
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (isMenuOpen && 
+                menuRef.current && 
+                !menuRef.current.contains(event.target) &&
+                buttonRef.current && 
+                !buttonRef.current.contains(event.target)) {
+                setIsMenuOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isMenuOpen]);
+
     const handleSearch = (query) => {
         navigate(`/courses?q=${encodeURIComponent(query)}`);
     };
 
-    // Logout handler that clears localStorage
+    // Logout handler that clears authentication data
     const handleLogout = () => {
-        localStorage.clear();
+        // Clear authentication data using utility
+        authStorage.clearAuthData();
+        
         dispatch(logout());
         navigate('/auth/login');
     };
 
     return (
         <div className='h-[56px]'>
-            <div className={`fixed top-0 left-0 right-0 h-[56px] bg-white shadow-xs flex items-center px-4 sm:px-6 ${styles.navbar} z-50`}>
+            <div className={`fixed top-0 left-0 right-0 h-[56px] bg-white shadow-xs flex items-center justify-between px-4 sm:px-6 lg:px-8 py-[10px] ${styles.navbar} z-50`}>
 
                 {/* Logo */}
 
@@ -59,6 +86,7 @@ function Navbar() {
 
                 {/* Mobile Menu Toggle Button */}
                 <button 
+                    ref={buttonRef}
                     onClick={toggleMenu}
                     className="lg:hidden absolute right-5 top-4 p-2 text-gray-600 hover:text-gray-900 focus:outline-none z-[60]"
                     aria-label="Toggle menu"
@@ -66,10 +94,10 @@ function Navbar() {
                     <i className={`fa-solid ${isMenuOpen ? 'fa-xmark' : 'fa-bars'} text-xl`}></i>
                 </button>
 
-                {/* Navbar Links (Large Screens) */}
-                <div className={`hidden lg:flex items-center gap-6 ml-[150px] ${styles.navLinks}`}>
+                {/* Navbar Links (Medium and Large Screens) */}
+                <div className={`hidden md:flex items-center gap-4 lg:gap-6 ${styles.navLinks}`}>
                     
-                    <ul className="flex items-center gap-4">
+                    <ul className="flex items-center gap-2 lg:gap-4">
                         {/* Common links for all users */}
                         <li><NavLink to="/" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('Home')}</NavLink></li>
                         <li><NavLink to="/about" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('About')}</NavLink></li>
@@ -91,52 +119,60 @@ function Navbar() {
                         )}
                         {isLoggedIn && userRole === 'Admin' && (
                           <>
-                            <li><NavLink to="/admin/dashboard" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('Dashboard')}</NavLink></li>
-                            <li><NavLink to="/admin/students" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('Students')}</NavLink></li>
-                            <li><NavLink to="/admin/addteacher" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('Teachers')}</NavLink></li>
-                            <li><NavLink to="/admin/addcourse" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('Courses')}</NavLink></li>
-                            <li><NavLink to="/admin/addgategory" className={({ isActive }) => isActive ? `${styles.navlink} ${styles.active}` : styles.navlink}>{t('Categories')}</NavLink></li>
+                            <li>
+                              <NavLink to="/admin/dashboard" className={({ isActive }) => 
+                                `${styles.navlink} ${styles.adminNavLink} ${isActive ? styles.active : ''}`
+                              }>{t('Dashboard')}</NavLink>
+                            </li>
+                            <li>
+                              <NavLink to="/admin/students" className={({ isActive }) => 
+                                `${styles.navlink} ${styles.adminNavLink} ${isActive ? styles.active : ''}`
+                              }>{t('Students')}</NavLink>
+                            </li>
+                            <li>
+                              <NavLink to="/admin/addteacher" className={({ isActive }) => 
+                                `${styles.navlink} ${styles.adminNavLink} ${isActive ? styles.active : ''}`
+                              }>{t('Teachers')}</NavLink>
+                            </li>
+                            <li>
+                              <NavLink to="/admin/addcourse" className={({ isActive }) => 
+                                `${styles.navlink} ${styles.adminNavLink} ${isActive ? styles.active : ''}`
+                              }>{t('Courses')}</NavLink>
+                            </li>
+                            <li>
+                              <NavLink to="/admin/addgategory" className={({ isActive }) => 
+                                `${styles.navlink} ${styles.adminNavLink} ${isActive ? styles.active : ''}`
+                              }>{t('Categories')}</NavLink>
+                            </li>
                           </>
                         )}
                     </ul>
                 </div>
 
-                {/* Search, Bell, and Profile Icons (Large Screens) */}
-                <div className={`hidden lg:flex items-center gap-4 ml-auto ${styles.icons}`}>
+                {/* Right side elements (Search, Profile, Translate, Auth) */}
+                <div className="hidden md:flex items-center gap-3 lg:gap-4">
+                  {/* Search Bar */}
                   <div className="relative">
                     <SearchBar onSearch={handleSearch} />
                   </div>
-                  {/* Notification icon commented out for now */}
-                  {/*
-                  {isLoggedIn && (userRole === 'Student' || userRole === 'Teacher') && (
-                    <div className="relative">
-                      <div className={`w-[24px] h-[24px] text-neutral-700 cursor-pointer ${styles.bellIcon}`} onClick={toggleNotification}>
-                        <i className="fa-solid fa-bell"></i>
-                      </div>
-                      {isNotificationVisible && (
-                        <div className={`absolute right-0 mt-2 w-[200px] bg-white shadow-lg rounded-md p-4 ${styles.notificationDropdown}`}>
-                          <p className="text-sm text-neutral-700">No new notifications</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  */}
+                  
+                  {/* Profile Icon */}
                   <Link to={
                     userRole === 'Teacher' ? "/teacher/profile" : 
                     userRole === 'Admin' ? "/admin/profile" : 
                     "/studentprofile"
                   }>
-                    <div className={`w-[24px] h-[24px] overflow-hidden ${styles.profileIcon}`}>
+                    <div className="w-6 h-6 overflow-hidden rounded-full">
                       <img src={img} alt="user profile" className="w-full h-full object-cover" />
                     </div>
                   </Link>
-                </div>
-                <div>
+                  
+                  {/* Translate */}
+                  <div>
                     <Translate/>
-                </div>
+                  </div>
 
-                {/* Auth Button (Large Screens) */}
-                <div className={`hidden lg:block ml-4 ${styles.button}`}>
+                  {/* Auth Button */}
                   {isLoggedIn ? (
                     <button 
                       onClick={handleLogout}
@@ -151,15 +187,19 @@ function Navbar() {
             </div>
 
             {/* Mobile Menu */}
-            <div className={`lg:hidden fixed top-[56px] left-0 w-full bg-white shadow-lg transition-all duration-300 ease-in-out z-[55] ${
-                isMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
-            } ${styles.dropdownMenu}`}>
+            <div 
+                ref={menuRef}
+                className={`md:hidden fixed top-[56px] left-0 w-full bg-white shadow-lg transition-all duration-300 ease-in-out z-[55] ${
+                    isMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
+                }`}
+            >
                 <div className="p-4">
                     <ul className="flex flex-col gap-6 items-center">
                         {/* Common links for all users */}
                         <li className="w-full text-center">
                             <NavLink 
                                 to="/" 
+                                onClick={closeMenu}
                                 className={({ isActive }) => 
                                     `block py-2 px-4 text-lg font-medium relative
                                     ${isActive 
@@ -178,6 +218,7 @@ function Navbar() {
                         <li className="w-full text-center">
                             <NavLink 
                                 to="/courses" 
+                                onClick={closeMenu}
                                 className={({ isActive }) => 
                                     `block py-2 px-4 text-lg font-medium relative
                                     ${isActive 

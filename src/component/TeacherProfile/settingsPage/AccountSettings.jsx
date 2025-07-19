@@ -1,30 +1,59 @@
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect } from 'react';
 import { courseService } from '../../../services/courseService';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-
-const AccountSettings = ({ teacherData, onUpdate }) => {
-
+const AccountSettings = ({ onUpdate }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: teacherData?.name || '',
-    age: teacherData?.age || '',
-    specialization: teacherData?.specialization || '',
-    phone: teacherData?.phone || '',
-    additionalInfo: teacherData?.additionalInfo || '',
+    name: '',
+    age: '',
+    specialization: '',
+    phone: '',
+    education: '',
+    additionalInfo: '',
     image: null
   });
-
-  const [previewUrl, setPreviewUrl] = useState(teacherData?.image || null);
-  const [loading, setLoading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState({});
 
   const guestId = localStorage.getItem('guestId');
+  useEffect(() => {
+    const fetchTeacher = async () => {
+      if (!guestId) {
+        setLoading(false);
+        return;
+      }
+      try {
+        setLoading(true);
+        const response = await courseService.getTeacherStats(guestId);
+        if (response.succeeded && response.data) {
+          setFormData({
+            name: response.data.name || '',
+            age: response.data.age || '',
+            specialization: response.data.specialization || '',
+            phone: response.data.phone || '',
+            education: response.data.education || '',
+            additionalInfo: response.data.additionalInfo || '',
+            image: null
+          });
+          setPreviewUrl(response.data.image || null);
+        } else {
+          toast.error(response.message || 'Failed to load teacher data');
+        }
+      } catch (err) {
+        toast.error('Failed to load teacher data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTeacher();
+  }, [guestId]);
+
   if (!guestId) {
-    console.error('guestId is missing. Please log in again.');
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-red-600 text-center">
@@ -32,6 +61,9 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
         </div>
       </div>
     );
+  }
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
   const handleChange = (e) => {
@@ -66,16 +98,6 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
     if (!formData.name?.trim()) {
       newErrors.name = 'Name is required';
     }
-    
-    if (!formData.specialization?.trim()) {
-      newErrors.specialization = 'Specialization is required';
-    }
-    
-    if (!formData.phone?.trim()) {
-      newErrors.phone = 'Phone number is required';
-    } else if (!formData.phone.match(/^\+?[1-9]\d{1,14}$/)) {
-      newErrors.phone = 'Invalid phone number format';
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -94,9 +116,10 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
       const response = await courseService.updateTeacher({
         Id: guestId,
         Name: formData.name.trim(),
-        Age: formData.age || '',
+        Age: formData.age ? parseInt(formData.age) : null,
         Specialization: formData.specialization.trim(),
         Phone: formData.phone.trim(),
+        Education: formData.education.trim(),
         AdditionalInfo: formData.additionalInfo,
         Image: formData.image
       });
@@ -113,8 +136,8 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
           });
         }
         
-        // Navigate back to profile
-        window.location.href = '/teacher/profile';
+        // Navigate back to profile using React Router
+        navigate('/teacher/profile');
       } else {
         toast.error(response.message || 'Failed to update profile');
       }
@@ -206,7 +229,7 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
             {/* Specialization Field */}
             <div>
               <label htmlFor="specialization" className="block text-sm font-medium text-gray-700 mb-1">
-                {t("specialization")} <span className="text-red-500">*</span>
+                {t("specialization")}
               </label>
               <input
                 type="text"
@@ -215,19 +238,14 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
                 value={formData.specialization}
                 onChange={handleChange}
                 placeholder={t("enter-specialization")}
-                className={`form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3 ${
-                  errors.specialization ? 'border-red-500' : ''
-                }`}
+                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"
               />
-              {errors.specialization && (
-                <p className="mt-1 text-sm text-red-600">{errors.specialization}</p>
-              )}
             </div>
 
             {/* Phone Field */}
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                {t("phone-number")} <span className="text-red-500">*</span>
+                {t("phone-number")}
               </label>
               <input
                 type="tel"
@@ -236,13 +254,24 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder={t("phone-placeholder")}
-                className={`form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3 ${
-                  errors.phone ? 'border-red-500' : ''
-                }`}
+                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"
               />
-              {errors.phone && (
-                <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
-              )}
+            </div>
+
+            {/* Education Field */}
+            <div>
+              <label htmlFor="education" className="block text-sm font-medium text-gray-700 mb-1">
+                Education
+              </label>
+              <input
+                type="text"
+                id="education"
+                name="education"
+                value={formData.education}
+                onChange={handleChange}
+                placeholder="Enter your education background"
+                className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring focus:ring-violet-500 focus:ring-opacity-50 p-3"
+              />
             </div>
 
             {/* Additional Info Field */}
@@ -264,7 +293,7 @@ const AccountSettings = ({ teacherData, onUpdate }) => {
             <div className="flex justify-end space-x-4">
               <button
                 type="button"
-                onClick={() => window.location.href = '/teacher/profile'}
+                onClick={() => navigate('/teacher/profile')}
                 className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
               >
                 {t('cancel')}

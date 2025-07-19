@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import axiosInstance from '../../services/axiosInstance';
 
 // A simple Chat Icon component
 const ChatIcon = () => (
@@ -22,7 +24,8 @@ const ChatIcon = () => (
 
 function TeacherStudents() {
   // Initialize useNavigate hook
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
 
   // State to hold the course data, loading status, and any errors
   const [courses, setCourses] = useState([]);
@@ -33,34 +36,38 @@ function TeacherStudents() {
     // Function to fetch data from the API
     const fetchStudents = async () => {
       try {
-        // IMPORTANT: Replace '153' with the actual teacher's ID.
-        // This ID should ideally come from your Redux store (state.auth.user.id) or localStorage.
-        const teacherId = localStorage.getItem('guestId'); // Assuming 'guestId' stores the teacher's ID
-        if (!teacherId) {
-            throw new Error("Teacher ID not found in localStorage.");
+        if (!user?.id) {
+          throw new Error("Teacher ID not found. Please log in again.");
         }
 
-        const response = await fetch(`https://e-learn-v1.runasp.net/api/ChatRooms/student/EnroolWithTeacher?id=${teacherId}`);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        
-        const result = await response.json();
+        console.log('Fetching students for teacher ID:', user.id);
 
-        if (result.succeeded && result.data) {
+        const response = await axiosInstance.get(`/api/ChatRooms/student/EnroolWithTeacher`, {
+          params: { id: user.id }
+        });
+
+        console.log('API Response:', response.data);
+
+        if (response.data.succeeded && response.data.data) {
           // Filter out courses that have no students enrolled
-          const coursesWithStudents = result.data.filter(course => 
+          const coursesWithStudents = response.data.data.filter(course => 
             Object.keys(course.keyValuePairs).length > 0
           );
           setCourses(coursesWithStudents);
         } else {
           // Handle API-level errors (e.g., "succeeded": false)
-          throw new Error(result.massage || 'Failed to fetch data');
+          throw new Error(response.data.massage || 'Failed to fetch data');
         }
 
       } catch (err) {
-        setError(err.message);
+        console.error('Error fetching students:', err);
+        if (err.response?.status === 401) {
+          setError('Authentication failed. Please log in again.');
+        } else if (err.response?.status === 403) {
+          setError('Access denied. You do not have permission to view this data.');
+        } else {
+          setError(err.message || 'Failed to fetch students data');
+        }
       } finally {
         setLoading(false);
       }

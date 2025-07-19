@@ -1,20 +1,20 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import * as signalR from '@microsoft/signalr';
-import axios from 'axios';
+import axiosInstance from '../../services/axiosInstance';
+import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
-import { FaPaperPlane, FaUserCircle } from 'react-icons/fa'; // Icons for send button and sender identity
-import Loader from './../Loader/Loader'; // Assuming correct path to Loader component
+import { FaPaperPlane, FaUserCircle } from 'react-icons/fa';
+import Loader from './../Loader/Loader';
 
 // API Endpoints (These remain the same for both student and teacher views)
 const CHAT_HUB_URL = "https://e-learn-v1.runasp.net/chatHub";
 const GET_CHAT_ROOM_ID_API = "https://e-learn-v1.runasp.net/api/ChatRooms/GetChatRoomID";
 const GET_MESSAGES_API_BASE = "https://e-learn-v1.runasp.net/api/ChatRooms"; // Append /<chatRoomId>/messages
 
-const TChatRoom = () => { // Renamed to TChatRoom for Teacher's perspective
-    // For the teacher's view, the URL parameter is expected to be the Student ID
-    // that the teacher wants to chat with. Example route: '/teacher/chat/:studentId'
-    const { studentId: paramStudentId } = useParams(); // Get studentId from URL
+const TChatRoom = () => {
+    const { studentId: paramStudentId } = useParams();
+    const { user } = useSelector((state) => state.auth);
 
     // State for the authenticated user's ID and name (which is the teacher in this component)
     const [currentUserId, setCurrentUserId] = useState(null);
@@ -60,9 +60,9 @@ const TChatRoom = () => { // Renamed to TChatRoom for Teacher's perspective
             setLoading(true);
             setError(null);
             console.log(`Attempting to get/create chat room for Student ID: ${studentIdNum}, Teacher ID: ${teacherIdNum}`);
-            const response = await axios.post(GET_CHAT_ROOM_ID_API, {
-                studentId: String(studentIdNum), // Ensure IDs are sent as strings if API expects them
-                teacherId: String(teacherIdNum), // Ensure IDs are sent as strings if API expects them
+            const response = await axiosInstance.post('/api/ChatRooms/GetChatRoomID', {
+                studentId: String(studentIdNum),
+                teacherId: String(teacherIdNum),
             });
 
             if (response.data.succeeded) {
@@ -80,18 +80,29 @@ const TChatRoom = () => { // Renamed to TChatRoom for Teacher's perspective
             }
         } catch (err) {
             console.error('Error getting/creating chat room:', err.response?.data || err.message, err);
-            const apiErrors = err.response?.data?.errors;
-            let detailedErrorMessage = '';
-            if (apiErrors) {
-                for (const key in apiErrors) {
-                    if (apiErrors.hasOwnProperty(key)) {
-                        detailedErrorMessage += `${key}: ${apiErrors[key].join(', ')}\n`;
+            
+            if (err.response?.status === 401) {
+                const errorMessage = 'Authentication failed. Please log in again.';
+                setError(errorMessage);
+                toast.error(errorMessage);
+            } else if (err.response?.status === 403) {
+                const errorMessage = 'Access denied. You do not have permission to access this chat.';
+                setError(errorMessage);
+                toast.error(errorMessage);
+            } else {
+                const apiErrors = err.response?.data?.errors;
+                let detailedErrorMessage = '';
+                if (apiErrors) {
+                    for (const key in apiErrors) {
+                        if (apiErrors.hasOwnProperty(key)) {
+                            detailedErrorMessage += `${key}: ${apiErrors[key].join(', ')}\n`;
+                        }
                     }
                 }
+                const finalErrorMessage = detailedErrorMessage || err.response?.data?.message || err.response?.data?.massage || err.message || 'Failed to load chat room.';
+                setError(finalErrorMessage);
+                toast.error(finalErrorMessage);
             }
-            const finalErrorMessage = detailedErrorMessage || err.response?.data?.message || err.response?.data?.massage || err.message || 'Failed to load chat room.';
-            setError(finalErrorMessage);
-            toast.error(finalErrorMessage);
             return null;
         } finally {
             setLoading(false);
@@ -102,7 +113,7 @@ const TChatRoom = () => { // Renamed to TChatRoom for Teacher's perspective
     const loadHistoricalMessages = useCallback(async (roomId) => {
         if (!roomId) return;
         try {
-            const response = await axios.get(`${GET_MESSAGES_API_BASE}/${roomId}/messages`);
+            const response = await axiosInstance.get(`/api/ChatRooms/${roomId}/messages`);
             if (response.data.succeeded) {
                 setMessages(response.data.data || []);
             } else {
@@ -176,17 +187,21 @@ const TChatRoom = () => { // Renamed to TChatRoom for Teacher's perspective
             setLoading(true);
             setError(null);
 
-            // Get logged-in teacher's ID and Name from localStorage
-            const storedTeacherId = localStorage.getItem('guestId');
-            const storedTeacherName = localStorage.getItem('teacherName');
-
-            const teacherUserId = parseInt(storedTeacherId, 10);
-            const teacherUserName = storedTeacherName || `Teacher ${teacherUserId}`;
-
-            // Validate the teacher's ID from localStorage (current user)
-            if (isNaN(teacherUserId) || teacherUserId <= 0) {
-                setError("Teacher ID not found in localStorage or is invalid. Please ensure you are logged in as a teacher.");
+            // Get logged-in teacher's ID and Name from Redux store
+            if (!user?.id) {
+                setError("Teacher ID not found. Please ensure you are logged in as a teacher.");
                 toast.error("Authentication error: Teacher ID missing.");
+                setLoading(false);
+                return;
+            }
+
+            const teacherUserId = parseInt(user.id, 10);
+            const teacherUserName = user.name || user.userName || `Teacher ${teacherUserId}`;
+
+            // Validate the teacher's ID from Redux store (current user)
+            if (isNaN(teacherUserId) || teacherUserId <= 0) {
+                setError("Teacher ID is invalid. Please ensure you are logged in as a teacher.");
+                toast.error("Authentication error: Invalid Teacher ID.");
                 setLoading(false);
                 return;
             }

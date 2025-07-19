@@ -1,15 +1,16 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from "../../../services/axiosInstance";
 
 
 export const allStudent = createAsyncThunk(
     'allStudent',
     async()=>{
         try{
-            const response = await axios.get('https://e-learn-v1.runasp.net/api/Student/GetAll/GetAll')
+            const response = await axiosInstance.get('/api/Student/GetAll/GetAll')
             return response.data.data
         }catch(error){
-            console.log(error)
+            console.log('Error fetching students:', error)
+            throw error
         }
 
     }

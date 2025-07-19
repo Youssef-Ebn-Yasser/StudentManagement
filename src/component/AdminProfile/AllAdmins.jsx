@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
+import axiosInstance from '@/services/axiosInstance'
+import { useNavigate } from 'react-router-dom'
 
 export default function AllAdmins() {
   const [admins, setAdmins] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [gettingId, setGettingId] = useState(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchAdmins = async () => {
       try {
         setLoading(true)
-        const res = await axios.get('https://e-learn-v1.runasp.net/api/Authorize/admins')
+        const res = await axiosInstance.get('/api/Authorize/admins')
         setAdmins(res.data?.data || [])
       } catch (err) {
         setError('Failed to fetch admins.')
@@ -20,6 +23,24 @@ export default function AllAdmins() {
     }
     fetchAdmins()
   }, [])
+
+  // Handler for the "Get" button
+  const handleGetClaims = async (adminId) => {
+    setGettingId(adminId)
+    try {
+      const res = await axiosInstance.get(`/api/Authorize?userId=${adminId}`)
+      if (res.data && res.data.succeeded) {
+        // Pass the data to the next page using state
+        navigate('/admin-claims', { state: { adminClaims: res.data.data } })
+      } else {
+        alert('Failed to get admin claims.')
+      }
+    } catch (err) {
+      alert('Failed to get admin claims.')
+    } finally {
+      setGettingId(null)
+    }
+  }
 
   return (
     <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-8 mt-12 mb-12">
@@ -40,6 +61,7 @@ export default function AllAdmins() {
                 <th className="py-3 px-6 text-left text-violet-700 font-semibold">#</th>
                 <th className="py-3 px-6 text-left text-violet-700 font-semibold">Admin Name</th>
                 <th className="py-3 px-6 text-left text-violet-700 font-semibold">Admin ID</th>
+                <th className="py-3 px-6 text-left text-violet-700 font-semibold"></th>
               </tr>
             </thead>
             <tbody>
@@ -48,6 +70,15 @@ export default function AllAdmins() {
                   <td className="py-3 px-6">{idx + 1}</td>
                   <td className="py-3 px-6 font-medium text-gray-800">{admin.name}</td>
                   <td className="py-3 px-6 text-violet-600">{admin.id}</td>
+                  <td className="py-3 px-6">
+                    <button
+                      className={`px-4 py-1 rounded-lg bg-violet-600 text-white font-semibold hover:bg-violet-700 transition ${gettingId === admin.id ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      disabled={gettingId === admin.id}
+                      onClick={() => handleGetClaims(admin.id)}
+                    >
+                      {gettingId === admin.id ? 'Loading...' : 'Get'}
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

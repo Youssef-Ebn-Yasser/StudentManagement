@@ -1,6 +1,7 @@
 import { login, getUser } from '@/services/auth'
 import axiosInstance from '@/services/axiosInstance'
 import { createAsyncThunk } from '@reduxjs/toolkit'
+import { authStorage } from '@/utils/authStorage'
 
 export const loginUser = createAsyncThunk(
     'auth/login',
@@ -44,15 +45,17 @@ export const loginBuilder = (builder) => {
             axiosInstance.defaults.headers.common[
                 'Authorization'
             ] = `Bearer ${action.payload.token}`
-            localStorage.setItem('refreshToken', action.payload.refreshToken)
-            // Store adminId instead of studentId for admin users
-            if (action.payload.isAdmin) {
-                localStorage.setItem('adminId', action.payload.user.id)
-            } else {
-                localStorage.setItem('guestId', action.payload.user.id)
-            }
-            localStorage.setItem('isAdmin', action.payload.isAdmin)
-            localStorage.setItem('isTeacher', action.payload.isTeacher)
+            
+            // Store authentication data using utility
+            authStorage.setAuthData({
+                token: action.payload.token,
+                refreshToken: action.payload.refreshToken,
+                expiration: action.payload.expiration,
+                role: action.payload.user.roles[0],
+                userId: action.payload.user.id,
+                isAdmin: action.payload.isAdmin,
+                isTeacher: action.payload.isTeacher
+            })
         })
         .addCase(loginUser.rejected, (state, action) => {
             state.loading = false

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { courseService } from '../../services/courseService';
-import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook, FaClipboardList, FaTrash, FaEdit, FaChartLine, FaCalendarAlt, FaTag, FaFileAlt, FaVideo, FaChartBar } from 'react-icons/fa';
+import {  FaClock, FaBook, FaClipboardList, FaTrash, FaEdit, FaChartLine, FaTag, FaFileAlt, FaVideo, FaChartBar } from 'react-icons/fa';
 import Loader from '../Loader/Loader';
 import { toast } from 'react-toastify';
-import axios from 'axios';
+import axiosInstance from '../../services/axiosInstance';
 import { useTranslation } from 'react-i18next';
 
 
@@ -38,7 +38,7 @@ const TeacherCourseDetails = () => {
           setCourse(response.data);
           const courseLessons = response.data.lessons || response.data.lessonInfo || [];
           const materialsPromises = courseLessons.map(lesson =>
-            axios.get(`https://e-learn-v1.runasp.net/api/Material/GetMaterialsByLessonId/GetMaterialsByLessonId/${lesson.id}`)
+            axiosInstance.get(`/api/Material/GetMaterialsByLessonId/GetMaterialsByLessonId/${lesson.id}`)
           );
           const materialsResponses = await Promise.all(materialsPromises);
           const materialsMap = {};
@@ -124,7 +124,7 @@ const TeacherCourseDetails = () => {
   const handleDeleteMaterial = async (materialId) => {
     if (window.confirm('Are you sure you want to delete this material?')) {
       try {
-        const response = await axios.delete(`https://e-learn-v1.runasp.net/api/Material/DeleteMaterial/DeleteMaterial/${materialId}`);
+        const response = await axiosInstance.delete(`/api/Material/DeleteMaterial/DeleteMaterial/${materialId}`);
         if (response.data.succeeded) {
           setLessonMaterials(prevMaterials => {
             const updatedMaterials = { ...prevMaterials };
@@ -157,8 +157,8 @@ const TeacherCourseDetails = () => {
       if (materialFile) {
         formData.append('Data', materialFile);
       }
-      const response = await axios.put(
-        'https://e-learn-v1.runasp.net/api/Material/UpdateMaterial/UpdateMaterial',
+      const response = await axiosInstance.put(
+        '/api/Material/UpdateMaterial/UpdateMaterial',
         formData,
         {
           headers: {
@@ -303,10 +303,12 @@ const TeacherCourseDetails = () => {
               <div className="flex justify-between items-start">
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 mb-2">{course.title}</h1>
+                  {/*
                   <div className="bg-gray-50 p-3 rounded-lg mb-4 inline-block">
                     <p className="text-sm text-gray-500">{t('course-id')}</p>
                     <p className="font-semibold">{course.id || t('not-available')}</p>
                   </div>
+                  */}
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -347,7 +349,7 @@ const TeacherCourseDetails = () => {
               </div>
               <p className="text-gray-600 mb-4">{course.description}</p>
               {/* Course Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div className="bg-gray-50 p-3 rounded-lg">
                   <div className="flex items-center">
                     <FaClock className="text-green-500 mr-2" />

@@ -4,6 +4,7 @@ import
     getJWTToken,
     getUser
   } from '@/services/auth';
+import { authStorage } from '@/utils/authStorage';
 
 // Async thunks for API calls
 
@@ -43,6 +44,8 @@ export const authorizeBuilder = (builder) => {
         .addCase(fetchUser.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;
+            // Don't clear user state on error to prevent logout
+            // Only clear if explicitly needed
         });
 
     builder
@@ -53,6 +56,7 @@ export const authorizeBuilder = (builder) => {
         .addCase(fetchJWTToken.fulfilled, (state, action) => {
             // state.loading = false;
             state.token = action.payload;
+            authStorage.setAuthData({ token: action.payload });
         })
         .addCase(fetchJWTToken.rejected, (state, action) => {
             // state.loading = false;

@@ -5,6 +5,7 @@ import Loader from '../Loader/Loader';
 import { FaVideo } from 'react-icons/fa';
 import { FaGraduationCap } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import { convertToEgyptTime } from '../../utils/timeUtils';
 
 export default function CourseDashDetails() {
   const { t } = useTranslation();
@@ -37,10 +38,9 @@ export default function CourseDashDetails() {
 
   const lessonsCount = course?.lessonInfo?.length || 0;
 
-  // Helper to format date
+  // Helper to format date in Egypt timezone
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+    return convertToEgyptTime(dateString);
   };
 
   if (loading) {

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { getQuizAvailabilityStatus } from '../../utils/timeUtils'
 
 export default function LessonDetails() {
     const { t } = useTranslation();
@@ -448,21 +449,64 @@ export default function LessonDetails() {
                                     </span>{' '}
                                     {quiz.durationMinutes} {t('minutes')}
                                 </div>
+                                
+                                {/* Quiz availability status */}
+                                {(() => {
+                                    const availability = getQuizAvailabilityStatus(quiz.startsAt || quiz.createdAt, quiz.endAt);
+                                    return (
+                                        <div className="mb-3">
+                                            <span className="font-semibold">Status: </span>
+                                            <span className={`px-2 py-1 rounded text-sm font-medium ${
+                                                availability.status === 'available' 
+                                                    ? 'bg-green-100 text-green-800' 
+                                                    : availability.status === 'not-started'
+                                                    ? 'bg-yellow-100 text-yellow-800'
+                                                    : 'bg-red-100 text-red-800'
+                                            }`}>
+                                                {availability.message}
+                                            </span>
+                                        </div>
+                                    );
+                                })()}
+                                
                                 {isQuizSubmitted ? (
                                     <span className="text-green-600 font-semibold">
                                         {t('submitted')}
                                     </span>
-                                ) : (
-                                    <button
-                                        className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition mt-2"
-                                        onClick={handleStartQuiz}
-                                    >
-                                        {t('start_quiz')}
-                                    </button>
-                                )}
+                                ) : (() => {
+                                    const availability = getQuizAvailabilityStatus(quiz.startsAt || quiz.createdAt, quiz.endAt);
+                                    if (availability.status === 'available') {
+                                        return (
+                                            <button
+                                                className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition mt-2"
+                                                onClick={handleStartQuiz}
+                                            >
+                                                {t('start_quiz')}
+                                            </button>
+                                        );
+                                    } else if (availability.status === 'not-started') {
+                                        return (
+                                            <button
+                                                className="bg-gray-400 text-white px-6 py-2 rounded cursor-not-allowed mt-2"
+                                                disabled
+                                            >
+                                                Quiz not started yet
+                                            </button>
+                                        );
+                                    } else {
+                                        return (
+                                            <button
+                                                className="bg-red-400 text-white px-6 py-2 rounded cursor-not-allowed mt-2"
+                                                disabled
+                                            >
+                                                Quiz expired
+                                            </button>
+                                        );
+                                    }
+                                })()}
                             </div>
                         ) : (
-                            <div className="text-gray-500"></div>
+                            <div className="text-gray-500">No quiz available</div>
                         )}
                     </section>
 

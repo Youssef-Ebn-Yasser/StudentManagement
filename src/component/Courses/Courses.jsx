@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styles from './Courses.module.css';
 import Loader from '../Loader/Loader';
 import { useTranslation } from 'react-i18next';
@@ -17,12 +17,15 @@ function Courses() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Get search query from URL
+    // Get search query and category from URL
     const params = new URLSearchParams(location.search);
     const query = params.get('q') || '';
+    const category = params.get('category') || 'All';
     setSearchQuery(query);
+    setSelectedCategory(category);
   }, [location]);
 
   async function getCourses() {
@@ -73,6 +76,17 @@ function Courses() {
     return filtered;
   };
 
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    const params = new URLSearchParams(location.search);
+    if (category === 'All') {
+      params.delete('category');
+    } else {
+      params.set('category', category);
+    }
+    navigate(`/courses?${params.toString()}`);
+  };
+
   useEffect(() => {
     getCourses();
   }, []);
@@ -114,7 +128,7 @@ function Courses() {
         <div className="lg:hidden mb-4">
           <select
             value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            onChange={(e) => handleCategorySelect(e.target.value)}
             className="w-full p-2 border rounded-lg bg-white"
           >
             {categories.map((category) => (
@@ -129,7 +143,7 @@ function Courses() {
           {categories.map((category) => (
             <button
               key={category}
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => handleCategorySelect(category)}
               className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
                 selectedCategory === category
                   ? 'bg-blue-500 text-white'

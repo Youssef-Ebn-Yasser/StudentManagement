@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { quizService } from '@/services/quizService';
+import axiosInstance from '@/services/axiosInstance';
 import { 
   Box, 
   Typography, 
@@ -53,7 +54,16 @@ const LessonQuizStats = () => {
       }
       try {
         setLoading(true);
-        const response = await quizService.getLessonQuizStats(lessonId);
+        // Manually get token in case axiosInstance is not attaching it
+        const token = localStorage.getItem('token') || localStorage.getItem('JWTToken');
+        let response;
+        if (token) {
+          response = await axiosInstance.get(`/api/Quize/LessonQuizStats/${lessonId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+        } else {
+          response = await axiosInstance.get(`/api/Quize/LessonQuizStats/${lessonId}`);
+        }
         console.log('Full API Response:', response);
         console.log('Response Data:', response.data);
         console.log('Stats Data:', response.data?.data);
