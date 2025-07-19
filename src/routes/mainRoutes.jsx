@@ -27,7 +27,6 @@ import CoursesDetails from '@/component/CoursesDetails/CoursesDetails'
 import CourseDashDetails from '@/component/StudentDashboard/CourseDashDetailes'
 import AddMaterial from '@/component/TeacherProfile/AddMaterial'
 import TeacherProfileView from '@/component/StudentDashboard/TeacherProfileView'
-import CreateQuiz from '@/component/CreateQuiz/CreateQuiz'
 import Quiz from '@/component/StudentDashboard/Quiz'
 import TeacherRequest from '@/component/Register/TeacherRequest'
 import TeacherDashboard from '@/component/TeacherDashboard/TeacherDashboard'
@@ -50,350 +49,73 @@ import AllAdmins from '@/component/AdminProfile/AllAdmins'
 import StudentProfile3 from '@/component/StudentProfile/StudentProfile3'
 import Report from '../component/Report/report'
 import Translate from '@/component/Translate/Translate'
+import ResetPassword from '@/component/ResetPassword/ResetPassword'
 
 
 
 
 const routesConfig = [
-    { path: '', element: <Home />, isProtected: false, accessRole: 'all' },
-    {
-        path: 'courses',
-        element: <Courses />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teachers',
-        element: <Teachers />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'about',
-        element: <About />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-   
-    {
-        path: 'studentdashboard',
-        element: <StudentDashboard />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'createquiz',
-        element: <CreateQuiz />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'admins',
-        element: <AllAdmins />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: '/studentdashboard/course/:courseId/lesson/:lessonId',
-        element: <LessonDetails />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'studentprofile',
-        element: <StudentProfile />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'studentprofilee',
-        element: <StudentProfile2 />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'studentprofileee',
-        element: <StudentProfile3 />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'courses/course/:id/paymob-checkout',
-        element: <PaymobCheckout/>,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'studentdashboard/quiz/:lessonId',
-        element: <Quiz />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'studentdashboard/lesson/:lessonId/quiz',
-        element: <QuizView />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'studentdashboard/course/:courseId/quiz-stats',
-        element: <StudentQuizStats />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/profile',
-        element: <TeacherProfile />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/profile/students',
-        element: <TeacherStudents />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/createcourse',
-        element: <CreateCourse />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/add-lesson',
-        element: <TeacherCourses />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/add-material',
-        element: <TeacherCourses />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/course/lesson/new',
-        element: <AddLesson />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/course/lesson/material/new',
-        element: <AddMaterial />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/courses',
-        element: <TeacherCourses />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/course/details',
-        element: <TeacherCourseDetails />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/course/meetings',
-        element: <MeetingData />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'studentdashboard/course/:courseId/stmeetings',
-        element: <MeetingSdata />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'courses/course/:id',
-        element: <CoursesDetails />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'courses/teacher/:teacherName',
-        element: <TeacherProfileView />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'studentdashboard/course/:id',
-        element: <CourseDashDetails />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: '/chat/:teacherId',
-        element: <ChatRoom />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: '/chatt/:studentId',
-        element: <TChatRoom />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/settings',
-        element: <AccountSettings />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'studentprofile/edit-profile',
-        element: <EditProfile />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/course/edit',
-        element: <EditCourse />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/review-student-answers',
-        element: <ReviewStudentAnswers />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/review-student-answers/:answerId',
-        element: <StudentAnswers />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'admin/profile',
-        element: <AdminProfile />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'admin/addteacher',
-        element: <AddTeacher />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'admin/addgategory',
-        element: <AddGategory/>,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'admin/addcourse',
-        element: <AddCourse/>,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'admin/reg-admin',
-        element: <RegisterAdmin/>,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'admin/controlCourse',
-        element: <ControlCourse/>,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'admin/studentDetails',
-        element: <StudentDetails/>,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'admin/students',
-        element: <Students/>,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'admin/dashboard',
-        element: <AdminDashboard/>,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/assignments',
-        element: <ManageAssignments />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'become-teacher',
-        element: <TeacherRequest />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/dashboard',
-        element: <TeacherDashboard />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'teacher/create-zoom',
-        element: <CreateZoom />,
-        isProtected: false,
-        accessRole: 'all',
-    },
-    {
-        path: 'admin/reports',
-        element: <Report />,
-        isProtected: true,
-        accessRole: 'admin',
-    },
-    ...teacherRoutes,
-    {
-        path: 'translate',
-        element: <Translate/>,
-        isProtected: false,
-        accessRole: 'all',
-    },
-]
-
-const mainRoutes = [
+    // Top-level route: no Layout, no Navbar/Chatbot
+    { path: 'reset-password', element: <ResetPassword />, isProtected: false, accessRole: 'all' },
+    // All other routes wrapped in Layout
     {
         path: '',
         element: <Layout />,
-        children: routesConfig.map(
-            ({ path, element, isProtected = false, accessRole = 'all' }) => ({
-                path,
-                element: (
-                    <ProtectedRoutes
-                        isProtected={isProtected}
-                        accessRole={accessRole}
-                    >
-                        {element}
-                    </ProtectedRoutes>
-                ),
-            })
-        ),
-    },
-]
-  
-  
+        children: [
+            { path: '', element: <Home />, isProtected: false, accessRole: 'all' },
+            { path: 'courses', element: <Courses />, isProtected: false, accessRole: 'all' },
+            { path: 'teachers', element: <Teachers />, isProtected: false, accessRole: 'all' },
+            { path: 'about', element: <About />, isProtected: false, accessRole: 'all' },
+            { path: 'dashboard', element: <Dashboard />, isProtected: false, accessRole: 'all' },
+            { path: 'studentdashboard', element: <StudentDashboard />, isProtected: false, accessRole: 'all' },
+            { path: 'admins', element: <AllAdmins />, isProtected: false, accessRole: 'all' },
+            { path: '/studentdashboard/course/:courseId/lesson/:lessonId', element: <LessonDetails />, isProtected: false, accessRole: 'all' },
+            { path: 'studentprofile', element: <StudentProfile />, isProtected: false, accessRole: 'all' },
+            { path: 'studentprofilee', element: <StudentProfile2 />, isProtected: false, accessRole: 'all' },
+            { path: 'studentprofileee', element: <StudentProfile3 />, isProtected: false, accessRole: 'all' },
+            { path: 'courses/course/:id/paymob-checkout', element: <PaymobCheckout/>, isProtected: false, accessRole: 'all' },
+            { path: 'studentdashboard/quiz/:lessonId', element: <Quiz />, isProtected: false, accessRole: 'all' },
+            { path: 'studentdashboard/lesson/:lessonId/quiz', element: <QuizView />, isProtected: false, accessRole: 'all' },
+            { path: 'studentdashboard/course/:courseId/quiz-stats', element: <StudentQuizStats />, isProtected: false, accessRole: 'all' },
+            { path: 'teacher/profile', element: <TeacherProfile />, isProtected: false, accessRole: 'all' },
+            { path: 'teacher/profile/students', element: <TeacherStudents />, isProtected: false, accessRole: 'all' },
+            { path: 'teacher/createcourse', element: <CreateCourse />, isProtected: false, accessRole: 'all' },
+            { path: 'teacher/add-lesson', element: <TeacherCourses />, isProtected: false, accessRole: 'all' },
+            { path: 'teacher/add-material', element: <TeacherCourses />, isProtected: false, accessRole: 'all' },
+            { path: 'teacher/course/lesson/new', element: <AddLesson />, isProtected: false, accessRole: 'all' },
+            { path: 'teacher/course/lesson/material/new', element: <AddMaterial />, isProtected: false, accessRole: 'all' },
+            { path: 'teacher/courses', element: <TeacherCourses />, isProtected: false, accessRole: 'all' },
+            { path: 'teacher/course/details', element: <TeacherCourseDetails />, isProtected: false, accessRole: 'all' },
+            { path: 'teacher/course/meetings', element: <MeetingData />, isProtected: false, accessRole: 'all' },
+            { path: 'studentdashboard/course/:courseId/stmeetings', element: <MeetingSdata />, isProtected: false, accessRole: 'all' },
+            { path: 'courses/course/:id', element: <CoursesDetails />, isProtected: false, accessRole: 'all' },
+            { path: 'courses/teacher/:teacherName', element: <TeacherProfileView />, isProtected: false, accessRole: 'all' },
+            { path: 'studentdashboard/course/:id', element: <CourseDashDetails />, isProtected: false, accessRole: 'all' },
+            { path: '/chat/:teacherId', element: <ChatRoom />, isProtected: false, accessRole: 'all' },
+            { path: '/chatt/:studentId', element: <TChatRoom />, isProtected: false, accessRole: 'all' },
+            { path: 'teacher/settings', element: <AccountSettings />, isProtected: false, accessRole: 'all' },
+            { path: 'studentprofile/edit-profile', element: <EditProfile />, isProtected: false, accessRole: 'all' },
+            { path: 'teacher/course/edit', element: <EditCourse />, isProtected: false, accessRole: 'all' },
+            { path: 'teacher/review-student-answers', element: <ReviewStudentAnswers />, isProtected: false, accessRole: 'all' },
+            { path: 'teacher/review-student-answers/:answerId', element: <StudentAnswers />, isProtected: false, accessRole: 'all' },
+            { path: 'admin/profile', element: <AdminProfile />, isProtected: false, accessRole: 'all' },
+            { path: 'admin/addteacher', element: <AddTeacher />, isProtected: false, accessRole: 'all' },
+            { path: 'admin/addgategory', element: <AddGategory/>, isProtected: false, accessRole: 'all' },
+            { path: 'admin/addcourse', element: <AddCourse/>, isProtected: false, accessRole: 'all' },
+            { path: 'admin/reg-admin', element: <RegisterAdmin/>, isProtected: false, accessRole: 'all' },
+            { path: 'admin/controlCourse', element: <ControlCourse/>, isProtected: false, accessRole: 'all' },
+            { path: 'admin/studentDetails', element: <StudentDetails/>, isProtected: false, accessRole: 'all' },
+            { path: 'admin/students', element: <Students/>, isProtected: false, accessRole: 'all' },
+            { path: 'admin/dashboard', element: <AdminDashboard/>, isProtected: false, accessRole: 'all' },
+            { path: 'teacher/assignments', element: <ManageAssignments />, isProtected: false, accessRole: 'all' },
+            { path: 'become-teacher', element: <TeacherRequest />, isProtected: false, accessRole: 'all' },
+            { path: 'teacher/dashboard', element: <TeacherDashboard />, isProtected: false, accessRole: 'all' },
+            { path: 'teacher/create-zoom', element: <CreateZoom />, isProtected: false, accessRole: 'all' },
+            { path: 'admin/reports', element: <Report />, isProtected: true, accessRole: 'admin' },
+            ...teacherRoutes,
+            { path: 'translate', element: <Translate/>, isProtected: false, accessRole: 'all' },
+        ]
+    }
+];
 
-// const mainRoutes = [
-//   {
-//     path: '',
-//     element: <Layout />,
-//     children: routesConfig.map(({ path, element, isProtected, accessRole }) => (
-//       isProtected
-//         ? { path, element: <ProtectedRoutes
-//             accessRole={accessRole}
-//             isAuth={!!localStorage.getItem('JWTToken')}>{element}</ProtectedRoutes> }
-//         : { path, element }
-//     )),
-//   },
-// ]
-
-export default mainRoutes
+export default routesConfig;

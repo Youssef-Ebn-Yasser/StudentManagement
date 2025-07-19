@@ -4,6 +4,7 @@ import Register from '../component/Register/Register';
 import StudentReg from '@/component/StudentReg/StudentReg';
 import AdminReg from '@/component/AdminReg/AdminReg';
 import ForgetPassword from '@/component/ForgetPassword/ForgetPassword';
+import ResetPassword from '@/component/ResetPassword/ResetPassword';
 
 const authRoutes = ([
   {
@@ -15,6 +16,7 @@ const authRoutes = ([
       { path: 'studentRegister', element: <StudentReg /> },
       { path: 'adminRegister', element: <AdminReg /> },
       { path: 'forgetpassword', element: <ForgetPassword /> },
+      { path: 'reset-password', element: <ResetPassword /> },
     ]
   }
 ]);

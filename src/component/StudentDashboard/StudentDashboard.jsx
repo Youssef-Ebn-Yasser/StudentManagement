@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 // It's good practice to include necessary external CSS/icon libraries.
 // For Font Awesome icons used in this component, you would typically link it
@@ -8,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 // <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" xintegrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 export default function StudentDashboard() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,7 +32,7 @@ export default function StudentDashboard() {
         // Get studentId from localStorage
         const studentId = localStorage.getItem('guestId');
         if (!studentId) {
-          setError('Student not logged in.');
+          setError(t('student-not-logged-in'));
           setLoading(false);
           return;
         }
@@ -42,7 +44,7 @@ export default function StudentDashboard() {
 
         // Check if the API call was successful and data is an array
         if (!coursesResponse.data.succeeded || !Array.isArray(coursesResponse.data.data)) {
-          throw new Error('Invalid courses data received');
+          throw new Error(t('invalid-courses-data'));
         }
 
         const courses = coursesResponse.data.data;
@@ -65,7 +67,7 @@ export default function StudentDashboard() {
             imagePath: course.imagePath, // Keeping imagePath, though not used in current render
             level: course.level,
             categoryName: course.categoryName,
-            grade: course.grade || 'N/A', // Default to 'N/A' if grade is missing
+            grade: course.grade || null, // Store null if grade is missing
           })),
           teachers: teacherNames,
           summary: {
@@ -75,7 +77,7 @@ export default function StudentDashboard() {
         });
       } catch (err) {
         // More specific error message based on the error object
-        setError(`Failed to fetch dashboard data: ${err.message || 'Unknown error'}`);
+        setError(t('fetch-dashboard-fail') + ': ' + (err.message || t('unknown-error')));
       } finally {
         setLoading(false);
       }
@@ -98,14 +100,14 @@ export default function StudentDashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="bg-white p-8 rounded-xl shadow-lg text-center">
-          <p className="text-2xl font-bold text-red-600 mb-4">Oops! Something went wrong.</p>
+          <p className="text-2xl font-bold text-red-600 mb-4">{t('dashboard-error-title')}</p>
           <p className="text-gray-700 text-lg">{error}</p>
-          <p className="text-sm text-gray-500 mt-4">Please try refreshing the page or contact support if the issue persists.</p>
+          <p className="text-sm text-gray-500 mt-4">{t('dashboard-error-desc')}</p>
           <button
             onClick={() => window.location.reload()}
             className="mt-6 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-200"
           >
-            Refresh Page
+            {t('refresh-page')}
           </button>
         </div>
       </div>
@@ -116,26 +118,26 @@ export default function StudentDashboard() {
     // Main container with a subtle background color
     <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8 font-inter">
       {/* Page Title and Description */}
-      <h1 className="text-4xl font-extrabold text-indigo-800 mb-2">Student Dashboard</h1>
-      <p className="text-gray-600 text-lg mb-8">Welcome back! Here's an overview of your academic progress.</p>
+      <h1 className="text-4xl font-extrabold text-indigo-800 mb-2">{t('student-dashboard-title')}</h1>
+      <p className="text-gray-600 text-lg mb-8">{t('student-dashboard-desc')}</p>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
         <div className="bg-white rounded-2xl p-6 shadow-xl flex flex-col items-start transform hover:scale-[1.02] transition duration-300 ease-in-out border-b-4 border-indigo-600">
           <div className="flex items-center mb-3">
             <i className="fas fa-book-open text-indigo-700 text-3xl mr-4" />
-            <span className="text-xl font-bold text-gray-800">Enrolled Courses</span>
+            <span className="text-xl font-bold text-gray-800">{t('enrolled-courses')}</span>
           </div>
           <div className="text-5xl font-extrabold text-indigo-700 mb-1">{dashboardData.summary.courses}</div>
-          <div className="text-gray-500 text-md">Total courses you're taking</div>
+          <div className="text-gray-500 text-md">{t('total-courses-taking')}</div>
         </div>
         <div className="bg-white rounded-2xl p-6 shadow-xl flex flex-col items-start transform hover:scale-[1.02] transition duration-300 ease-in-out border-b-4 border-teal-600">
           <div className="flex items-center mb-3">
             <i className="fas fa-chalkboard-teacher text-teal-700 text-3xl mr-4" />
-            <span className="text-xl font-bold text-gray-800">Your Teachers</span>
+            <span className="text-xl font-bold text-gray-800">{t('your-teachers')}</span>
           </div>
           <div className="text-5xl font-extrabold text-teal-700 mb-1">{dashboardData.summary.teachers}</div>
-          <div className="text-gray-500 text-md">Educators guiding your learning</div>
+          <div className="text-gray-500 text-md">{t('educators-guiding')}</div>
         </div>
       </div>
 
@@ -151,7 +153,7 @@ export default function StudentDashboard() {
               }`}
             onClick={() => setActiveTab(tab)}
           >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {t('dashboard-tab-' + tab)}
           </button>
         ))}
       </div>
@@ -161,7 +163,7 @@ export default function StudentDashboard() {
       {/* Teachers Tab Content */}
       {activeTab === 'teachers' && (
         <section className="animate-fade-in">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">All Teachers</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">{t('all-teachers')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {dashboardData.teachers.length > 0 ? (
               dashboardData.teachers.map((teacherName, idx) => (
@@ -179,12 +181,12 @@ export default function StudentDashboard() {
                   </div>
                   <div className="flex-1">
                     <div className="font-bold text-xl text-gray-900">{teacherName}</div>
-                    <div className="text-gray-500 text-sm">View courses taught</div>
+                    <div className="text-gray-500 text-sm">{t('view-courses-taught')}</div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="col-span-full text-center py-10 text-gray-500 text-lg">No teachers found for your enrolled courses.</div>
+              <div className="col-span-full text-center py-10 text-gray-500 text-lg">{t('no-teachers-found-enrolled')}</div>
             )}
           </div>
         </section>
@@ -193,7 +195,7 @@ export default function StudentDashboard() {
       {/* Courses Tab Content */}
       {activeTab === 'courses' && (
         <section className="animate-fade-in">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">All Courses</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">{t('all-courses')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {dashboardData.courses.length > 0 ? (
               dashboardData.courses.map((course) => (
@@ -221,12 +223,12 @@ export default function StudentDashboard() {
                     )}
                   </div>
                   <div className="text-gray-700 text-md mt-4 flex items-center">
-                    Current Grade: <span className="font-bold text-indigo-700 ml-2 text-lg">{course.grade}</span>
+                    {t('current-grade')} <span className="font-bold text-indigo-700 ml-2 text-lg">{(course.grade === null || course.grade === undefined || course.grade === '') ? t('not-available') : course.grade}</span>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="col-span-full text-center py-10 text-gray-500 text-lg">You are not enrolled in any courses yet.</div>
+              <div className="col-span-full text-center py-10 text-gray-500 text-lg">{t('not-enrolled-in-courses')}</div>
             )}
           </div>
         </section>
@@ -237,12 +239,12 @@ export default function StudentDashboard() {
         <section className="animate-fade-in">
           {/* Courses Overview Section */}
           <div className="flex justify-between items-center mb-5">
-            <h2 className="text-3xl font-bold text-gray-800">Recent Courses</h2>
+            <h2 className="text-3xl font-bold text-gray-800">{t('recent-courses')}</h2>
             <button
               onClick={() => setActiveTab('courses')}
               className="text-indigo-600 font-semibold hover:underline text-md px-4 py-2 rounded-lg hover:bg-indigo-50 transition duration-200"
             >
-              View All Courses <i className="fas fa-arrow-right ml-1"></i>
+              {t('view-all-courses')} <i className="fas fa-arrow-right ml-1"></i>
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
@@ -272,23 +274,23 @@ export default function StudentDashboard() {
                     )}
                   </div>
                   <div className="text-gray-700 text-md mt-4 flex items-center">
-                    Current Grade: <span className="font-bold text-indigo-700 ml-2 text-lg">{course.grade}</span>
+                    {t('current-grade')} <span className="font-bold text-indigo-700 ml-2 text-lg">{(course.grade === null || course.grade === undefined || course.grade === '') ? t('not-available') : course.grade}</span>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="col-span-full text-center py-10 text-gray-500 text-lg">No recent courses to display. Enroll in some to get started!</div>
+              <div className="col-span-full text-center py-10 text-gray-500 text-lg">{t('no-recent-courses')}</div>
             )}
           </div>
 
           {/* Teachers Overview Section */}
           <div className="flex justify-between items-center mt-10 mb-5">
-            <h2 className="text-3xl font-bold text-gray-800">Key Teachers</h2>
+            <h2 className="text-3xl font-bold text-gray-800">{t('key-teachers')}</h2>
             <button
               onClick={() => setActiveTab('teachers')}
               className="text-indigo-600 font-semibold hover:underline text-md px-4 py-2 rounded-lg hover:bg-indigo-50 transition duration-200"
             >
-              View All Teachers <i className="fas fa-arrow-right ml-1"></i>
+              {t('view-all-teachers')} <i className="fas fa-arrow-right ml-1"></i>
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -308,12 +310,12 @@ export default function StudentDashboard() {
                   </div>
                   <div className="flex-1">
                     <div className="font-bold text-xl text-gray-900">{teacherName}</div>
-                    <div className="text-gray-500 text-sm">View courses taught</div>
+                    <div className="text-gray-500 text-sm">{t('view-courses-taught')}</div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="col-span-full text-center py-10 text-gray-500 text-lg">No key teachers to display.</div>
+              <div className="col-span-full text-center py-10 text-gray-500 text-lg">{t('no-key-teachers')}</div>
             )}
           </div>
         </section>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   FaPhone,
   FaTachometerAlt,
@@ -14,6 +15,7 @@ import {
 import axios from 'axios';
 
 export default function StudentProfile3() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,16 +38,16 @@ export default function StudentProfile3() {
         if (res.data && res.data.succeeded) {
           setProfile(res.data.data);
         } else {
-          setError('Failed to fetch profile data');
+          setError(t('fetch-profile-fail'));
         }
       } catch (err) {
-        setError('Failed to fetch profile data');
+        setError(t('fetch-profile-fail'));
       } finally {
         setLoading(false);
       }
     };
     fetchProfile();
-  }, [studentId]);
+  }, [studentId, t]);
 
   const handleGoToDashboard = () => {
     navigate('/studentdashboard');
@@ -95,8 +97,8 @@ export default function StudentProfile3() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f4f7fa]">
         <div className="text-red-600 text-center">
-          <p className="text-xl font-semibold">{error || "No profile data found."}</p>
-          <p className="text-sm mt-2">Please try refreshing the page</p>
+          <p className="text-xl font-semibold">{error || t('no-profile-data')}</p>
+          <p className="text-sm mt-2">{t('refresh-page')}</p>
         </div>
       </div>
     );
@@ -123,7 +125,7 @@ export default function StudentProfile3() {
               <button
                 onClick={handleEditProfile}
                 className="absolute bottom-2 right-2 bg-indigo-600 text-white p-2 rounded-full shadow-lg hover:bg-indigo-700 transition-colors"
-                title="Edit Profile Picture"
+                title={t('edit-profile-picture')}
               >
                 <i className="fa fa-camera"></i>
               </button>
@@ -139,15 +141,15 @@ export default function StudentProfile3() {
                   onClick={handleEditProfile}
                   className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg font-semibold shadow hover:from-indigo-600 hover:to-blue-600 transition-all"
                 >
-                  Edit Profile
+                  {t('edit-profile')}
                 </button>
                 <button
                   onClick={handleGoToDashboard}
                   className="flex items-center gap-2 px-6 py-2 bg-indigo-50 text-indigo-700 rounded-lg font-semibold shadow hover:bg-indigo-100 border border-indigo-200 transition-all"
-                  title="Go to Dashboard"
+                  title={t('go-to-dashboard')}
                 >
                   <FaTachometerAlt className="text-lg" />
-                  Dashboard
+                  {t('dashboard')}
                 </button>
               </div>
             </div>
@@ -156,7 +158,7 @@ export default function StudentProfile3() {
 
         {/* Assignments Section */}
         <div className="bg-white border rounded-2xl p-6 shadow mb-10">
-          <h2 className="text-xl font-bold text-indigo-700 mb-4">Assignments</h2>
+          <h2 className="text-xl font-bold text-indigo-700 mb-4">{t('assignments')}</h2>
           {assignments && assignments.length > 0 ? (
             <>
               <div className="overflow-x-auto">
@@ -164,10 +166,10 @@ export default function StudentProfile3() {
                   <thead>
                     <tr className="bg-indigo-50">
                       <th className="py-2 px-4 text-left">#</th>
-                      <th className="py-2 px-4 text-left">Course</th>
-                      <th className="py-2 px-4 text-left">Lesson</th>
-                      <th className="py-2 px-4 text-left">File</th>
-                      <th className="py-2 px-4 text-left">Degree %</th>
+                      <th className="py-2 px-4 text-left">{t('course')}</th>
+                      <th className="py-2 px-4 text-left">{t('lesson')}</th>
+                      <th className="py-2 px-4 text-left">{t('file')}</th>
+                      <th className="py-2 px-4 text-left">{t('degree-percent')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -184,7 +186,7 @@ export default function StudentProfile3() {
                             className="flex items-center gap-2 text-indigo-600 hover:underline"
                           >
                             {getFileIcon(a.path)}
-                            View
+                            {t('view')}
                           </a>
                         </td>
                         <td className="py-2 px-4 min-w-[120px]">
@@ -210,11 +212,11 @@ export default function StudentProfile3() {
                   >
                     {showAllAssignments ? (
                       <>
-                        Show Less <FaChevronUp />
+                        {t('show-less')} <FaChevronUp />
                       </>
                     ) : (
                       <>
-                        Show All <FaChevronDown />
+                        {t('show-all')} <FaChevronDown />
                       </>
                     )}
                   </button>
@@ -222,13 +224,13 @@ export default function StudentProfile3() {
               )}
             </>
           ) : (
-            <div className="text-gray-500">No assignments found.</div>
+            <div className="text-gray-500">{t('no-assignments-found')}</div>
           )}
         </div>
 
         {/* Quizzes Section */}
         <div className="bg-white border rounded-2xl p-6 shadow mb-10">
-          <h2 className="text-xl font-bold text-indigo-700 mb-4">Quizzes</h2>
+          <h2 className="text-xl font-bold text-indigo-700 mb-4">{t('quizzes')}</h2>
           {quizzes && quizzes.length > 0 ? (
             <>
               <div className="overflow-x-auto">
@@ -236,10 +238,10 @@ export default function StudentProfile3() {
                   <thead>
                     <tr className="bg-indigo-50">
                       <th className="py-2 px-4 text-left">#</th>
-                      <th className="py-2 px-4 text-left">Quiz Title</th>
-                      <th className="py-2 px-4 text-left">Score</th>
-                      <th className="py-2 px-4 text-left">Passed</th>
-                      <th className="py-2 px-4 text-left">Grade %</th>
+                      <th className="py-2 px-4 text-left">{t('quiz-title')}</th>
+                      <th className="py-2 px-4 text-left">{t('score')}</th>
+                      <th className="py-2 px-4 text-left">{t('passed')}</th>
+                      <th className="py-2 px-4 text-left">{t('grade-percent')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -251,11 +253,11 @@ export default function StudentProfile3() {
                         <td className="py-2 px-4">
                           {q.isPassed === true ? (
                             <span className="flex items-center gap-1 text-green-600 font-semibold">
-                              <FaCheckCircle /> Yes
+                              <FaCheckCircle /> {t('yes')}
                             </span>
                           ) : q.isPassed === false ? (
                             <span className="flex items-center gap-1 text-red-600 font-semibold">
-                              <FaTimesCircle /> No
+                              <FaTimesCircle /> {t('no')}
                             </span>
                           ) : (
                             <span className="text-gray-500">-</span>
@@ -288,11 +290,11 @@ export default function StudentProfile3() {
                   >
                     {showAllQuizzes ? (
                       <>
-                        Show Less <FaChevronUp />
+                        {t('show-less')} <FaChevronUp />
                       </>
                     ) : (
                       <>
-                        Show All <FaChevronDown />
+                        {t('show-all')} <FaChevronDown />
                       </>
                     )}
                   </button>
@@ -300,21 +302,21 @@ export default function StudentProfile3() {
               )}
             </>
           ) : (
-            <div className="text-gray-500">No quizzes found.</div>
+            <div className="text-gray-500">{t('no-quizzes-found')}</div>
           )}
         </div>
 
         {/* Attendance Section */}
         <div className="bg-white border rounded-2xl p-6 shadow mb-10">
-          <h2 className="text-xl font-bold text-indigo-700 mb-4">Attendance</h2>
+          <h2 className="text-xl font-bold text-indigo-700 mb-4">{t('attendance')}</h2>
           {attendance && attendance.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm">
                 <thead>
                   <tr className="bg-indigo-50">
                     <th className="py-2 px-4 text-left">#</th>
-                    <th className="py-2 px-4 text-left">Date</th>
-                    <th className="py-2 px-4 text-left">Status</th>
+                    <th className="py-2 px-4 text-left">{t('date')}</th>
+                    <th className="py-2 px-4 text-left">{t('status')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -331,7 +333,7 @@ export default function StudentProfile3() {
               </table>
             </div>
           ) : (
-            <div className="text-gray-500">No attendance records found.</div>
+            <div className="text-gray-500">{t('no-attendance-records-found')}</div>
           )}
         </div>
       </div>
