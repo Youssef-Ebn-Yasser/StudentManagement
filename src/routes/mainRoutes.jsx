@@ -89,12 +89,12 @@ const mainRoutes = [
                 isProtected: false,
                 accessRole: 'all',
             },
-            {
-                path: 'dashboard',
-                element: <Dashboard />,
-                isProtected: false,
-                accessRole: 'all',
-            },
+            // {
+            //     path: 'dashboard',
+            //     element: <Dashboard />,
+            //     isProtected: false,
+            //     accessRole: 'all',
+            // },
             {
                 path: 'enrollment',
                 element: <EnrollStudentCourse />,

@@ -12,7 +12,9 @@ import {
     getFooterSitemap,
     subscribeNewsletter
 } from '../../services/footerService';
-
+import { t } from 'i18next';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const Footer = () => {
     // State for fetched data
