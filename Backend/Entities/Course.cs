@@ -1,12 +1,10 @@
-﻿using Backend.Entities.Meetings;
-
-namespace Backend.Entities;
+﻿namespace Backend.Entities;
 
 public class Course : BaseEntity
 {
 
     public string? DescriptionEn { get; set; }
-    public string? DescriptionAr {  get; set; }
+    public string? DescriptionAr { get; set; }
     public double Price { get; set; }
     public string? ImagePath { get; set; }
     public string? LevelEn { get; set; }
@@ -22,6 +20,6 @@ public class Course : BaseEntity
     public Category Category { get; set; }
     public bool? IsDeleted { get; set; } = false;
     public DateTime? CreatedAt { get; set; } = DateTime.Now;
-
+    public List<MeetingAttendance> MeetingAttendance { get; set; }
     public List<Meeting> Meetings { get; set; }
 }

@@ -17,7 +17,7 @@ public class Student : User
     public List<Comment>? Comments { get; set; }
     public List<StudentAssignment>? StudentAssignments { get; set; }
 
-
+    public List<MeetingAttendance>? MeetingAttendance { get; set; }
     public static long RandomNumberGenerator()
     {
         Random random = new Random();

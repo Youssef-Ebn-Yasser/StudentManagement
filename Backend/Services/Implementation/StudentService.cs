@@ -558,7 +558,6 @@ public class StudentService : ResponseHandler, IStudentService
         // This is just a placeholder implementation
         return await _unitOfWork.Repository<MeetingAttendance>() // You'll need this entity
             .GetTableNoTracking()
-            .Include(ma => ma.Meeting)
             .Where(ma => ma.StudentId == studentId)
             .Select(ma => new StudentAttendanceStatusDto
             {

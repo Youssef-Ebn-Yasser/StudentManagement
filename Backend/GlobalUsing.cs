@@ -39,3 +39,4 @@ global using System.Text;
 global using Backend.DTOs.StudentDOs;
 global using Backend.DTOs.StudentProfileDto;
 global using Backend.Wrapper;
+global using Backend.DTOs.AttendanceDTOs;
