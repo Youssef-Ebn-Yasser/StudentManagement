@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { courseService } from '../../services/courseService';
-import AddLesson from './AddLesson';
-import AddMaterial from './AddMaterial';
 import Loader from '../Loader/Loader';
 import "./CreateCourse.css";
 import axiosInstance from '../../services/axiosInstance';

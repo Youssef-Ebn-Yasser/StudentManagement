@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axiosInstance from '@/services/axiosInstance';
 import React, { useEffect, useState } from 'react'
 import { allStudent } from '@/Redux/features/allStudents/allStudents'
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,7 +23,7 @@ function StudentDetails() {
 
 
     function getStudentDetails(){
-        axios.get(`https://e-learn-v1.runasp.net/api/Student/GetById/GetById/${id}`)
+        axiosInstance.get(`/Student/GetById/GetById/${id}`)
         .then((response)=>{
             console.log(response.data);
             setDetails(response.data)
@@ -36,7 +36,7 @@ function StudentDetails() {
     }
 
     async function handleRemovestudent(id) {
-        axios.delete(`https://e-learn-v1.runasp.net/api/Student/Delete/Delete/${id}`)
+        axiosInstance.delete(`/Student/Delete/Delete/${id}`)
         .then((response)=>{
             toast.success('Student Deleted')
             console.log("Student deleted");
@@ -49,7 +49,7 @@ function StudentDetails() {
     }
 
     async function getStudentAssignInCourse(id, courseId){
-        axios.get(`https://e-learn-v1.runasp.net/api/Assignment/GetStudentAssignmentInCourse`,{
+        axiosInstance.get(`/Assignment/GetStudentAssignmentInCourse`,{
             params:{
                 id,
                 courseId
@@ -67,7 +67,7 @@ function StudentDetails() {
     }
 
     async function handleEnrolledCourse(id){
-        axios.get('https://e-learn-v1.runasp.net/api/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses',{
+        axiosInstance.get('/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses',{
             params: { studentId: id }
         }).then(response => {
             console.log(`Courses for student ${id}:`, response.data);
