@@ -37,6 +37,8 @@ public static class ClassesDependencies
         services.AddTransient<IQuizService, QuizService>();
         services.AddTransient<IStructuredLogger, StructuredLogger>();
         services.AddTransient<IReportServices, ReportServices>();
+        services.AddTransient<IAttendanceSevice, AttendanceSevice>();
+
 
 
 

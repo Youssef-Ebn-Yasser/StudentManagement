@@ -221,7 +221,6 @@ namespace Backend.Services.Implementation
 
             // Get attendance information
             var attendance = await _context.MeetingAttendances
-                .Include(ma => ma.Meeting)
                 .Where(ma => ma.StudentId == studentId)
                 .ToListAsync();
 
@@ -238,7 +237,6 @@ namespace Backend.Services.Implementation
                     .Select(a => new StudentAttendanceReportDto
                     {
                         Id = a.Id,
-                        MeetingTopic = a.Meeting.TopicEn,
                         MeetingDate = a.AttendanceDate,
                         Attended = a.Attended
                     })

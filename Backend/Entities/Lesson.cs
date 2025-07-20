@@ -7,10 +7,11 @@ public class Lesson : BaseEntity
     public bool IsDeleted { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public List<Material>? materials { get; set; }
+
     public int? CourseId { get; set; }
     [ForeignKey("CourseId")]
     public Course? Course { get; set; }
+    public List<MeetingAttendance> MeetingAttendance { get; set; }
     public List<Quiz> Quizs { get; set; }
     public List<StudentAssignment>? StudentAssignments { get; set; }
-
 }

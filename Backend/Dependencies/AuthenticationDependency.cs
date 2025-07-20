@@ -1,6 +1,3 @@
-using Backend.Context;
-using Backend.Settings;
-
 namespace Backend.Dependencies;
 
 public static class AuthenticationDependency

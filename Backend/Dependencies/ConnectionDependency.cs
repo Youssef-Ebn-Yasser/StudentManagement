@@ -1,13 +1,11 @@
-﻿using Backend.Context;
-
-namespace Backend.Dependencies;
+﻿namespace Backend.Dependencies;
 
 public static class ConnectionDependency
 {
     public static IServiceCollection AddConnectionDependency(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), options => options.EnableRetryOnFailure()));
         //        services.AddIdentity<User, IdentityRole<int>>()
         //            .AddEntityFrameworkStores<ApplicationDbContext>()
         //            .AddDefaultTokenProviders();
