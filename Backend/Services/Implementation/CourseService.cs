@@ -98,7 +98,7 @@ public class CourseService : ResponseHandler, ICourseService
             .Where(c => c.IsDeleted == false)
             .Include(c => c.Category)!
             .Include(c => c.Teacher)
-            .Include(c => c.lessons)! 
+            .Include(c => c.lessons)!
             .Include(c => c.StudentCourses)!
                 .ThenInclude(sc => sc.Student)!
             .FirstOrDefaultAsync(c => c.Id == id);
@@ -108,8 +108,13 @@ public class CourseService : ResponseHandler, ICourseService
             _logger.LogInfo($"No Course with this id => {id} in GetCourseByIdAsync");
             return NotFound<ShowCourseDto>("Course not found");
         }
+        if (cultureInfo.TwoLetterISOLanguageName.ToLower() == "ar" && course.LevelAr == null)
+        {
+            course.LevelAr = await _translator.TranslateObjectAsync<string>(course.LevelEn, "English", "Arabic");
+            course.TitleAr = await _translator.TranslateObjectAsync<string>(course.TitleEn, "English", "Arabic");
+            course.DescriptionAr = await _translator.TranslateObjectAsync<string>(course.DescriptionEn, "English", "Arabic");
+        }
 
-       
         course.lessons = course.lessons?.Where(l => !l.IsDeleted).ToList();
 
         var result = _mapper.Map<ShowCourseDto>(course);
@@ -144,9 +149,10 @@ public class CourseService : ResponseHandler, ICourseService
     }
 
 
+
     public async Task Translate(string level, string title, string desc, int courseId, string language)
     {
-        var course = await _unitOfWork.Repository<Course>().GetByIdAsync(courseId);
+        var course = _unitOfWork.Repository<Course>().GetTableAsTracking().FirstOrDefault(c => c.Id == courseId);
         _logger.LogInfo("Start hangfire service");
         if (language == "en")
         {
@@ -307,7 +313,7 @@ public class CourseService : ResponseHandler, ICourseService
                 StudentName = sc.Student.NameEn,
                 CourseId = sc.Course.Id,
                 CourseTitle = GeneralLocalizableEntity.Localized(sc.Course.TitleAr, sc.Course.TitleEn),
-               
+
             })
             .ToListAsync();
         if (studentCourses == null || !studentCourses.Any())

@@ -1,14 +1,18 @@
-﻿namespace Backend.Controllers;
+﻿using Hangfire;
+
+namespace Backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class TranslationController : ControllerBase
 {
-    private readonly GeminiObjectTranslator _translateService;
+    private readonly IGeminiObjectTranslator _translateService;
+    private readonly ApplicationDbContext _context;
 
-    public TranslationController(GeminiObjectTranslator translateService)
+    public TranslationController(IGeminiObjectTranslator translateService, ApplicationDbContext context)
     {
         _translateService = translateService;
+        _context = context;
     }
 
     [HttpPost("translate-object")]
@@ -21,8 +25,23 @@ public class TranslationController : ControllerBase
 
         return Ok(translated); // ✅ return content, not NoContent()
     }
-}
 
+    [HttpPost("background/Test")]
+    public async Task<IActionResult> test(forTest forTest)
+    {
+        BackgroundJob.Enqueue(() => _translateService.test(forTest));
+
+        return Ok("done");
+    }
+
+
+}
+public class forTest
+{
+    public string nameEn { get; set; }
+    public string nameAr { get; set; }
+
+}
 public class YourDto
 {
     public string Title { get; set; }

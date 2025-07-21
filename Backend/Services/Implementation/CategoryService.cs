@@ -34,7 +34,6 @@ public class CategoryService : ResponseHandler, ICategoryService
     {
         var allCategories = await _unitOfWork.Repository<Category>()
                                                             .GetTableAsTracking()
-                                                          //.GetTableNoTracking()
                                                           .Where(c => !c.IsDeleted)
                                                           .ToListAsync();
 
