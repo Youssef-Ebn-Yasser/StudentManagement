@@ -2,7 +2,6 @@
 
 public class Course : BaseEntity
 {
-
     public string? DescriptionEn { get; set; }
     public string? DescriptionAr { get; set; }
     public double Price { get; set; }

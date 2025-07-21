@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using Backend.Controllers;
+using System.Text.RegularExpressions;
 
 namespace Backend.Helper;
 
@@ -6,12 +7,14 @@ public class GeminiObjectTranslator : IGeminiObjectTranslator
 {
     #region   Fields
     private readonly GeminiService _geminiService;
+    private readonly ApplicationDbContext _context;
     #endregion
 
     #region   Constructor
-    public GeminiObjectTranslator(GeminiService geminiService)
+    public GeminiObjectTranslator(GeminiService geminiService, ApplicationDbContext context)
     {
         _geminiService = geminiService;
+        _context = context;
     }
     #endregion
 
@@ -23,19 +26,34 @@ public class GeminiObjectTranslator : IGeminiObjectTranslator
 
         try
         {
+            // Try to clean markdown if present
+            response = response.Trim();
+
+            if (response.StartsWith("```json"))
+            {
+                response = response.Replace("```json", "")
+                                   .Replace("```", "")
+                                   .Trim();
+            }
+
             // Extract the first JSON object from the response using regex
             var match = Regex.Match(response, @"\{[\s\S]*\}");
+
 
             if (!match.Success)
             {
                 Console.WriteLine("[TranslateObjectAsync] No valid JSON object found in response.");
                 return default;
             }
+            var jsonOnly = match.Value
+               .Replace("{{", "{")
+               .Replace("}}", "}")
+               .Trim();
+            var result = JsonConvert.DeserializeObject<Dictionary<T, T>>(jsonOnly);
 
-            var jsonOnly = match.Value;
 
-            var translatedObj = JsonConvert.DeserializeObject<T>(jsonOnly);
-            return translatedObj;
+            return result.Values.FirstOrDefault();
+
         }
         catch (Exception ex)
         {
@@ -79,6 +97,19 @@ public class GeminiObjectTranslator : IGeminiObjectTranslator
                     
                     {objectJson}
                     ";
+    }
+
+    public void test(forTest forTest)
+    {
+        var stu = new Category
+        {
+            CategoryNameEn = forTest.nameEn,
+            IsDeleted = false,
+            CategoryNameAr = forTest.nameAr,
+        };
+
+        _context.Categories.Add(stu);
+        _context.SaveChanges();
     }
     #endregion
 }
