@@ -57,7 +57,7 @@ const CreateCourse = () => {
   const fetchCategories = async () => {
     try {
       setIsLoadingCategories(true);
-      const response = await axiosInstance.get('/api/Category/GetAll');
+      const response = await axiosInstance.get('https://e-learn-v1.runasp.net/api/Category/All');
       console.log('Categories API Response:', response);
       
       if (response.data && response.data.data) {

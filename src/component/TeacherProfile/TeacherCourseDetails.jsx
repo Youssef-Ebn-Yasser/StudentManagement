@@ -38,7 +38,7 @@ const TeacherCourseDetails = () => {
           setCourse(response.data);
           const courseLessons = response.data.lessons || response.data.lessonInfo || [];
           const materialsPromises = courseLessons.map(lesson =>
-            axiosInstance.get(`/api/Material/GetMaterialsByLessonId/GetMaterialsByLessonId/${lesson.id}`)
+            axiosInstance.get(`https://e-learn-v1.runasp.net/api/Material?lessonId=${lesson.id}`)
           );
           const materialsResponses = await Promise.all(materialsPromises);
           const materialsMap = {};
@@ -124,7 +124,7 @@ const TeacherCourseDetails = () => {
   const handleDeleteMaterial = async (materialId) => {
     if (window.confirm('Are you sure you want to delete this material?')) {
       try {
-        const response = await axiosInstance.delete(`/api/Material/DeleteMaterial/DeleteMaterial/${materialId}`);
+        const response = await axiosInstance.delete(`/api/Material?materialId=${materialId}`);
         if (response.data.succeeded) {
           setLessonMaterials(prevMaterials => {
             const updatedMaterials = { ...prevMaterials };
@@ -158,7 +158,7 @@ const TeacherCourseDetails = () => {
         formData.append('Data', materialFile);
       }
       const response = await axiosInstance.put(
-        '/api/Material/UpdateMaterial/UpdateMaterial',
+        '/api/Material',
         formData,
         {
           headers: {

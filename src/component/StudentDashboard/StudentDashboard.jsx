@@ -29,7 +29,7 @@ export default function StudentDashboard() {
   // Function to get teacher ID by name
   const getTeacherIdByName = async (teacherName) => {
     try {
-      const response = await axiosInstance.get('/api/Teacher/Teacher/All');
+      const response = await axiosInstance.get('/api/Teacher/GetAll');
       if (response.data.succeeded && response.data.data) {
         const teacher = response.data.data.find(t => 
           t.name && t.name.toLowerCase() === teacherName.toLowerCase()

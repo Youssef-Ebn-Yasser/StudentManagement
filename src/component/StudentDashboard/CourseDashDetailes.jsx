@@ -20,7 +20,7 @@ export default function CourseDashDetails() {
     const fetchCourseDetails = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`https://e-learn-v1.runasp.net/Course/Get/${id}`);
+        const response = await axios.get(`https://e-learn-v1.runasp.net/api/Course?id=${id}`);
         if (response.data.succeeded) {
           setCourse(response.data.data);
         } else {

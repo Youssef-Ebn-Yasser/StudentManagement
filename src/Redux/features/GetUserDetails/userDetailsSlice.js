@@ -12,7 +12,7 @@ export const getUserDetails=createAsyncThunk(
         }
 
         try{
-            const response = await axios.get(`http://e-learn-v1.runasp.net/api/Teacher/Teacher/ById/${userId}`)
+            const response = await axios.get(`http://e-learn-v1.runasp.net/api/Course/GetAllCoursesOfTeacher?teacherId=${userId}`)
             return response.data
         }catch(error){
             if(error.response && error.response.data){

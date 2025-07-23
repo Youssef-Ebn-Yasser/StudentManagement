@@ -69,7 +69,7 @@ export default function LessonDetails() {
             setErrorMsg('')
             try {
                 const res = await axios.get(
-                    `https://e-learn-v1.runasp.net/api/Material/GetMaterialsByLessonId/GetMaterialsByLessonId/${lessonId}`
+                    `https://e-learn-v1.runasp.net/api/Material?lessonId=${lessonId}`
                 )
                 if (res.data.succeeded && Array.isArray(res.data.data)) {
                     setMaterials(

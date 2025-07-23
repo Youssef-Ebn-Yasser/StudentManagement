@@ -6,7 +6,7 @@ export const allGategory = createAsyncThunk(
     'allGategory',
     async(_,thunkAPI)=>{
         try{
-            const response = await axiosInstance.get('/api/Category/GetAll')
+            const response = await axiosInstance.get('https://e-learn-v1.runasp.net/api/Category/All')
             return response.data.data
         }catch(error){
             console.log(error)

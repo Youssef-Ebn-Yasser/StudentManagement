@@ -130,7 +130,7 @@ export default function CoursesDetails() {
   const fetchCourseDetails = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get(`/Course/Get/${id}`);
+      const response = await axiosInstance.get(`https://e-learn-v1.runasp.net/api/Course?id=${id}`);
       if (response.data.succeeded) {
         setCourse(response.data.data);
       } else {
