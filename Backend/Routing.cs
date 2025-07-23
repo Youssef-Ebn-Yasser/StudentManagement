@@ -3,26 +3,25 @@
 public class Routing
 {
     private const string SingleId = "/{id}";
-    private const string root = "Api";
-    private const string version = "V1";
-    private const string Rule = root + "/" + version + "/";
-
+    private const string root = "api";
+    // private const string version = "V1";
+    //private const string Rule = root + "/" + version + "/";
+    private const string Rule = root;
     public static class StudentRouting
     {
-        public const string Prefix = Rule + "Student";
-        public const string GetList = Prefix + "/GetAll";
-        public const string GetById = Prefix + SingleId;
+        public const string Prefix = Rule + "/Student";
+        public const string GetList = Prefix + "/All";
         public const string GetByName = Prefix + "/{name}";
-        public const string AddNew = Prefix + "/Create";
-        public const string Update = Prefix + "/Update";
-        public const string Delete = Prefix + "/Delete/{id}";
         public const string Paginated = Prefix + "/Paginated";
-        public const string PagGetAllInCourseByCourseNameinated = Prefix + "PagGetAllInCourseByCourseNameinated" + "/{courseName}";
+        public const string PagGetAllInCourseByCourseName = Prefix + "PagGetAllInCourseByCourseName" + "/{courseName}";
         public const string GetPaginatedCourses = Prefix + "GetPaginatedCourses" + "/{pageNumber}" + "/{pageSize}";
         public const string GetAllEnrolledStudentCourses = Prefix + "/GetAllEnrolledStudentCourses";
         public const string IsEnrolled = Prefix + "/IsEnrolled";
         public const string EnrollToCourse = Prefix + "/EnrollToCourse";
         public const string DeleteStudentFromCourse = Prefix + "/DeleteStudentFromCourse";
+        public const string Profile = Prefix + "profile/{studentId}";
+        public const string DownloadSampleExcel = Prefix + "/download/sample";
+        public const string UploadAddStudentsExcel = Prefix + "/upload";
     }
 
     public static class AuthRouting
@@ -66,19 +65,8 @@ public class Routing
 
     public static class CommentRouting
     {
-        public const string Prefix = Rule + "Comment";
-        public const string Create = Prefix + "/create";
-        public const string Delete = Prefix + "/{commentId}";
-        public const string GetAllByLessonId = Prefix + "/lesson/{lessonId}";
-        public const string GetAllForStudentInLesson = Prefix + "/lesson/{lessonId}/student-comments";
-        public const string Update = Prefix + "/Update";
-        public const string GetById = Prefix + SingleId;
-        public const string GetAll = Prefix + "/GetAll";
-        public const string GetByStudentId = Prefix + "/GetByStudentId/{studentId}";
-        public const string GetByLessonId = Prefix + "/GetByLessonId/{lessonId}";
-        public const string GetByCourseId = Prefix + "/GetByCourseId/{courseId}";
-        public const string GetByDateRange = Prefix + "/GetByDateRange";
-        public const string GetByContent = Prefix + "/GetByContent/{content}";
+        public const string Prefix = Rule + "/Comment";
+        public const string ForStudent = Prefix + "/Student";
     }
 
     public static class PaymentRouting
@@ -128,200 +116,32 @@ public class Routing
 
     public static class CourseRouting
     {
-        public const string Prefix = Rule + "Course";
-        public const string Create = Prefix + "/Create";
-        public const string Update = Prefix + "/Update";
-        public const string Delete = Prefix + "/Delete/{id}";
-        public const string GetById = Prefix + SingleId;
-        public const string GetAll = Prefix + "/GetAll";
-        public const string GetByTitle = Prefix + "/GetByTitle/{title}";
-        public const string GetByDescription = Prefix + "/GetByDescription/{description}";
-        public const string GetByLevel = Prefix + "/GetByLevel/{level}";
-        public const string GetByCategoryId = Prefix + "/GetByCategoryId/{categoryId}";
-        public const string GetByTeacherId = Prefix + "/GetByTeacherId/{teacherId}";
-        public const string GetByPriceRange = Prefix + "/GetByPriceRange";
-        public const string GetByDurationRange = Prefix + "/GetByDurationRange";
-        public const string GetByDateRange = Prefix + "/GetByDateRange";
-        public const string GetByIsActive = Prefix + "/GetByIsActive/{isActive}";
-        public const string GetByIsDeleted = Prefix + "/GetByIsDeleted/{isDeleted}";
-        public const string GetByIsPublished = Prefix + "/GetByIsPublished/{isPublished}";
-        public const string GetByIsFeatured = Prefix + "/GetByIsFeatured/{isFeatured}";
-        public const string GetByIsPopular = Prefix + "/GetByIsPopular/{isPopular}";
-        public const string GetByIsNew = Prefix + "/GetByIsNew/{isNew}";
-        public const string GetByIsRecommended = Prefix + "/GetByIsRecommended/{isRecommended}";
-        public const string GetByIsTrending = Prefix + "/GetByIsTrending/{isTrending}";
-        public const string GetByIsBestSeller = Prefix + "/GetByIsBestSeller/{isBestSeller}";
-        public const string GetByIsTopRated = Prefix + "/GetByIsTopRated/{isTopRated}";
-        public const string GetByIsMostViewed = Prefix + "/GetByIsMostViewed/{isMostViewed}";
-        public const string GetByIsMostEnrolled = Prefix + "/GetByIsMostEnrolled/{isMostEnrolled}";
-        public const string GetByIsMostReviewed = Prefix + "/GetByIsMostReviewed/{isMostReviewed}";
-        public const string GetByIsMostRated = Prefix + "/GetByIsMostRated/{isMostRated}";
-        public const string GetByIsMostCommented = Prefix + "/GetByIsMostCommented/{isMostCommented}";
-        public const string GetByIsMostLiked = Prefix + "/GetByIsMostLiked/{isMostLiked}";
-        public const string GetByIsMostShared = Prefix + "/GetByIsMostShared/{isMostShared}";
-        public const string GetByIsMostBookmarked = Prefix + "/GetByIsMostBookmarked/{isMostBookmarked}";
-        public const string GetByIsMostDownloaded = Prefix + "/GetByIsMostDownloaded/{isMostDownloaded}";
-        public const string GetByIsMostPurchased = Prefix + "/GetByIsMostPurchased/{isMostPurchased}";
-        public const string GetByIsMostWatched = Prefix + "/GetByIsMostWatched/{isMostWatched}";
-        public const string GetByIsMostListened = Prefix + "/GetByIsMostListened/{isMostListened}";
-        public const string GetByIsMostRead = Prefix + "/GetByIsMostRead/{isMostRead}";
-        public const string GetByIsMostPlayed = Prefix + "/GetByIsMostPlayed/{isMostPlayed}";
-        public const string GetByIsMostCompleted = Prefix + "/GetByIsMostCompleted/{isMostCompleted}";
-        public const string GetByIsMostFailed = Prefix + "/GetByIsMostFailed/{isMostFailed}";
-        public const string GetByIsMostAbandoned = Prefix + "/GetByIsMostAbandoned/{isMostAbandoned}";
-        public const string GetByIsMostRevisited = Prefix + "/GetByIsMostRevisited/{isMostRevisited}";
-        public const string GetByIsMostRecommended = Prefix + "/GetByIsMostRecommended/{isMostRecommended}";
-        public const string GetByIsMostReported = Prefix + "/GetByIsMostReported/{isMostReported}";
-        public const string GetByIsMostFlagged = Prefix + "/GetByIsMostFlagged/{isMostFlagged}";
-        public const string GetByIsMostBlocked = Prefix + "/GetByIsMostBlocked/{isMostBlocked}";
-        public const string GetByIsMostHidden = Prefix + "/GetByIsMostHidden/{isMostHidden}";
-        public const string GetByIsMostArchived = Prefix + "/GetByIsMostArchived/{isMostArchived}";
+        public const string Prefix = Rule + "/Course";
+        public const string GetAll = Prefix + "/All";
+        public const string GetAllByCategory = Prefix + "/GetAllByCategory";
+        public const string GetPaginated = Prefix + "/HomeCourses/GetPaginated";
+        public const string GetAllCoursesOfTeacher = Prefix + "/GetAllCoursesOfTeacher";
+        public const string GetAllStudentAndCourse = Prefix + "/GetAllStudentAndCourse";
     }
 
     public static class LessonRouting
     {
-        public const string Prefix = Rule + "Lesson";
-        public const string Create = Prefix + "/Create";
-        public const string Update = Prefix + "/Update";
-        public const string Delete = Prefix + "/Delete/{id}";
-        public const string GetById = Prefix + SingleId;
-        public const string GetAll = Prefix + "/GetAll";
-        public const string GetByTitle = Prefix + "/GetByTitle/{title}";
-        public const string GetByDescription = Prefix + "/GetByDescription/{description}";
-        public const string GetByCourseId = Prefix + "/GetByCourseId/{courseId}";
-        public const string GetByOrder = Prefix + "/GetByOrder/{order}";
-        public const string GetByDurationRange = Prefix + "/GetByDurationRange";
-        public const string GetByDateRange = Prefix + "/GetByDateRange";
-        public const string GetByIsActive = Prefix + "/GetByIsActive/{isActive}";
-        public const string GetByIsDeleted = Prefix + "/GetByIsDeleted/{isDeleted}";
-        public const string GetByIsPublished = Prefix + "/GetByIsPublished/{isPublished}";
-        public const string GetByIsFeatured = Prefix + "/GetByIsFeatured/{isFeatured}";
-        public const string GetByIsPopular = Prefix + "/GetByIsPopular/{isPopular}";
-        public const string GetByIsNew = Prefix + "/GetByIsNew/{isNew}";
-        public const string GetByIsRecommended = Prefix + "/GetByIsRecommended/{isRecommended}";
-        public const string GetByIsTrending = Prefix + "/GetByIsTrending/{isTrending}";
-        public const string GetByIsBestSeller = Prefix + "/GetByIsBestSeller/{isBestSeller}";
-        public const string GetByIsTopRated = Prefix + "/GetByIsTopRated/{isTopRated}";
-        public const string GetByIsMostViewed = Prefix + "/GetByIsMostViewed/{isMostViewed}";
-        public const string GetByIsMostEnrolled = Prefix + "/GetByIsMostEnrolled/{isMostEnrolled}";
-        public const string GetByIsMostReviewed = Prefix + "/GetByIsMostReviewed/{isMostReviewed}";
-        public const string GetByIsMostRated = Prefix + "/GetByIsMostRated/{isMostRated}";
-        public const string GetByIsMostCommented = Prefix + "/GetByIsMostCommented/{isMostCommented}";
-        public const string GetByIsMostLiked = Prefix + "/GetByIsMostLiked/{isMostLiked}";
-        public const string GetByIsMostShared = Prefix + "/GetByIsMostShared/{isMostShared}";
-        public const string GetByIsMostBookmarked = Prefix + "/GetByIsMostBookmarked/{isMostBookmarked}";
-        public const string GetByIsMostDownloaded = Prefix + "/GetByIsMostDownloaded/{isMostDownloaded}";
-        public const string GetByIsMostPurchased = Prefix + "/GetByIsMostPurchased/{isMostPurchased}";
-        public const string GetByIsMostWatched = Prefix + "/GetByIsMostWatched/{isMostWatched}";
-        public const string GetByIsMostListened = Prefix + "/GetByIsMostListened/{isMostListened}";
-        public const string GetByIsMostRead = Prefix + "/GetByIsMostRead/{isMostRead}";
-        public const string GetByIsMostPlayed = Prefix + "/GetByIsMostPlayed/{isMostPlayed}";
-        public const string GetByIsMostCompleted = Prefix + "/GetByIsMostCompleted/{isMostCompleted}";
-        public const string GetByIsMostFailed = Prefix + "/GetByIsMostFailed/{isMostFailed}";
-        public const string GetByIsMostAbandoned = Prefix + "/GetByIsMostAbandoned/{isMostAbandoned}";
-        public const string GetByIsMostRevisited = Prefix + "/GetByIsMostRevisited/{isMostRevisited}";
-        public const string GetByIsMostRecommended = Prefix + "/GetByIsMostRecommended/{isMostRecommended}";
-        public const string GetByIsMostReported = Prefix + "/GetByIsMostReported/{isMostReported}";
-        public const string GetByIsMostFlagged = Prefix + "/GetByIsMostFlagged/{isMostFlagged}";
-        public const string GetByIsMostBlocked = Prefix + "/GetByIsMostBlocked/{isMostBlocked}";
-        public const string GetByIsMostHidden = Prefix + "/GetByIsMostHidden/{isMostHidden}";
-        public const string GetByIsMostArchived = Prefix + "/GetByIsMostArchived/{isMostArchived}";
+        public const string Prefix = Rule + "/Lesson";
+        public const string GetAll = Prefix + "/All";
     }
 
     public static class CategoryRouting
     {
-        public const string Prefix = Rule + "Category";
-        public const string Create = Prefix + "/Create";
-        public const string Update = Prefix + "/Update";
-        public const string Delete = Prefix + "/Delete/{id}";
-        public const string GetById = Prefix + SingleId;
-        public const string GetAll = Prefix + "/GetAll";
-        public const string GetByName = Prefix + "/GetByName/{name}";
-        public const string GetByDescription = Prefix + "/GetByDescription/{description}";
-        public const string GetByParentId = Prefix + "/GetByParentId/{parentId}";
-        public const string GetByIsActive = Prefix + "/GetByIsActive/{isActive}";
-        public const string GetByIsDeleted = Prefix + "/GetByIsDeleted/{isDeleted}";
-        public const string GetByIsFeatured = Prefix + "/GetByIsFeatured/{isFeatured}";
-        public const string GetByIsPopular = Prefix + "/GetByIsPopular/{isPopular}";
-        public const string GetByIsNew = Prefix + "/GetByIsNew/{isNew}";
-        public const string GetByIsRecommended = Prefix + "/GetByIsRecommended/{isRecommended}";
-        public const string GetByIsTrending = Prefix + "/GetByIsTrending/{isTrending}";
-        public const string GetByIsBestSeller = Prefix + "/GetByIsBestSeller/{isBestSeller}";
-        public const string GetByIsTopRated = Prefix + "/GetByIsTopRated/{isTopRated}";
-        public const string GetByIsMostViewed = Prefix + "/GetByIsMostViewed/{isMostViewed}";
-        public const string GetByIsMostEnrolled = Prefix + "/GetByIsMostEnrolled/{isMostEnrolled}";
-        public const string GetByIsMostReviewed = Prefix + "/GetByIsMostReviewed/{isMostReviewed}";
-        public const string GetByIsMostRated = Prefix + "/GetByIsMostRated/{isMostRated}";
-        public const string GetByIsMostCommented = Prefix + "/GetByIsMostCommented/{isMostCommented}";
-        public const string GetByIsMostLiked = Prefix + "/GetByIsMostLiked/{isMostLiked}";
-        public const string GetByIsMostShared = Prefix + "/GetByIsMostShared/{isMostShared}";
-        public const string GetByIsMostBookmarked = Prefix + "/GetByIsMostBookmarked/{isMostBookmarked}";
-        public const string GetByIsMostDownloaded = Prefix + "/GetByIsMostDownloaded/{isMostDownloaded}";
-        public const string GetByIsMostPurchased = Prefix + "/GetByIsMostPurchased/{isMostPurchased}";
-        public const string GetByIsMostWatched = Prefix + "/GetByIsMostWatched/{isMostWatched}";
-        public const string GetByIsMostListened = Prefix + "/GetByIsMostListened/{isMostListened}";
-        public const string GetByIsMostRead = Prefix + "/GetByIsMostRead/{isMostRead}";
-        public const string GetByIsMostPlayed = Prefix + "/GetByIsMostPlayed/{isMostPlayed}";
-        public const string GetByIsMostCompleted = Prefix + "/GetByIsMostCompleted/{isMostCompleted}";
-        public const string GetByIsMostFailed = Prefix + "/GetByIsMostFailed/{isMostFailed}";
-        public const string GetByIsMostAbandoned = Prefix + "/GetByIsMostAbandoned/{isMostAbandoned}";
-        public const string GetByIsMostRevisited = Prefix + "/GetByIsMostRevisited/{isMostRevisited}";
-        public const string GetByIsMostRecommended = Prefix + "/GetByIsMostRecommended/{isMostRecommended}";
-        public const string GetByIsMostReported = Prefix + "/GetByIsMostReported/{isMostReported}";
-        public const string GetByIsMostFlagged = Prefix + "/GetByIsMostFlagged/{isMostFlagged}";
-        public const string GetByIsMostBlocked = Prefix + "/GetByIsMostBlocked/{isMostBlocked}";
-        public const string GetByIsMostHidden = Prefix + "/GetByIsMostHidden/{isMostHidden}";
-        public const string GetByIsMostArchived = Prefix + "/GetByIsMostArchived/{isMostArchived}";
+        public const string Prefix = Rule + "/Category";
+        public const string GetAll = Prefix + "/All";
     }
 
     public static class TeacherRouting
     {
-        public const string Prefix = Rule + "Teacher";
-        public const string Create = Prefix + "/Create";
-        public const string Update = Prefix + "/Update";
-        public const string Delete = Prefix + "/Delete/{id}";
-        public const string GetById = Prefix + SingleId;
+        public const string Prefix = Rule + "/Teacher";
         public const string GetAll = Prefix + "/GetAll";
         public const string GetByName = Prefix + "/GetByName/{name}";
-        public const string GetByEmail = Prefix + "/GetByEmail/{email}";
-        public const string GetByPhone = Prefix + "/GetByPhone/{phone}";
-        public const string GetBySpecialization = Prefix + "/GetBySpecialization/{specialization}";
-        public const string GetByExperienceRange = Prefix + "/GetByExperienceRange";
-        public const string GetByDateRange = Prefix + "/GetByDateRange";
-        public const string GetByIsActive = Prefix + "/GetByIsActive/{isActive}";
-        public const string GetByIsDeleted = Prefix + "/GetByIsDeleted/{isDeleted}";
-        public const string GetByIsVerified = Prefix + "/GetByIsVerified/{isVerified}";
-        public const string GetByIsFeatured = Prefix + "/GetByIsFeatured/{isFeatured}";
-        public const string GetByIsPopular = Prefix + "/GetByIsPopular/{isPopular}";
-        public const string GetByIsNew = Prefix + "/GetByIsNew/{isNew}";
-        public const string GetByIsRecommended = Prefix + "/GetByIsRecommended/{isRecommended}";
-        public const string GetByIsTrending = Prefix + "/GetByIsTrending/{isTrending}";
-        public const string GetByIsBestSeller = Prefix + "/GetByIsBestSeller/{isBestSeller}";
-        public const string GetByIsTopRated = Prefix + "/GetByIsTopRated/{isTopRated}";
-        public const string GetByIsMostViewed = Prefix + "/GetByIsMostViewed/{isMostViewed}";
-        public const string GetByIsMostEnrolled = Prefix + "/GetByIsMostEnrolled/{isMostEnrolled}";
-        public const string GetByIsMostReviewed = Prefix + "/GetByIsMostReviewed/{isMostReviewed}";
-        public const string GetByIsMostRated = Prefix + "/GetByIsMostRated/{isMostRated}";
-        public const string GetByIsMostCommented = Prefix + "/GetByIsMostCommented/{isMostCommented}";
-        public const string GetByIsMostLiked = Prefix + "/GetByIsMostLiked/{isMostLiked}";
-        public const string GetByIsMostShared = Prefix + "/GetByIsMostShared/{isMostShared}";
-        public const string GetByIsMostBookmarked = Prefix + "/GetByIsMostBookmarked/{isMostBookmarked}";
-        public const string GetByIsMostDownloaded = Prefix + "/GetByIsMostDownloaded/{isMostDownloaded}";
-        public const string GetByIsMostPurchased = Prefix + "/GetByIsMostPurchased/{isMostPurchased}";
-        public const string GetByIsMostWatched = Prefix + "/GetByIsMostWatched/{isMostWatched}";
-        public const string GetByIsMostListened = Prefix + "/GetByIsMostListened/{isMostListened}";
-        public const string GetByIsMostRead = Prefix + "/GetByIsMostRead/{isMostRead}";
-        public const string GetByIsMostPlayed = Prefix + "/GetByIsMostPlayed/{isMostPlayed}";
-        public const string GetByIsMostCompleted = Prefix + "/GetByIsMostCompleted/{isMostCompleted}";
-        public const string GetByIsMostFailed = Prefix + "/GetByIsMostFailed/{isMostFailed}";
-        public const string GetByIsMostAbandoned = Prefix + "/GetByIsMostAbandoned/{isMostAbandoned}";
-        public const string GetByIsMostRevisited = Prefix + "/GetByIsMostRevisited/{isMostRevisited}";
-        public const string GetByIsMostRecommended = Prefix + "/GetByIsMostRecommended/{isMostRecommended}";
-        public const string GetByIsMostReported = Prefix + "/GetByIsMostReported/{isMostReported}";
-        public const string GetByIsMostFlagged = Prefix + "/GetByIsMostFlagged/{isMostFlagged}";
-        public const string GetByIsMostBlocked = Prefix + "/GetByIsMostBlocked/{isMostBlocked}";
-        public const string GetByIsMostHidden = Prefix + "/GetByIsMostHidden/{isMostHidden}";
-        public const string GetByIsMostArchived = Prefix + "/GetByIsMostArchived/{isMostArchived}";
+        public const string GetPaginated = Prefix + "/GetPaginated";
     }
 
     public static class NotificationRouting
@@ -396,22 +216,10 @@ public class Routing
         public const string GetByIsActive = Prefix + "/GetByIsActive/{isActive}";
     }
 
-    public static class CertificateRouting
+    public static class MaterialRouting
     {
-        public const string Prefix = Rule + "Certificate";
-        public const string Create = Prefix + "/Create";
-        public const string Update = Prefix + "/Update";
-        public const string Delete = Prefix + "/Delete/{id}";
-        public const string GetById = Prefix + SingleId;
-        public const string GetAll = Prefix + "/GetAll";
-        public const string GetByUserId = Prefix + "/GetByUserId/{userId}";
-        public const string GetByCourseId = Prefix + "/GetByCourseId/{courseId}";
-        public const string GetByDateRange = Prefix + "/GetByDateRange";
-        public const string GetByIsVerified = Prefix + "/GetByIsVerified/{isVerified}";
-        public const string GetByIsDeleted = Prefix + "/GetByIsDeleted/{isDeleted}";
-        public const string GetByIsActive = Prefix + "/GetByIsActive/{isActive}";
-        public const string Verify = Prefix + "/Verify/{id}";
-        public const string Download = Prefix + "/Download/{id}";
+        public const string Prefix = Rule + "/Material";
+
     }
 
     public static class QuizRouting

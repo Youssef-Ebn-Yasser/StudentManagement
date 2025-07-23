@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers;
 
-[Route("api/[controller]/[action]")]
 [ApiController]
 public class LessonController : AppControllerBase
 {
@@ -21,7 +20,7 @@ public class LessonController : AppControllerBase
     #endregion
 
     #region Method
-    [HttpGet("Get/All/Lessons")]
+    [HttpGet(Routing.LessonRouting.GetAll)]
     public async Task<IActionResult> GetLessonDetails()
     {
         try
@@ -36,8 +35,7 @@ public class LessonController : AppControllerBase
         }
     }
 
-
-    [HttpGet("GetLessonDetails/{lessonId}")]
+    [HttpGet(Routing.LessonRouting.Prefix)]
     public async Task<IActionResult> GetLessonDetails(int lessonId, int courseId)
     {
         try
@@ -53,7 +51,7 @@ public class LessonController : AppControllerBase
     }
 
     [Authorize(Roles = "Admin,Teacher")]
-    [HttpPost("CreateLesson")]
+    [HttpPost(Routing.LessonRouting.Prefix)]
     public async Task<IActionResult> CreateLesson([FromBody] CreateLessonDto createLessonDto)
     {
         try
@@ -69,7 +67,7 @@ public class LessonController : AppControllerBase
     }
 
     [Authorize(Roles = "Admin,Teacher")]
-    [HttpPut("UpdateLesson")]
+    [HttpPut(Routing.LessonRouting.Prefix)]
     public async Task<IActionResult> UpdateLesson([FromBody] UpdateLessonDto updateLessonDto)
     {
         try
@@ -85,7 +83,7 @@ public class LessonController : AppControllerBase
     }
 
     [Authorize(Roles = "Admin,Teacher")]
-    [HttpDelete("DeleteLesson/{lessonId}")]
+    [HttpDelete(Routing.LessonRouting.Prefix)]
     public async Task<IActionResult> DeleteLesson(int lessonId)
     {
         try

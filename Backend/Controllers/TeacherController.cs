@@ -3,7 +3,7 @@ using static Backend.Services.Interfaces.ITeacherService;
 
 namespace Backend.Controllers;
 
-[Route("api/[controller]")]
+
 [ApiController]
 public class TeacherController : AppControllerBase
 {
@@ -21,7 +21,7 @@ public class TeacherController : AppControllerBase
     #endregion
 
     #region Method
-    [HttpGet("Teacher/ById/{id}")]
+    [HttpGet(Routing.TeacherRouting.Prefix)]
     public async Task<IActionResult> GetTeacherById(int id)
     {
         try
@@ -37,7 +37,7 @@ public class TeacherController : AppControllerBase
     }
 
 
-    [HttpGet("Teacher/All")]
+    [HttpGet(Routing.TeacherRouting.GetAll)]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -53,7 +53,7 @@ public class TeacherController : AppControllerBase
     }
 
 
-    [HttpGet("Teacher/GetPaginated")]
+    [HttpGet(Routing.TeacherRouting.GetPaginated)]
     public async Task<IActionResult> GetAllPaginated(int pageNumber, int pageSize, enTeacherOrderBy enTeacherOrderBy)
     {
         try
@@ -69,7 +69,7 @@ public class TeacherController : AppControllerBase
     }
 
 
-    [HttpGet("Teacher/ByName/{name}")]
+    [HttpGet(Routing.TeacherRouting.GetByName)]
     public async Task<IActionResult> GetTeacherByName(string name)
     {
         try
@@ -86,7 +86,7 @@ public class TeacherController : AppControllerBase
     }
 
     [Authorize(Roles = "Admin,Teacher")]
-    [HttpPut("Teacher/Update")]
+    [HttpPut(Routing.TeacherRouting.Prefix)]
     public async Task<IActionResult> Update(UpdateTeacherDto updateTeacherDto)
     {
         try
@@ -103,7 +103,7 @@ public class TeacherController : AppControllerBase
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpDelete("Teacher/Delete")]
+    [HttpDelete(Routing.TeacherRouting.Prefix)]
     public async Task<IActionResult> DeleteAll(int id)
     {
         try

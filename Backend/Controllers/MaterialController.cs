@@ -1,9 +1,9 @@
 using Backend.DTOs.MaterialDTOs;
 using Microsoft.AspNetCore.Authorization;
+using static Backend.Routing;
 
 namespace Backend.Controllers;
 
-[Route("api/[controller]/[action]")]
 [ApiController]
 public class MaterialController : AppControllerBase
 {
@@ -21,7 +21,7 @@ public class MaterialController : AppControllerBase
     #endregion
 
     #region Method
-    [HttpGet("GetMaterialsByLessonId/{lessonId}")]
+    [HttpGet(MaterialRouting.Prefix)]
     public async Task<IActionResult> GetMaterialsByLessonId(int lessonId)
     {
         try
@@ -36,7 +36,7 @@ public class MaterialController : AppControllerBase
         }
     }
     [Authorize(Roles = "Admin,Teacher")]
-    [HttpPost("CreateMaterial")]
+    [HttpPost(MaterialRouting.Prefix)]
     public async Task<IActionResult> CreateMaterial([FromForm] CreateMaterialDto createMaterialDto)
     {
         try
@@ -51,7 +51,7 @@ public class MaterialController : AppControllerBase
         }
     }
     [Authorize(Roles = "Admin,Teacher")]
-    [HttpPut("UpdateMaterial")]
+    [HttpPut(MaterialRouting.Prefix)]
     public async Task<IActionResult> UpdateMaterial([FromForm] UpdateMaterialDto updateMaterialDto)
     {
         try
@@ -66,7 +66,7 @@ public class MaterialController : AppControllerBase
         }
     }
     [Authorize(Roles = "Admin,Teacher")]
-    [HttpDelete("DeleteMaterial/{materialId}")]
+    [HttpDelete(MaterialRouting.Prefix)]
     public async Task<IActionResult> DeleteMaterial(int materialId)
     {
         try
@@ -80,5 +80,5 @@ public class MaterialController : AppControllerBase
             return NewResult(ErrorHappen.ErrorInServer());
         }
     }
+    #endregion
 }
-#endregion
