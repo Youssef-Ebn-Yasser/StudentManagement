@@ -20,7 +20,7 @@ public class CourseController : AppControllerBase
 
     #region Method
 
-    [HttpGet("Course/GetAll")]
+    [HttpGet(Routing.CourseRouting.GetAll)]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -35,7 +35,9 @@ public class CourseController : AppControllerBase
         }
     }
 
-    [HttpGet("Course/GetAllByCategory")]
+
+
+    [HttpGet(Routing.CourseRouting.GetAllByCategory)]
     public async Task<IActionResult> GetAllByCategory(int categoryId)
     {
         try
@@ -50,7 +52,9 @@ public class CourseController : AppControllerBase
         }
     }
 
-    [HttpGet("HomeCourses/GetPaginated")]
+
+
+    [HttpGet(Routing.CourseRouting.GetPaginated)]
     public async Task<IActionResult> GetPaginated([FromQuery] int pageNumber, [FromQuery] int PageSize, [FromQuery] enOrderBy enOrderBy)
     {
         try
@@ -65,7 +69,9 @@ public class CourseController : AppControllerBase
         }
     }
 
-    [HttpGet("Course/Get/{id}")]
+
+
+    [HttpGet(Routing.CourseRouting.Prefix)]
     public async Task<IActionResult> GetCourseById(int id)
     {
         try
@@ -79,7 +85,10 @@ public class CourseController : AppControllerBase
             return NewResult(ErrorHappen.ErrorInServer());
         }
     }
-    [HttpGet("Course/GetAllCoursesOfTeacher/{teacherId}")]
+
+
+
+    [HttpGet(Routing.CourseRouting.GetAllCoursesOfTeacher)]
     public async Task<IActionResult> GetAllCoursesOfTeacher(int teacherId)
     {
         try
@@ -93,7 +102,9 @@ public class CourseController : AppControllerBase
             return NewResult(ErrorHappen.ErrorInServer());
         }
     }
-    [HttpGet("Course/GetAllStudentAndCourse")]
+
+
+    [HttpGet(Routing.CourseRouting.GetAllStudentAndCourse)]
     public async Task<IActionResult> GetAllStudentAndCourse()
     {
         try
@@ -110,7 +121,7 @@ public class CourseController : AppControllerBase
 
 
     [Authorize(Roles = "Admin,Teacher")]
-    [HttpPost("Course/Create")]
+    [HttpPost(Routing.CourseRouting.Prefix)]
     public async Task<IActionResult> Create(CreateCourseDto createCourseDto)
     {
         try
@@ -125,8 +136,10 @@ public class CourseController : AppControllerBase
         }
     }
 
+
+
     [Authorize(Roles = "Admin,Teacher")]
-    [HttpPut("Course/Update")]
+    [HttpPut(Routing.CourseRouting.Prefix)]
     public async Task<IActionResult> Update(UpdateCourseDto updateCourseDto)
     {
         try
@@ -141,8 +154,10 @@ public class CourseController : AppControllerBase
         }
     }
 
+
+
     [Authorize(Roles = "Admin,Teacher")]
-    [HttpDelete("Course/Delete/")]
+    [HttpDelete(Routing.CourseRouting.Prefix)]
     public async Task<IActionResult> Delete([FromQuery] int id)
     {
         try

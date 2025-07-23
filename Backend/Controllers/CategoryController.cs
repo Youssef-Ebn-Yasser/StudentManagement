@@ -5,7 +5,6 @@ using Microsoft.Extensions.Localization;
 
 namespace Backend.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
 public class CategoryController : AppControllerBase
 {
@@ -27,16 +26,7 @@ public class CategoryController : AppControllerBase
     #endregion
 
     #region Method
-    [HttpGet("testLocaLization")]
-    public async Task<IActionResult> testLoca()
-    {
-        var val = GeneralLocalizableEntity.Localized("سيد سيد", "Said Said");
-        return Ok(new { e = _localizer["Error_NotFound:Value"], x = val });
-    }
-
-
-
-    [HttpGet("GetAll")]
+    [HttpGet(Routing.CategoryRouting.GetAll)]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -51,7 +41,7 @@ public class CategoryController : AppControllerBase
         }
     }
 
-    [HttpGet("{id}")]
+    [HttpGet(Routing.CategoryRouting.Prefix)]
     public async Task<IActionResult> GetById(int id)
     {
         try
@@ -66,7 +56,7 @@ public class CategoryController : AppControllerBase
         }
     }
     [Authorize(Roles = "Admin")]
-    [HttpPut("{id}")]
+    [HttpPut(Routing.CategoryRouting.Prefix)]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoryDto dto)
     {
         try
@@ -81,7 +71,7 @@ public class CategoryController : AppControllerBase
         }
     }
     [Authorize(Roles = "Admin")]
-    [HttpDelete("Delete")]
+    [HttpDelete(Routing.CategoryRouting.Prefix)]
     public async Task<IActionResult> Delete([FromBody] int id)
     {
         try
@@ -96,7 +86,7 @@ public class CategoryController : AppControllerBase
         }
     }
     [Authorize(Roles = "Admin")]
-    [HttpPost("Create")]
+    [HttpPost(Routing.CategoryRouting.Prefix)]
     public async Task<IActionResult> Create([FromBody] CreateCategoryDto dto)
     {
         try

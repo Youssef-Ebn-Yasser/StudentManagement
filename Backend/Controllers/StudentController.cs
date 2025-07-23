@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers;
 
-[Route("api/[controller]/[action]")]
+//[Route("api/[controller]/[action]")]
 [ApiController]
 public class StudentController : AppControllerBase
 {
@@ -110,7 +110,7 @@ public class StudentController : AppControllerBase
 
 
     [Authorize(Roles = "Admin")]
-    [HttpGet("GetAll")]
+    [HttpGet(Routing.StudentRouting.GetList)]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -126,7 +126,7 @@ public class StudentController : AppControllerBase
     }
 
     [Authorize]
-    [HttpGet("GetById/{id}")]
+    [HttpGet(Routing.StudentRouting.Prefix)]
     public async Task<IActionResult> GetById(int id)
     {
         try
@@ -142,7 +142,7 @@ public class StudentController : AppControllerBase
     }
 
     [Authorize]
-    [HttpGet("GetByName/{name}")]
+    [HttpGet(Routing.StudentRouting.GetByName)]
     public async Task<IActionResult> GetByName(string name)
     {
         try
@@ -158,7 +158,7 @@ public class StudentController : AppControllerBase
     }
 
     [Authorize(Roles = "Admin,Teacher")]
-    [HttpGet("GetAllInCourseByCourseName/{courseName}")]
+    [HttpGet(Routing.StudentRouting.PagGetAllInCourseByCourseName)]
     public async Task<IActionResult> GetAllInCourseByCourseName(string courseName)
     {
         try
@@ -175,7 +175,7 @@ public class StudentController : AppControllerBase
     }
 
     [Authorize(Roles = "Admin,Teacher")]
-    [HttpGet("GetPaginatedCourses/{pageNumber}/{pageSize}")]
+    [HttpGet(Routing.StudentRouting.GetPaginatedCourses)]
     public async Task<IActionResult> GetAllInCourseByCourseName(int pageNumber, int pageSize)
     {
         try
@@ -191,7 +191,7 @@ public class StudentController : AppControllerBase
     }
 
     [Authorize(Roles = "Student")]
-    [HttpGet("GetAllEnrolledStudentCourses")]
+    [HttpGet(Routing.StudentRouting.GetAllEnrolledStudentCourses)]
     public async Task<IActionResult> GetAllEnrolledStudentCourses(int studentId)
     {
         try
@@ -207,7 +207,7 @@ public class StudentController : AppControllerBase
     }
 
     [Authorize]
-    [HttpGet("profile/{studentId}")]
+    [HttpGet(Routing.StudentRouting.Profile)]
     public async Task<IActionResult> GetStudentProfile(int studentId)
     {
         try
@@ -222,8 +222,7 @@ public class StudentController : AppControllerBase
         }
     }
 
-
-    [HttpPost("IsEnrolled")]
+    [HttpPost(Routing.StudentRouting.IsEnrolled)]
     public async Task<IActionResult> IsEnrolledInCourse(StudentEnrollDto studentEnrollDto)
     {
         try
@@ -239,7 +238,7 @@ public class StudentController : AppControllerBase
     }
 
     [Authorize(Roles = "Admin,Teacher")]
-    [HttpPost("EnrollToCourse")]
+    [HttpPost(Routing.StudentRouting.EnrollToCourse)]
     public async Task<IActionResult> EnrollToCourse(StudentEnrollDto studentEnrollDto)
     {
         try
@@ -255,7 +254,7 @@ public class StudentController : AppControllerBase
     }
 
 
-    [HttpPost("Create")]
+    [HttpPost(Routing.StudentRouting.Prefix)]
     public async Task<IActionResult> Create(CreateStudentDto createStudentDto)
     {
         try
@@ -271,7 +270,7 @@ public class StudentController : AppControllerBase
     }
 
     [Authorize]
-    [HttpPut("Update")]
+    [HttpPut(Routing.StudentRouting.Prefix)]
     public async Task<IActionResult> Update(UpdateStudentDto updateStudentDto)
     {
         try
@@ -287,7 +286,7 @@ public class StudentController : AppControllerBase
     }
 
     [Authorize(Roles = "Admin,Teacher")]
-    [HttpDelete("Delete/{id}")]
+    [HttpDelete(Routing.StudentRouting.Prefix)]
     public async Task<IActionResult> Delete(int id)
     {
         try
@@ -303,7 +302,7 @@ public class StudentController : AppControllerBase
     }
 
     [Authorize(Roles = "Admin,Teacher")]
-    [HttpDelete("DeleteStudentFromCourse")]
+    [HttpDelete(Routing.StudentRouting.DeleteStudentFromCourse)]
     public async Task<IActionResult> DeleteStudentFromCourse([FromBody] DeleteStudentFromCourseDto deleteStudentFromCourseDto)
     {
         try
@@ -320,7 +319,7 @@ public class StudentController : AppControllerBase
 
 
     [Authorize(Roles = "Admin")]
-    [HttpGet("download/sample")]
+    [HttpGet(Routing.StudentRouting.DownloadSampleExcel)]
     public IActionResult DownloadExcel()
     {
         using var workbook = new XLWorkbook();
@@ -376,7 +375,7 @@ public class StudentController : AppControllerBase
 
 
     [Authorize(Roles = "Admin")]
-    [HttpPost("upload")]
+    [HttpPost(Routing.StudentRouting.UploadAddStudentsExcel)]
     public async Task<IActionResult> UploadExcel(IFormFile file)
     {
         try
