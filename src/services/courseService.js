@@ -3,6 +3,17 @@ import axios from 'axios';
 import { API_URL } from '../config';
 
 export const courseService = {
+  // Get teacher details
+  getTeacherDetails: async (teacherId) => {
+    try {
+      const response = await axiosInstance.get(`/api/Teacher?id=${teacherId}`);
+      console.log('Raw teacher response:', JSON.stringify(response.data, null, 2));
+      return response.data; // Return the full response data
+    } catch (error) {
+      console.error('Error in getTeacherDetails:', error);
+      throw error;
+    }
+  },
   // Create a new course
   createCourse: async (courseData) => {
     try {
@@ -516,7 +527,7 @@ export const courseService = {
         AdditionalInfo: teacherData.AdditionalInfo
       });
 
-      const response = await axiosInstance.put(`/api/Teacher/Update?${params.toString()}`);
+      const response = await axiosInstance.put(`/api/Teacher?${params.toString()}`);
       
       return response.data;
     } catch (error) {
