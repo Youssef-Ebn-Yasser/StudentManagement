@@ -114,7 +114,7 @@ const AddMaterial = () => {
       });
 
       const response = await axiosInstance.post(
-        '/api/Material/CreateMaterial/CreateMaterial',
+        '/api/Material',
         formData,
         {
           headers: {

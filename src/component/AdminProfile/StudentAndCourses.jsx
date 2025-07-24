@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '@/services/axiosInstance';
 import { FaUserGraduate, FaBookOpen } from 'react-icons/fa';
 
 export default function StudentAndCourses() {
@@ -12,7 +12,7 @@ export default function StudentAndCourses() {
       setLoading(true);
       setError('');
       try {
-        const res = await axios.get('https://e-learn-v1.runasp.net/Course/GetAllStudentAndCourse');
+        const res = await axiosInstance.get('Course/GetAllStudentAndCourse');
         if (res.data && res.data.succeeded) {
           // Group by studentId
           const grouped = {};

@@ -41,12 +41,21 @@ function TeacherProfile() {
           console.error('Teacher ID not found in user object or localStorage');
           throw new Error('Teacher ID not found');
         }
-        const response = await courseService.getTeacherStats(localTeacherId);
-        console.log('Teacher data response:', response);
-        if (response.succeeded) {
+        const response = await courseService.getTeacherDetails(localTeacherId);
+        console.log('Full teacher response:', JSON.stringify(response, null, 2));
+        console.log('Response data:', response.data);
+        
+        // Check for successful response
+        if (response && response.data) {
+          console.log('Setting teacher data:', response.data);
           setTeacherData(response.data);
         } else {
-          throw new Error(response.message || 'Failed to load teacher data');
+          console.error('Response structure:', {
+            hasResponse: !!response,
+            hasData: !!response?.data,
+            responseKeys: response ? Object.keys(response) : 'No response object'
+          });
+          throw new Error('Failed to load teacher data');
         }
       } catch (error) {
         console.error('Error in fetchTeacherData:', error);
