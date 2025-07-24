@@ -20,7 +20,7 @@ const TeacherProfileView = () => {
         setError(null);
 
         // Fetch teacher profile by name
-        const teacherResponse = await axios.get(`https://e-learn-v1.runasp.net/api/Teacher/Teacher/ById/${teacherId}`);
+        const teacherResponse = await axios.get(`https://e-learn-v1.runasp.net/api/Teacher?id=${teacherId}`);
         console.log('Teacher Response:', teacherResponse.data);
         if (!teacherResponse.data.succeeded) {
           throw new Error(teacherResponse.data.message || 'Failed to load teacher information');
@@ -30,7 +30,7 @@ const TeacherProfileView = () => {
         // Fetch teacher's courses using the teacher's ID from the response
         if (teacherResponse.data.data?.id) {
           console.log('Fetching courses for teacher ID:', teacherResponse.data.data.id);
-          const coursesResponse = await axios.get(`https://e-learn-v1.runasp.net/Course/GetAllCoursesOfTeacher/${teacherResponse.data.data.id}`);
+          const coursesResponse = await axios.get(`https://e-learn-v1.runasp.net/api/Course/GetAllCoursesOfTeacher?teacherId=${teacherResponse.data.data.id}`);
           console.log('Courses Response:', coursesResponse.data);
           if (!coursesResponse.data.succeeded) {
             throw new Error(coursesResponse.data.message || 'Failed to load teacher courses');

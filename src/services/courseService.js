@@ -175,7 +175,7 @@ export const courseService = {
   // Get paginated courses for home page
   getPaginatedCourses: async (page = 1, pageSize = 10) => {
     try {
-      const response = await axiosInstance.get(`/HomeCourses/GetPaginated?page=${page}&pageSize=${pageSize}`);
+      const response = await axiosInstance.get(`/api/Course/HomeCourses/GetPaginated?pageNumber=${page}&PageSize=${pageSize}`);
       return response.data;
     } catch (error) {
       throw error;

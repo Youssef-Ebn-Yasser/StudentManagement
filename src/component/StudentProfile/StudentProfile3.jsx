@@ -42,7 +42,7 @@ export default function StudentProfile3() {
         setError(null);
         console.log('StudentProfile3 - Fetching profile for studentId:', studentId);
         const res = await axiosInstance.get(
-          `/api/Student/GetStudentProfile/profile/${studentId}`
+          `/api/Studentprofile/${studentId}`
         );
         if (res.data && res.data.succeeded) {
           setProfile(res.data.data);

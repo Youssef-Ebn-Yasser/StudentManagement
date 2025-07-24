@@ -59,7 +59,6 @@ import ResetPassword from '@/component/ResetPassword/ResetPassword'
 import NotFound from '../component/NotFound/NotFound'
 import Attendance from '@/component/Attendance/Attendance'
 
-
 const mainRoutes = [
     {
         path: '',

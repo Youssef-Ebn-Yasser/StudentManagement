@@ -69,7 +69,7 @@ export default function LessonDetails() {
             setErrorMsg('')
             try {
                 const res = await axios.get(
-                    `https://e-learn-v1.runasp.net/api/Material/GetMaterialsByLessonId/GetMaterialsByLessonId/${lessonId}`
+                    `https://e-learn-v1.runasp.net/api/Material?lessonId=${lessonId}`
                 )
                 if (res.data.succeeded && Array.isArray(res.data.data)) {
                     setMaterials(
@@ -98,7 +98,7 @@ export default function LessonDetails() {
         setCommentError('')
         try {
             const res = await axios.get(
-                `https://e-learn-v1.runasp.net/api/Comment/lesson/${lessonId}`
+                `https://e-learn-v1.runasp.net/api/Comment?lessonId=${lessonId}`
             )
             if (res.data.succeeded && Array.isArray(res.data.data)) {
                 setComments(res.data.data)
@@ -224,7 +224,7 @@ export default function LessonDetails() {
         try {
             setCommentLoading(true)
             const res = await axios.post(
-                'https://e-learn-v1.runasp.net/api/Comment/create',
+                'https://e-learn-v1.runasp.net/api/Comment',
                 {
                     content: commentContent,
                     lessonId: Number(lessonId),

@@ -130,7 +130,7 @@ export default function CoursesDetails() {
   const fetchCourseDetails = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`https://e-learn-v1.runasp.net/Course/Get/${id}`);
+      const response = await axios.get(`https://e-learn-v1.runasp.net/api/Course?id=${id}`);
       if (response.data.succeeded) {
         setCourse(response.data.data);
       } else {
@@ -153,7 +153,7 @@ export default function CoursesDetails() {
     const fetchRelatedCourses = async () => {
       if (!course) return;
       try {
-        const res = await axios.get('https://e-learn-v1.runasp.net/Course/GetAll');
+        const res = await axios.get('https://e-learn-v1.runasp.net/api/Course/All');
         const allCourses = res.data.data || [];
         // Only show courses with the same category, and not the current course
         const filtered = allCourses.filter(c =>

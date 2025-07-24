@@ -28,7 +28,7 @@ function Courses() {
     try {
       setLoading(true);
       setError(null);
-      let { data } = await axios.get('https://e-learn-v1.runasp.net/Course/GetAll');
+      let { data } = await axios.get('https://e-learn-v1.runasp.net/api/Course/All');
       console.log(data.data);
       setCourses(data.data);
       setFilteredCourses(data.data);
