@@ -7,6 +7,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
 
 
 function Login() {
@@ -17,6 +18,8 @@ function Login() {
 
     return (
         <>
+        {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
             <div className="mx-auto flex flex-row flex-wrap justify-center items-center">
                 <div className="basis-[100%]">
                     <i
@@ -184,6 +187,7 @@ function Login() {
                     </div>
                 </div>
             </div>
+            </ContentWrapper>
         </>
     )
 }

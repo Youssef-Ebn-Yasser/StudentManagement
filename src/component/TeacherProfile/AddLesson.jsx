@@ -217,6 +217,10 @@ const AddLesson = () => {
   };
 
   return (
+    <>
+        {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
+            
     <div className="min-h-screen bg-gray-50">
       <div className="w-full min-h-screen bg-white p-8">
         <div className="flex justify-between items-center mb-8">
@@ -324,6 +328,8 @@ const AddLesson = () => {
         )}
       </div>
     </div>
+
+    </ContentWrapper></>
   );
 };
 

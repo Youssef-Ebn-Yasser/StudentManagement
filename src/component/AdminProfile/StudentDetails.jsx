@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 import toast from 'react-hot-toast'
 import Loader from '../Loader/Loader'
 import studentImg from '../../assets/student.png'
+import ContentWrapper from '../ContentWrapper/ContentWrapper';
 
 
 
@@ -94,7 +95,10 @@ function StudentDetails() {
     return <>
     {isloading ? (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <Loader />
+            {loading && <Loader visible={loading} />}
+            <ContentWrapper $loading={loading}>
+                <Loader />
+            </ContentWrapper>
         </div>
     ) : (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">

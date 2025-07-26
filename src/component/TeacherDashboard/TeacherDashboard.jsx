@@ -66,7 +66,12 @@ const TeacherDashboard = () => {
   };
 
   if (loading) {
-    return <Loader />;
+    return (
+    <> 
+    {loading && <Loader visible={loading} />}
+    <ContentWrapper $loading={loading}>
+        <Loader />
+    </ContentWrapper></>);
   }
 
   return (

@@ -6,6 +6,7 @@ import { FaCheck, FaTimes } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { t } from 'i18next';
 
+
 const QuizView = () => {
   const { lessonId } = useParams();
   const navigate = useNavigate();
@@ -77,9 +78,15 @@ const QuizView = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader />
-      </div>
+      <>
+        {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
+          <div className="min-h-screen flex items-center justify-center">
+            <Loader />
+          </div>
+        </ContentWrapper>
+      </>
+      
     );
   }
 

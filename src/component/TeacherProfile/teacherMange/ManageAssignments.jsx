@@ -9,6 +9,7 @@ import Loader from '@/component/Loader/Loader';
 import { toast } from 'react-toastify';
 import { useCombobox } from 'downshift';
 import { useTranslation } from 'react-i18next';
+import ContentWrapper from '@/component/ContentWrapper/ContentWrapper';
 
 const ManageAssignments = () => {
 
@@ -208,7 +209,12 @@ const ManageAssignments = () => {
   });
 
   if (loading) {
-    return <Loader />;
+    return (
+    <> 
+    {loading && <Loader visible={loading} />}
+    <ContentWrapper $loading={loading}>
+        <Loader />
+    </ContentWrapper></>);
   }
 
   return (

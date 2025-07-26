@@ -472,11 +472,16 @@ const CreateCourse = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-[calc(100vh-300px)]">
-        <div className="scale-[2.5]">
-          <Loader />
-        </div>
-      </div>
+      <>
+          {isLoading && <Loader visible={isLoading} />}
+          <ContentWrapper $isLoading={isLoading}>
+              <div className="flex items-center justify-center h-[calc(100vh-300px)]">
+                <div className="scale-[2.5]">
+                  <Loader />
+                </div>
+              </div>
+          </ContentWrapper></>
+      
     );
   }
 

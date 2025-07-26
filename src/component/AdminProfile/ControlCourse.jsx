@@ -57,7 +57,9 @@ function ControlCourse() {
     },[id])
 
     return (<>
-        {!isloading ? (
+        {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
+            {!isloading ? (
             <div className="p-5">
             <div key={details?.data.id} className="grid relative grid-cols-1 lg:grid-cols-2 md:grid-cols-2 border-1 border-gray-100 mx-auto shadow p-2 rounded bg-white hover:shadow-xl hover:shadow-violet-200 ">
                 <div>
@@ -96,6 +98,8 @@ function ControlCourse() {
               ) : (
                 <Loader className='flex flex-row justify-center items-center content-center'/>
               )}
+        </ContentWrapper>
+        
 
     </>)
 

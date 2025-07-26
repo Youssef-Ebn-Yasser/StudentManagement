@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import Loader from '@/component/Loader/Loader';
 import { useTranslation } from 'react-i18next';
+import ContentWrapper from '@/component/ContentWrapper/ContentWrapper';
 
 
 const ManageQuiz = () => {
@@ -388,7 +389,12 @@ const ManageQuiz = () => {
   };
 
   if (isLoading) {
-    return <Loader />;
+    return (
+    <> 
+    {loading && <Loader visible={loading} />}
+    <ContentWrapper $loading={loading}>
+        <Loader />
+    </ContentWrapper></>);
   }
 
   if (error) {

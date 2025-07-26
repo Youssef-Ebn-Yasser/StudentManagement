@@ -6,6 +6,7 @@ import { FaVideo } from 'react-icons/fa';
 import { FaGraduationCap } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import { convertToEgyptTime } from '../../utils/timeUtils';
+import ContentWrapper from '../ContentWrapper/ContentWrapper';
 
 export default function CourseDashDetails() {
   const { t } = useTranslation();
@@ -46,7 +47,10 @@ export default function CourseDashDetails() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader />
+        {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
+            <Loader />
+        </ContentWrapper>
       </div>
     );
   }

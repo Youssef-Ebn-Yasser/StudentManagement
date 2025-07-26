@@ -170,9 +170,15 @@ export default function CoursesDetails() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader />
-      </div>
+      <>
+        {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
+          <div className="min-h-screen flex items-center justify-center">
+              <Loader />
+            </div>
+        </ContentWrapper>
+      </>
+      
     );
   }
 

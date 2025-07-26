@@ -7,6 +7,7 @@ import { useEffect } from 'react'
 import Loader from '../Loader/Loader'
 import NoAccess from '../NoAccess/NoAccess'
 import { useTranslation } from 'react-i18next'
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
 
 function Register() {
 
@@ -18,7 +19,12 @@ function Register() {
         if (role !== 'Admin') navigate('/auth/studentRegister')
     }, [role])
 
-    if (loading) return <Loader />
+    if (loading) return (
+    <> 
+    {loading && <Loader visible={loading} />}
+    <ContentWrapper $loading={loading}>
+        <Loader />
+    </ContentWrapper></>)
 
     if (role !== 'Admin') {
         return (

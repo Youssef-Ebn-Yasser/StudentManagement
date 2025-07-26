@@ -11,6 +11,7 @@ import Loader from '../Loader/Loader'
 import toast from 'react-hot-toast'
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
 
 
 
@@ -114,7 +115,9 @@ function AddTeacher() {
     },[])
 
     return <>
-        <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
+        {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
+            <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
             <div className="container mx-auto space-y-10">
                 {/* Add Teacher Form Section */}
                 <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl max-w-2xl mx-auto">
@@ -267,10 +270,12 @@ function AddTeacher() {
                                 )}
                             </div>
                         </>
-                    )}
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
+        </ContentWrapper>
+        
     </>
 }
 

@@ -72,7 +72,12 @@ const TeacherProfileView = () => {
     }
   };
 
-  if (loading) return <Loader />;
+  if (loading) return (
+    <> 
+    {loading && <Loader visible={loading} />}
+    <ContentWrapper $loading={loading}>
+        <Loader />
+    </ContentWrapper></>);
   if (error) return <div className="text-center text-red-500 mt-8">{error}</div>;
   if (!teacher) return <div className="text-center text-gray-500 mt-8">Teacher not found</div>;
 

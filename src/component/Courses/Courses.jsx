@@ -97,11 +97,17 @@ function Courses() {
 
   if (loading && !error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="scale-[3]">
-          <Loader />
-        </div>
-      </div>
+      <>
+      {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="scale-[3]">
+              <Loader />
+            </div>
+          </div>
+        </ContentWrapper>
+      </>
+      
     );
   }
 
@@ -122,7 +128,10 @@ function Courses() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen">
+    <>
+      {loading && <Loader visible={loading} />}
+    <ContentWrapper $loading={loading}>
+      <div className="flex flex-col lg:flex-row min-h-screen">
       {/* Sidebar - Hidden on mobile, shown as dropdown */}
       <div className="lg:w-64 bg-white shadow-lg p-4 lg:p-6">
         <div className="lg:hidden mb-4">
@@ -219,6 +228,9 @@ function Courses() {
         </div>
       </div>
     </div>
+    </ContentWrapper>
+    </>
+    
   );
 }
 

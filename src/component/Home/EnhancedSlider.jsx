@@ -3,6 +3,7 @@ import { FaArrowLeft, FaArrowRight, FaPlay, FaPause } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import Loader from '../Loader/Loader';
 import img from '../../assets/sliderpic.jpg';
+import ContentWrapper from '../ContentWrapper/ContentWrapper';
 
 const EnhancedSlider = ({ sliders, loading }) => {
     const { t } = useTranslation();
@@ -63,9 +64,15 @@ const EnhancedSlider = ({ sliders, loading }) => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-96">
-                <Loader />
-            </div>
+            <>
+                {loading && <Loader visible={loading} />}
+                <ContentWrapper $loading={loading}>
+                <div className="flex justify-center items-center h-96">
+                    <Loader />
+                </div>
+                </ContentWrapper>
+            </>
+            
         );
     }
 

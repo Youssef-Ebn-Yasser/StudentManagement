@@ -5,6 +5,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { FaPaperPlane, FaUserCircle } from 'react-icons/fa'; // Icons for send button and sender identity
 import Loader from './../Loader/Loader'; // Assuming correct path to Loader component
+import ContentWrapper from '../ContentWrapper/ContentWrapper';
 
 const CHAT_HUB_URL = "https://e-learn-v1.runasp.net/chatHub";
 const GET_CHAT_ROOM_ID_API = "https://e-learn-v1.runasp.net/api/ChatRooms/GetChatRoomID";
@@ -281,7 +282,12 @@ const ChatRoom = () => {
   };
 
   // --- JSX Render ---
-  if (loading) return <Loader />;
+  if (loading) return (
+    <> 
+    {loading && <Loader visible={loading} />}
+    <ContentWrapper $loading={loading}>
+        <Loader />
+    </ContentWrapper></>);
   if (error) return <div className="text-center text-red-500 mt-8 p-4 bg-red-100 rounded-lg">{error}</div>;
   // This condition should now pass quickly once chatRoomId is set to 3
   if (!chatRoomId) return <div className="text-center text-gray-500 mt-8">Initializing chat...</div>;
