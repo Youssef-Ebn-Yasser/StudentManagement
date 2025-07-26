@@ -82,6 +82,99 @@ public class StudentService : ResponseHandler, IStudentService
         return Success(mappedStudents);
     }
 
+    public async Task<Response<StudentProfDTO>> GetStudentProfileAsync(int studentId)
+    {
+        var student = await _studentExistById(studentId);
+        if (student == null)
+            return NotFound<StudentProfDTO>($"Student with ID {studentId} not found");
+
+        // Get student basic info
+        var studentInfo = _mapper.Map<ShowStudentDto>(student);
+
+        var listOfAssignment = _unitOfWork.Repository<Lesson>()
+            .GetTableNoTracking()
+            .Include(sa => sa.StudentAssignments)
+            .Include(l => l.Quizs)
+        .Select(l => new
+        {
+            AssignmentDetails = l.StudentAssignments.Where(sa => sa.LessonId == l.Id)
+                                   .Select(sa => new
+                                   {
+                                       StudentDegreePercentage = sa.DegreePercentage,
+                                       StudentAssignmentId = sa.Id,
+                                       AssignmentName = l.materials.Where(m => m.LessonId == l.Id)
+                                                                   .Select(m => m.TitleEn)
+                                                                   .FirstOrDefault(),
+                                   }).FirstOrDefault(),
+
+            numberOfQuizesInLesson = l.Quizs.Where(q => q.LessonId == l.Id).Count(),
+            TotalQuizesDegreeInLessons = l.Quizs.Where(q => q.LessonId == l.Id).Sum(q => q.PossiblePoints),
+            StudentDegreeOfQuizesInLessons = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Sum(qa => qa.GradingRating),
+            quizLestDetails = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Select(qa => new
+            {
+                studentQuizAnswerId = qa.Id,
+                quizPercentageDegree = qa.GradingRating,
+                IsPass = qa.IsPassed,
+                PossiblePoints = qa.Quiz.PossiblePoints,
+                NumberOfAswered = qa.NumberOfAswered,
+                quizName = qa.Quiz.TitleEn,
+
+            })
+        });
+
+
+
+
+
+
+
+
+        // Get assignments
+        var assignments = await _unitOfWork.Repository<StudentAssignment>()
+            .GetTableNoTracking()
+            .Include(sa => sa.Lesson)
+            .ThenInclude(l => l.Course)
+            .Where(sa => sa.StudentId == studentId)
+            .Select(sa => new DTOs.StudentProfileDto.StudentAssignmentDto
+            {
+                Id = sa.Id,
+                CourseName = sa.Lesson.Course.TitleEn,
+                LessonName = sa.Lesson.TitleEn,
+                Path = sa.Path,
+                DegreePercentage = sa.DegreePercentage
+
+            })
+            .ToListAsync();
+
+
+
+        var quizzes = await _unitOfWork.Repository<StudentQuizeAnswer>()
+         .GetTableNoTracking()
+         .Include(sqa => sqa.Quiz)
+        .Where(sqa => sqa.StudentId == studentId)
+        .Select(sqa => new StudentQuizDto
+        {
+            QuizId = sqa.Id,
+            QuizTitle = sqa.Quiz.TitleEn,
+            GradingRating = sqa.GradingRating,
+            IsPassed = sqa.IsPassed,
+
+        })
+      .ToListAsync();
+        var attendance = await GetStudentAttendance(studentId);
+
+        // Create the profile DTO
+        var profile = new StudentProfDTO
+        {
+            StudentInfo = studentInfo,
+            Assignments = assignments,
+            Quizzes = quizzes,
+            Attendance = attendance
+        };
+
+        return Success(profile);
+    }
+
     public async Task<Response<List<ShowStudentWithCoursesDto>>> GetAllInCourseByCourseNameAsync(string courseName)
     {
 
@@ -133,7 +226,7 @@ public class StudentService : ResponseHandler, IStudentService
 
     public async Task<Response<ShowStudentDto>> GetByNameAsync(string name)
     {
-        Student student = new Student();
+        Student? student = new Student();
 
         if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
         {
@@ -193,9 +286,7 @@ public class StudentService : ResponseHandler, IStudentService
                        ImagePath = _.Course.ImagePath,
                        Hours = _.Course.Hours,
                        TeacherName = GeneralLocalizableEntity.Localized(_.Course.Teacher.NameAr, _.Course.Teacher.NameEn)
-
-                   })
-        .ToListAsync();
+                   }).ToListAsync();
 
         if (studentCourses == null)
         {
@@ -259,24 +350,7 @@ public class StudentService : ResponseHandler, IStudentService
 
         return isEnrolled ? Success(true) : BadRequest<bool>("not in course");
     }
-    public async Task<Response<string>> CreateAsync(CreateStudentDto createStudent)
-    {
-        var isNameExist = await _isNameExist(createStudent.Name);
-        if (isNameExist) return BadRequest<string>("Student Name is already exist");
 
-        var isEmailExist = await _isEmailExist(createStudent.Email);
-        if (isNameExist) return BadRequest<string>("Student Email is already exist");
-
-        var newStudent = _mapper.Map<Student>(createStudent);
-
-
-        newStudent.UserType = "Student";
-        await _unitOfWork.Repository<Student>().AddAsync(newStudent);
-        var result = _unitOfWork.Complete();
-
-        return result > 0 ? Success("Student Added Successfully") :
-                            BadRequest<string>("can not add this student error happen when try add");
-    }
     public async Task<Response<string>> UpdateAsync(UpdateStudentDto updateStudentDto)
     {
         // check this student is exist 
@@ -419,7 +493,7 @@ public class StudentService : ResponseHandler, IStudentService
     await _unitOfWork.Repository<Course>().GetTableNoTracking().AnyAsync(s => s.Id == id);
     private async Task<Course> _courseExistByName(string Name)
     {
-        Course course = new Course();
+        Course? course = new Course();
 
         if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
         {
@@ -438,7 +512,7 @@ public class StudentService : ResponseHandler, IStudentService
     }
     private async Task<Student> _studentExistByName(string name)
     {
-        Student student = new Student();
+        Student? student = new Student();
 
         if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
         {
@@ -457,101 +531,8 @@ public class StudentService : ResponseHandler, IStudentService
 
         return student;
     }
-    private async Task<Student> _studentExistById(int id) =>
+    private async Task<Student?> _studentExistById(int id) =>
     await _unitOfWork.Repository<Student>().GetTableAsTracking().FirstOrDefaultAsync(s => s.Id == id);
-
-    public async Task<Response<StudentProfDTO>> GetStudentProfileAsync(int studentId)
-    {
-        var student = await _studentExistById(studentId);
-        if (student == null)
-            return NotFound<StudentProfDTO>($"Student with ID {studentId} not found");
-
-        // Get student basic info
-        var studentInfo = _mapper.Map<ShowStudentDto>(student);
-
-        var listOfAssignment = _unitOfWork.Repository<Lesson>()
-            .GetTableNoTracking()
-            .Include(sa => sa.StudentAssignments)
-            .Include(l => l.Quizs)
-        .Select(l => new
-        {
-            AssignmentDetails = l.StudentAssignments.Where(sa => sa.LessonId == l.Id)
-                                   .Select(sa => new
-                                   {
-                                       StudentDegreePercentage = sa.DegreePercentage,
-                                       StudentAssignmentId = sa.Id,
-                                       AssignmentName = l.materials.Where(m => m.LessonId == l.Id)
-                                                                   .Select(m => m.TitleEn)
-                                                                   .FirstOrDefault(),
-                                   }).FirstOrDefault(),
-
-            numberOfQuizesInLesson = l.Quizs.Where(q => q.LessonId == l.Id).Count(),
-            TotalQuizesDegreeInLessons = l.Quizs.Where(q => q.LessonId == l.Id).Sum(q => q.PossiblePoints),
-            StudentDegreeOfQuizesInLessons = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Sum(qa => qa.GradingRating),
-            quizLestDetails = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Select(qa => new
-            {
-                studentQuizAnswerId = qa.Id,
-                quizPercentageDegree = qa.GradingRating,
-                IsPass = qa.IsPassed,
-                PossiblePoints = qa.Quiz.PossiblePoints,
-                NumberOfAswered = qa.NumberOfAswered,
-                quizName = qa.Quiz.TitleEn,
-
-            })
-        });
-
-
-
-
-
-
-
-
-        // Get assignments
-        var assignments = await _unitOfWork.Repository<StudentAssignment>()
-            .GetTableNoTracking()
-            .Include(sa => sa.Lesson)
-            .ThenInclude(l => l.Course)
-            .Where(sa => sa.StudentId == studentId)
-            .Select(sa => new DTOs.StudentProfileDto.StudentAssignmentDto
-            {
-                Id = sa.Id,
-                CourseName = sa.Lesson.Course.TitleEn,
-                LessonName = sa.Lesson.TitleEn,
-                Path = sa.Path,
-                DegreePercentage = sa.DegreePercentage
-
-            })
-            .ToListAsync();
-
-
-
-        var quizzes = await _unitOfWork.Repository<StudentQuizeAnswer>()
-         .GetTableNoTracking()
-         .Include(sqa => sqa.Quiz)
-        .Where(sqa => sqa.StudentId == studentId)
-        .Select(sqa => new StudentQuizDto
-        {
-            QuizId = sqa.Id,
-            QuizTitle = sqa.Quiz.TitleEn,
-            GradingRating = sqa.GradingRating,
-            IsPassed = sqa.IsPassed,
-
-        })
-      .ToListAsync();
-        var attendance = await GetStudentAttendance(studentId);
-
-        // Create the profile DTO
-        var profile = new StudentProfDTO
-        {
-            StudentInfo = studentInfo,
-            Assignments = assignments,
-            Quizzes = quizzes,
-            Attendance = attendance
-        };
-
-        return Success(profile);
-    }
     private async Task<List<StudentAttendanceStatusDto>> GetStudentAttendance(int studentId)
     {
         // Implement this based on how you track meeting attendance
@@ -573,6 +554,7 @@ public class StudentService : ResponseHandler, IStudentService
         if (userExists != null && userExists.UserType == "Student") return true;
         return false;
     }
+
     private async Task<(bool, string, List<Student>?, List<User>?)> GetStudentAndUserList(IEnumerable<IXLRangeRow> rows)
     {
         var students = new List<Student>();
@@ -612,6 +594,7 @@ public class StudentService : ResponseHandler, IStudentService
 
         return (true, "Success", students, users);
     }
+
     private async Task<(bool, string, List<Student>?, List<User>?)> FetchDataFromExcel(IFormFile file)
     {
         if (file == null || file.Length == 0)

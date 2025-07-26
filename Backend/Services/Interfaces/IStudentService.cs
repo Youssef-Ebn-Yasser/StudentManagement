@@ -13,7 +13,6 @@ public interface IStudentService
     public Task<Response<bool>> IsEnrolledInCourse(StudentEnrollDto studentEnrollDto);
 
     public Task<Response<string>> SaveFromExcel(IFormFile file);
-    public Task<Response<string>> CreateAsync(CreateStudentDto createStudent);
     public Task<Response<string>> UpdateAsync(UpdateStudentDto updateStudentDto);
     public Task<Response<string>> DeleteAsync(int id);
     public Task<Response<string>> DeleteStudentFromCourseAsync(DeleteStudentFromCourseDto deleteStudent);

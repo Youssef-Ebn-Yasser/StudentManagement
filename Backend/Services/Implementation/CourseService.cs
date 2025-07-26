@@ -100,7 +100,7 @@ public class CourseService : ResponseHandler, ICourseService
             .Include(c => c.Teacher)
             .Include(c => c.lessons)!
             .Include(c => c.StudentCourses)!
-                .ThenInclude(sc => sc.Student)!
+            .ThenInclude(sc => sc.Student)!
             .FirstOrDefaultAsync(c => c.Id == id);
 
         if (course == null)
@@ -147,9 +147,6 @@ public class CourseService : ResponseHandler, ICourseService
                                                         .ToPaginatedListAsync(pageNumber, pageSize);
         return Success(result);
     }
-
-
-
     public async Task Translate(string level, string title, string desc, int courseId, string language)
     {
         var course = _unitOfWork.Repository<Course>().GetTableAsTracking().FirstOrDefault(c => c.Id == courseId);
@@ -322,7 +319,6 @@ public class CourseService : ResponseHandler, ICourseService
             return NotFound<List<ShowStudentAndCourse>>("No students and courses found");
         }
         return Success(studentCourses);
-
     }
 
     private IQueryable<Course> GetCourseQuerable()

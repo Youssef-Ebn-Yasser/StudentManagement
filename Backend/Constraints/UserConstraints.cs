@@ -6,6 +6,11 @@ public class UserConstraints : IEntityTypeConfiguration<User>
     {
         builder.HasKey(u => u.Id);
 
+        builder.HasIndex(u => u.NameEn);
+        builder.HasIndex(u => u.NameAr);
+        builder.HasIndex(u => u.Email);
+
+
 
         builder.Property(u => u.NameEn)
                .IsRequired()
@@ -24,8 +29,5 @@ public class UserConstraints : IEntityTypeConfiguration<User>
 
         builder.Property(t => t.CreatedAt)
                .HasDefaultValueSql("GETDATE()");
-
-
-
     }
 }

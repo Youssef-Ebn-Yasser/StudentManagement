@@ -1,30 +1,30 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Backend.Constraints
+namespace Backend.Constraints;
+
+public class CategoryConstraints : IEntityTypeConfiguration<Category>
 {
-    public class CategoryConstraints : IEntityTypeConfiguration<Category>
+    public void Configure(EntityTypeBuilder<Category> builder)
     {
-        public void Configure(EntityTypeBuilder<Category> builder)
-        {
-            builder.HasKey(c => c.Id);
+        builder.HasKey(c => c.Id);
 
-            builder.Property(c => c.CategoryNameEn)
-                   .IsRequired()
-                   .HasMaxLength(50);
+        builder.HasIndex(c => c.CategoryNameEn);
+        builder.HasIndex(c => c.CategoryNameAr);
 
-            builder.Property(c => c.CategoryNameAr)
-                   .IsRequired()
-                   .HasMaxLength(50);
 
-            builder.Property(c => c.IsDeleted)
-                   .HasDefaultValue(false);
+        builder.Property(c => c.CategoryNameEn)
+               .IsRequired()
+               .HasMaxLength(50);
 
-            builder.HasMany(c => c.Courses)
-                   .WithOne(c => c.Category)
-                   .HasForeignKey(c => c.CategoryId);
-        }
+        builder.Property(c => c.CategoryNameAr)
+               .IsRequired()
+               .HasMaxLength(50);
 
-       
+        builder.Property(c => c.IsDeleted)
+               .HasDefaultValue(false);
+
+        builder.HasMany(c => c.Courses)
+               .WithOne(c => c.Category)
+               .HasForeignKey(c => c.CategoryId);
     }
-    
 }

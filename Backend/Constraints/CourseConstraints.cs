@@ -6,6 +6,8 @@ public class CourseConstraints : IEntityTypeConfiguration<Course>
 {
     public void Configure(EntityTypeBuilder<Course> builder)
     {
+        builder.HasIndex(c => c.Price);
+
         builder.Property(c => c.DescriptionEn)
                .HasMaxLength(250);
 
@@ -40,7 +42,7 @@ public class CourseConstraints : IEntityTypeConfiguration<Course>
         builder.Property(c => c.CreatedAt)
                 .HasDefaultValueSql("GETDATE()");
 
-       
+
 
         builder.Property(c => c.ImagePath)
                .HasMaxLength(250);

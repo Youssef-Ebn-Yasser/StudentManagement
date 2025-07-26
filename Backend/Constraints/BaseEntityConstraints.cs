@@ -8,6 +8,9 @@ public class BaseEntityConstraints : IEntityTypeConfiguration<BaseEntity>
     {
         builder.HasKey(be => be.Id);
 
+        builder.HasIndex(be => be.TitleEn);
+        builder.HasIndex(be => be.TitleAr);
+
         builder.Property(be => be.TitleEn)
                .IsRequired()
                .HasMaxLength(50);
