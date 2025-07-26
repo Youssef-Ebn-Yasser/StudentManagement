@@ -5,8 +5,14 @@ import axios from 'axios';
 import { API_URL } from '@/config';
 import { FaBook, FaChalkboardTeacher, FaUsers, FaFileAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
+
+
 
 const TeacherDashboard = () => {
+
+  const { t } = useTranslation();
   const { user } = useSelector((state) => state.auth);
   const teacherId = user?.id;
   const [courses, setCourses] = useState([]);
@@ -62,7 +68,12 @@ const TeacherDashboard = () => {
   };
 
   if (loading) {
-    return <Loader />;
+    return (
+    <> 
+    {loading && <Loader visible={loading} />}
+    <ContentWrapper $loading={loading}>
+        <Loader />
+    </ContentWrapper></>);
   }
 
   return (
@@ -71,7 +82,7 @@ const TeacherDashboard = () => {
         onClick={() => navigate(-1)}
         className="mb-6 px-4 py-2 bg-[#6366f1] text-white rounded hover:bg-[#4f46e5] transition"
       >
-        ← Back
+        ← {t("go-back")}
       </button>
       {/* Stats Cards */}
       <div className="grid grid-cols-2 gap-6 mb-8">
@@ -81,7 +92,7 @@ const TeacherDashboard = () => {
               <FaBook className="text-2xl" />
             </div>
             <div className="ml-4">
-              <h3 className="text-gray-500 text-sm">Total Courses</h3>
+              <h3 className="text-gray-500 text-sm">{t("total-courses")}</h3>
               <p className="text-2xl font-semibold">{courses.length}</p>
             </div>
           </div>
@@ -92,7 +103,7 @@ const TeacherDashboard = () => {
               <FaChalkboardTeacher className="text-2xl" />
             </div>
             <div className="ml-4">
-              <h3 className="text-gray-500 text-sm">Total Lessons</h3>
+              <h3 className="text-gray-500 text-sm">{t("total-lessons")}</h3>
               <p className="text-2xl font-semibold">{lessons.length}</p>
             </div>
           </div>
@@ -100,20 +111,20 @@ const TeacherDashboard = () => {
       </div>
       {/* Recent Courses */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">Recent Courses</h2>
+        <h2 className="text-xl font-semibold mb-4">{t("recent-courses")}</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t("course-name")}</th>
                 {courses && courses.some(c => c.categoryName) && (
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t("category")}</th>
                 )}
                 {courses && courses.some(c => c.studentsCount !== undefined) && (
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Students</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t("Students")}</th>
                 )}
                 {courses && courses.some(c => c.rating !== undefined) && (
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t("rating")}</th>
                 )}
               </tr>
             </thead>
@@ -146,9 +157,9 @@ const TeacherDashboard = () => {
       </div>
       {/* Lessons Grouped by Course */}
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold mb-4">LESSONS OF COURSE</h2>
+        <h2 className="text-xl font-semibold mb-4">{t("lessons-of-course")}</h2>
         <div className="space-y-8">
-          {courses.length === 0 && <div className="text-gray-500">No courses found.</div>}
+          {courses.length === 0 && <div className="text-gray-500">{t("no-courses-found")}</div>}
           {courses.map((course) => (
             <div key={course.id}>
               <h3 className="font-bold text-lg mb-2 text-[#6366f1]">{course.title}</h3>
@@ -159,14 +170,14 @@ const TeacherDashboard = () => {
                       <h4 className="font-medium text-md mb-2">{lesson.title}</h4>
                       {lesson.description && <p className="text-gray-600 text-sm mb-2">{lesson.description}</p>}
                       <div className="flex justify-between items-center text-sm text-gray-500">
-                        {lesson.duration && <span>Duration: {lesson.duration} min</span>}
-                        {lesson.materialsCount !== undefined && <span>Materials: {lesson.materialsCount}</span>}
+                        {lesson.duration && <span>{t("duration")}: {lesson.duration} {t("min")}</span>}
+                        {lesson.materialsCount !== undefined && <span>{t("materials")}: {lesson.materialsCount}</span>}
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-gray-400 italic mb-6">No lessons for this course.</div>
+                <div className="text-gray-400 italic mb-6">{t("no-lessons-for-course")}</div>
               )}
             </div>
           ))}

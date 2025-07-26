@@ -10,6 +10,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import UploadStudentExcel from './UploadStudentExcel';
 import EnrollStudentCourse from './EnrollStudentCourse';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
+
 
 
 function Students() {
@@ -78,7 +80,9 @@ function Students() {
       }, [students]);
 
     return <>
-        <div className='bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8'>
+        {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
+            <div className='bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8'>
             <div className="container mx-auto">
                 <h1 className='text-3xl font-bold text-gray-800 mb-8 flex items-center'>
                     <img src={stuImg} alt="Students Icon" className='w-8 h-8 mr-3' />
@@ -205,6 +209,8 @@ function Students() {
                 )}
             </div>
         </div>
+        </ContentWrapper>
+        
     </>
 }
 

@@ -215,7 +215,7 @@ const TeacherCourseDetails = () => {
   };
 
   const handleTakeAttendance = (lessonId) => {
-    navigate(`/teacher/attendance`);
+    navigate(`/attendance`);
     //toast.info(`Taking attendance for Lesson ID: ${lessonId}`);
   };
 

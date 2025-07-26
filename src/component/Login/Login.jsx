@@ -7,6 +7,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import BtnLoader from '../BtnLoader/BtnLoader'
 
 
 function Login() {
@@ -94,7 +95,7 @@ function Login() {
                                         className="bg-blue-600 text-white px-6 py-2 rounded text-xl  hover:cursor-pointer hover:shadow-sm hover:shadow-blue-500 transition-all duration-300 ease"
                                         type="submit"
                                     >
-                                        {loading ? <Loader /> : t('login')}
+                                        {loading ? <BtnLoader/> : t('login')}
                                     </button>
                                 </div>
 

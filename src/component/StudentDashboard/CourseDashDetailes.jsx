@@ -47,7 +47,10 @@ export default function CourseDashDetails() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader />
+        {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
+            <Loader />
+        </ContentWrapper>
       </div>
     );
   }

@@ -7,6 +7,7 @@ import { FaArrowLeft } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { useCombobox } from 'downshift';
 import { useTranslation } from 'react-i18next';
+import ContentWrapper from '@/component/ContentWrapper/ContentWrapper';
 
 
 const ReviewStudentAnswers = () => {
@@ -138,7 +139,12 @@ const ReviewStudentAnswers = () => {
   });
 
   if (loading) {
-    return <Loader />;
+    return (
+    <> 
+    {loading && <Loader visible={loading} />}
+    <ContentWrapper $loading={loading}>
+        <Loader />
+    </ContentWrapper></>);
   }
 
   return (

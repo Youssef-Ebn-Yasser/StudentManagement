@@ -11,6 +11,7 @@ import Translate from '../Translate/Translate';
 import { authStorage } from '@/utils/authStorage';
 
 function Navbar() {
+
     const dispatch = useDispatch();
     const authStore = useSelector((state) => state.auth || {});
     const userRole = authStore.role;
@@ -72,17 +73,22 @@ function Navbar() {
             <div className={`fixed top-0 left-0 right-0 h-[56px] bg-white shadow-xs flex items-center justify-between px-4 sm:px-6 lg:px-8 py-[10px] ${styles.navbar} z-50`}>
 
                 {/* Logo */}
-                <div className="flex items-center">
-                    <div className="text-black text-lg font-extrabold">
-                        E-learning
-                    </div>
+
+                <div
+                  className={`
+                     top-[10px] 
+                    ${isRTL ? 'right-[24px] left-auto' : 'left-[24px] right-auto'} 
+                    w-[106px] h-[36px] text-black text-center text-lg font-extrabold flex items-center justify-center rounded-md ms-5 pt-2
+                  `}
+                >
+                    E-learning
                 </div>
 
                 {/* Mobile Menu Toggle Button */}
                 <button 
                     ref={buttonRef}
                     onClick={toggleMenu}
-                    className="md:hidden p-2 text-gray-600 hover:text-gray-900 focus:outline-none transition-colors duration-200"
+                    className="lg:hidden absolute right-5 top-4 p-2 text-gray-600 hover:text-gray-900 focus:outline-none z-[60]"
                     aria-label="Toggle menu"
                 >
                     <i className={`fa-solid ${isMenuOpen ? 'fa-xmark' : 'fa-bars'} text-xl`}></i>

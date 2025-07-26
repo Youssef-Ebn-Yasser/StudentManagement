@@ -12,6 +12,9 @@ import {
     getFooterSitemap,
     subscribeNewsletter
 } from '../../services/footerService';
+import { t } from 'i18next';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const Footer = () => {
     // State for fetched data
@@ -341,7 +344,7 @@ const Footer = () => {
 
                     {/* Resources Section */}
                     <div className="col-span-1 md:col-span-2">
-                        <h6 className="font-semibold text-gray-700 mb-2 text-sm md:text-base">Resources</h6>
+                        <h6 className="font-semibold text-gray-700 mb-2 text-sm md:text-base">{t("resources")}</h6>
                         <ul className="text-gray-600 text-sm">
                             <li className="mb-1 cursor-pointer hover:text-indigo-500" onClick={() => setOpenSection('blog')}>Blog</li>
                             <li className="mb-1 cursor-pointer hover:text-indigo-500" onClick={() => setOpenSection('userGuides')}>User Guides</li>
@@ -351,7 +354,7 @@ const Footer = () => {
 
                     {/* Company Section */}
                     <div className="col-span-1 md:col-span-2">
-                        <h6 className="font-semibold text-gray-700 mb-2 text-sm md:text-base">Company</h6>
+                        <h6 className="font-semibold text-gray-700 mb-2 text-sm md:text-base">{t("company")}</h6>
                         <ul className="text-gray-600 text-sm">
                             <li className="mb-1 cursor-pointer hover:text-indigo-500" onClick={() => setOpenSection('about')}>About</li>
                             <li className="mb-1 cursor-pointer hover:text-indigo-500" onClick={() => setOpenSection('joinUs')}>Join Us</li>
@@ -360,9 +363,9 @@ const Footer = () => {
 
                     {/* Subscribe Section */}
                     <div className="col-span-1 sm:col-span-2 md:col-span-4">
-                        <h6 className="font-semibold text-indigo-500 mb-4 text-base md:text-lg">Subscribe to our newsletter</h6>
+                        <h6 className="font-semibold text-indigo-500 mb-4 text-base md:text-lg">{t("subscribe-newsletter")}</h6>
                         <p className="text-gray-600 text-xs md:text-sm mb-4">
-                            Stay updated with the latest courses and exclusive insights.
+                            {t("newsletter-description")}
                         </p>
                         <form className="flex flex-col md:flex-row items-center" onSubmit={handleNewsletterSubmit}>
                             <div className="relative flex-grow w-full md:w-auto mb-4 md:mb-0">
@@ -398,9 +401,13 @@ const Footer = () => {
                             <span className="mx-2 hidden md:inline">•</span>
                             <span className="cursor-pointer hover:text-indigo-500" onClick={() => setOpenSection('privacy')}>Privacy</span>
                             <span className="mx-2">•</span>
-                            <span className="cursor-pointer hover:text-indigo-500" onClick={() => setOpenSection('terms')}>Terms</span>
+                            <a href="#" className="hover:text-indigo-500">
+                                Terms
+                            </a>
                             <span className="mx-2">•</span>
-                            <span className="cursor-pointer hover:text-indigo-500" onClick={() => setOpenSection('sitemap')}>Sitemap</span>
+                            <a href="#" className="hover:text-indigo-500">
+                                Sitemap
+                            </a>
                         </div>
                     </div>
                     <div className="flex space-x-4 mt-4 md:mt-0 md:ml-auto">

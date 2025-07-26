@@ -11,6 +11,7 @@ import axios from 'axios'
 import { useTranslation } from 'react-i18next'
 import { FaPlay, FaStar, FaUsers, FaClock, FaGraduationCap, FaArrowRight, FaArrowLeft, FaCode, FaPalette, FaBriefcase, FaChartLine, FaFlask, FaCalculator, FaLanguage, FaPaintBrush } from 'react-icons/fa'
 import { allGategory } from '../../Redux/features/allGategory/allGategory'
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
 
 const CourseCard = ({ course }) => (
     <Link
@@ -256,6 +257,7 @@ function Home() {
     const [sliders, setSliders] = useState([])
     const [sliderLoading, setSliderLoading] = useState(true)
 
+
     useEffect(() => {
         const fetchSliders = async () => {
             setSliderLoading(true)
@@ -296,6 +298,8 @@ function Home() {
     // Use the custom hook for each course section with different enOrderBy values
     const popularCourses = useCourseFetch(1, 2) // Popular courses
     const trendingCourses = useCourseFetch(1, 1) // Trending courses
+
+    const isLoading = categoryLoading || sliderLoading || popularCourses.loading || trendingCourses.loading;
 
     const goToSlide = (index) => {
         setCurrentSlide(index)
@@ -393,6 +397,8 @@ function Home() {
 
     return (
         <>
+        {isLoading && <Loader visible={isLoading} />}
+        <ContentWrapper $loading={isLoading}>
             <div className="min-h-screen w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-indigo-50 mt-[56px] sm:mt-[75px]">
                 <div className="py-8 sm:py-12">
                     {/* Hero Section with Enhanced Slider - Now at the top */}
@@ -565,6 +571,8 @@ function Home() {
                     </div>
                 </div>
             </div>
+        </ContentWrapper>
+            
         </>
     )
 }

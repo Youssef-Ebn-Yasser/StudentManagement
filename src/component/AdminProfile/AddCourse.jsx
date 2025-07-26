@@ -10,6 +10,7 @@ import img from '../../assets/avatar.png'
 import toast from 'react-hot-toast'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
 
 
 function AddCourse() {
@@ -100,6 +101,8 @@ function AddCourse() {
     },[dispatch]) // dispatch is stable, so this effectively runs once on mount
 
     return <>
+    {loading && <Loader visible={loading} />}
+    <ContentWrapper $loading={loading}>
         <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
             <div className="container mx-auto space-y-10">
                 {/* Add Course Form Section */}
@@ -258,6 +261,7 @@ function AddCourse() {
                 </div>
             </div>
         </div>
+        </ContentWrapper>
     </>
 }
 

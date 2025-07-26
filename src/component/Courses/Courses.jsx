@@ -3,8 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styles from './Courses.module.css';
 import Loader from '../Loader/Loader';
+import { useTranslation } from 'react-i18next';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
+
+
 
 function Courses() {
+
+  const { t } = useTranslation();
   const [courses, setCourses] = useState([]);
   const [categories, setCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -93,11 +99,17 @@ function Courses() {
 
   if (loading && !error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="scale-[3]">
-          <Loader />
-        </div>
-      </div>
+      <>
+      {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="scale-[3]">
+              <Loader />
+            </div>
+          </div>
+        </ContentWrapper>
+      </>
+      
     );
   }
 
@@ -110,7 +122,7 @@ function Courses() {
             onClick={getCourses}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
-            Retry
+            {t('retry')}
           </button>
         </div>
       </div>
@@ -118,7 +130,10 @@ function Courses() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen">
+    <>
+      {loading && <Loader visible={loading} />}
+    <ContentWrapper $loading={loading}>
+      <div className="flex flex-col lg:flex-row min-h-screen">
       {/* Sidebar - Hidden on mobile, shown as dropdown */}
       <div className="lg:w-64 bg-white shadow-lg p-4 lg:p-6">
         <div className="lg:hidden mb-4">
@@ -134,7 +149,7 @@ function Courses() {
             ))}
           </select>
         </div>
-        <h2 className="text-xl font-bold mb-4 hidden lg:block">Categories</h2>
+        <h2 className="text-xl font-bold mb-4 hidden lg:block">{t('categories')}</h2>
         <div className="space-y-2 hidden lg:block">
           {categories.map((category) => (
             <button
@@ -154,11 +169,11 @@ function Courses() {
 
       {/* Main Content */}
       <div className="flex-1 p-4 lg:p-6">
-        <h1 className="text-xl lg:text-2xl font-bold text-center mb-2 lg:mb-4">Courses</h1>
-        <p className="text-sm lg:text-base text-center mb-4 lg:mb-8">Explore our wide range of courses</p>
+        <h1 className="text-xl lg:text-2xl font-bold text-center mb-2 lg:mb-4">{t("Courses")}</h1>
+        <p className="text-sm lg:text-base text-center mb-4 lg:mb-8">{t("explore-courses")}</p>
         {searchQuery && (
           <p className="text-center mb-4 text-gray-600 text-sm lg:text-base">
-            Showing results for: "{searchQuery}"
+            {t("showing-results-for")}: "{searchQuery}"
           </p>
         )}
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8'>
@@ -177,33 +192,33 @@ function Courses() {
                     className="block w-full h-[140px] lg:h-[180px] object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                 </div>
-<div className='p-3 lg:p-4 flex-1 flex flex-col'>
-  <div className="flex justify-between items-center mb-2">
-    <span className="text-gray-500 text-xs lg:text-sm truncate max-w-[60%]">{course.title}</span>
-    {course.level && (
-      <span className="bg-red-400 text-white py-1 px-2 rounded-xl text-xs">
-        {course.level} Level
-      </span>
-    )}
-  </div>
-  <h3 className="mt-0 mb-2 text-sm lg:text-lg font-semibold text-black line-clamp-2 flex-1">
-    {course.description}
-  </h3>
-  <div className="flex items-center justify-between mt-auto">
-    <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">
-      {course.categoryName}
-    </span>
-    <span className="text-base lg:text-xl font-bold text-black">${course.price}</span>
-  </div>
-</div>
+                <div className='p-3 lg:p-4 flex-1 flex flex-col'>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-500 text-xs lg:text-sm truncate max-w-[60%]">{course.title}</span>
+                  {course.level && (
+                    <span className="bg-red-400 text-white py-1 px-2 rounded-xl text-xs">
+                      {course.level} {t('level')}
+                    </span>
+                  )}
+                </div>
+                <h3 className="mt-0 mb-2 text-sm lg:text-lg font-semibold text-black line-clamp-2 flex-1">
+                  {course.description}
+                </h3>
+                <div className="flex items-center justify-between mt-auto">
+                  <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">
+                    {course.categoryName}
+                  </span>
+                  <span className="text-base lg:text-xl font-bold text-black">${course.price}</span>
+                </div>
+                </div>
               </div>
             </Link>
           )) : (
             <div className="col-span-full flex flex-col items-center justify-center min-h-[50vh] lg:min-h-[60vh]">
               {searchQuery ? (
                 <div className="text-center px-4">
-                  <p className="text-lg lg:text-xl text-gray-600 mb-2 lg:mb-4">No courses found matching "{searchQuery}"</p>
-                  <p className="text-sm lg:text-base text-gray-500">Try searching with different keywords or check your spelling</p>
+                  <p className="text-lg lg:text-xl text-gray-600 mb-2 lg:mb-4">{t("no-courses-matching")} "{searchQuery}"</p>
+                  <p className="text-sm lg:text-base text-gray-500">{t("try-different-keywords")}</p>
                 </div>
               ) : (
                 <div className="scale-[2] lg:scale-[3]">
@@ -215,6 +230,9 @@ function Courses() {
         </div>
       </div>
     </div>
+    </ContentWrapper>
+    </>
+    
   );
 }
 

@@ -4,8 +4,13 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Loader from '../Loader/Loader';
 import "./CreateCourse.css";
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
+
 
 const AddLesson = () => {
+
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
@@ -167,7 +172,7 @@ const AddLesson = () => {
     return (
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label className="required-field">Title</label>
+          <label className="required-field">{t("title")}</label>
           <input
             type="text"
             name="title"
@@ -180,7 +185,7 @@ const AddLesson = () => {
         </div>
 
         <div className="form-group">
-          <label className="required-field">Description</label>
+          <label className="required-field">{t("description")}</label>
           <textarea
             name="description"
             required
@@ -199,7 +204,7 @@ const AddLesson = () => {
               onClick={onCancel}
               className="px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all duration-200 ease-in-out shadow-sm hover:shadow-md"
             >
-              Cancel
+              {t('cancel')}
             </button>
           )}
           <button 
@@ -214,16 +219,20 @@ const AddLesson = () => {
   };
 
   return (
+    <>
+        {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
+            
     <div className="min-h-screen bg-gray-50">
       <div className="w-full min-h-screen bg-white p-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Add New Lesson</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{t("add-new-lesson")}</h1>
         </div>
 
         {error && (
           <div className="error-message" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', zIndex: 2000, background: '#fee2e2', color: '#b91c1c', padding: '16px', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
             <p style={{ margin: 0 }}>{error}</p>
-            <button onClick={() => setError(null)} style={{ marginLeft: 16, background: '#b91c1c', color: 'white', border: 'none', borderRadius: 4, padding: '4px 12px', cursor: 'pointer' }}>Dismiss</button>
+            <button onClick={() => setError(null)} style={{ marginLeft: 16, background: '#b91c1c', color: 'white', border: 'none', borderRadius: 4, padding: '4px 12px', cursor: 'pointer' }}>{t("dismiss")}</button>
           </div>
         )}
 
@@ -237,7 +246,7 @@ const AddLesson = () => {
           <>
             {!courseId && (
               <div className="form-group">
-                <label className="required-field">Select Course</label>
+                <label className="required-field">{t("select-course")}</label>
                 <select 
                   name="courseId" 
                   required 
@@ -245,7 +254,7 @@ const AddLesson = () => {
                   value={editingCourseId || ''}
                   onChange={(e) => setEditingCourseId(e.target.value)}
                 >
-                  <option value="">Choose a course</option>
+                  <option value="">{t("choose-course")}</option>
                   {courses.map(course => (
                     <option key={course.id} value={course.id}>
                       {course.title}
@@ -259,7 +268,7 @@ const AddLesson = () => {
               <>
                 {editingLesson ? (
                   <>
-                    <h2>Edit Lesson</h2>
+                    <h2>{t("edit-lesson")}</h2>
                     <LessonForm
                       lesson={editingLesson}
                       onSubmit={handleUpdateLesson}
@@ -290,8 +299,8 @@ const AddLesson = () => {
                           {lesson.content}
                         </div>
                         <div className="card-stats">
-                          <span>Duration: {lesson.duration} minutes</span>
-                          <span>Order: {lesson.order}</span>
+                          <span>{t("duration")}: {lesson.duration} {t("minutes")}</span>
+                          <span>{t("order")}: {lesson.order}</span>
                         </div>
                         <div className="card-actions">
                           <button
@@ -321,6 +330,8 @@ const AddLesson = () => {
         )}
       </div>
     </div>
+
+    </ContentWrapper></>
   );
 };
 

@@ -16,6 +16,7 @@ import styles from './AdminDashboard.module.css' // Unused import
 import allLessons from '@/Redux/features/allLessons/allLessons'
 import allGategory from '@/Redux/features/allGategory/allGategory'
 import { useTranslation } from 'react-i18next'
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
 
 function AdminDashboard() {
 
@@ -58,160 +59,167 @@ function AdminDashboard() {
     const viewMoreButtonClasses = 'cursor-pointer text-md font-medium shadow-md hover:shadow-lg bg-violet-500 text-white hover:bg-violet-600 py-2 px-6 rounded-full hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-opacity-75 transition-all duration-300 ease';
 
     return (
-    <div className='bg-gray-100 min-h-screen p-4 md:p-6'>
-        <div className='grid grid-cols-1 lg:grid-cols-12 gap-6'>
 
-            {/* Overview Panel */}
-            <aside className='lg:col-span-3'>
-              <div className="lg:sticky lg:top-6">
-                <div className='bg-white shadow-xl rounded-xl p-4'>
-                    <h2 className='text-2xl font-semibold text-gray-800 text-center pb-4 mb-4 border-b border-gray-300'>{t("Overview")}</h2>
-                    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3'>
-                        {[
-                            { id: "students", title: t("Students"), count: students?.length, icon: stuImg, alt: "Students overview icon" },
-                            { id: "teachers", title: t("Teachers"), count: teachers?.length, icon: teaImg, alt: "Teachers overview icon" },
-                            { id: "courses", title: t("Courses"), count: courses?.length, icon: courseImg, alt: "Courses overview icon" },
-                            { id: "gategory", title: t("Categories"), count: gategory?.length, icon: gateImg, alt: "Categories overview icon" },
-                        ].map(item => (
-                            <a key={item.id} href={`#${item.id}`} className={overviewCardBaseClasses}>
-                                <div className={overviewCardInnerClasses}>
-                                    <div className={overviewCardContentClasses}>
-                                        <h3 className={overviewCardTitleClasses}>{item.title}</h3>
-                                        <p className={overviewCardCountClasses}>
-                                            {loading ? <Loader size="sm" /> : <span className="text-2xl font-semibold text-violet-600">{item.count || 0}</span>}
-                                            <img className={overviewCardIconClasses} src={item.icon} alt={item.alt} />
-                                        </p>
-                                    </div>
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#6366F1" fillOpacity="0.8" d="M0,224L40,229.3C80,235,160,245,240,229.3C320,213,400,171,480,149.3C560,128,640,128,720,144C800,160,880,192,960,208C1040,224,1120,224,1200,224C1280,224,1360,224,1400,224L1440,224L1440,320L1400,320C1360,320,1280,320,1200,320C1120,320,1040,320,960,320C880,320,800,320,720,320C640,320,560,320,480,320C400,320,320,320,240,320C160,320,80,320,40,320L0,320Z"></path></svg>
-                                </div>
-                            </a>
-                        ))}
+        <>
+        {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
+            <div className='bg-gray-100 min-h-screen p-4 md:p-6'>
+                <div className='grid grid-cols-1 lg:grid-cols-12 gap-6'>
+
+                    {/* Overview Panel */}
+                    <aside className='lg:col-span-3'>
+                    <div className="lg:sticky lg:top-6">
+                        <div className='bg-white shadow-xl rounded-xl p-4'>
+                            <h2 className='text-2xl font-semibold text-gray-800 text-center pb-4 mb-4 border-b border-gray-300'>{t("Overview")}</h2>
+                            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3'>
+                                {[
+                                    { id: "students", title: t("Students"), count: students?.length, icon: stuImg, alt: "Students overview icon" },
+                                    { id: "teachers", title: t("Teachers"), count: teachers?.length, icon: teaImg, alt: "Teachers overview icon" },
+                                    { id: "courses", title: t("Courses"), count: courses?.length, icon: courseImg, alt: "Courses overview icon" },
+                                    { id: "gategory", title: t("Categories"), count: gategory?.length, icon: gateImg, alt: "Categories overview icon" },
+                                ].map(item => (
+                                    <a key={item.id} href={`#${item.id}`} className={overviewCardBaseClasses}>
+                                        <div className={overviewCardInnerClasses}>
+                                            <div className={overviewCardContentClasses}>
+                                                <h3 className={overviewCardTitleClasses}>{item.title}</h3>
+                                                <p className={overviewCardCountClasses}>
+                                                    {loading ? <Loader size="sm" /> : <span className="text-2xl font-semibold text-violet-600">{item.count || 0}</span>}
+                                                    <img className={overviewCardIconClasses} src={item.icon} alt={item.alt} />
+                                                </p>
+                                            </div>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#6366F1" fillOpacity="0.8" d="M0,224L40,229.3C80,235,160,245,240,229.3C320,213,400,171,480,149.3C560,128,640,128,720,144C800,160,880,192,960,208C1040,224,1120,224,1200,224C1280,224,1360,224,1400,224L1440,224L1440,320L1400,320C1360,320,1280,320,1200,320C1120,320,1040,320,960,320C880,320,800,320,720,320C640,320,560,320,480,320C400,320,320,320,240,320C160,320,80,320,40,320L0,320Z"></path></svg>
+                                        </div>
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
                     </div>
-                </div>
-              </div>
-            </aside>
+                    </aside>
 
-            {/* Main Content Area */}
-            <main className='lg:col-span-9'>
-            <section id='students' className={sectionBaseClasses}>
-            <h2 className={sectionTitleClasses}>{t("our-stu")}</h2>
-                <div  className={sectionGridClasses}>
-                {!loading?
-                (
-                    <>
-                    {students && students.length >0 ?
-                    (
-                        students.map((student)=>{
-                            return(
-                                <div key={student.id} className={`${itemCardBaseClasses} hover:bg-indigo-500`}>
-                                     <img className={itemCardIconClasses} src={studentImg} alt="Student avatar icon" />
-                                    <h3 className={itemCardTitleClasses}>{student.name}</h3>
-                                    <p className={itemCardIdClasses}>Id: {student.id}</p>
-                                </div>
-                            )
-                        })
-                    ): <p className="col-span-full text-gray-500 py-10">{t("no-students-found")}</p>
-                    }
-                    </>
-                ): <div className="col-span-full flex justify-center py-10"><Loader /></div>}
-                </div>
-                <div className='flex flex-row justify-center items-center mt-6'>
-                <Link to={'/admin/students'}>
-                    <button className={viewMoreButtonClasses}>{t("view-mstu")}</button>
-                </Link>
-                </div>
-            </section>
+                    {/* Main Content Area */}
+                    <main className='lg:col-span-9'>
+                    <section id='students' className={sectionBaseClasses}>
+                    <h2 className={sectionTitleClasses}>{t("our-stu")}</h2>
+                        <div  className={sectionGridClasses}>
+                        {!loading?
+                        (
+                            <>
+                            {students && students.length >0 ?
+                            (
+                                students.map((student)=>{
+                                    return(
+                                        <div key={student.id} className={`${itemCardBaseClasses} hover:bg-indigo-500`}>
+                                            <img className={itemCardIconClasses} src={studentImg} alt="Student avatar icon" />
+                                            <h3 className={itemCardTitleClasses}>{student.name}</h3>
+                                            <p className={itemCardIdClasses}>Id: {student.id}</p>
+                                        </div>
+                                    )
+                                })
+                            ): <p className="col-span-full text-gray-500 py-10">{t("no-students-found")}</p>
+                            }
+                            </>
+                        ): <div className="col-span-full flex justify-center py-10"><Loader /></div>}
+                        </div>
+                        <div className='flex flex-row justify-center items-center mt-6'>
+                        <Link to={'/admin/students'}>
+                            <button className={viewMoreButtonClasses}>{t("view-mstu")}</button>
+                        </Link>
+                        </div>
+                    </section>
 
-            <section id='teachers' className={sectionBaseClasses}>
-            <h2 className={sectionTitleClasses}>{t("our-teach")}</h2>
-                <div  className={sectionGridClasses}>
-                {!loading?
-                (
-                    <>
-                    {teachers && teachers.length >0 ?
-                    (
-                        teachers.map((teacher)=>{
-                            return(
-                                <div key={teacher.id} className={`${itemCardBaseClasses} hover:bg-green-500`}>
-                                     <img className={itemCardIconClasses} src={teaImg} alt="Teacher avatar icon" />
-                                    <h3 className={itemCardTitleClasses}>{teacher.name}</h3>
-                                    <p className={itemCardIdClasses}>Id: {teacher.id}</p>
-                                </div>
-                            )
-                        })
-                    ): <p className="col-span-full text-gray-500 py-10">{t('no-teachers-found')}</p>
-                    }
-                    </>
-                ): <div className="col-span-full flex justify-center py-10"><Loader /></div>}
-                </div>
-                <div className='flex flex-row justify-center items-center mt-6'>
-                <Link to={'/admin/addteacher'}>
-                    <button className={viewMoreButtonClasses}>{t("view-mtech")}</button>
-                </Link>
-                </div>
-            </section>
+                    <section id='teachers' className={sectionBaseClasses}>
+                    <h2 className={sectionTitleClasses}>{t("our-teach")}</h2>
+                        <div  className={sectionGridClasses}>
+                        {!loading?
+                        (
+                            <>
+                            {teachers && teachers.length >0 ?
+                            (
+                                teachers.map((teacher)=>{
+                                    return(
+                                        <div key={teacher.id} className={`${itemCardBaseClasses} hover:bg-green-500`}>
+                                            <img className={itemCardIconClasses} src={teaImg} alt="Teacher avatar icon" />
+                                            <h3 className={itemCardTitleClasses}>{teacher.name}</h3>
+                                            <p className={itemCardIdClasses}>Id: {teacher.id}</p>
+                                        </div>
+                                    )
+                                })
+                            ): <p className="col-span-full text-gray-500 py-10">{t('no-teachers-found')}</p>
+                            }
+                            </>
+                        ): <div className="col-span-full flex justify-center py-10"><Loader /></div>}
+                        </div>
+                        <div className='flex flex-row justify-center items-center mt-6'>
+                        <Link to={'/admin/addteacher'}>
+                            <button className={viewMoreButtonClasses}>{t("view-mtech")}</button>
+                        </Link>
+                        </div>
+                    </section>
 
-            <section id='courses' className={sectionBaseClasses}>
-            <h2 className={sectionTitleClasses}>{t("our-cour")}</h2>
-                <div  className={sectionGridClasses}>
-                {!loading?
-                (
-                    <>
-                    {courses && courses.length >0 ?
-                    (
-                        courses.map((course)=>{
-                            return(
-                                <div key={course.id} className={`${itemCardBaseClasses} hover:bg-blue-500`}>
-                                     <img className={itemCardIconClasses} src={courseImg} alt="Course icon" />
-                                    <h3 className={itemCardTitleClasses}>{course.title}</h3>
-                                    <p className={itemCardIdClasses}>Id: {course.id}</p>
-                                </div>
-                            )
-                        })
-                    ): <p className="col-span-full text-gray-500 py-10">{t("no-courses-found")}</p>
-                    }
-                    </>
-                ): <div className="col-span-full flex justify-center py-10"><Loader /></div>}
-                </div>
-                <div className='flex flex-row justify-center items-center mt-6'>
-                <Link to={'/admin/addcourse'}>
-                    <button className={viewMoreButtonClasses}>{t("view-mcour")}</button>
-                </Link>
-                </div>
-            </section>
+                    <section id='courses' className={sectionBaseClasses}>
+                    <h2 className={sectionTitleClasses}>{t("our-cour")}</h2>
+                        <div  className={sectionGridClasses}>
+                        {!loading?
+                        (
+                            <>
+                            {courses && courses.length >0 ?
+                            (
+                                courses.map((course)=>{
+                                    return(
+                                        <div key={course.id} className={`${itemCardBaseClasses} hover:bg-blue-500`}>
+                                            <img className={itemCardIconClasses} src={courseImg} alt="Course icon" />
+                                            <h3 className={itemCardTitleClasses}>{course.title}</h3>
+                                            <p className={itemCardIdClasses}>Id: {course.id}</p>
+                                        </div>
+                                    )
+                                })
+                            ): <p className="col-span-full text-gray-500 py-10">{t("no-courses-found")}</p>
+                            }
+                            </>
+                        ): <div className="col-span-full flex justify-center py-10"><Loader /></div>}
+                        </div>
+                        <div className='flex flex-row justify-center items-center mt-6'>
+                        <Link to={'/admin/addcourse'}>
+                            <button className={viewMoreButtonClasses}>{t("view-mcour")}</button>
+                        </Link>
+                        </div>
+                    </section>
 
 
-            <section id='gategory' className={sectionBaseClasses}>
-            <h2 className={sectionTitleClasses}>{t("Our-Cate")}</h2>
-                <div  className={sectionGridClasses}>
-                {!loading?
-                (
-                    <>
-                    {gategory && gategory.length >0 ?
-                    (
-                        gategory.map((cat)=>{ // Renamed to avoid conflict with gategory state variable
-                            return(
-                                <div key={cat.id} className={`${itemCardBaseClasses} hover:bg-purple-500`}>
-                                     <img className={itemCardIconClasses} src={gateImg} alt="Category icon" />
-                                    <h3 className={itemCardTitleClasses}>{cat.title}</h3>
-                                    <p className={itemCardIdClasses}>Id: {cat.id}</p>
-                                </div>
-                            )
-                        })
-                    ): <p className="col-span-full text-gray-500 py-10">{t("no-categories-found")}</p>
-                    }
-                    </>
-                ): <div className="col-span-full flex justify-center py-10"><Loader /></div>}
+                    <section id='gategory' className={sectionBaseClasses}>
+                    <h2 className={sectionTitleClasses}>{t("Our-Cate")}</h2>
+                        <div  className={sectionGridClasses}>
+                        {!loading?
+                        (
+                            <>
+                            {gategory && gategory.length >0 ?
+                            (
+                                gategory.map((cat)=>{ // Renamed to avoid conflict with gategory state variable
+                                    return(
+                                        <div key={cat.id} className={`${itemCardBaseClasses} hover:bg-purple-500`}>
+                                            <img className={itemCardIconClasses} src={gateImg} alt="Category icon" />
+                                            <h3 className={itemCardTitleClasses}>{cat.title}</h3>
+                                            <p className={itemCardIdClasses}>Id: {cat.id}</p>
+                                        </div>
+                                    )
+                                })
+                            ): <p className="col-span-full text-gray-500 py-10">{t("no-categories-found")}</p>
+                            }
+                            </>
+                        ): <div className="col-span-full flex justify-center py-10"><Loader /></div>}
+                        </div>
+                        <div className='flex flex-row justify-center items-center mt-6'>
+                        <Link to={'/admin/addgategory'}>
+                            <button className={viewMoreButtonClasses}>{t('view-mCate')}</button>
+                        </Link>
+                        </div>
+                    </section>
+                    </main>
                 </div>
-                <div className='flex flex-row justify-center items-center mt-6'>
-                <Link to={'/admin/addgategory'}>
-                    <button className={viewMoreButtonClasses}>{t('view-mCate')}</button>
-                </Link>
-                </div>
-            </section>
-            </main>
-        </div>
-    </div>
+            </div>
+            </ContentWrapper>
+        </>
+    
     )
 }
 

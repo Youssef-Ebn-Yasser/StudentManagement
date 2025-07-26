@@ -170,9 +170,15 @@ export default function CoursesDetails() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader />
-      </div>
+      <>
+        {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
+          <div className="min-h-screen flex items-center justify-center">
+              <Loader />
+            </div>
+        </ContentWrapper>
+      </>
+      
     );
   }
 
@@ -185,7 +191,7 @@ export default function CoursesDetails() {
             onClick={() => navigate(-1)}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
-            Go Back
+            {t("go-back")}
           </button>
         </div>
       </div>
@@ -196,12 +202,12 @@ export default function CoursesDetails() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600 text-xl mb-4">Course not found</p>
+          <p className="text-gray-600 text-xl mb-4">{t("course-not-found")}</p>
           <button
             onClick={() => navigate(-1)}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
-            Go Back
+            {t("go-back")}
           </button>
         </div>
       </div>
@@ -238,18 +244,18 @@ export default function CoursesDetails() {
                 <div className="flex items-center">
                   {rating}
                   <FaStar className="text-yellow-400 ml-1" />
-                  <span className="ml-2 text-gray-600">{lessonsCount} lessons</span>
+                  <span className="ml-2 text-gray-600">{lessonsCount} {t("lessons")}</span>
                 </div>
                 <div className="flex items-center">
                   <FaClock className="text-gray-400" />
-                  <span className="ml-1 text-gray-600">{course.hours} hours</span>
+                  <span className="ml-1 text-gray-600">{course.hours} {t("hours")}</span>
                 </div>
                 <div className="flex items-center">
                   <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
                   </svg>
                   <span className="ml-1 text-gray-600">
-                    Teacher:{' '}
+                    {t("Teachers")}:{' '}
                     <button
                       onClick={() => navigate(`/courses/teacher/${course.teacherId}`)}
                       className="text-blue-600 hover:text-blue-800 hover:underline"
@@ -294,7 +300,7 @@ export default function CoursesDetails() {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
               >
-                Description
+                {t("description")}
               </button>
               <button
                 onClick={() => setActiveTab('curriculum')}
@@ -304,7 +310,7 @@ export default function CoursesDetails() {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
               >
-                Lessons
+                {t("lessons")}
               </button>
             </nav>
           </div>
@@ -363,7 +369,7 @@ export default function CoursesDetails() {
 
         {/* Related Courses */}
         <div className="mt-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Related Courses</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("related-courses")}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {relatedCourses.map((relatedCourse) => (
               <Link
@@ -385,7 +391,7 @@ export default function CoursesDetails() {
                       <span className="text-gray-500 text-sm">{relatedCourse.title}</span>
                       {relatedCourse.level && (
                         <span className="bg-red-400 text-white py-1 px-2 rounded-xl text-xs">
-                          {relatedCourse.level} level
+                          {relatedCourse.level} {t('level')}
                         </span>
                       )}
                     </div>

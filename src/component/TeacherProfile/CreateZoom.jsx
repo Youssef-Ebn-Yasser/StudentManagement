@@ -1,3 +1,4 @@
+import { t } from 'i18next';
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 
@@ -267,7 +268,7 @@ function CreateZoom() {
     <div className="min-h-screen bg-gray-100 p-4 font-sans text-gray-800">
       <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-xl">
         <h1 className="text-4xl font-extrabold text-center text-indigo-700 mb-8">
-          Zoom Meeting Integrator
+          {t("zoom-meeting-integrator")}
         </h1>
 
         {/* <div className="mb-6 p-4 bg-indigo-50 rounded-lg border border-indigo-200 flex items-center justify-between">
@@ -297,11 +298,11 @@ function CreateZoom() {
         )}
 
         <form onSubmit={createMeeting} className="space-y-6">
-          <h2 className="text-2xl font-bold text-indigo-600 mb-4">Create New Meeting</h2>
+          <h2 className="text-2xl font-bold text-indigo-600 mb-4">{t("create-new-meeting")}</h2>
 
           <div>
             <label htmlFor="topic" className="block text-sm font-medium text-gray-700 mb-1">
-              Meeting Topic
+              {t("meeting-topic")}
             </label>
             <input
               type="text"
@@ -316,7 +317,7 @@ function CreateZoom() {
 
           <div>
             <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-1">
-              Duration (minutes)
+              {t("duration")} ({t("minutes")})
             </label>
             <input
               type="number"
@@ -331,7 +332,7 @@ function CreateZoom() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Meeting Type</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t("meeting-type")}</label>
             <div className="flex space-x-4">
               <label className="inline-flex items-center">
                 <input
@@ -342,7 +343,7 @@ function CreateZoom() {
                   checked={formData.meetingType === '1'}
                   onChange={handleRadioChange}
                 />
-                <span className="ml-2 text-gray-800">Instant Meeting</span>
+                <span className="ml-2 text-gray-800">{t("instant-meeting")}</span>
               </label>
               <label className="inline-flex items-center">
                 <input
@@ -353,7 +354,7 @@ function CreateZoom() {
                   checked={formData.meetingType === '2'}
                   onChange={handleRadioChange}
                 />
-                <span className="ml-2 text-gray-800">Scheduled Meeting</span>
+                <span className="ml-2 text-gray-800">{t("scheduled-meeting")}</span>
               </label>
               <label className="inline-flex items-center">
                 <input
@@ -364,7 +365,7 @@ function CreateZoom() {
                   checked={formData.meetingType === '8'}
                   onChange={handleRadioChange}
                 />
-                <span className="ml-2 text-gray-800">Recurring Meeting (Fixed Time)</span>
+                <span className="ml-2 text-gray-800">{t("recurring-meeting")}</span>
               </label>
             </div>
           </div>
@@ -372,7 +373,7 @@ function CreateZoom() {
           {(formData.meetingType === '2' || formData.meetingType === '8') && (
             <div>
               <label htmlFor="startTime" className="block text-sm font-medium text-gray-700 mb-1">
-                Start Date & Time
+                {t("start-date-time")}
               </label>
               <input
                 type="datetime-local"
@@ -388,9 +389,9 @@ function CreateZoom() {
 
           {formData.meetingType === '8' && (
             <div className="p-4 border border-indigo-300 rounded-md bg-indigo-50 space-y-4">
-              <h3 className="text-lg font-semibold text-indigo-700">Recurrence Details</h3>
+              <h3 className="text-lg font-semibold text-indigo-700">{t("recurrence-details")}</h3>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Recurrence Type</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t("recurrence-type")}</label>
                 <select
                   id="recurrenceType"
                   name="recurrenceType"
@@ -398,15 +399,15 @@ function CreateZoom() {
                   value={formData.recurrenceType}
                   onChange={handleInputChange}
                 >
-                  <option value="1">Daily</option>
-                  <option value="2">Weekly</option>
-                  <option value="3">Monthly</option>
+                  <option value="1">{t("daily")}</option>
+                  <option value="2">{t("weekly")}</option>
+                  <option value="3">{t("monthly")}</option>
                 </select>
               </div>
 
               <div>
                 <label htmlFor="repeatInterval" className="block text-sm font-medium text-gray-700 mb-1">
-                  Repeat Interval
+                  R{t("repeat-interval")}
                 </label>
                 <input
                   type="number"
@@ -420,7 +421,7 @@ function CreateZoom() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">End Condition</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t("end-condition")}</label>
                 <div className="flex space-x-4">
                   <label className="inline-flex items-center">
                     <input
@@ -431,7 +432,7 @@ function CreateZoom() {
                       checked={formData.endCondition === 'endTimes'}
                       onChange={handleRadioChange}
                     />
-                    <span className="ml-2 text-gray-800">After</span>
+                    <span className="ml-2 text-gray-800">{t("after")}</span>
                     <input
                       type="number"
                       id="endTimes"
@@ -442,7 +443,7 @@ function CreateZoom() {
                       min="1"
                       disabled={formData.endCondition !== 'endTimes'}
                     />
-                    <span className="ml-2 text-gray-800">occurrences</span>
+                    <span className="ml-2 text-gray-800">{t("occurrences")}</span>
                   </label>
                   <label className="inline-flex items-center">
                     <input
@@ -453,7 +454,7 @@ function CreateZoom() {
                       checked={formData.endCondition === 'endDate'}
                       onChange={handleRadioChange}
                     />
-                    <span className="ml-2 text-gray-800">On date</span>
+                    <span className="ml-2 text-gray-800">{t("on-date")}</span>
                     <input
                       type="date"
                       id="endDate"
@@ -469,7 +470,7 @@ function CreateZoom() {
 
               {formData.recurrenceType === '2' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Repeat On</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("repeat-on")}</label>
                   <div className="grid grid-cols-3 gap-2">
                     {[1, 2, 3, 4, 5, 6, 7].map(day => (
                       <label key={day} className="inline-flex items-center">
@@ -488,7 +489,7 @@ function CreateZoom() {
 
               {formData.recurrenceType === '3' && (
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Repeat By</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("monthly-repeat-by")}</label>
                   <div className="flex space-x-4">
                     <label className="inline-flex items-center">
                       <input
@@ -499,7 +500,7 @@ function CreateZoom() {
                         checked={formData.monthlyRepeatBy === 'dayOfMonth'}
                         onChange={handleRadioChange}
                       />
-                      <span className="ml-2 text-gray-800">Day of month</span>
+                      <span className="ml-2 text-gray-800">{t("day-of-month")}</span>
                       <input
                         type="number"
                         id="monthlyDay"
@@ -521,7 +522,7 @@ function CreateZoom() {
                         checked={formData.monthlyRepeatBy === 'weekOfMonth'}
                         onChange={handleRadioChange}
                       />
-                      <span className="ml-2 text-gray-800">Week of month</span>
+                      <span className="ml-2 text-gray-800">{t("week-of-month")}</span>
                       <select
                         id="monthlyWeek"
                         name="monthlyWeek"
@@ -530,11 +531,11 @@ function CreateZoom() {
                         onChange={handleInputChange}
                         disabled={formData.monthlyRepeatBy !== 'weekOfMonth'}
                       >
-                        <option value="1">First</option>
-                        <option value="2">Second</option>
-                        <option value="3">Third</option>
-                        <option value="4">Fourth</option>
-                        <option value="5">Last</option>
+                        <option value="1">{t("first")}</option>
+                        <option value="2">{t("second")}</option>
+                        <option value="3">{t("third")}</option>
+                        <option value="4">{t("fourth")}</option>
+                        <option value="5">{t("last")}</option>
                       </select>
                       <select
                         id="monthlyWeekDay"
@@ -544,13 +545,13 @@ function CreateZoom() {
                         onChange={handleInputChange}
                         disabled={formData.monthlyRepeatBy !== 'weekOfMonth'}
                       >
-                        <option value="1">Sunday</option>
-                        <option value="2">Monday</option>
-                        <option value="3">Tuesday</option>
-                        <option value="4">Wednesday</option>
-                        <option value="5">Thursday</option>
-                        <option value="6">Friday</option>
-                        <option value="7">Saturday</option>
+                        <option value="1">{t("sunday")}</option>
+                        <option value="2">{t("monday")}</option>
+                        <option value="3">{t("tuesday")}</option>
+                        <option value="4">{t("wednesday")}</option>
+                        <option value="5">{t("thursday")}</option>
+                        <option value="6">{t("friday")}</option>
+                        <option value="7">{t("saturday")}</option>
                       </select>
                     </label>
                   </div>
@@ -560,7 +561,7 @@ function CreateZoom() {
           )}
 
           <div className="p-4 border border-gray-300 rounded-md bg-gray-50 space-y-4">
-            <h3 className="text-lg font-semibold text-gray-700">Meeting Options</h3>
+            <h3 className="text-lg font-semibold text-gray-700">{t("meeting-options")}</h3>
 
             <div>
               <label className="inline-flex items-center">
@@ -572,7 +573,7 @@ function CreateZoom() {
                   checked={formData.enablePassword}
                   onChange={handleInputChange}
                 />
-                <span className="ml-2 text-gray-800">Require Meeting Password</span>
+                <span className="ml-2 text-gray-800">{t("require-password")}</span>
               </label>
               {formData.enablePassword && (
                 <input
@@ -580,7 +581,7 @@ function CreateZoom() {
                   id="password"
                   name="password"
                   className="w-full p-3 mt-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Enter password"
+                  placeholder={t("enter-password")}
                   value={formData.password}
                   onChange={handleInputChange}
                   required
@@ -598,7 +599,7 @@ function CreateZoom() {
                   checked={formData.muteParticipants}
                   onChange={handleInputChange}
                 />
-                <span className="ml-2 text-gray-800">Mute Participants Upon Entry</span>
+                <span className="ml-2 text-gray-800">{t("mute-on-entry")}</span>
               </label>
             </div>
 
@@ -612,7 +613,7 @@ function CreateZoom() {
                   checked={formData.enableAutoRecording}
                   onChange={handleInputChange}
                 />
-                <span className="ml-2 text-gray-800">Enable Auto Recording</span>
+                <span className="ml-2 text-gray-800">{t("auto-recording")}</span>
               </label>
               {formData.enableAutoRecording && (
                 <div className="flex space-x-4 mt-2 ml-6">
@@ -625,7 +626,7 @@ function CreateZoom() {
                       checked={formData.recordingLocation === 'local'}
                       onChange={handleRadioChange}
                     />
-                    <span className="ml-2 text-gray-800">Local Computer</span>
+                    <span className="ml-2 text-gray-800">{t("local-computer")}</span>
                   </label>
                   <label className="inline-flex items-center">
                     <input
@@ -654,29 +655,29 @@ function CreateZoom() {
 
         {createdMeeting && (
           <div className="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
-            <h2 className="text-2xl font-bold text-blue-700 mb-4">Meeting Created!</h2>
-            <p className="text-lg mb-2"><span className="font-semibold">Topic:</span> {createdMeeting.topic || createdMeeting.Topic}</p>
-            <p className="text-lg mb-2"><span className="font-semibold">Meeting ID:</span> {createdMeeting.meetingId || createdMeeting.MeetingId}</p>
+            <h2 className="text-2xl font-bold text-blue-700 mb-4">{t("meeting-created")}</h2>
+            <p className="text-lg mb-2"><span className="font-semibold">{t("topic")}:</span> {createdMeeting.topic || createdMeeting.Topic}</p>
+            <p className="text-lg mb-2"><span className="font-semibold">{t("meeting-id")}:</span> {createdMeeting.meetingId || createdMeeting.MeetingId}</p>
             {(createdMeeting.password || createdMeeting.Password) && (
-              <p className="text-lg mb-2"><span className="font-semibold">Password:</span> {createdMeeting.password || createdMeeting.Password}</p>
+              <p className="text-lg mb-2"><span className="font-semibold">{t("password")}:</span> {createdMeeting.password || createdMeeting.Password}</p>
             )}
             {(createdMeeting.startTime || createdMeeting.StartTime) && (
-              <p className="text-lg mb-2"><span className="font-semibold">Start Time:</span> {createdMeeting.startTime || createdMeeting.StartTime}</p>
+              <p className="text-lg mb-2"><span className="font-semibold">{t("start-time")}:</span> {createdMeeting.startTime || createdMeeting.StartTime}</p>
             )}
-            <p className="text-lg mb-2"><span className="font-semibold">Duration:</span> {createdMeeting.duration || createdMeeting.Duration} minutes</p>
-            <p className="text-lg mb-2"><span className="font-semibold">Type:</span>
+            <p className="text-lg mb-2"><span className="font-semibold">{t("duration")}:</span> {createdMeeting.duration || createdMeeting.Duration} minutes</p>
+            <p className="text-lg mb-2"><span className="font-semibold">{t("type")}:</span>
               {(createdMeeting.type || createdMeeting.Type) === 1 ? 'Instant' :
                 (createdMeeting.type || createdMeeting.Type) === 2 ? 'Scheduled' : 'Recurring'}
             </p>
             {(createdMeeting.isRecurring || createdMeeting.IsRecurring) && (createdMeeting.daysThatRepeat || createdMeeting.DaysThatRepeat) && (
               <p className="text-lg mb-2">
-                <span className="font-semibold">Recurrence:</span>
+                <span className="font-semibold">{t("recurrence")}:</span>
                 {createdMeeting.daysThatRepeat || createdMeeting.DaysThatRepeat}
                 {(createdMeeting.occurrences || createdMeeting.Occurrences) ? ` (${createdMeeting.occurrences || createdMeeting.Occurrences} occurrences)` : ''}
               </p>
             )}
             <p className="text-lg mb-2">
-              <span className="font-semibold">Mute Participants:</span>
+              <span className="font-semibold">{t("mute-participants")}:</span>
               {(createdMeeting.muteParticipantsUponEntry || createdMeeting.MuteParticipantsUponEntry) ? 'Yes' : 'No'}
             </p>
             <p className="text-lg mb-2">
@@ -693,7 +694,7 @@ function CreateZoom() {
                 rel="noopener noreferrer"
                 className="inline-block px-6 py-3 bg-blue-600 text-white font-bold rounded-full shadow-md hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105"
               >
-                Join Meeting
+                {t("join-meeting")}
               </a>
             </div>
           </div>
@@ -701,26 +702,26 @@ function CreateZoom() {
 
         {savedMeetings.length > 0 && (
           <div className="mt-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-700 mb-4">Your Saved Meetings</h2>
+            <h2 className="text-2xl font-bold text-gray-700 mb-4">{t("your-saved-meetings")}</h2>
             <div className="space-y-4">
               {savedMeetings.map(meeting => (
                 <div key={meeting.zoomMeetingId || meeting.meetingId} className="p-4 border border-gray-300 rounded-md bg-white shadow-sm">
                   <p className="text-lg font-semibold">{meeting.topic}</p>
                   <p className="text-sm text-gray-600">ID: {meeting.zoomMeetingId || meeting.meetingId}</p>
-                  {meeting.password && <p className="text-sm text-gray-600">Password: {meeting.password}</p>}
+                  {meeting.password && <p className="text-sm text-gray-600">{t('password')}: {meeting.password}</p>}
                   {meeting.startTime && (
                     <p className="text-sm text-gray-600">
-                      Start: {new Date(meeting.startTime).toLocaleString()}
+                      {t("start")}: {new Date(meeting.startTime).toLocaleString()}
                     </p>
                   )}
                   {meeting.type === 8 && meeting.daysThatRepeat && (
                     <p className="text-sm text-gray-600">
-                      Recurrence: {meeting.daysThatRepeat}
+                      {t("recurrence")}: {meeting.daysThatRepeat}
                       {meeting.occurrences ? ` (${meeting.occurrences} occurrences)` : ''}
                     </p>
                   )}
                   <p className="text-sm text-gray-600">
-                    Mute Participants: {meeting.muteParticipantsUponEntry ? 'Yes' : 'No'}
+                    {t("mute-participants")}: {meeting.muteParticipantsUponEntry ? 'Yes' : 'No'}
                   </p>
                   <p className="text-sm text-gray-600">
                     Auto Recording: {meeting.autoRecording
@@ -734,7 +735,7 @@ function CreateZoom() {
                       rel="noopener noreferrer"
                       className="text-indigo-600 hover:underline text-sm"
                     >
-                      Join Meeting
+                      {t("join-meeting")}
                     </a>
                   </div>
                 </div>

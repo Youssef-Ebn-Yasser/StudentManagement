@@ -4,6 +4,7 @@ import img from '../../assets/error.png'
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import { useTranslation } from 'react-i18next'
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
 
 function ForgetPassword() {
 

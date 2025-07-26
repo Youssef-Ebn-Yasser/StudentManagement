@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import {DollarSign} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function PaymobCheckout() {
+
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
@@ -72,7 +75,7 @@ export default function PaymobCheckout() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <span>Loading...</span>
+        <span>{t('loading')}...</span>
       </div>
     );
   }
@@ -86,7 +89,7 @@ export default function PaymobCheckout() {
             onClick={() => navigate(-1)}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
-            Go Back
+            {t("go-back")}
           </button>
         </div>
       </div>
@@ -103,12 +106,12 @@ export default function PaymobCheckout() {
       <div className="mb-8 text-center">
         <div className="text-xl font-semibold text-blue-900">{course.title}</div>
         <div className="text-gray-700 mt-1 text-2xl font-extrabold">
-          <span className="text-base text-gray-600 mr-2">Price:</span> <span className=" text-green-700 ">${getUsdPrice()}</span>
+          <span className="text-base text-gray-600 mr-2">{t('price')}:</span> <span className=" text-green-700 ">${getUsdPrice()}</span>
         </div>
       </div>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block mb-1 font-semibold text-blue-800">First Name</label>
+          <label className="block mb-1 font-semibold text-blue-800">{t("first-name")}</label>
           <input
             type="text"
             name="firstName"
@@ -120,7 +123,7 @@ export default function PaymobCheckout() {
           />
         </div>
         <div>
-          <label className="block mb-1 font-semibold text-blue-800">Last Name</label>
+          <label className="block mb-1 font-semibold text-blue-800">{t("last-name")}</label>
           <input
             type="text"
             name="lastName"
@@ -132,7 +135,7 @@ export default function PaymobCheckout() {
           />
         </div>
         <div>
-          <label className="block mb-1 font-semibold text-blue-800">Email</label>
+          <label className="block mb-1 font-semibold text-blue-800">{t('email')}</label>
           <input
             type="email"
             name="email"
@@ -144,7 +147,7 @@ export default function PaymobCheckout() {
           />
         </div>
         <div>
-          <label className="block mb-1 font-semibold text-blue-800">Phone Number</label>
+          <label className="block mb-1 font-semibold text-blue-800">{t("phone-number")}</label>
           <input
             type="tel"
             name="phoneNumber"

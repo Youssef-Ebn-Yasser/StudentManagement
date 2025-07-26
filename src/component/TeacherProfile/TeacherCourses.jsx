@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
+
 
 const TeacherCourses = ({ setActiveTab }) => {
 
@@ -112,160 +114,165 @@ const TeacherCourses = ({ setActiveTab }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="w-full min-h-screen bg-white p-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Back to Profile Button */}
-          <div className="mb-6">
-            <button
-              onClick={() => navigate('/teacher/profile')}
-              className="flex items-center text-gray-600 hover:text-gray-900 transition-colors duration-200"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              {t("back-to-profile")}
-            </button>
-          </div>
-
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
-              {getPageTitle()}
-            </h1>
-            {!isSelectionMode && (
-              <button 
-                onClick={() => navigate('/teacher/createcourse')}
-                className="bg-gradient-to-r from-[var(--primary-dark)] to-[var(--primary-color)] text-white px-6 py-3 rounded-lg hover:opacity-90 transition-all duration-200 ease-in-out shadow-md hover:shadow-lg flex items-center gap-2"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                {t("create-new-course")}
-              </button>
-            )}
-          </div>
-
-          {!teacherId ? (
-            <div className="flex items-center justify-center h-[calc(100vh-300px)]">
-              <div className="text-center">
-                <div className="scale-[2.5] mb-4">
-                  <Loader />
-                </div>
-                <p className="text-gray-600">{t("loading-teacher-info")}...</p>
-              </div>
-            </div>
-          ) : (
-            <>
-              {/* Search and Filter Section */}
-              <div className="mb-8 flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    placeholder={t("search-courses")}
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-                <div className="flex gap-4">
-                  <select
-                    value={sortBy}
-                    onChange={handleSortChange}
-                    className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  >
-                    <option value="Latest">{t("latest")}</option>
-                    <option value="Most Popular">{t("most-popular")}</option>
-                    <option value="Price: Low to High">{t("price-low-high")}</option>
-                    <option value="Price: High to Low">{t("price-high-low")}</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Courses Grid */}
-              {loading ? (
-                <div className="flex items-center justify-center h-[calc(100vh-300px)]">
-                  <div className="scale-[2.5]">
-                    <Loader />
-                  </div>
-                </div>
-              ) : error ? (
-                <div className="flex items-center justify-center h-[calc(100vh-300px)] text-red-600 text-2xl">
-                  {error}
-                </div>
-              ) : filteredAndSortedCourses.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8 xl:gap-10">
-                  {filteredAndSortedCourses.map((course) => (
-                    <div 
-                      key={course?.id || Math.random()} 
-                      className="w-full border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group hover:shadow-lg transition duration-300 h-[300px] lg:h-[330px] flex flex-col"
+    <>{loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
+          <div className="min-h-screen bg-gray-50">
+              <div className="w-full min-h-screen bg-white p-8">
+                <div className="max-w-7xl mx-auto">
+                  {/* Back to Profile Button */}
+                  <div className="mb-6">
+                    <button
+                      onClick={() => navigate('/teacher/profile')}
+                      className="flex items-center text-gray-600 hover:text-gray-900 transition-colors duration-200"
                     >
-                      <div className="relative overflow-hidden">
-                        <img
-                          src={course?.imagePath || 'https://via.placeholder.com/300x200'}
-                          alt={course?.title || 'Course'}
-                          className="block w-full h-[140px] lg:h-[180px] object-cover transition-transform duration-300 group-hover:scale-110"
-                        />
-                      </div>
-                      <div className="p-3 lg:p-4 flex-1 flex flex-col">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-gray-500 text-xs lg:text-sm truncate max-w-[60%]">{course?.title || 'Untitled Course'}</span>
-                          {course?.level && (
-                            <span className="bg-red-400 text-white py-1 px-2 rounded-xl text-xs">
-                              {course.level} {t('level')}
-                            </span>
-                          )}
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                      </svg>
+                      {t("back-to-profile")}
+                    </button>
+                  </div>
+
+                  <div className="flex justify-between items-center mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900">
+                      {getPageTitle()}
+                    </h1>
+                    {!isSelectionMode && (
+                      <button 
+                        onClick={() => navigate('/teacher/createcourse')}
+                        className="bg-gradient-to-r from-[var(--primary-dark)] to-[var(--primary-color)] text-white px-6 py-3 rounded-lg hover:opacity-90 transition-all duration-200 ease-in-out shadow-md hover:shadow-lg flex items-center gap-2"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        {t("create-new-course")}
+                      </button>
+                    )}
+                  </div>
+
+                  {!teacherId ? (
+                    <div className="flex items-center justify-center h-[calc(100vh-300px)]">
+                      <div className="text-center">
+                        <div className="scale-[2.5] mb-4">
+                          <Loader />
                         </div>
-                        <h3 className="mt-0 mb-2 text-sm lg:text-lg font-semibold text-black line-clamp-2 flex-1">
-                          {course?.description || 'No description available'}
-                        </h3>
-                        <div className="flex items-center justify-between mt-auto">
-                          <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">
-                            {course?.categoryName || 'Uncategorized'}
-                          </span>
-                          <span className="text-base lg:text-xl font-bold text-black">${course?.price || 0}</span>
-                        </div>
-                        <div className="flex gap-2 mt-3">
-                          {isSelectionMode ? (
-                            <button 
-                              onClick={() => handleCourseAction(course.id)}
-                              className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 text-sm"
-                            >
-                              {isAddLessonMode ? 'Add Lesson' : 'Upload Material'}
-                            </button>
-                          ) : (
-                            <>
-                              <button 
-                                onClick={() => navigate('/teacher/course/details', { state: { courseId: course.id } })}
-                                className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 text-sm"
-                              >
-                                {t("view-details")}
-                              </button>
-                              <button 
-                                onClick={() => navigate('/teacher/course/edit', { state: { courseId: course.id } })}
-                                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200 text-sm"
-                              >
-                                {t("edit")}
-                              </button>
-                            </>
-                          )}
-                        </div>
+                        <p className="text-gray-600">{t("loading-teacher-info")}...</p>
                       </div>
                     </div>
-                  ))}
+                  ) : (
+                    <>
+                      {/* Search and Filter Section */}
+                      <div className="mb-8 flex flex-col md:flex-row gap-4">
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            placeholder={t("search-courses")}
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          />
+                        </div>
+                        <div className="flex gap-4">
+                          <select
+                            value={sortBy}
+                            onChange={handleSortChange}
+                            className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          >
+                            <option value="Latest">{t("latest")}</option>
+                            <option value="Most Popular">{t("most-popular")}</option>
+                            <option value="Price: Low to High">{t("price-low-high")}</option>
+                            <option value="Price: High to Low">{t("price-high-low")}</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Courses Grid */}
+                      {loading ? (
+                        <div className="flex items-center justify-center h-[calc(100vh-300px)]">
+                          <div className="scale-[2.5]">
+                            <Loader />
+                          </div>
+                        </div>
+                      ) : error ? (
+                        <div className="flex items-center justify-center h-[calc(100vh-300px)] text-red-600 text-2xl">
+                          {error}
+                        </div>
+                      ) : filteredAndSortedCourses.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8 xl:gap-10">
+                          {filteredAndSortedCourses.map((course) => (
+                            <div 
+                              key={course?.id || Math.random()} 
+                              className="w-full border border-gray-300 rounded-lg overflow-hidden shadow-md font-sans group hover:shadow-lg transition duration-300 h-[300px] lg:h-[330px] flex flex-col"
+                            >
+                              <div className="relative overflow-hidden">
+                                <img
+                                  src={course?.imagePath || 'https://via.placeholder.com/300x200'}
+                                  alt={course?.title || 'Course'}
+                                  className="block w-full h-[140px] lg:h-[180px] object-cover transition-transform duration-300 group-hover:scale-110"
+                                />
+                              </div>
+                              <div className="p-3 lg:p-4 flex-1 flex flex-col">
+                                <div className="flex justify-between items-center mb-2">
+                                  <span className="text-gray-500 text-xs lg:text-sm truncate max-w-[60%]">{course?.title || 'Untitled Course'}</span>
+                                  {course?.level && (
+                                    <span className="bg-red-400 text-white py-1 px-2 rounded-xl text-xs">
+                                      {course.level} {t('level')}
+                                    </span>
+                                  )}
+                                </div>
+                                <h3 className="mt-0 mb-2 text-sm lg:text-lg font-semibold text-black line-clamp-2 flex-1">
+                                  {course?.description || 'No description available'}
+                                </h3>
+                                <div className="flex items-center justify-between mt-auto">
+                                  <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">
+                                    {course?.categoryName || 'Uncategorized'}
+                                  </span>
+                                  <span className="text-base lg:text-xl font-bold text-black">${course?.price || 0}</span>
+                                </div>
+                                <div className="flex gap-2 mt-3">
+                                  {isSelectionMode ? (
+                                    <button 
+                                      onClick={() => handleCourseAction(course.id)}
+                                      className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 text-sm"
+                                    >
+                                      {isAddLessonMode ? 'Add Lesson' : 'Upload Material'}
+                                    </button>
+                                  ) : (
+                                    <>
+                                      <button 
+                                        onClick={() => navigate('/teacher/course/details', { state: { courseId: course.id } })}
+                                        className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 text-sm"
+                                      >
+                                        {t("view-details")}
+                                      </button>
+                                      <button 
+                                        onClick={() => navigate('/teacher/course/edit', { state: { courseId: course.id } })}
+                                        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200 text-sm"
+                                      >
+                                        {t("edit")}
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-12">
+                          <p className="text-gray-500 text-lg">
+                            {searchQuery ? 'No courses match your search' : 'No courses available in this category'}
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg">
-                    {searchQuery ? 'No courses match your search' : 'No courses available in this category'}
-                  </p>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </div>
-      <ToastContainer />
-    </div>
+              </div>
+              <ToastContainer />
+            </div>
+        </ContentWrapper>
+          </>
+    
   );
 };
 

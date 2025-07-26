@@ -1,13 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const Loader = () => {
+const Loader = ({ visible }) => {
   return (
-    <StyledWrapper>
-      <svg xmlns="http://www.w3.org/2000/svg" height="20px" width="20px" viewBox="0 0 200 200" className="pencil">
+    <StyledOverlay $visible={visible}>
+      <StyledWrapper>
+      <svg xmlns="http://www.w3.org/2000/svg" height="50px" width="50px" viewBox="0 0 200 200" className="pencil">
         <defs>
           <clipPath id="pencil-eraser">
-          <rect height={30} width={30} ry={5} rx={5} />
+          <rect height={50} width={50} ry={5} rx={5} />
           </clipPath>
         </defs>
         <circle transform="rotate(-113,100,100)" strokeLinecap="round" strokeDashoffset="439.82" strokeDasharray="439.82 439.82" strokeWidth={2} stroke="currentColor" fill="none" r={70} className="pencil__stroke" />
@@ -36,14 +37,36 @@ const Loader = () => {
         </g>
       </svg>
     </StyledWrapper>
+    </StyledOverlay>
+
+    
   );
 }
+
+const ContentWrapper = styled.div`
+        transition: opacity 0.5s ease;
+        opacity: ${({ $loading }) => ($loading ? 0 : 1)};
+        pointer-events: ${({ $loading }) => ($loading ? 'none' : 'auto')};
+    `;
+    
+const StyledOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(255,255,255,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s ease;
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  pointer-events: ${({ $visible }) => ($visible ? 'auto' : 'none')};
+`;
 
 const StyledWrapper = styled.div`
   .pencil {
     display: block;
-    width: 2em;
-    height: 2em;
+    width: 5em;
+    height: 5em;
   }
 
   .pencil__body1,

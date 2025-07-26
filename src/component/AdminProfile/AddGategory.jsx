@@ -8,6 +8,8 @@ import Loader from '../Loader/Loader';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import axiosInstance from '@/services/axiosInstance';
+import ContentWrapper from '../ContentWrapper/ContentWrapper';
+
 
 
 function AddGategory() {
@@ -66,7 +68,9 @@ function AddGategory() {
     },[])
 
     return <>
-        <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
+    {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
+            <div className="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
             <div className="container mx-auto space-y-10">
                 {/* Add Category Form Section */}
                 <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl max-w-lg mx-auto">
@@ -137,9 +141,11 @@ function AddGategory() {
                             )}
                         </div>
                     )}
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+        </ContentWrapper>
+        
     </>
 }
 

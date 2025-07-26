@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { courseService } from '../../services/courseService';
 import Loader from '../Loader/Loader';
+import { useTranslation } from 'react-i18next';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
+
+
 
 export default function Teachers() {
+
+  const { t } = useTranslation();
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,7 +33,10 @@ export default function Teachers() {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="scale-[2.5]">
-          <Loader />
+          {loading && <Loader visible={loading} />}
+          <ContentWrapper $loading={loading}>
+            <Loader />
+          </ContentWrapper>
         </div>
       </div>
     );
@@ -42,7 +51,7 @@ export default function Teachers() {
             onClick={() => window.location.reload()}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
-            Retry
+            {t('retry')}
           </button>
         </div>
       </div>
@@ -51,7 +60,7 @@ export default function Teachers() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Our Teachers</h1>
+      <h1 className="text-3xl font-bold mb-8">{t("our-teach")}</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {teachers.map((teacher) => (
           <div key={teacher.id} className="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-xl transition" onClick={() => window.location.href = `/courses/teacher/${teacher.id}`}>

@@ -4,6 +4,8 @@ import { quizService } from '../../services/quizService';
 import Loader from '../Loader/Loader';
 import { FaCheck, FaTimes } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import { t } from 'i18next';
+
 
 const QuizView = () => {
   const { lessonId } = useParams();
@@ -76,9 +78,15 @@ const QuizView = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader />
-      </div>
+      <>
+        {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
+          <div className="min-h-screen flex items-center justify-center">
+            <Loader />
+          </div>
+        </ContentWrapper>
+      </>
+      
     );
   }
 
@@ -95,9 +103,9 @@ const QuizView = () => {
       {!selectedQuiz ? (
         // Quiz List View
         <div>
-          <h2 className="text-2xl font-bold mb-6">Available Quizzes</h2>
+          <h2 className="text-2xl font-bold mb-6">{t("available-quizzes")}</h2>
           {quizzes.length === 0 ? (
-            <p className="text-gray-500">No quizzes available for this lesson.</p>
+            <p className="text-gray-500">{t("no-quizzes-available")}</p>
           ) : (
             <div className="grid gap-4">
               {quizzes.map((quiz) => (
@@ -109,8 +117,8 @@ const QuizView = () => {
                   <h3 className="text-xl font-semibold mb-2">{quiz.title}</h3>
                   <p className="text-gray-600">{quiz.description}</p>
                   <div className="mt-4 flex items-center text-sm text-gray-500">
-                    <span className="mr-4">Questions: {quiz.totalQuestions}</span>
-                    <span>Time: {quiz.duration} minutes</span>
+                    <span className="mr-4">{t("questions")}: {quiz.totalQuestions}</span>
+                    <span>{t("time")}: {quiz.duration} {t('minutes')}</span>
                   </div>
                 </div>
               ))}
@@ -126,21 +134,21 @@ const QuizView = () => {
               onClick={() => setSelectedQuiz(null)}
               className="text-blue-600 hover:text-blue-800"
             >
-              Back to Quizzes
+              {t("back-to-quizzes")}
             </button>
           </div>
 
           {submitted ? (
             <div className="bg-green-50 p-6 rounded-lg">
-              <h3 className="text-xl font-semibold text-green-800 mb-4">Quiz Submitted!</h3>
-              <p className="text-green-600">Your answers have been recorded successfully.</p>
+              <h3 className="text-xl font-semibold text-green-800 mb-4">{t("quiz-submitted")}</h3>
+              <p className="text-green-600">{t("answers-recorded")}</p>
             </div>
           ) : (
             <div className="space-y-6">
               {selectedQuiz.questions?.map((question, index) => (
                 <div key={question.id} className="bg-white p-6 rounded-lg shadow-md">
                   <h3 className="text-lg font-semibold mb-4">
-                    Question {index + 1}: {question.text}
+                    {t("question")} {index + 1}: {question.text}
                   </h3>
                   <div className="space-y-3">
                     {question.options?.map((option) => (
@@ -169,7 +177,7 @@ const QuizView = () => {
                   disabled={loading}
                   className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                 >
-                  {loading ? 'Submitting...' : 'Submit Quiz'}
+                  {loading ? `${t("submitting")}...` : `${t("submit-quiz")}`}
                 </button>
               </div>
             </div>

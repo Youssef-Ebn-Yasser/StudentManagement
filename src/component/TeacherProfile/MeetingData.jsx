@@ -34,14 +34,14 @@ export default function MeetingData() {
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-blue-100 to-purple-100 p-6">
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl p-8">
         <h1 className="text-3xl font-extrabold text-center text-indigo-700 mb-8">
-          Course Meetings
+          {t("course-meetings")}
         </h1>
         {loading ? (
-          <div className="text-center text-lg text-indigo-600 font-semibold">Loading meetings...</div>
+          <div className="text-center text-lg text-indigo-600 font-semibold">{t("loading-meetings")}...</div>
         ) : error ? (
           <div className="text-center text-red-600 font-semibold">{error}</div>
         ) : meetings.length === 0 ? (
-          <div className="text-center text-gray-500 text-lg font-semibold">No meetings yet</div>
+          <div className="text-center text-gray-500 text-lg font-semibold">{t("no-meetings")}</div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2">
             {meetings.map((meeting) => (
@@ -55,7 +55,7 @@ export default function MeetingData() {
                   <span className="text-gray-900">{meeting.zoomMeetingId}</span>
                 </p>
                 <p className="mb-1">
-                  <span className="font-semibold text-gray-700">Type:</span>{" "}
+                  <span className="font-semibold text-gray-700">{t("type")}:</span>{" "}
                   <span className="text-blue-700">
                     {meeting.type === 1
                       ? "Instant"
@@ -68,19 +68,19 @@ export default function MeetingData() {
                 </p>
                 {meeting.startTime && (
                   <p className="mb-1">
-                    <span className="font-semibold text-gray-700">Start Time:</span>{" "}
+                    <span className="font-semibold text-gray-700">{t("start-time")}:</span>{" "}
                     <span className="text-gray-900">
                       {new Date(meeting.startTime).toLocaleString()}
                     </span>
                   </p>
                 )}
                 <p className="mb-1">
-                  <span className="font-semibold text-gray-700">Duration:</span>{" "}
-                  <span className="text-gray-900">{meeting.duration} min</span>
+                  <span className="font-semibold text-gray-700">{t("duration")}:</span>{" "}
+                  <span className="text-gray-900">{meeting.duration} {t('min')}</span>
                 </p>
                 {meeting.password && (
                   <p className="mb-1">
-                    <span className="font-semibold text-gray-700">Password:</span>{" "}
+                    <span className="font-semibold text-gray-700">{t('password')}:</span>{" "}
                     <span className="text-gray-900">{meeting.password}</span>
                   </p>
                 )}
@@ -91,7 +91,7 @@ export default function MeetingData() {
                     rel="noopener noreferrer"
                     className="inline-block px-5 py-2 bg-indigo-600 text-white font-bold rounded-full shadow hover:bg-indigo-700 transition"
                   >
-                    Join Meeting
+                    {t("join-meeting")}
                   </a>
                   <span className="text-xs text-gray-400">
                     {meeting.type === 8 ? "Recurring" : ""}

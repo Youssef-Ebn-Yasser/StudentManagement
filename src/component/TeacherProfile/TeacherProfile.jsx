@@ -12,6 +12,8 @@ import { courseService } from '../../services/courseService';
 import Loader from '../Loader/Loader';
 import TeacherDashboard from '../TeacherDashboard/TeacherDashboard';
 import { useSelector } from 'react-redux';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
+
 
 function TeacherProfile() {
   console.log('TeacherProfile component mounted');
@@ -115,7 +117,12 @@ function TeacherProfile() {
         console.log('teacherData:', teacherData);
         console.log('localTeacherId:', localTeacherId);
         if (isLoading) {
-          return <Loader />;
+          return <>
+          {isLoading && <Loader visible={isLoading} />}
+            <ContentWrapper $loading={isLoading}>
+              <Loader/>
+            </ContentWrapper>
+          </>;
         }
         if (!teacherData || !localTeacherId) {
           return <div className="text-red-600 text-center mt-10">Teacher ID is missing. Please log in again.</div>;
@@ -130,7 +137,10 @@ function TeacherProfile() {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="scale-[2.5]">
-          <Loader />
+          {isLoading && <Loader visible={isLoading} />}
+            <ContentWrapper $loading={isLoading}>
+              <Loader/>
+            </ContentWrapper>
         </div>
       </div>
     );

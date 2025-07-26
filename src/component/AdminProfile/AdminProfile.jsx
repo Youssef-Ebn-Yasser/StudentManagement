@@ -14,7 +14,8 @@ import { allCourses } from '@/Redux/features/allCourses/allCourses'
 import toast from 'react-hot-toast'
 import Loader from '../Loader/Loader'
 import { useTranslation } from 'react-i18next'
-import { Attendance } from '@/component/Attendance/Attendance';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
+
 
 function AdminProfile() {
 
@@ -50,6 +51,9 @@ function AdminProfile() {
     }, [dispatch])
 
     return (
+        <>
+        {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
         <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 <div className="bg-white shadow-xl rounded-lg overflow-hidden">
@@ -142,7 +146,7 @@ function AdminProfile() {
                             <img src={gateImg} alt="reportImg" className="w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-indigo-600">Add Slider</h3>
                         </Link>
-                        <Link to="/admin/attendance" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
+                        <Link to="/attendance" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
                             <img src={gateImg} alt="reportImg" className="w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-indigo-600">Take Attendance</h3>
                         </Link>
@@ -151,6 +155,9 @@ function AdminProfile() {
                 </div>
             </div>
         </div>
+        </ContentWrapper>
+        </>
+        
     );
 }
 
