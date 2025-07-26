@@ -14,6 +14,7 @@ import { allCourses } from '@/Redux/features/allCourses/allCourses'
 import toast from 'react-hot-toast'
 import Loader from '../Loader/Loader'
 import { useTranslation } from 'react-i18next'
+import { Attendance } from '@/component/Attendance/Attendance';
 
 function AdminProfile() {
 
@@ -140,6 +141,10 @@ function AdminProfile() {
                         <Link to="/admin/addslider" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
                             <img src={gateImg} alt="reportImg" className="w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-indigo-600">Add Slider</h3>
+                        </Link>
+                        <Link to="/admin/attendance" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg p-6 text-center transition-colors duration-300">
+                            <img src={gateImg} alt="reportImg" className="w-12 h-12 mx-auto mb-4" />
+                            <h3 className="text-xl font-semibold text-indigo-600">Take Attendance</h3>
                         </Link>
                         
                     </div>

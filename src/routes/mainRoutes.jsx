@@ -90,7 +90,7 @@ const mainRoutes = [
                 accessRole: 'all',
             },
             {
-                path: 'teacher/attendance',
+                path: '/attendance',
                 element: <Attendance />,
                 isProtected: false,
                 accessRole: 'all',
