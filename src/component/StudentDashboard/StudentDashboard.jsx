@@ -3,6 +3,8 @@ import axiosInstance from '../../services/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import ContentWrapper from '../ContentWrapper/ContentWrapper';
+import Loader from '../Loader/Loader';
 
 // It's good practice to include necessary external CSS/icon libraries.
 // For Font Awesome icons used in this component, you would typically link it
@@ -133,9 +135,12 @@ export default function StudentDashboard() {
   // Loading spinner component
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-600"></div>
-      </div>
+      <>
+      {loading && <Loader visible={loading} />}
+        <ContentWrapper $loading={loading}>
+            <Loader />
+        </ContentWrapper>
+      </>
     );
   }
 

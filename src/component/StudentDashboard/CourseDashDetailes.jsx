@@ -49,7 +49,7 @@ export default function CourseDashDetails() {
       <div className="min-h-screen flex items-center justify-center">
         {loading && <Loader visible={loading} />}
         <ContentWrapper $loading={loading}>
-            <Loader />
+            <Loader/>
         </ContentWrapper>
       </div>
     );

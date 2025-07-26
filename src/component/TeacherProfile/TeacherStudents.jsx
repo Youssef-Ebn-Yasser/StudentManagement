@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import axiosInstance from '../../services/axiosInstance';
+import { useTranslation } from 'react-i18next';
 
 // A simple Chat Icon component
 const ChatIcon = () => (
@@ -24,6 +25,7 @@ const ChatIcon = () => (
 
 function TeacherStudents() {
   // Initialize useNavigate hook
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
 
