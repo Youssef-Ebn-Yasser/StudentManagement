@@ -6,6 +6,8 @@ import { API_URL } from '@/config';
 import { FaBook, FaChalkboardTeacher, FaUsers, FaFileAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
+
 
 
 const TeacherDashboard = () => {
@@ -33,7 +35,7 @@ const TeacherDashboard = () => {
     try {
       // Fetch teacher's courses (basic info)
       console.log('Fetching basic course list for teacher ID:', teacherId);
-      const coursesRes = await axios.get(`${API_URL}/Course/GetAllCoursesOfTeacher/${teacherId}`);
+      const coursesRes = await axios.get(`https://e-learn-v1.runasp.net/api/Course/GetAllCoursesOfTeacher?teacherId=${teacherId}`);
       const coursesData = coursesRes.data?.data || [];
       console.log('Basic courses response data:', coursesData);
 
@@ -41,7 +43,7 @@ const TeacherDashboard = () => {
       // For each course, fetch its details (including lessons)
       for (const course of coursesData) {
         console.log('Fetching details for course ID:', course.id);
-        const courseDetailRes = await axios.get(`${API_URL}/Course/Get/${course.id}`);
+        const courseDetailRes = await axios.get(`https://e-learn-v1.runasp.net/api/Course?id=${course.id}`);
         const courseDetail = courseDetailRes.data?.data || {};
         console.log(`Details for course ${course.id}:`, courseDetail);
         console.log(`Lessons for course ${course.id} (lessonInfo):`, courseDetail.lessonInfo);

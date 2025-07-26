@@ -25,7 +25,7 @@ export default function PaymobCheckout() {
     const fetchCourse = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`https://e-learn-v1.runasp.net/Course/Get/${id}`);
+        const res = await axios.get(`https://e-learn-v1.runasp.net/api/Course?id=${id}`);
         if (res.data?.succeeded) {
           setCourse(res.data.data);
         } else {

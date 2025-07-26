@@ -10,7 +10,7 @@ export default function About() {
   async function getAllStudent() {
     
 
-    let response = await axios.get('http://e-learn-v1.runasp.net/api/Teacher/Teacher/GetAll')
+    let response = await axios.get('http://e-learn-v1.runasp.net/api/Teacher/GetAll')
     console.log(response);
   }
   

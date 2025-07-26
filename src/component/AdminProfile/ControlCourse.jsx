@@ -7,6 +7,8 @@ import axios from 'axios'
 import courseImg from '../../assets/online-lesson.png'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
+
 
 
 
@@ -21,7 +23,7 @@ function ControlCourse() {
     let [error, setError]= useState()
 
     function getCourseDetails(){
-        axios.get(`https://e-learn-v1.runasp.net/Course/Get/${id}`)
+        axios.get(`https://e-learn-v1.runasp.net/api/Course?id=${id}`)
         .then((response)=>{
             console.log(response.data);
             setDetails(response.data)

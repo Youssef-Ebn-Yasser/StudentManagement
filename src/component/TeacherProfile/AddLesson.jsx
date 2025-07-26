@@ -5,6 +5,8 @@ import Loader from '../Loader/Loader';
 import "./CreateCourse.css";
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
+
 
 const AddLesson = () => {
 

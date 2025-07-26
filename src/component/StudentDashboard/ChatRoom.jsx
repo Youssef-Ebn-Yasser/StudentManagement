@@ -193,13 +193,13 @@ const ChatRoom = () => {
 
       if (storedStudentId) {
         userId = parseInt(storedStudentId, 10);
-        userName = storedStudentName || `Student ${userId}`;
+        userName = storedStudentName || `Student `;
         userRole = 'student';
         console.log("User determined as Student:", userName, userId);
       }
       else if (storedTeacherId && parseInt(storedTeacherId, 10) === parsedTeacherIdFromUrl) {
           userId = parseInt(storedTeacherId, 10);
-          userName = storedTeacherName || `Teacher ${userId}`;
+          userName = storedTeacherName || `Teacher `;
           userRole = 'teacher';
           console.log("User determined as Teacher:", userName, userId);
       } else {
@@ -265,6 +265,18 @@ const ChatRoom = () => {
     scrollToBottom();
   }, [messages]);
 
+  // --- Function to determine message alignment and color ---
+  const getMessageAlignment = (msg, currentUserId) => {
+    // Returns the correct Tailwind classes for alignment and color
+    if (msg.senderId === currentUserId || msg.SenderId === currentUserId) {
+      // Sender (current user): blue, right
+      return "self-end bg-blue-500 text-white shadow-md";
+    } else {
+      // Receiver (other user): grey, left
+      return "mr-auto bg-gray-200 text-gray-800 shadow-sm";
+    }
+  };
+
   // --- Send Message Function ---
   const sendMessage = async () => {
     if (!messageInput.trim() || !connection || connection.state !== signalR.HubConnectionState.Connected || !chatRoomId || !currentUserId) {
@@ -299,7 +311,7 @@ const ChatRoom = () => {
           Teacher-Student Chat Room
         </h2>
 
-        {/* Connection Status / Info */}
+        {/* Connection Status / Info - Removed Room ID display */}
         <div className="mb-4 text-center text-sm font-medium">
           {isConnected ? (
             <span className="text-green-600 flex items-center justify-center space-x-2">
@@ -307,7 +319,7 @@ const ChatRoom = () => {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
               </span>
-              Connected to Chat (Room ID: {chatRoomId})
+              Connected to Chat
             </span>
           ) : (
             <span className="text-red-500 flex items-center justify-center space-x-2">
@@ -319,16 +331,16 @@ const ChatRoom = () => {
           )}
         </div>
 
-        {/* User Identity Display */}
+        {/* User Identity Display - Removed ID display */}
         {currentUserId && currentUserName && (
             <div className="flex items-center justify-center mb-4 text-gray-700 text-lg font-semibold">
                 <FaUserCircle className="text-blue-500 mr-2 text-2xl" />
-                You are: <span className="ml-1 text-blue-700">{currentUserName} (ID: {currentUserId})</span>
+                You are: <span className="ml-1 text-blue-700">{currentUserName}</span>
             </div>
         )}
 
         {/* Messages Display Area */}
-        <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 h-96 overflow-y-auto mb-4 custom-scrollbar">
+        <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 h-96 overflow-y-auto mb-4 custom-scrollbar flex flex-col">
           {messages.length === 0 ? (
             <p className="text-gray-500 text-center italic py-10">No messages yet. Start the conversation!</p>
           ) : (
@@ -336,11 +348,8 @@ const ChatRoom = () => {
               <div
                 key={msg.id || index} // Use msg.id if available, otherwise index (for newly sent messages)
                 className={`
-                  message mb-3 p-3 rounded-lg max-w-[80%]
-                  ${(msg.senderId === currentUserId || msg.SenderId === currentUserId)
-                    ? 'ml-auto bg-blue-500 text-white shadow-md' // My messages
-                    : 'mr-auto bg-gray-200 text-gray-800 shadow-sm' // Other messages
-                  }
+                  message mb-3 p-3 rounded-lg max-w-[80%] w-fit
+                  ${getMessageAlignment(msg, currentUserId)}
                 `}
               >
                 <div className="font-semibold text-sm mb-1 opacity-90">

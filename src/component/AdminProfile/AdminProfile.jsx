@@ -14,6 +14,8 @@ import { allCourses } from '@/Redux/features/allCourses/allCourses'
 import toast from 'react-hot-toast'
 import Loader from '../Loader/Loader'
 import { useTranslation } from 'react-i18next'
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
+
 
 function AdminProfile() {
 

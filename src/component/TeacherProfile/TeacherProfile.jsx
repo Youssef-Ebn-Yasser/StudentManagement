@@ -12,6 +12,8 @@ import { courseService } from '../../services/courseService';
 import Loader from '../Loader/Loader';
 import TeacherDashboard from '../TeacherDashboard/TeacherDashboard';
 import { useSelector } from 'react-redux';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
+
 
 function TeacherProfile() {
   console.log('TeacherProfile component mounted');
@@ -41,12 +43,21 @@ function TeacherProfile() {
           console.error('Teacher ID not found in user object or localStorage');
           throw new Error('Teacher ID not found');
         }
-        const response = await courseService.getTeacherStats(localTeacherId);
-        console.log('Teacher data response:', response);
-        if (response.succeeded) {
+        const response = await courseService.getTeacherDetails(localTeacherId);
+        console.log('Full teacher response:', JSON.stringify(response, null, 2));
+        console.log('Response data:', response.data);
+        
+        // Check for successful response
+        if (response && response.data) {
+          console.log('Setting teacher data:', response.data);
           setTeacherData(response.data);
         } else {
-          throw new Error(response.message || 'Failed to load teacher data');
+          console.error('Response structure:', {
+            hasResponse: !!response,
+            hasData: !!response?.data,
+            responseKeys: response ? Object.keys(response) : 'No response object'
+          });
+          throw new Error('Failed to load teacher data');
         }
       } catch (error) {
         console.error('Error in fetchTeacherData:', error);
@@ -106,7 +117,12 @@ function TeacherProfile() {
         console.log('teacherData:', teacherData);
         console.log('localTeacherId:', localTeacherId);
         if (isLoading) {
-          return <Loader />;
+          return <>
+          {isLoading && <Loader visible={isLoading} />}
+            <ContentWrapper $loading={isLoading}>
+              <Loader/>
+            </ContentWrapper>
+          </>;
         }
         if (!teacherData || !localTeacherId) {
           return <div className="text-red-600 text-center mt-10">Teacher ID is missing. Please log in again.</div>;
@@ -121,7 +137,10 @@ function TeacherProfile() {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="scale-[2.5]">
-          <Loader />
+          {isLoading && <Loader visible={isLoading} />}
+            <ContentWrapper $loading={isLoading}>
+              <Loader/>
+            </ContentWrapper>
         </div>
       </div>
     );

@@ -5,6 +5,8 @@ import Loader from '../Loader/Loader';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
+
 
 const EditCourse = () => {
   const { t } = useTranslation();
@@ -128,7 +130,11 @@ const EditCourse = () => {
   };
 
   if (isLoading) {
-    return <div className="flex items-center justify-center h-screen"><Loader /></div>;
+    return <div className="flex items-center justify-center h-screen">
+      {isLoading && <Loader visible={isLoading} />}
+        <ContentWrapper $loading={isLoading}>
+          <Loader />
+          </ContentWrapper></div>;
   }
 
   if (error) {

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { courseService } from '../../services/courseService';
 import Loader from '../Loader/Loader';
 import { useTranslation } from 'react-i18next';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
+
 
 
 export default function Teachers() {
@@ -31,7 +33,10 @@ export default function Teachers() {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="scale-[2.5]">
-          <Loader />
+          {loading && <Loader visible={loading} />}
+          <ContentWrapper $loading={loading}>
+            <Loader />
+          </ContentWrapper>
         </div>
       </div>
     );

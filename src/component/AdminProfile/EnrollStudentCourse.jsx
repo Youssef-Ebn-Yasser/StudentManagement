@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '@/services/axiosInstance';
 
 export default function EnrollStudentCourse() {
   const [studentId, setStudentId] = useState('');
@@ -15,8 +15,8 @@ export default function EnrollStudentCourse() {
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        'https://e-learn-v1.runasp.net/api/Student/EnrollToCourse/EnrollToCourse',
+      const res = await axiosInstance.post(
+        '/api/Student/EnrollToCourse/EnrollToCourse',
         {
           studentId: Number(studentId),
           courseId: Number(courseId),
@@ -30,7 +30,14 @@ export default function EnrollStudentCourse() {
         setErrorMsg(res.data.massage || 'Failed to enroll student.');
       }
     } catch (err) {
-      setErrorMsg('Failed to enroll student. Please check the IDs and try again.');
+      console.error('Enrollment error:', err);
+      if (err.response?.status === 401) {
+        setErrorMsg('Authentication failed. Please log in again.');
+      } else if (err.response?.status === 400) {
+        setErrorMsg(err.response.data?.message || 'Invalid student or course ID.');
+      } else {
+        setErrorMsg('Failed to enroll student. Please check the IDs and try again.');
+      }
     } finally {
       setLoading(false);
     }

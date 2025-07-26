@@ -391,8 +391,8 @@ const ManageQuiz = () => {
   if (isLoading) {
     return (
     <> 
-    {loading && <Loader visible={loading} />}
-    <ContentWrapper $loading={loading}>
+    {isLoading && <Loader visible={isLoading} />}
+    <ContentWrapper $loading={isLoading}>
         <Loader />
     </ContentWrapper></>);
   }

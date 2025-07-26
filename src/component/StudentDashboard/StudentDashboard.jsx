@@ -29,7 +29,7 @@ export default function StudentDashboard() {
   // Function to get teacher ID by name
   const getTeacherIdByName = async (teacherName) => {
     try {
-      const response = await axiosInstance.get('/api/Teacher/Teacher/All');
+      const response = await axiosInstance.get('/api/Teacher/GetAll');
       if (response.data.succeeded && response.data.data) {
         const teacher = response.data.data.find(t => 
           t.name && t.name.toLowerCase() === teacherName.toLowerCase()
@@ -73,7 +73,7 @@ export default function StudentDashboard() {
         // Fetch enrolled courses for the logged-in student
         console.log('StudentDashboard - Making API call with studentId:', studentId);
         const coursesResponse = await axiosInstance.get(
-          `/api/Student/GetAllEnrolledStudentCourses/GetAllEnrolledStudentCourses?studentId=${studentId}`
+          `/api/Student/GetAllEnrolledStudentCourses?studentId=${studentId}`
         );
 
         // Check if the API call was successful and data is an array

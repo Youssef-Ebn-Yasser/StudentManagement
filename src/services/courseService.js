@@ -3,6 +3,17 @@ import axios from 'axios';
 import { API_URL } from '../config';
 
 export const courseService = {
+  // Get teacher details
+  getTeacherDetails: async (teacherId) => {
+    try {
+      const response = await axiosInstance.get(`/api/Teacher?id=${teacherId}`);
+      console.log('Raw teacher response:', JSON.stringify(response.data, null, 2));
+      return response.data; // Return the full response data
+    } catch (error) {
+      console.error('Error in getTeacherDetails:', error);
+      throw error;
+    }
+  },
   // Create a new course
   createCourse: async (courseData) => {
     try {
@@ -75,7 +86,7 @@ export const courseService = {
 
       while (retryCount < maxRetries) {
         try {
-          const response = await axiosInstance.post('/Course/Create', formData, {
+          const response = await axiosInstance.post('/api/Course', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
@@ -153,7 +164,7 @@ export const courseService = {
   // Get all courses
   getAllCourses: async () => {
     try {
-      const response = await axiosInstance.get('/Course/GetAll');
+      const response = await axiosInstance.get('/api/Course/All');
       return response.data;
     } catch (error) {
       console.error('Error in getAllCourses:', error);
@@ -164,7 +175,7 @@ export const courseService = {
   // Get teacher's courses
   getTeacherCourses: async (teacherId) => {
     try {
-      const response = await axiosInstance.get(`/Course/GetAllCoursesOfTeacher/${teacherId}`);
+      const response = await axiosInstance.get(`https://e-learn-v1.runasp.net/api/Course/GetAllCoursesOfTeacher?teacherId=${teacherId}`);
       return response.data;
     } catch (error) {
       console.error('Error in getTeacherCourses:', error);
@@ -175,7 +186,7 @@ export const courseService = {
   // Get paginated courses for home page
   getPaginatedCourses: async (page = 1, pageSize = 10) => {
     try {
-      const response = await axiosInstance.get(`/HomeCourses/GetPaginated?page=${page}&pageSize=${pageSize}`);
+      const response = await axiosInstance.get(`/api/Course/HomeCourses/GetPaginated?pageNumber=${page}&PageSize=${pageSize}`);
       return response.data;
     } catch (error) {
       throw error;
@@ -185,7 +196,7 @@ export const courseService = {
   // Get course details
   getCourseDetails: async (courseId) => {
     try {
-      const response = await axiosInstance.get(`/Course/Get/${courseId}`);
+      const response = await axiosInstance.get(`https://e-learn-v1.runasp.net/api/Course?id=${courseId}`);
       return response.data;
     } catch (error) {
       throw error;
@@ -195,6 +206,8 @@ export const courseService = {
   // Update a course
   updateCourse: async (courseId, courseData) => {
     try {
+      // Validate required fields
+      if (!courseId || courseId <= 0) throw new Error('Course ID is required');
       if (!courseData.title?.trim()) throw new Error('Course title is required');
       if (!courseData.price || courseData.price <= 0) throw new Error('Course price must be greater than 0');
       if (!courseData.teacherId || courseData.teacherId <= 0) throw new Error('Valid teacher ID is required');
@@ -202,12 +215,17 @@ export const courseService = {
       if (!courseData.level?.trim()) throw new Error('Course level is required');
       if (!courseData.hours?.trim()) throw new Error('Course hours is required');
 
+      const token = localStorage.getItem('token') || localStorage.getItem('JWTToken');
       const response = await axiosInstance.put(
-        `/Course/Update/${courseId}`,
-        courseData,
+        `/api/Course?Id=${courseId}&Title=${encodeURIComponent(courseData.title)}&Description=${encodeURIComponent(courseData.description || '')}&Price=${courseData.price}&TeacherId=${courseData.teacherId}&CategoryId=${courseData.categoryId}&Level=${encodeURIComponent(courseData.level)}&Hours=${encodeURIComponent(courseData.hours)}`,
+        // Send image as form data if it exists
+        courseData.image ? {
+          file: courseData.image
+        } : null,
         {
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': courseData.image ? 'multipart/form-data' : 'application/json',
+            Authorization: `Bearer ${token}`
           },
           timeout: 30000
         }
@@ -229,7 +247,7 @@ export const courseService = {
   // Delete a course
   deleteCourse: async (courseId) => {
     try {
-      const response = await axiosInstance.delete(`/Course/Delete?id=${courseId}`);
+      const response = await axiosInstance.delete(`/api/Course?id=${courseId}`);
       return response.data;
     } catch (error) {
       console.error('Error deleting course:', error.response?.data || error.message);
@@ -274,7 +292,7 @@ export const courseService = {
   // Add a lesson
   addLesson: async (lessonData) => {
     try {
-      const response = await axiosInstance.post('/api/Lesson/CreateLesson/CreateLesson', lessonData);
+      const response = await axiosInstance.post('/api/Lesson', lessonData);
       return response.data;
     } catch (error) {
       throw error;
@@ -295,7 +313,7 @@ export const courseService = {
   deleteLesson: async (lessonId) => {
     try {
       // Use /api prefix for Vite proxy
-      const response = await axiosInstance.delete(`/api/Lesson/DeleteLesson/DeleteLesson/${lessonId}`);
+      const response = await axiosInstance.delete(`/api/Lesson?lessonId=${lessonId}`);
       return response.data;
     } catch (error) {
       throw error;
@@ -319,7 +337,7 @@ export const courseService = {
   // Get materials by lesson
   getLessonMaterials: async (lessonId) => {
     try {
-      const response = await axiosInstance.get(`/api/Material/GetMaterialsByLessonId/GetMaterialsByLessonId/${lessonId}`);
+      const response = await axiosInstance.get(`https://e-learn-v1.runasp.net/api/Material?lessonId=${lessonId}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching lesson materials:', error);
@@ -341,7 +359,7 @@ export const courseService = {
   // Create material
   createMaterial: async (materialData) => {
     try {
-      const response = await axiosInstance.post('/api/Material/CreateMaterial/CreateMaterial', materialData, {
+      const response = await axiosInstance.post('/api/Material', materialData, {
        
       });
       return response.data;
@@ -364,7 +382,7 @@ export const courseService = {
         formData.append('Data', materialData.file);
       }
 
-      const response = await axiosInstance.put('/api/Material/UpdateMaterial/UpdateMaterial', formData, {
+      const response = await axiosInstance.put('/api/Material', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
@@ -380,7 +398,7 @@ export const courseService = {
   // Delete material
   deleteMaterial: async (materialId) => {
     try {
-      const response = await axiosInstance.delete(`/api/Material/DeleteMaterial/DeleteMaterial/${materialId}`);
+      const response = await axiosInstance.delete(`/api/Material?materialId=${materialId}`);
       return response.data;
     } catch (error) {
       throw error;
@@ -390,7 +408,7 @@ export const courseService = {
   // Get teacher stats
   getTeacherStats: async (teacherId) => {
     try {
-      const response = await axiosInstance.get(`/api/Teacher/Teacher/ById/${teacherId}`);
+      const response = await axiosInstance.get(`/api/Course/GetAllCoursesOfTeacher?teacherId=${teacherId}`);
       return response.data;
     } catch (error) {
       throw error;
@@ -441,7 +459,7 @@ export const courseService = {
   // Get all categories
   getAllCategories: async () => {
     try {
-      const response = await axiosInstance.get('/api/Category/GetAll');
+      const response = await axiosInstance.get('https://e-learn-v1.runasp.net/api/Category/All');
       return response.data;
     } catch (error) {
       throw error;
@@ -509,7 +527,7 @@ export const courseService = {
         AdditionalInfo: teacherData.AdditionalInfo
       });
 
-      const response = await axiosInstance.put(`/api/Teacher/Teacher/Update?${params.toString()}`);
+      const response = await axiosInstance.put(`/api/Teacher?${params.toString()}`);
       
       return response.data;
     } catch (error) {

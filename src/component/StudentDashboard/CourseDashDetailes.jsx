@@ -6,7 +6,7 @@ import { FaVideo } from 'react-icons/fa';
 import { FaGraduationCap } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import { convertToEgyptTime } from '../../utils/timeUtils';
-import ContentWrapper from '../ContentWrapper/ContentWrapper';
+import axiosInstance from '@/services/axiosInstance';
 
 export default function CourseDashDetails() {
   const { t } = useTranslation();
@@ -21,7 +21,7 @@ export default function CourseDashDetails() {
     const fetchCourseDetails = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`https://e-learn-v1.runasp.net/Course/Get/${id}`);
+        const response = await axiosInstance.get(`/api/Course?id=${id}`);
         if (response.data.succeeded) {
           setCourse(response.data.data);
         } else {

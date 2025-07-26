@@ -45,7 +45,7 @@ function AddTeacher() {
     async function handleRemoveTeacher(id) {
         const token = localStorage.getItem('token') || localStorage.getItem('JWTToken');
         axios.delete(
-          `https://e-learn-v1.runasp.net/api/Teacher/Teacher/Delete?id=${id}`,
+          `https://e-learn-v1.runasp.net/api/Teacher/Delete?id=${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

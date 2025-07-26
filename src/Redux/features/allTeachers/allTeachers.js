@@ -6,7 +6,7 @@ export const allTeachers = createAsyncThunk(
     'allTeachers',
     async()=>{
         try{
-            const response = await axios.get('https://e-learn-v1.runasp.net/api/Teacher/Teacher/All')
+            const response = await axios.get('https://e-learn-v1.runasp.net/api/Teacher/GetAll')
             return response.data.data
         }catch(error){
             console.log(error)

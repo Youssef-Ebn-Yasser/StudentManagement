@@ -8,6 +8,8 @@ import axiosInstance from '../../services/axiosInstance';
 import { FaFileUpload } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { t } from 'i18next';
+import ContentWrapper from '../ContentWrapper/ContentWrapper'
+
 
 const AddMaterial = () => {
   const location = useLocation();
@@ -115,7 +117,7 @@ const AddMaterial = () => {
       });
 
       const response = await axiosInstance.post(
-        '/api/Material/CreateMaterial/CreateMaterial',
+        '/api/Material',
         formData,
         {
           headers: {

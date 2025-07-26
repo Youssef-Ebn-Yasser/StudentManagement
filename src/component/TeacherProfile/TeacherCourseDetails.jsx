@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { courseService } from '../../services/courseService';
-import {  FaClock, FaBook, FaClipboardList, FaTrash, FaEdit, FaChartLine, FaTag, FaFileAlt, FaVideo, FaChartBar } from 'react-icons/fa';
+import { FaClock, FaBook, FaClipboardList, FaTrash, FaEdit, FaChartLine, FaTag, FaFileAlt, FaVideo, FaChartBar } from 'react-icons/fa';
 import Loader from '../Loader/Loader';
 import { toast } from 'react-toastify';
 import axiosInstance from '../../services/axiosInstance';
@@ -38,7 +38,7 @@ const TeacherCourseDetails = () => {
           setCourse(response.data);
           const courseLessons = response.data.lessons || response.data.lessonInfo || [];
           const materialsPromises = courseLessons.map(lesson =>
-            axiosInstance.get(`/api/Material/GetMaterialsByLessonId/GetMaterialsByLessonId/${lesson.id}`)
+            axiosInstance.get(`https://e-learn-v1.runasp.net/api/Material?lessonId=${lesson.id}`)
           );
           const materialsResponses = await Promise.all(materialsPromises);
           const materialsMap = {};
@@ -124,7 +124,7 @@ const TeacherCourseDetails = () => {
   const handleDeleteMaterial = async (materialId) => {
     if (window.confirm('Are you sure you want to delete this material?')) {
       try {
-        const response = await axiosInstance.delete(`/api/Material/DeleteMaterial/DeleteMaterial/${materialId}`);
+        const response = await axiosInstance.delete(`/api/Material?materialId=${materialId}`);
         if (response.data.succeeded) {
           setLessonMaterials(prevMaterials => {
             const updatedMaterials = { ...prevMaterials };
@@ -158,7 +158,7 @@ const TeacherCourseDetails = () => {
         formData.append('Data', materialFile);
       }
       const response = await axiosInstance.put(
-        '/api/Material/UpdateMaterial/UpdateMaterial',
+        '/api/Material',
         formData,
         {
           headers: {
@@ -213,6 +213,12 @@ const TeacherCourseDetails = () => {
       setMaterialFile(file);
     }
   };
+
+  const handleTakeAttendance = (lessonId) => {
+    navigate(`/teacher/attendance`);
+    //toast.info(`Taking attendance for Lesson ID: ${lessonId}`);
+  };
+
 
   if (loading) {
     return (
@@ -470,8 +476,8 @@ const TeacherCourseDetails = () => {
                               {lesson.difficulty}
                             </div>
                           )}
-                          {/* Create Quiz Button */}
-                          <div className="ml-11 mb-2 flex gap-2">
+                          {/* Action Buttons for Lesson */}
+                          <div className="ml-11 mb-2 flex flex-wrap gap-2">
                             <button
                               onClick={() => navigate('/teacher/manage-quiz')}
                               className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 flex items-center gap-2"
@@ -496,6 +502,19 @@ const TeacherCourseDetails = () => {
                                 {t('quiz-statistics-id-missing')}
                               </button>
                             )}
+                            {/* Take Attendance Button */}
+                            <button
+                             onClick={handleTakeAttendance}
+                              className="
+                                bg-indigo-500 text-white
+                                px-4 py-2 rounded
+                                hover:bg-indigo-600
+                                flex items-center gap-2
+                                font-semibold
+                                focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:ring-opacity-75
+                                transition duration-150 ease-in-out">
+                              <span>Take Attendance</span>
+                          </button>
                           </div>
                           {/* Materials Section */}
                           <div className="ml-11 mt-4">

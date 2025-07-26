@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '@/services/axiosInstance';
 import { FaStar, FaUsers, FaClock, FaGraduationCap, FaBook } from 'react-icons/fa';
 import Loader from '../Loader/Loader';
 import styles from '../Courses/Courses.module.css';
@@ -61,7 +61,7 @@ export default function CoursesDetails() {
         studentId: Number(studentId),
         courseId: parseInt(id)
       };
-      const response = await axios.post('https://e-learn-v1.runasp.net/api/Payments/create-payment-intent', paymentData);
+      const response = await axiosInstance.post('/Payments/create-payment-intent', paymentData);
       if (response.data && response.data.url) {
         // Save info to enroll after redirect
         localStorage.setItem('pendingEnrollCourseId', id);
@@ -106,7 +106,7 @@ export default function CoursesDetails() {
     const studentId = localStorage.getItem('studentId');
 
     if (paymentSuccess && pendingCourseId && studentId) {
-      axios.post('https://e-learn-v1.runasp.net/api/Student/EnrollToCourse/EnrollToCourse', {
+      axiosInstance.post('/Student/EnrollToCourse/EnrollToCourse', {
         studentId: Number(studentId),
         courseId: Number(pendingCourseId)
       })
@@ -130,7 +130,7 @@ export default function CoursesDetails() {
   const fetchCourseDetails = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`https://e-learn-v1.runasp.net/Course/Get/${id}`);
+      const response = await axiosInstance.get(`/api/Course?id=${id}`);
       if (response.data.succeeded) {
         setCourse(response.data.data);
       } else {
@@ -153,7 +153,7 @@ export default function CoursesDetails() {
     const fetchRelatedCourses = async () => {
       if (!course) return;
       try {
-        const res = await axios.get('https://e-learn-v1.runasp.net/Course/GetAll');
+        const res = await axios.get('https://e-learn-v1.runasp.net/api/Course/All');
         const allCourses = res.data.data || [];
         // Only show courses with the same category, and not the current course
         const filtered = allCourses.filter(c =>
