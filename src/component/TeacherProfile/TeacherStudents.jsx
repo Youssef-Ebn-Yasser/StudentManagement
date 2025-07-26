@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import axiosInstance from '../../services/axiosInstance';
+import { useTranslation } from 'react-i18next';
 
-// A simple Chat Icon component
 const ChatIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -23,17 +23,15 @@ const ChatIcon = () => (
 
 
 function TeacherStudents() {
-  // Initialize useNavigate hook
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
+  const { t } = useTranslation(); 
 
-  // State to hold the course data, loading status, and any errors
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Function to fetch data from the API
     const fetchStudents = async () => {
       try {
         if (!user?.id) {
@@ -43,19 +41,17 @@ function TeacherStudents() {
         console.log('Fetching students for teacher ID:', user.id);
 
         const response = await axiosInstance.get(`/api/ChatRooms/student/EnroolWithTeacher`, {
-          params: { id: user.id }
+          params: { teacherId: user.id }
         });
 
         console.log('API Response:', response.data);
 
         if (response.data.succeeded && response.data.data) {
-          // Filter out courses that have no students enrolled
-          const coursesWithStudents = response.data.data.filter(course => 
+          const coursesWithStudents = response.data.data.filter(course =>
             Object.keys(course.keyValuePairs).length > 0
           );
           setCourses(coursesWithStudents);
         } else {
-          // Handle API-level errors (e.g., "succeeded": false)
           throw new Error(response.data.massage || 'Failed to fetch data');
         }
 
@@ -74,49 +70,40 @@ function TeacherStudents() {
     };
 
     fetchStudents();
-  }, []); // The empty dependency array ensures this effect runs only once on mount
+  }, [user]);
 
-  // Handler for chat icon click
   const handleChatClick = (studentId) => {
-    // Navigate to the chatroom with the specific student ID
     navigate(`/chatt/${studentId}`);
   };
 
-  // Render a loading message while fetching data
   if (loading) {
     return <div className="text-center p-10">{t("loading-students")}...</div>;
   }
 
-  // Render an error message if the fetch failed
   if (error) {
     return <div className="text-center p-10 text-red-500">{t('error')}: {error}</div>;
   }
-  
-  // Render the main component
+
   return (
     <div className="bg-gray-100 min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">{t("enrolled-students")}</h1>
-        
-        {/* Check if there are any courses with students to display */}
+
         {courses.length > 0 ? (
           <div className="space-y-6">
-            {/* Map over each course */}
             {courses.map((course) => (
               <div key={course.courseName} className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="p-5 bg-indigo-600">
                   <h2 className="text-xl font-semibold text-white">{course.courseName}</h2>
                 </div>
 
-                {/* List of students for the current course */}
                 <ul className="divide-y divide-gray-200">
                   {Object.entries(course.keyValuePairs).map(([studentId, studentName]) => (
                     <li key={studentId} className="p-4 flex items-center justify-between hover:bg-gray-50">
                       <p className="text-md font-medium text-gray-800">{studentName}</p>
-                      
-                      {/* Chat icon button with onClick handler */}
-                      <button 
-                        onClick={() => handleChatClick(studentId, studentName)} // Call the new handler
+
+                      <button
+                        onClick={() => handleChatClick(studentId)}
                         aria-label={`Chat with ${studentName}`}
                       >
                         <ChatIcon />
@@ -128,7 +115,6 @@ function TeacherStudents() {
             ))}
           </div>
         ) : (
-          // Message to show if no students are found in any course
           <div className="text-center p-10 bg-white rounded-lg shadow-md">
             <p className="text-gray-600">{t("no-enrolled-students")}</p>
           </div>
