@@ -12,9 +12,9 @@ public class StudentAssignmentService : ResponseHandler, IStudentAssignmentServi
     #endregion
 
     #region    Constructor
-    public StudentAssignmentService(IUnitOfWork unitOfWork, 
-                                    IMapper Mapper, 
-                                    IPhysicalFileUpload physicalFileUpload, 
+    public StudentAssignmentService(IUnitOfWork unitOfWork,
+                                    IMapper Mapper,
+                                    IPhysicalFileUpload physicalFileUpload,
                                     IStructuredLogger logger)
     {
         _unitOfWork = unitOfWork;

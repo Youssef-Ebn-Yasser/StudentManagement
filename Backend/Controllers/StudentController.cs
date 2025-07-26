@@ -253,22 +253,6 @@ public class StudentController : AppControllerBase
         }
     }
 
-
-    [HttpPost(Routing.StudentRouting.Prefix)]
-    public async Task<IActionResult> Create(CreateStudentDto createStudentDto)
-    {
-        try
-        {
-            var result = await _studentService.CreateAsync(createStudentDto);
-            return NewResult(result);
-        }
-        catch
-        {
-            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
-            return NewResult(ErrorHappen.ErrorInServer());
-        }
-    }
-
     [Authorize]
     [HttpPut(Routing.StudentRouting.Prefix)]
     public async Task<IActionResult> Update(UpdateStudentDto updateStudentDto)
