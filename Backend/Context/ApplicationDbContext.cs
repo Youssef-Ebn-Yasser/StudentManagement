@@ -1,4 +1,3 @@
-using Backend.Entities.QuizeEntities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Backend.Context;
@@ -14,7 +13,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
     public DbSet<User> Users { get; set; }
     public DbSet<Student> Students { get; set; }
     public DbSet<StudentAttendance> StudentAttendances { get; set; }
-    public DbSet<Teacher>  Teachers { get; set; }
+    public DbSet<Teacher> Teachers { get; set; }
     public DbSet<Course> Courses { get; set; }
     public DbSet<Material> Materials { get; set; }
     public DbSet<StudentAssignment> StudentAssignments { get; set; }
