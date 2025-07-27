@@ -82,7 +82,7 @@ public class AttendanceSevice : ResponseHandler, IAttendanceSevice
         var FilterForAttendance = await _unitOfWork.Repository<Course>()
                                           .GetTableNoTracking()
                                           .Include(c => c.lessons)
-                                          .Where(c => c.IsDeleted != false)
+                                          .Where(c => c.IsDeleted == false)
                                           .Select(c => new FilterAtt
                                           {
                                               CourseId = c.Id,
