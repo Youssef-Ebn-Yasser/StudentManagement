@@ -82,6 +82,38 @@ public class StudentService : ResponseHandler, IStudentService
         return Success(mappedStudents);
     }
 
+    public async Task<Response<ForAddStudentToCourseDependenciesDto>> GetAddStudentCourseDependenciesDto()
+    {
+
+        var studentDependencies = await _unitOfWork.Repository<Student>()
+                                                                        .GetTableNoTracking()
+                                                                        .Where(s => !s.IsDeleted)
+                                                                        .Select(s => new StudentDependencies
+                                                                        {
+                                                                            StudentId = s.Id,
+                                                                            StudentName = s.NameEn,
+                                                                        }).ToListAsync();
+
+        var Coursependencies = await _unitOfWork.Repository<Course>()
+                                                                    .GetTableNoTracking()
+                                                                    .Where(c => (bool)!c.IsDeleted)
+                                                                    .Select(c => new CourseDependencies
+                                                                    {
+                                                                        CourseId = c.Id,
+                                                                        Coursename = c.TitleEn
+                                                                    }).ToListAsync();
+
+        var response = new ForAddStudentToCourseDependenciesDto()
+        {
+            CourseDependencies = Coursependencies,
+            StudentDependencies = studentDependencies
+        };
+
+
+        return Success(response);
+
+    }
+
     public async Task<Response<StudentProfDTO>> GetStudentProfileAsync(int studentId)
     {
         var student = await _studentExistById(studentId);
@@ -666,4 +698,26 @@ public class StudentService : ResponseHandler, IStudentService
         return success;
     }
     #endregion
+}
+
+
+public class ForAddStudentToCourseDependenciesDto
+{
+    public List<CourseDependencies> CourseDependencies { get; set; }
+    public List<StudentDependencies> StudentDependencies { get; set; }
+
+
+}
+
+public class StudentDependencies
+{
+    public int StudentId { get; set; }
+    public string StudentName { get; set; }
+
+}
+
+public class CourseDependencies
+{
+    public int CourseId { get; set; }
+    public string Coursename { get; set; }
 }

@@ -1,5 +1,4 @@
-﻿using Backend.Wrapper;
-using static Backend.Services.Interfaces.ITeacherService;
+﻿using static Backend.Services.Interfaces.ITeacherService;
 
 namespace Backend.Services.Implementation;
 
@@ -143,27 +142,21 @@ public class TeacherService : ResponseHandler, ITeacherService
         var exist = await _isTeacherExistByIdAsync(id);
         if (!exist) return BadRequest<string>($"this teacher is not exist");
 
+        // error track
         var teacher = await _unitOfWork.Repository<Teacher>()
                                               .GetTableAsTracking()
                                               .Include(t => t.Courses)
-                                              .ThenInclude(c => c.Select(c => c.lessons))
-                                              .FirstOrDefaultAsync(t => t.Id == id);
+                                              .FirstOrDefaultAsync(t => t.Id == id && !t.IsDeleted);
 
-        teacher!.IsDeleted = true;
 
-        if (teacher != null && teacher.Courses != null)
+        if (teacher != null && teacher.Courses!.Any())
         {
-            _logger.LogInfo("Start delete All releated Courses with this teacher");
-            teacher.Courses.ForEach(c => c.IsDeleted = true);
-
-            foreach (var course in teacher.Courses)
-            {
-                if (course.lessons != null)
-                    course.lessons.ForEach(c => c.IsDeleted = true);
-            }
-            _logger.LogInfo("Finish deleteing All releated Courses with this teacher");
+            BadRequest<string>($"can not delete this teacher has a related info");
+            _logger.LogInfo("can not delete");
         }
 
+
+        teacher!.IsDeleted = true;
         var result = _unitOfWork.Complete();
 
         return result > 0 ? Delete<string>() :

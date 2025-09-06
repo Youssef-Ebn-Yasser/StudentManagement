@@ -35,6 +35,21 @@ public class CourseController : AppControllerBase
         }
     }
 
+    [HttpGet(Routing.CourseRouting.GetDependenciesForAddCourse)]
+    public async Task<IActionResult> GetDependenciesForAddCourse()
+    {
+        try
+        {
+            var result = await _courseService.GetDependenciesForAddCourse();
+            return NewResult(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen  by network in GetDependenciesForAddCourse Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
+    }
+
 
 
     [HttpGet(Routing.CourseRouting.GetAllByCategory)]

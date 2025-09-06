@@ -42,6 +42,27 @@ public class MaterialService : ResponseHandler, IMaterialService
         return Success(mappedMaterials);
     }
 
+    public async Task<Response<string>> UploadLink(UploadLinkDto uploadLinkDto)
+    {
+        var material = new Material()
+        {
+            LessonId = uploadLinkDto.LessionId,
+            Path = uploadLinkDto.UrlLink,
+            Type = MaterialTypeId.Link,
+            TitleEn = "",
+            ContentAr = "",
+            ContentEn = "",
+            CreatedAt = DateTime.UtcNow,
+            IsDeleted = false,
+        };
+
+        await _unitOfWork.Repository<Material>().AddAsync(material);
+        var result = _unitOfWork.Complete();
+        return result > 0 ? Success("Material Created Successfully") :
+                         BadRequest<string>("make link shorter to save it");
+
+    }
+
     public async Task<Response<string>> CreateAsync(CreateMaterialDto createMaterialDto)
     {
         var path = await _physicalFileUpload.UploadFileAsync("Material", createMaterialDto.Data);
@@ -142,5 +163,5 @@ public class MaterialService : ResponseHandler, IMaterialService
             return Success("Material Deleted Faild");
         }
     }
+    #endregion
 }
-#endregion

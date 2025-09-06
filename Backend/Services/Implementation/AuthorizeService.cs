@@ -9,14 +9,17 @@ public class AuthorizeService : ResponseHandler, IAuthorizeService
     #region   Fields
     private readonly UserManager<User> _userManager;
     private readonly IUnitOfWork _unitOfWork;
+    ApplicationDbContext _dbContext;
     #endregion
 
     #region   Constructor
     public AuthorizeService(UserManager<User> userManager,
-                            IUnitOfWork unitOfWork)
+                            IUnitOfWork unitOfWork,
+                            ApplicationDbContext dbContext)
     {
         _userManager = userManager;
         _unitOfWork = unitOfWork;
+        _dbContext = dbContext;
     }
     #endregion
 
@@ -54,34 +57,71 @@ public class AuthorizeService : ResponseHandler, IAuthorizeService
 
     public async Task<Response<string>> UpdateUserClaims(EditUserClaimsDto dto)
     {
-        _unitOfWork.BeginTransaction();
-        try
+        var strategy = _dbContext.Database.CreateExecutionStrategy();
+
+        await strategy.ExecuteAsync(async () =>
         {
-            var user = await _userManager.FindByIdAsync(dto.UserId.ToString());
-            if (user == null)
-                return BadRequest<string>("UserIsNull");
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                var user = await _userManager.FindByIdAsync(dto.UserId.ToString());
+                if (user == null)
+                    return BadRequest<string>("UserIsNull");
 
-            var userClaims = await _userManager.GetClaimsAsync(user);
-            var removeClaimsResult = await _userManager.RemoveClaimsAsync(user, userClaims);
+                var userClaims = await _userManager.GetClaimsAsync(user);
+                var removeClaimsResult = await _userManager.RemoveClaimsAsync(user, userClaims);
 
-            if (!removeClaimsResult.Succeeded)
-                return BadRequest<string>("FailedToRemoveOldClaims");
+                if (!removeClaimsResult.Succeeded)
+                    return BadRequest<string>("FailedToRemoveOldClaims");
 
-            var claims = dto.userClaims?.Where(x => x.Value == true)
-                                                            .Select(x => new Claim(x.Type, x.Value.ToString()));
+                var claims = dto.userClaims?
+                    .Where(x => x.Value == true)
+                    .Select(x => new Claim(x.Type, x.Value.ToString()));
 
-            var addUserClaimResult = await _userManager.AddClaimsAsync(user, claims!);
-            if (!addUserClaimResult.Succeeded)
-                return BadRequest<string>("FailedToAddNewClaims");
+                var addUserClaimResult = await _userManager.AddClaimsAsync(user, claims!);
+                if (!addUserClaimResult.Succeeded)
+                    return BadRequest<string>("FailedToAddNewClaims");
 
-            _unitOfWork.CommitTransaction();
-            return Success("Success");
-        }
-        catch
-        {
-            _unitOfWork.RollbackTransaction();
-            return BadRequest<string>("FailedToUpdateClaims");
-        }
+                await transaction.CommitAsync();
+                return Success("Success");
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                return BadRequest<string>("FailedToUpdateClaims");
+            }
+        });
+        return Success("Success");
+
+
+        //try
+        //{
+        //    _unitOfWork.BeginTransaction();
+        //    var user = await _userManager.FindByIdAsync(dto.UserId.ToString());
+        //    if (user == null)
+        //        return BadRequest<string>("UserIsNull");
+
+        //    var userClaims = await _userManager.GetClaimsAsync(user);
+        //    var removeClaimsResult = await _userManager.RemoveClaimsAsync(user, userClaims);
+
+        //    if (!removeClaimsResult.Succeeded)
+        //        return BadRequest<string>("FailedToRemoveOldClaims");
+
+        //    var claims = dto.userClaims?.Where(x => x.Value == true)
+        //                                                    .Select(x => new Claim(x.Type, x.Value.ToString()));
+
+        //    var addUserClaimResult = await _userManager.AddClaimsAsync(user, claims!);
+        //    if (!addUserClaimResult.Succeeded)
+        //        return BadRequest<string>("FailedToAddNewClaims");
+
+        //    //_unitOfWork.CommitTransaction();
+        //    return Success("Success");
+        //}
+        //catch
+        //{
+        //    _unitOfWork.RollbackTransaction();
+        //    return BadRequest<string>("FailedToUpdateClaims");
+        //}
     }
 
     public async Task<Response<List<AdminDto>>> GetAllAdminsAsync()

@@ -65,6 +65,23 @@ public class MaterialController : AppControllerBase
             return NewResult(ErrorHappen.ErrorInServer());
         }
     }
+
+    [Authorize(Roles = "Admin,Teacher")]
+    [HttpPut(MaterialRouting.UpdateLink)]
+    public async Task<IActionResult> UpdateLink([FromForm] UploadLinkDto uploadLinkDto)
+    {
+        try
+        {
+            var result = await _materialService.UploadLink(uploadLinkDto);
+            return NewResult(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
+    }
+
     [Authorize(Roles = "Admin,Teacher")]
     [HttpDelete(MaterialRouting.Prefix)]
     public async Task<IActionResult> DeleteMaterial(int materialId)

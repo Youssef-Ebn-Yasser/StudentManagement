@@ -3,7 +3,7 @@ using Backend.DTOs.AuthorizeDTO;
 
 namespace Backend.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/")]
 [ApiController]
 public class AuthorizeController : AppControllerBase
 {
@@ -19,28 +19,28 @@ public class AuthorizeController : AppControllerBase
     #endregion
 
     #region    Methods
-    [HttpGet("")]
+    [HttpGet("Authorize")]
     public async Task<IActionResult> ManageUserClaims(int userId)
     {
         var response = await _authorizeService.ManageUserClaimData(userId);
         return NewResult(response);
     }
 
-    [HttpPut("")]
+    [HttpPut("Authorize")]
     public async Task<IActionResult> UpdateUserClaims(EditUserClaimsDto model)
     {
         var response = await _authorizeService.UpdateUserClaims(model);
         return NewResult(response);
     }
 
-    [HttpGet("admins")]
+    [HttpGet("Authorize/admins")]
     public async Task<IActionResult> GetAllAdmins()
     {
         var response = await _authorizeService.GetAllAdminsAsync();
         return NewResult(response);
     }
 
-    [HttpPut("admin")]
+    [HttpPut("Authorize/admin")]
     public async Task<IActionResult> UpdateAdmin([FromBody] UpdateAdminDto dto)
     {
         var response = await _authorizeService.UpdateAdminAsync(dto);
