@@ -33,7 +33,7 @@ public class CategoryService : ResponseHandler, ICategoryService
     public async Task<Response<List<CategoryDto>>> GetAllAsync()
     {
         var allCategories = await _unitOfWork.Repository<Category>()
-                                                            .GetTableAsTracking()
+                                                          .GetTableNoTracking()
                                                           .Where(c => !c.IsDeleted)
                                                           .ToListAsync();
 
@@ -45,6 +45,7 @@ public class CategoryService : ResponseHandler, ICategoryService
         var lang = cultureInfo.TwoLetterISOLanguageName.ToLower();
 
         var mapped = _mapper.Map<List<CategoryDto>>(allCategories);
+
         return Success(mapped);
     }
 
@@ -80,6 +81,13 @@ public class CategoryService : ResponseHandler, ICategoryService
         }
 
         var category = _mapper.Map<Category>(dto);
+
+        //var category = new Category()
+        //{
+        //    CategoryNameEn = dto.Name,
+        //    IsDeleted = false
+        //};
+
         await _unitOfWork.Repository<Category>().AddAsync(category);
         var result = _unitOfWork.Complete();
 
@@ -113,7 +121,8 @@ public class CategoryService : ResponseHandler, ICategoryService
             return NotFound<string>("Category not found");
         }
 
-        if (category.Courses != null && category.Courses.Any()) return BadRequest<string>("Can not delete this category has an courses");
+        if (category.Courses != null && category.Courses.Any())
+            return BadRequest<string>("Can not delete this category has an courses");
 
         category.IsDeleted = true;
         _unitOfWork.Complete();
@@ -124,7 +133,7 @@ public class CategoryService : ResponseHandler, ICategoryService
     {
         var exist = await _unitOfWork.Repository<Student>()
                                            .GetTableNoTracking()
-                                           .AnyAsync(s => GeneralLocalizableEntity.Localized(s.NameAr, s.NameEn) == name && s.IsDeleted == false);
+                                           .AnyAsync(s => s.NameEn == name && s.IsDeleted == false);
 
         return exist;
     }

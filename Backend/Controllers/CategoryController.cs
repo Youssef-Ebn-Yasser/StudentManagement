@@ -36,7 +36,7 @@ public class CategoryController : AppControllerBase
         }
         catch
         {
-            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            _logger.LogInfo("Error happen when mapping or by network in GetAll category");
             return NewResult(ErrorHappen.ErrorInServer());
         }
     }
@@ -72,11 +72,11 @@ public class CategoryController : AppControllerBase
     }
     [Authorize(Roles = "Admin")]
     [HttpDelete(Routing.CategoryRouting.Prefix)]
-    public async Task<IActionResult> Delete([FromBody] int id)
+    public async Task<IActionResult> Delete(int id)
     {
         try
         {
-            var result = await _categoryService.DeleteAsync(int.Parse(id.ToString().Trim()));
+            var result = await _categoryService.DeleteAsync(id);
             return Ok(result);
         }
         catch

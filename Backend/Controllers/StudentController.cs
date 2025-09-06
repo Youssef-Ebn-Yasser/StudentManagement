@@ -125,6 +125,22 @@ public class StudentController : AppControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
+    [HttpGet(Routing.StudentRouting.GetAddStudentCourseDependenciesDto)]
+    public async Task<IActionResult> GetAddStudentCourseDependenciesDto()
+    {
+        try
+        {
+            var result = await _studentService.GetAddStudentCourseDependenciesDto();
+            return NewResult(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen by network in GetAddStudentCourseDependenciesDto");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
+    }
+
     [Authorize]
     [HttpGet(Routing.StudentRouting.Prefix)]
     public async Task<IActionResult> GetById(int id)

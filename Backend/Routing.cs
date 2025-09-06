@@ -22,6 +22,9 @@ public class Routing
         public const string Profile = Prefix + "profile/{studentId}";
         public const string DownloadSampleExcel = Prefix + "/download/sample";
         public const string UploadAddStudentsExcel = Prefix + "/upload";
+        public const string GetAddStudentCourseDependenciesDto = Prefix + "/GetAddStudentCourseDependenciesDto";
+
+
     }
 
     public static class AuthRouting
@@ -122,6 +125,7 @@ public class Routing
         public const string GetPaginated = Prefix + "/HomeCourses/GetPaginated";
         public const string GetAllCoursesOfTeacher = Prefix + "/GetAllCoursesOfTeacher";
         public const string GetAllStudentAndCourse = Prefix + "/GetAllStudentAndCourse";
+        public const string GetDependenciesForAddCourse = Prefix + "/GetDependenciesForAddCourse";
     }
 
     public static class LessonRouting
@@ -219,7 +223,7 @@ public class Routing
     public static class MaterialRouting
     {
         public const string Prefix = Rule + "/Material";
-
+        public const string UpdateLink = Rule + "/UpdateLink";
     }
 
     public static class QuizRouting

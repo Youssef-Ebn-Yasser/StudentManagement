@@ -48,6 +48,36 @@ public class CourseService : ResponseHandler, ICourseService
         var result = _mapper.Map<List<ShowAllCoursesDto>>(courses);
         return Success(result);
     }
+
+    public async Task<Response<ForAddCourseDependenciesDto>> GetDependenciesForAddCourse()
+    {
+        var teacherDependencies = await _unitOfWork.Repository<Teacher>()
+                                                                        .GetTableNoTracking()
+                                                                        .Where(t => !t.IsDeleted)
+                                                                        .Select(t => new TeacherDependencies
+                                                                        {
+                                                                            TeacherId = t.Id,
+                                                                            TeacherName = t.NameEn
+                                                                        }).ToListAsync();
+
+        var Categoryependencies = await _unitOfWork.Repository<Category>()
+                                                                         .GetTableNoTracking()
+                                                                         .Where(c => !c.IsDeleted)
+                                                                         .Select(c => new CategoryDependencies
+                                                                         {
+                                                                             CategoryId = c.Id,
+                                                                             Categoryname = c.CategoryNameEn
+                                                                         }).ToListAsync();
+
+        var response = new ForAddCourseDependenciesDto()
+        {
+            CategoryDependencies = Categoryependencies,
+            TeacherDependencies1 = teacherDependencies
+        };
+
+
+        return Success(response);
+    }
     public async Task<Response<List<HomeCourses>>> GetAllByCategoryAsync(int categoryId)
     {
         var courses = await _unitOfWork.Repository<Course>()
@@ -249,7 +279,6 @@ public class CourseService : ResponseHandler, ICourseService
         return Success("Course updated successfully");
     }
 
-
     public async Task<Response<string>> DeleteAsync(int id)
     {
         var course = await _unitOfWork.Repository<Course>()
@@ -328,4 +357,26 @@ public class CourseService : ResponseHandler, ICourseService
         return result;
     }
     #endregion
+}
+
+
+public class ForAddCourseDependenciesDto
+{
+    public List<TeacherDependencies> TeacherDependencies1 { get; set; }
+    public List<CategoryDependencies> CategoryDependencies { get; set; }
+
+
+}
+
+public class TeacherDependencies
+{
+    public int TeacherId { get; set; }
+    public string TeacherName { get; set; }
+
+}
+
+public class CategoryDependencies
+{
+    public int CategoryId { get; set; }
+    public string Categoryname { get; set; }
 }

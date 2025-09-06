@@ -7,14 +7,14 @@ public class CategoryProfile : Profile
 {
     public CategoryProfile()
     {
-        // Entity to DTO (Reading)
+        //Entity to DTO(Reading)
         CreateMap<Category, CategoryDto>()
             .ForMember(dest => dest.Name,
                        opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.CategoryNameAr, src.CategoryNameEn)));
 
+
         // Create DTO to Entity (Writing)
         CreateMap<CreateCategoryDto, Category>()
-            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => false))
             .AfterMap((src, dest) =>
             {
                 if (IsArabic(src.Name))
@@ -31,7 +31,6 @@ public class CategoryProfile : Profile
 
         // Update DTO to Entity (Writing)
         CreateMap<UpdateCategoryDto, Category>()
-            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
             .AfterMap((src, dest) =>
             {
                 if (IsArabic(src.Name))
