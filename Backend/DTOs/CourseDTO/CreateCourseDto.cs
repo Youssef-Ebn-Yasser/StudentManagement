@@ -1,4 +1,6 @@
-﻿namespace Backend.DTOs.CourseDTO;
+﻿using Backend.Models.Enums;
+
+namespace Backend.DTOs.CourseDTO;
 
 public class CreateCourseDto
 {
@@ -15,5 +17,9 @@ public class CreateCourseDto
     public string Level { get; set; }
     [Required]
     public string Hours { get; set; }
+
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
+    public EnCourseType? CourseType { get; set; }
     public IFormFile? Image { get; set; }
 }

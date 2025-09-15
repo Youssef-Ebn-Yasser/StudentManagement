@@ -1,5 +1,6 @@
 using AspNetCore.JsonLocalization;
 using Hangfire;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Stripe;
@@ -164,7 +165,17 @@ app.UseHttpsRedirection();
 
 app.UseCors(CORS);
 
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    ServeUnknownFileTypes = true,
+    ContentTypeProvider = new FileExtensionContentTypeProvider
+    {
+        Mappings = {
+            [".m3u8"] = "application/vnd.apple.mpegurl",
+            [".ts"] = "video/mp2t"
+        }
+    }
+});
 
 
 // Auth Middleware

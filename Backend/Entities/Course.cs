@@ -1,4 +1,6 @@
-﻿namespace Backend.Entities;
+﻿using Backend.Models.Enums;
+
+namespace Backend.Entities;
 
 public class Course : BaseEntity
 {
@@ -9,6 +11,13 @@ public class Course : BaseEntity
     public string? LevelEn { get; set; }
     public string? LevelAr { get; set; }
     public string? Hours { get; set; }
+
+    //           for search by duration
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
+    public decimal? DurationBDays { get; set; }
+    public EnCourseType? CourseType { get; set; }
+    //
     public List<Lesson>? lessons { get; set; }
     [ForeignKey("TecherId")]
     public Teacher? Teacher { get; set; }

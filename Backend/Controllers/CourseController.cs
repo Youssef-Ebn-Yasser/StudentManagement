@@ -1,3 +1,4 @@
+using Backend.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers;
@@ -70,7 +71,7 @@ public class CourseController : AppControllerBase
 
 
     [HttpGet(Routing.CourseRouting.GetPaginated)]
-    public async Task<IActionResult> GetPaginated([FromQuery] int pageNumber, [FromQuery] int PageSize, [FromQuery] enOrderBy enOrderBy)
+    public async Task<IActionResult> GetPaginated([FromQuery] int pageNumber, [FromQuery] int PageSize, [FromQuery] enOrderBy enOrderBy, EnFilterBy? filterBy = null, string? value = null)
     {
         try
         {

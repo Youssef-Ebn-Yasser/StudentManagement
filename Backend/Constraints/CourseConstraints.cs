@@ -42,6 +42,8 @@ public class CourseConstraints : IEntityTypeConfiguration<Course>
         builder.Property(c => c.CreatedAt)
                 .HasDefaultValueSql("GETDATE()");
 
+        builder.Property(c => c.DurationBDays)
+               .HasComputedColumnSql("DATEDIFF(DAY, [StartDate], [EndDate])");
 
 
         builder.Property(c => c.ImagePath)

@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using Backend.Models.Enums;
+using Hangfire;
 
 
 namespace Backend.Services.Implementation;
@@ -150,7 +151,9 @@ public class CourseService : ResponseHandler, ICourseService
         var result = _mapper.Map<ShowCourseDto>(course);
         return Success(result);
     }
-    public async Task<Response<PaginateResult<HomeCourses>>> GetPaginatedCourse(int pageNumber, int pageSize, enOrderBy? orderBy = null)
+
+
+    public async Task<Response<PaginateResult<HomeCourses>>> GetPaginatedCourse(int pageNumber, int pageSize, enOrderBy? orderBy = null, EnFilterBy? filterBy = null, string? value = null)
     {
         var querable = GetCourseQuerable();
 
@@ -158,6 +161,24 @@ public class CourseService : ResponseHandler, ICourseService
         {
             _logger.LogInfo($"No Courses in GetPaginatedCourse in this page");
             return NotFound<PaginateResult<HomeCourses>>("Course not found");
+        }
+
+        if (filterBy != null && value != null)
+        {
+            switch (filterBy)
+            {
+                case EnFilterBy.name:
+                    querable = querable.Where(c => c.TitleEn.Contains(value) || c.TitleAr.Contains(value));
+                    break;
+                case EnFilterBy.duration:
+                    querable = querable.Where(c => c.DurationBDays.ToString() == value);
+                    break;
+                case EnFilterBy.content:
+                    querable = querable.OrderBy(c => c.DescriptionEn.Contains(value) || c.DescriptionAr.Contains(value));
+                    break;
+                default:
+                    break;
+            }
         }
         switch (orderBy)
         {
@@ -213,10 +234,10 @@ public class CourseService : ResponseHandler, ICourseService
         if (string.IsNullOrWhiteSpace(createCourseDto.Title))
             return BadRequest<string>("Course title is required");
 
-        if (createCourseDto.Price == null || createCourseDto.Price <= 0)
+        if (createCourseDto.Price <= 0)
             return BadRequest<string>("Course price must be greater than 0");
 
-        if (createCourseDto.TeacherId == null || createCourseDto.TeacherId <= 0)
+        if (createCourseDto.TeacherId <= 0)
             return BadRequest<string>("Valid teacher ID is required");
 
         string? imageUrl = null;
@@ -357,26 +378,4 @@ public class CourseService : ResponseHandler, ICourseService
         return result;
     }
     #endregion
-}
-
-
-public class ForAddCourseDependenciesDto
-{
-    public List<TeacherDependencies> TeacherDependencies1 { get; set; }
-    public List<CategoryDependencies> CategoryDependencies { get; set; }
-
-
-}
-
-public class TeacherDependencies
-{
-    public int TeacherId { get; set; }
-    public string TeacherName { get; set; }
-
-}
-
-public class CategoryDependencies
-{
-    public int CategoryId { get; set; }
-    public string Categoryname { get; set; }
 }
