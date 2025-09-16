@@ -1,44 +1,101 @@
 using Backend.DTOs.LessonDTOs;
+using Microsoft.AspNetCore.Authorization;
 
-namespace Backend.Controllers
+namespace Backend.Controllers;
+
+[ApiController]
+public class LessonController : AppControllerBase
 {
-    [Route("api/[controller]/[action]")]
-    [ApiController]
-    public class LessonController : AppControllerBase
+    #region Fields
+    private readonly ILessonService _lessonService;
+    private readonly IStructuredLogger _logger;
+    #endregion
+
+    #region Constructor
+    public LessonController(ILessonService lessonService, IStructuredLogger logger)
     {
-        private readonly ILessonService _lessonService;
+        _lessonService = lessonService;
+        _logger = logger;
+    }
+    #endregion
 
-        public LessonController(ILessonService lessonService)
+    #region Method
+    [HttpGet(Routing.LessonRouting.GetAll)]
+    public async Task<IActionResult> GetLessonDetails()
+    {
+        try
         {
-            _lessonService = lessonService;
-        }
-
-        [HttpGet("GetLessonDetails/{lessonId}")]
-        public async Task<IActionResult> GetLessonDetails(int lessonId)
-        {
-            var result = await _lessonService.GetLessonAsync(lessonId);
+            var result = await _lessonService.GetAll();
             return NewResult(result);
         }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
+    }
 
-        [HttpPost("CreateLesson")]
-        public async Task<IActionResult> CreateLesson([FromBody] CreateLessonDto createLessonDto)
+    [HttpGet(Routing.LessonRouting.Prefix)]
+    public async Task<IActionResult> GetLessonDetails(int lessonId, int courseId)
+    {
+        try
+        {
+            var result = await _lessonService.GetLessonAsync(lessonId, courseId);
+            return NewResult(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
+    }
+
+    [Authorize(Roles = "Admin,Teacher")]
+    [HttpPost(Routing.LessonRouting.Prefix)]
+    public async Task<IActionResult> CreateLesson([FromBody] CreateLessonDto createLessonDto)
+    {
+        try
         {
             var result = await _lessonService.CreateAsync(createLessonDto);
             return NewResult(result);
         }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
+    }
 
-        [HttpPut("UpdateLesson")]
-        public async Task<IActionResult> UpdateLesson([FromBody] UpdateLessonDto updateLessonDto)
+    [Authorize(Roles = "Admin,Teacher")]
+    [HttpPut(Routing.LessonRouting.Prefix)]
+    public async Task<IActionResult> UpdateLesson([FromBody] UpdateLessonDto updateLessonDto)
+    {
+        try
         {
             var result = await _lessonService.UpdateAsync(updateLessonDto);
             return NewResult(result);
         }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
+    }
 
-        [HttpDelete("DeleteLesson/{lessonId}")]
-        public async Task<IActionResult> DeleteLesson(int lessonId)
+    [Authorize(Roles = "Admin,Teacher")]
+    [HttpDelete(Routing.LessonRouting.Prefix)]
+    public async Task<IActionResult> DeleteLesson(int lessonId)
+    {
+        try
         {
             var result = await _lessonService.DeleteAsync(lessonId);
             return NewResult(result);
         }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
     }
+    #endregion
 }

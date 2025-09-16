@@ -1,29 +1,213 @@
+using AspNetCore.JsonLocalization;
+using Hangfire;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
+using Stripe;
+using static Backend.Services.Implementation.AuthenticationService;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 // Dependencies
 builder.Services.AddConnectionDependency(builder.Configuration)
                 .AddCustomAuthentication(builder.Configuration)
+                .AddFilesDependencies(builder.Configuration)
                 .AddClassesDependencies();
+
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<IPaymobService, PaymobService>();
+builder.Services.AddScoped<IReportServices, ReportServices>();
+builder.Services.AddTransient<IStructuredLogger, StructuredLogger>();
+
+#region Payment stripe
+
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+
+#endregion
+
+#region   Google Authentication
+builder.Services.AddAuthentication().AddCookie().AddGoogle(options =>
+{
+    var clientID = builder.Configuration["Authorization:google:clientId"];
+    var clientSecret = builder.Configuration["Authorization:google:clientSecret"];
+
+    if (clientID is null || clientSecret is null)
+        throw new ArgumentException("Google config are missing");
+
+    options.ClientId = clientID;
+    options.ClientSecret = clientSecret;
+    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+});
+#endregion
+
+#region   CORS
+var CORS = "_cors";
+builder.Services.AddCors(Options =>
+{
+    Options.AddPolicy(name: CORS,
+       policy =>
+       {
+           policy.AllowAnyHeader();
+           policy.AllowAnyMethod();
+           policy.WithOrigins("http://localhost:5175", "https://localhost:5178",
+           "http://127.0.0.1:5500", "http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5500",
+           "https://mega-project-h5z7.vercel.app");
+           policy.AllowCredentials();
+       });
+});
+#endregion
+
+#region   chat
+
+// Add SignalR service
+builder.Services.AddSignalR();
+#endregion
+
+
+#region     HangFire
+builder.Services.AddHangfire(config =>
+{
+    config.UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+builder.Services.AddHangfireServer();
+#endregion
+
+#region   Localization
+// Add JSON-based localization
+builder.Services.AddJsonLocalization(options =>
+{
+    options.ResourcesPath = "Resources";
+});
+
+builder.Services.AddControllersWithViews()
+    .AddViewLocalization()
+    .AddDataAnnotationsLocalization();
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[] { "en", "ar" };
+
+    options.SetDefaultCulture("en");
+    options.AddSupportedCultures(supportedCultures);
+    options.AddSupportedUICultures(supportedCultures);
+    options.RequestCultureProviders.Insert(0, new QueryStringRequestCultureProvider());
+});
+builder.Services.AddSingleton<IStringLocalizer>(sp =>
+{
+    var factory = sp.GetRequiredService<IStringLocalizerFactory>();
+    return factory.Create("Messages", Assembly.GetExecutingAssembly().GetName().Name);
+
+});
+#endregion
+
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<ApplicationSettings>(builder.Configuration.GetSection("ApplicationSettings"));
+
+//public class ApplicationSettings
+//{
+//    public string BaseUrl { get; set; }
+//}
+
+
+#region authorize
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Enter JWT token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement{
+    {
+        new OpenApiSecurityScheme{
+            Reference = new OpenApiReference{
+                Type=ReferenceType.SecurityScheme,
+                Id="Bearer"
+            }
+        },
+        new string[]{}
+    }});
+});
+
+
+#endregion
+Console.WriteLine("Running in: " + builder.Environment.EnvironmentName);
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+
+
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+
+app.UseCors(CORS);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+    Path.Combine(builder.Environment.ContentRootPath, "HlsStorage")),
+    RequestPath = "/videos"
+});
+//app.UseStaticFiles(new StaticFileOptions
+//{
+//    ServeUnknownFileTypes = true,
+//    ContentTypeProvider = new FileExtensionContentTypeProvider
+//    {
+//        Mappings = {
+//            [".m3u8"] = "application/vnd.apple.mpegurl",
+//            [".ts"] = "video/mp2t"
+//        }
+//    }
+//});
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "HlsStorage")
+    ),
+    RequestPath = "/hls",
+    ServeUnknownFileTypes = true, // serve .ts files
+    DefaultContentType = "application/octet-stream"
+});
 
 // Auth Middleware
 app.UseAuthentication();
 app.UseAuthorization();
+
+#region   localization
+var locOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>();
+app.UseRequestLocalization(locOptions.Value);
+//app.UseRequestLocalization();
+#endregion
+
+#region   Hangfire
+app.UseHangfireDashboard(); // URL: /hangfire
+#endregion
+
+// Map SignalR Hub
+app.MapHub<ChatHub>("/chatHub"); // The path clients will connect to
 
 app.MapControllers();
 

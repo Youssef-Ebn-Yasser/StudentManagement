@@ -1,14 +1,13 @@
 ﻿namespace Backend.Entities;
-public class User
+
+public class User : IdentityUser<int>
 {
-    [Key]
-    public int Id { get; set; }
-    public string? Name { get; set; }
-    public byte Age { get; set; }
-    public string? Email { get; set; }
-    public string? Phone { get; set; }
-    public string? Password { get; set; }
+    public string? NameAr { get; set; }
     public bool IsDeleted { get; set; } = false;
-    public string? ProfileImagePath { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public string? NameEn { get; set; }
+    public string UserType { get; set; }
+
+    [NotMapped]
+    public List<Message>? Messages { get; set; }
 }

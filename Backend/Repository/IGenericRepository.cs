@@ -7,6 +7,7 @@ public interface IGenericRepository<T>
 
     IQueryable<T> GetTableNoTracking();
     IQueryable<T> GetTableAsTracking();
+    Task<IReadOnlyList<T>> GetAllAsync();
 
     Task AddAsync(T entity);
     Task AddRangeAsync(ICollection<T> entity);

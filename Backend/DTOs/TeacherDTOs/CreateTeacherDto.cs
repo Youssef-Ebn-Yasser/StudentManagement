@@ -2,12 +2,19 @@
 
 public class CreateTeacherDto
 {
-    public string? Name { get; set; }
-   
-
-    public string? Email { get; set; }
+    [Required]
+    public string Name { get; set; }
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; }
     public byte? Age { get; set; }
+    [Required]
+    public string Specialization { get; set; }
+    [Required]
+    [Phone]
+    public string? Phone { get; set; }
+    [Required]
+    [DataType(DataType.Password)]
+    public string Password { get; set; }
     public IFormFile? Image { get; set; }
-    public string? Education { get; set; }
-    public string? AdditionalInfo { get; set; }
 }

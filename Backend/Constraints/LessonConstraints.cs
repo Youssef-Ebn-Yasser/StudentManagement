@@ -6,14 +6,20 @@ public class LessonConstraints : IEntityTypeConfiguration<Lesson>
 {
     public void Configure(EntityTypeBuilder<Lesson> builder)
     {
-        builder.Property(l => l.Description)
-               .HasMaxLength(250);
+
+        builder.Property(l => l.DescriptionEn)
+               .HasMaxLength(250)
+               .IsRequired();
+
+        builder.Property(l => l.DescriptionAr)
+               .HasMaxLength(250)
+               .IsRequired();
 
         builder.Property(l => l.IsDeleted)
-               .IsRequired();
+               .HasDefaultValue(false);
 
         builder.Property(l => l.CreatedAt)
-               .IsRequired();
+               .HasDefaultValueSql("getdate()");
 
         builder.HasMany(l => l.materials)
                .WithOne(m => m.Lesson)

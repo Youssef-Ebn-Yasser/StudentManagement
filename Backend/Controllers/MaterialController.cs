@@ -1,46 +1,101 @@
 using Backend.DTOs.MaterialDTOs;
-using Backend.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using static Backend.Routing;
 
-namespace Backend.Controllers
+namespace Backend.Controllers;
+
+[ApiController]
+public class MaterialController : AppControllerBase
 {
-    [Route("api/[controller]/[action]")]
-    [ApiController]
-    public class MaterialController : AppControllerBase
+    #region Fields
+    private readonly IMaterialService _materialService;
+    private readonly IStructuredLogger _logger;
+    #endregion
+
+    #region Constructor
+    public MaterialController(IMaterialService materialService, IStructuredLogger logger)
     {
-        private readonly IMaterialService _materialService;
+        _materialService = materialService;
+        _logger = logger;
+    }
+    #endregion
 
-        public MaterialController(IMaterialService materialService)
-        {
-            _materialService = materialService;
-        }
-
-        [HttpGet("GetMaterialsByLessonId/{lessonId}")]
-        public async Task<IActionResult> GetMaterialsByLessonId(int lessonId)
+    #region Method
+    [HttpGet(MaterialRouting.Prefix)]
+    public async Task<IActionResult> GetMaterialsByLessonId(int lessonId)
+    {
+        try
         {
             var result = await _materialService.GetAllMaterialByLessonIdAsync(lessonId);
             return NewResult(result);
         }
-
-        [HttpPost("CreateMaterial")]
-        public async Task<IActionResult> CreateMaterial([FromBody] CreateMaterialDto createMaterialDto)
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
+    }
+    [Authorize(Roles = "Admin,Teacher")]
+    [HttpPost(MaterialRouting.Prefix)]
+    public async Task<IActionResult> CreateMaterial([FromForm] CreateMaterialDto createMaterialDto)
+    {
+        try
         {
             var result = await _materialService.CreateAsync(createMaterialDto);
             return NewResult(result);
         }
-
-        [HttpPut("UpdateMaterial")]
-        public async Task<IActionResult> UpdateMaterial([FromBody] UpdateMaterialDto updateMaterialDto)
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
+    }
+    [Authorize(Roles = "Admin,Teacher")]
+    [HttpPut(MaterialRouting.Prefix)]
+    public async Task<IActionResult> UpdateMaterial([FromForm] UpdateMaterialDto updateMaterialDto)
+    {
+        try
         {
             var result = await _materialService.UpdateAsync(updateMaterialDto);
             return NewResult(result);
         }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
+    }
 
-        [HttpDelete("DeleteMaterial/{materialId}")]
-        public async Task<IActionResult> DeleteMaterial(int materialId)
+    [Authorize(Roles = "Admin,Teacher")]
+    [HttpPut(MaterialRouting.UpdateLink)]
+    public async Task<IActionResult> UpdateLink([FromForm] UploadLinkDto uploadLinkDto)
+    {
+        try
+        {
+            var result = await _materialService.UploadLink(uploadLinkDto);
+            return NewResult(result);
+        }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
+    }
+
+    [Authorize(Roles = "Admin,Teacher")]
+    [HttpDelete(MaterialRouting.Prefix)]
+    public async Task<IActionResult> DeleteMaterial(int materialId)
+    {
+        try
         {
             var result = await _materialService.DeleteAsync(materialId);
             return NewResult(result);
         }
+        catch
+        {
+            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
+            return NewResult(ErrorHappen.ErrorInServer());
+        }
     }
-} 
+    #endregion
+}

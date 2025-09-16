@@ -1,4 +1,6 @@
-﻿namespace Backend.Dependencies;
+﻿using Microsoft.Extensions.Localization;
+
+namespace Backend.Dependencies;
 
 public static class ClassesDependencies
 {
@@ -18,10 +20,46 @@ public static class ClassesDependencies
 
 
         services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IAuthorizeService, AuthorizeService>();
         services.AddTransient<ICourseService, CourseService>();
         services.AddTransient<IStudentService, StudentService>();
         services.AddTransient<IMaterialService, MaterialService>();
         services.AddTransient<ILessonService, LessonService>();
+        services.AddTransient<ITeacherService, TeacherService>();
+        services.AddTransient<ICategoryService, CategoryService>();
+        services.AddTransient<IAuthGoogleService, AuthGoogleService>();
+        services.AddTransient<ICommentService, CommentService>();
+        services.AddTransient<IStudentAssignmentService, StudentAssignmentService>();
+        services.AddTransient<IMeetingService, MeetingService>();
+        services.AddTransient<IChatService, ChatService>();
+        services.AddTransient<IStructuredLogger, StructuredLogger>();
+
+        services.AddTransient<IQuizService, QuizService>();
+        services.AddTransient<IStructuredLogger, StructuredLogger>();
+        services.AddTransient<IReportServices, ReportServices>();
+        services.AddTransient<IAttendanceSevice, AttendanceSevice>();
+        services.AddTransient<IVedioUpload, VedioUpload>();
+
+
+
+
+
+        services.AddTransient<IGeminiObjectTranslator, GeminiObjectTranslator>();
+
+
+        services.AddScoped<IPhysicalFileUpload, PhysicalFileUpload>();
+
+        services.AddSingleton(typeof(IStringLocalizer<>), typeof(StringLocalizer<>));
+
+        services.AddTransient<GeminiService>();
+
+        services.AddTransient<ISliderService, SliderService>();
+
+
+
+
+
+
 
 
         return services;

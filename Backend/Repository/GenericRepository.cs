@@ -1,12 +1,10 @@
-﻿using Backend.Context;
-using Microsoft.EntityFrameworkCore;
-
-namespace Backend.Repository;
+﻿namespace Backend.Repository;
 
 public class GenericRepository<T> : IGenericRepository<T> where T : class
 {
     #region  Fields
     public ApplicationDbContext _dbContext { get; }
+
     #endregion
 
     #region  Constructor
@@ -68,5 +66,14 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         _dbContext.Set<T>().UpdateRange(entity);
     }
+
+    public async Task<IReadOnlyList<T>> GetAllAsync()
+    {
+        return await _dbContext.Set<T>().ToListAsync();
+    }
+
+
+
+
     #endregion
 }

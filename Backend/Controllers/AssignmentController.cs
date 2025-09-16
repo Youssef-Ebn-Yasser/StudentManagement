@@ -1,33 +1,57 @@
-﻿using Backend.DTOs.AssignmentDTOs;
-[ApiController]
+﻿using Backend.DTOs.AssignmentDTO;
+
+namespace Backend.Controllers;
+
 [Route("api/[controller]")]
-public class AssignmentsController : ControllerBase
+[ApiController]
+public class AssignmentController(IStudentAssignmentService _studentAssignmentService) : AppControllerBase
 {
-    private readonly IAssignmentService _assignmentService;
-
-    public AssignmentsController(IAssignmentService assignmentService)
+    [HttpGet("GetStudentAssignmentInCourse")]
+    public async Task<IActionResult> UploadAssignment(int studentId, int courseId)
     {
-        _assignmentService = assignmentService;
+        var result = await _studentAssignmentService.GetAllStudentAssignmentInCourse(studentId, courseId);
+
+        return NewResult(result);
+
     }
 
-    [HttpGet("by-lesson/{lessonId}")]
-    public async Task<IActionResult> GetByLesson(int lessonId)
+    [HttpPost("upload/assignment")]
+    public async Task<IActionResult> UploadAssignment([FromForm] UploadAssignmentDto dto)
     {
-        var result = await _assignmentService.GetByLessonAsync(lessonId);
-        return Ok(result);
+        var result = await _studentAssignmentService.UploadAssignment(dto);
+
+        return NewResult(result);
+
+    }
+    [HttpGet("GetStudentAssignmentForLessonId")]
+    public async Task<IActionResult> GetStudentAssignmentForLesson(int lessonId)
+    {
+        var result = await _studentAssignmentService.GetStudentAssignmentForLessonId(lessonId);
+        return NewResult(result);
+    }
+    [HttpGet("GetAllAssignmentOfCourse")]
+    public async Task<IActionResult> GetAllAssignmentOfCourse(string courseName, string studentName)
+    {
+        var result = await _studentAssignmentService.GetAllAssignmentOfCourse(courseName, studentName);
+        return NewResult(result);
     }
 
-    [HttpGet("{studentAssignmentId}")]
-    public async Task<IActionResult> GetDetail(int studentAssignmentId)
+    [HttpGet("GetAssignmentByLessonId")]
+    public async Task<IActionResult> GetAssignmentByLessonId(int lessonId)
     {
-        var result = await _assignmentService.GetDetailAsync(studentAssignmentId);
-        return Ok(result);
+        var result = await _studentAssignmentService.GetAssignmentByLessonId(lessonId);
+        return NewResult(result);
     }
-
-    [HttpPut("{studentAssignmentId}/grade")]
-    public async Task<IActionResult> UpdateGrade(int studentAssignmentId, [FromBody] UpdateAssignmentDegreeDto dto)
+    [HttpGet("GetAssignmentForStudentToCorrect")]
+    public async Task<IActionResult> GetAssignmentForStudentToCorrect(int studentAssignmentId)
     {
-        await _assignmentService.UpdateDegreeAsync(studentAssignmentId, dto.Degree);
-        return Ok(new { success = true });
+        var result = await _studentAssignmentService.GetAssignmentForStudentToCorrect(studentAssignmentId);
+        return NewResult(result);
+    }
+    [HttpPost("SaveStudentDegreeInAssignment")]
+    public async Task<IActionResult> SaveStudentDegreeInAssignment(StudentAssignmentDegreeDto dto)
+    {
+        var result = await _studentAssignmentService.SaveStudentDegreeInAssignment(dto);
+        return NewResult(result);
     }
 }

@@ -26,6 +26,6 @@ public class Response<T>
     public object? Meta { get; set; }
     public bool Succeeded { get; set; }
     public string? Massage { get; set; }
-    public List<string>? Errors { get; set; }
+    public List<string>? Errors { get; set; } = new List<string>();
     public T? Data { get; set; }
 }

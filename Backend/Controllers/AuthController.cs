@@ -1,22 +1,45 @@
 using Backend.DTOs.AuthDTOs;
+using Microsoft.AspNetCore.Cors;
 
 namespace Backend.Controllers;
 
+[EnableCors("_cors")]
 [Route("api/[controller]")]
 [ApiController]
 public class AuthController : AppControllerBase
 {
+    #region Fields
     private readonly IAuthenticationService _authService;
+    private readonly IAuthGoogleService _authGoogleService;
+    private readonly IEmailSender _emailSender;
+    private readonly IStructuredLogger _logger;
+    #endregion
 
-    public AuthController(IAuthenticationService authService)
+    #region Constructor
+    public AuthController(IAuthenticationService authService, 
+                          IAuthGoogleService authGoogleService, 
+                          IEmailSender emailSender, 
+                          IStructuredLogger logger)
     {
         _authService = authService;
+        _authGoogleService = authGoogleService;
+        _emailSender = emailSender;
+        _logger = logger;
     }
+    #endregion
 
+    #region Method
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto model)
     {
         var result = await _authService.LoginAsync(model);
+        return NewResult(result);
+    }
+
+    [HttpPost("Googlelogin")]
+    public async Task<IActionResult> Googlelogin([FromBody] GoogleLoginDto googleLogin)
+    {
+        var result = await _authGoogleService.AuthenticationWithGoogle(googleLogin.IdToken);
         return NewResult(result);
     }
 
@@ -27,13 +50,33 @@ public class AuthController : AppControllerBase
         return NewResult(result);
     }
 
+
+    //[Authorize(Roles = "Admin")]
     [HttpPost("register/teacher")]
     public async Task<IActionResult> RegisterTeacher([FromBody] RegisterDto model)
     {
         var result = await _authService.RegisterTeacherAsync(model);
         return NewResult(result);
     }
+    [HttpPost("Teacher-request")]
+    public async Task<IActionResult> TeacherRequest(string name, string email)
+    {
+        string subject = "Ask for Uploading a teacher";
+        string body = $"I am a teacher and want to applay to upload my courses here this is my name :- {name}  , and this is my email :- {email}";
+        string mailTo = "hadeer.abdelgawad44@gmail.com";
+        var result = await _emailSender.SendEmailAsync(mailTo, subject, body);
+        return Ok(result);
+    }
 
+    [HttpPost("confirm-email")]
+    public async Task<IActionResult> Verify([FromQuery] int userId, [FromQuery] string token)
+    {
+        var result = await _authService.ConfirmEmailAsync(userId, token);
+        return NewResult(result);
+    }
+
+
+    //[Authorize(Roles = "Admin")]
     [HttpPost("register/admin")]
     public async Task<IActionResult> RegisterAdmin([FromBody] RegisterDto model)
     {
@@ -44,7 +87,7 @@ public class AuthController : AppControllerBase
     [HttpGet("GetUserByToken")]
     public async Task<IActionResult> GetUserByToken([FromHeader] string refreshToken)
     {
-        
+
         if (string.IsNullOrEmpty(refreshToken))
         {
             return BadRequest("Refresh token is required.");
@@ -59,5 +102,36 @@ public class AuthController : AppControllerBase
 
         return NewResult(result);
     }
-}
 
+
+
+    //[HttpGet("GetJWTToken")]
+
+    //public async Task<IActionResult> GetJWTToken([FromQuery] string userId)
+    //{
+    //    var result = await _authService.GetJWTToken(userId);
+    //    return NewResult(result);
+    //}
+
+    [HttpGet("GetRefreshToken")]
+    public async Task<IActionResult> GetRefreshToken([FromQuery] string refreshToken)
+    {
+        var result = await _authService.GetRefreshToken(refreshToken);
+        return NewResult(result);
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword(string email)
+    {
+        var result = await _authService.ForgotPasswordAsync(email);
+        return NewResult(result);
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto model)
+    {
+        var result = await _authService.ResetPasswordAsync(model.Email, model.Token, model.NewPassword);
+        return NewResult(result);
+    }
+    #endregion
+}
