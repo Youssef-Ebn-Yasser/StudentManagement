@@ -4,6 +4,7 @@ using Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250916101114_CreateVaoucherCodeProp")]
+    partial class CreateVaoucherCodeProp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1115,7 +1118,7 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("UsedAt")
+                    b.Property<DateTime>("UsedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("VoucherCourseType")
@@ -1124,7 +1127,7 @@ namespace Backend.Migrations
                     b.Property<int>("VoucherFor")
                         .HasColumnType("int");
 
-                    b.Property<int?>("isUsedById")
+                    b.Property<int>("isUsedById")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -1699,7 +1702,8 @@ namespace Backend.Migrations
                     b.HasOne("Backend.Entities.Student", "Student")
                         .WithMany()
                         .HasForeignKey("isUsedById")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("Student");
 

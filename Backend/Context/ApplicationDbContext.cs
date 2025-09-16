@@ -1,3 +1,4 @@
+using Backend.Constraints;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Backend.Context;
@@ -40,6 +41,8 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
 
     public DbSet<Slider> Sliders { get; set; }
     public DbSet<VedioesDetails> VedioesDetails { get; set; }
+    public DbSet<Voucher> vouchers { get; set; }
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -71,7 +74,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
         modelBuilder.Entity<IdentityRoleClaim<int>>().ToTable("RoleClaims");
         modelBuilder.Entity<IdentityUserToken<int>>().ToTable("UserTokens");
 
-
+        modelBuilder.ConfigureVoucher();
         #region chat 
         // Configure ChatRoom relationships
         modelBuilder.Entity<ChatRoom>()

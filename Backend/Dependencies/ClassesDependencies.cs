@@ -39,6 +39,7 @@ public static class ClassesDependencies
         services.AddTransient<IReportServices, ReportServices>();
         services.AddTransient<IAttendanceSevice, AttendanceSevice>();
         services.AddTransient<IVedioUpload, VedioUpload>();
+        services.AddTransient<IVoucherService, VoucherService>();
 
 
 
