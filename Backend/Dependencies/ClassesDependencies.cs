@@ -38,6 +38,8 @@ public static class ClassesDependencies
         services.AddTransient<IStructuredLogger, StructuredLogger>();
         services.AddTransient<IReportServices, ReportServices>();
         services.AddTransient<IAttendanceSevice, AttendanceSevice>();
+        services.AddTransient<IVedioUpload, VedioUpload>();
+
 
 
 

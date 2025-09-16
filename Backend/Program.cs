@@ -1,6 +1,6 @@
 using AspNetCore.JsonLocalization;
 using Hangfire;
-using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Stripe;
@@ -164,19 +164,33 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseCors(CORS);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+    Path.Combine(builder.Environment.ContentRootPath, "HlsStorage")),
+    RequestPath = "/videos"
+});
+//app.UseStaticFiles(new StaticFileOptions
+//{
+//    ServeUnknownFileTypes = true,
+//    ContentTypeProvider = new FileExtensionContentTypeProvider
+//    {
+//        Mappings = {
+//            [".m3u8"] = "application/vnd.apple.mpegurl",
+//            [".ts"] = "video/mp2t"
+//        }
+//    }
+//});
 
 app.UseStaticFiles(new StaticFileOptions
 {
-    ServeUnknownFileTypes = true,
-    ContentTypeProvider = new FileExtensionContentTypeProvider
-    {
-        Mappings = {
-            [".m3u8"] = "application/vnd.apple.mpegurl",
-            [".ts"] = "video/mp2t"
-        }
-    }
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "HlsStorage")
+    ),
+    RequestPath = "/hls",
+    ServeUnknownFileTypes = true, // serve .ts files
+    DefaultContentType = "application/octet-stream"
 });
-
 
 // Auth Middleware
 app.UseAuthentication();

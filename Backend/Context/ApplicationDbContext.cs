@@ -39,6 +39,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
     public DbSet<MeetingAttendance> MeetingAttendances { get; set; }
 
     public DbSet<Slider> Sliders { get; set; }
+    public DbSet<VedioesDetails> VedioesDetails { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

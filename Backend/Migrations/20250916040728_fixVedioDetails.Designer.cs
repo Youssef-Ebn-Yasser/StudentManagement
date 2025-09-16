@@ -4,6 +4,7 @@ using Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250916040728_fixVedioDetails")]
+    partial class fixVedioDetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1039,11 +1042,7 @@ namespace Backend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DisableDownloadedFile")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DisableDownloadedFolder")
+                    b.Property<string>("DisableDownloadedUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -1051,20 +1050,13 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("RelatedById")
+                    b.Property<int>("RelatedById")
                         .HasColumnType("int");
-
-                    b.Property<int>("SavedIn")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ThirdPartyLink")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UploadedById")
                         .HasColumnType("int");
 
-                    b.Property<int?>("VedioFor")
+                    b.Property<int>("VedioFor")
                         .HasColumnType("int");
 
                     b.Property<int>("VedioPermision")
