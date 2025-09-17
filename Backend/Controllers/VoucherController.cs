@@ -46,5 +46,27 @@ public class VoucherController : AppControllerBase
         }
 
     }
+
+    [HttpPost("ApplayVoucher")]
+    public async Task<IActionResult> ApplayVoucher(applayCodeRequestDto dto)
+    {
+        try
+        {
+            var result = await _voucherService.ApplayVoucher(dto);
+
+            return NewResult(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+
+    }
     #endregion
+}
+
+public class applayCodeRequestDto
+{
+    public string code { get; set; }
+    public List<int> coursesIds { get; set; }
 }

@@ -1,4 +1,6 @@
-﻿namespace Backend.Services.Implementation;
+﻿using Backend.Controllers;
+
+namespace Backend.Services.Implementation;
 
 public class VoucherService : ResponseHandler, IVoucherService
 {
@@ -120,7 +122,85 @@ public class VoucherService : ResponseHandler, IVoucherService
                               BadRequest<string>("can not add this voucher");
     }
 
-    // Deserialize JSON back to list<int>
-    // List<int> courses = JsonSerializer.Deserialize<List<int>>(voucher.TargetCourses);
+
+    public async Task<Response<CartAfterDiscountDto>> ApplayVoucher(applayCodeRequestDto dto)
+    {
+        // 1- validate this code Voucher
+        var (errorVoucherMessage, voucher) = await ValidateVoucher(dto.code, dto.coursesIds);
+
+        if (voucher == null)
+            return BadRequest<CartAfterDiscountDto>(errorVoucherMessage);
+
+
+        // if avaliable more than one id will take most big one
+        var (errorCourseMessage, course) = await GetMostHighPriceCourse(dto.coursesIds);
+
+        if (course == null)
+            return BadRequest<CartAfterDiscountDto>(errorCourseMessage);
+
+
+        var result = new CartAfterDiscountDto
+        {
+            courseAppliedId = course.Id,
+            code = dto.code,
+            DiscountType = voucher.DiscountType,
+            DiscountValue = voucher.DiscountType == EnDiscountType.Amount ? (double)voucher.DiscountAmount! : voucher.DiscountPercentage,
+        };
+
+        return Success(result);
+    }
+
+    private async Task<(string?, Voucher?)> ValidateVoucher(string code, List<int>? coursesId)
+    {
+        var voucher = await _unitOfWork.Repository<Voucher>()
+                                    .GetTableNoTracking()
+                                    .FirstOrDefaultAsync(v => v.Code == code && !v.IsUsed);
+
+        if (voucher == null)
+        {
+            return ("voucher not exist or already used", null);
+        }
+
+        if (voucher.ExpireDate < DateTime.Now)
+        {
+            return ("voucher is a expired", null);
+        }
+
+
+        if (voucher.TargetCourses == "all")
+        {
+            return (null, voucher);
+        }
+
+        var voucherAvaliableIds = JsonConvert.DeserializeObject<List<int>>(voucher.TargetCourses);
+        var isAvaliableIds = voucherAvaliableIds?.Intersect(coursesId).Any();
+
+        if (isAvaliableIds == null || isAvaliableIds == false)
+        {
+            return ("can not applay this vouchr on this course", null);
+        }
+
+        return (null, voucher);
+    }
+
+    private async Task<(string?, Course?)> GetMostHighPriceCourse(List<int> coursesId)
+    {
+        var maxPrice = await _unitOfWork.Repository<Course>()
+                                              .GetTableNoTracking()
+                                              .Where(c => coursesId.Contains(c.Id))
+                                              .MaxAsync(c => c.Price);
+
+        var course = await _unitOfWork.Repository<Course>()
+                                            .GetTableNoTracking()
+                                            .Where(c => coursesId.Contains(c.Id) && c.Price == maxPrice)
+                                            .FirstOrDefaultAsync();
+
+        if (course == null)
+        {
+            return ("this course not avaliable now", null);
+        }
+
+        return (null, course);
+    }
     #endregion
 }
