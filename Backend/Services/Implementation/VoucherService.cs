@@ -66,11 +66,14 @@ public class VoucherService : ResponseHandler, IVoucherService
 
     public async Task<Response<string>> CreateVoucher(CreateVaoucherDto dto)
     {
+        if (dto.DiscountPercentage != null || dto.DiscountPercentage > 100 || dto.DiscountPercentage < 0)
+            return BadRequest<string>("this percentage must be equal or under 100 and more than 0");
+
         var userExist = _unitOfWork.Repository<User>()
                                        .GetTableNoTracking()
                                        .Any(s => s.Id == dto.CreatedById && !(bool)s.IsDeleted);
 
-        if (userExist)
+        if (!userExist)
             return BadRequest<string>("this created user id not exist");
 
         foreach (var courseId in dto.TargetCoursesIds)
