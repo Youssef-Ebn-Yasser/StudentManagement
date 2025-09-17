@@ -123,6 +123,33 @@ public class VoucherService : ResponseHandler, IVoucherService
     }
 
 
+    public async Task<Response<List<GetAllValidVouchersDto>>> GetAllValiableVouchers()
+    {
+        var vouchers = await _unitOfWork.Repository<Voucher>()
+                                                 .GetTableNoTracking()
+                                                 .Where(x => x.CreatedAt < DateTime.Now)
+                                                 .Select(v => new GetAllValidVouchersDto
+                                                 {
+                                                     Code = v.Code,
+                                                     DiscountType = v.DiscountType,
+                                                     ExpireDate = v.ExpireDate,
+                                                     Id = v.Id,
+                                                     VoucherFor = v.VoucherFor,
+                                                     VoucherCourseType = v.VoucherCourseType,
+                                                     TargetCourses = v.TargetCourses,
+                                                     CreatedByAdminName = _unitOfWork.Repository<User>()
+                                                                                      .GetTableNoTracking()
+                                                                                      .Where(u => u.Id == v.CreatedById)
+                                                                                      .Select(u => u.NameEn)
+                                                                                      .FirstOrDefault(),
+                                                     DiscounValue = v.DiscountType == EnDiscountType.Amount
+                                                     ? v.DiscountAmount : (decimal)v.DiscountPercentage!,
+                                                 }).ToListAsync();
+
+        return Success(vouchers);
+    }
+
+
     public async Task<Response<CartAfterDiscountDto>> ApplayVoucher(applayCodeRequestDto dto)
     {
         // 1- validate this code Voucher

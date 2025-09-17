@@ -42,6 +42,8 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
     public DbSet<Slider> Sliders { get; set; }
     public DbSet<VedioesDetails> VedioesDetails { get; set; }
     public DbSet<Voucher> vouchers { get; set; }
+    public DbSet<testTable> testTable { get; set; }
+
 
 
 
@@ -108,4 +110,12 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
             .OnDelete(DeleteBehavior.Restrict);
         #endregion
     }
+}
+
+
+public class testTable
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+
 }

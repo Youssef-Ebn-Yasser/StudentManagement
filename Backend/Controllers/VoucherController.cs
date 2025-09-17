@@ -62,11 +62,20 @@ public class VoucherController : AppControllerBase
         }
 
     }
-    #endregion
-}
 
-public class applayCodeRequestDto
-{
-    public string code { get; set; }
-    public List<int> coursesIds { get; set; }
+    [HttpPost("all")]
+    public async Task<IActionResult> GetAllVoucher()
+    {
+        try
+        {
+            var result = await _voucherService.GetAllValiableVouchers();
+
+            return NewResult(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    #endregion
 }

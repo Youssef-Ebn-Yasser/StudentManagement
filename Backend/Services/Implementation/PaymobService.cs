@@ -1,7 +1,4 @@
-﻿
-using Backend.DTOs.Paymob_DTOS;
-
-namespace Backend.Services.Implementation
+﻿namespace Backend.Services.Implementation
 {
     public class PaymobService : IPaymobService
     {
@@ -37,7 +34,9 @@ namespace Backend.Services.Implementation
             if (!response.IsSuccessStatusCode)
                 throw new Exception("Auth Token Error: " + responseBody);
 
+
             var result = JObject.Parse(responseBody);
+
             return result["token"]?.ToString() ?? throw new Exception("Auth token not received");
         }
 

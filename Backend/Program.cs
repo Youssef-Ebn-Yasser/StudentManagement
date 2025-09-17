@@ -117,6 +117,8 @@ builder.Services.Configure<ApplicationSettings>(builder.Configuration.GetSection
 //}
 
 
+
+
 #region authorize
 
 builder.Services.AddSwaggerGen(c =>
@@ -149,6 +151,8 @@ builder.Services.AddSwaggerGen(c =>
 Console.WriteLine("Running in: " + builder.Environment.EnvironmentName);
 
 var app = builder.Build();
+
+
 
 
 
