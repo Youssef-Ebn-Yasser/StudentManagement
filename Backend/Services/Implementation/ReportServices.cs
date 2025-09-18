@@ -44,26 +44,26 @@ public class ReportServices : IReportServices
 
         return report;
     }
-    public async Task<List<CourseRevenueReportDto>> GetCourseRevenuesAsync(bool isArabic = false)
-    {
-        var data = await _context.Payments
-            .Where(p => p.StatusEn == "Paid")
-            .GroupBy(p => new
-            {
-                p.CourseId,
-                Title = isArabic ? p.Course.TitleAr : p.Course.TitleEn
-            })
-            .Select(g => new CourseRevenueReportDto
-            {
-                CourseId = g.Key.CourseId ?? 0,
-                CourseName = g.Key.Title,
-                TotalRevenue = g.Sum(x => (decimal)x.Amount),
-                PaymentsCount = g.Count()
-            })
-            .ToListAsync();
+    //public async Task<List<CourseRevenueReportDto>> GetCourseRevenuesAsync(bool isArabic = false)
+    //{
+    //    var data = await _context.Payments
+    //        .Where(p => p.PaymentStatus == EnOrderStatus.success)
+    //        .GroupBy(p => new
+    //        {
+    //            p.,
+    //            Title = isArabic ? p.Course.TitleAr : p.Course.TitleEn
+    //        })
+    //        .Select(g => new CourseRevenueReportDto
+    //        {
+    //            CourseId = g.Key.CourseId ?? 0,
+    //            CourseName = g.Key.Title,
+    //            TotalRevenue = g.Sum(x => (decimal)x.Amount),
+    //            PaymentsCount = g.Count()
+    //        })
+    //        .ToListAsync();
 
-        return data;
-    }
+    //    return data;
+    //}
     public async Task<DashboardSummaryDto> GetSummaryAsync()
     {
         var now = DateTime.Now;
@@ -79,7 +79,7 @@ public class ReportServices : IReportServices
         var totalPayments = await _context.Payments.CountAsync();
 
         var revenueThisMonth = await _context.Payments
-            .Where(p => p.PaymentDate >= firstDayOfMonth && p.StatusEn == "Success")
+            .Where(p => p.TransactionDate >= firstDayOfMonth && p.PaymentStatus == EnOrderStatus.success)
             .SumAsync(p => (decimal?)p.Amount) ?? 0;
 
         return new DashboardSummaryDto
@@ -292,6 +292,11 @@ public class ReportServices : IReportServices
         };
 
         return report;
+    }
+
+    public Task<List<CourseRevenueReportDto>> GetCourseRevenuesAsync(bool isArabic = false)
+    {
+        throw new NotImplementedException();
     }
     #endregion
 }

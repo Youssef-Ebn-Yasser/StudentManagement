@@ -18,7 +18,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
     public DbSet<Course> Courses { get; set; }
     public DbSet<Material> Materials { get; set; }
     public DbSet<StudentAssignment> StudentAssignments { get; set; }
-    public DbSet<Payment> Payments { get; set; }
+
     public DbSet<Comment> Comment { get; set; }
     public DbSet<Lesson> Lessons { get; set; }
     public DbSet<StudentCourse> studentCourses { get; set; }
@@ -43,6 +43,10 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
     public DbSet<VedioesDetails> VedioesDetails { get; set; }
     public DbSet<Voucher> vouchers { get; set; }
     public DbSet<testTable> testTable { get; set; }
+
+    public DbSet<Payment> Payments { get; set; }
+    public DbSet<Backend.Entities.OrderTable> Orders { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
 
 
 

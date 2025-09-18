@@ -19,7 +19,7 @@ public class StructuredLogger : IStructuredLogger
     #endregion
 
     #region    Methods
-    public void LogInfo(string message)
+    public void LogInfo(string message, EnLevel level = EnLevel.Information, EnLogType logType = EnLogType.Normal)
     {
         var user = _httpContextAccessor.HttpContext?.User;
 
@@ -28,10 +28,49 @@ public class StructuredLogger : IStructuredLogger
             : "Anonymous";
 
         var userRole = user?.FindFirst(ClaimTypes.Role)?.Value ?? "Unknown";
-        _logger
-            .ForContext("UserName", userName)
-            .ForContext("UserRole", userRole)
-            .Information(message);
+
+
+
+        switch (level)
+        {
+            case EnLevel.Information:
+                _logger
+                    .ForContext("UserName", userName)
+                    .ForContext("UserRole", userRole)
+                    .ForContext("LogType", (int)logType)
+                    .Information(message);
+                break;
+
+            case EnLevel.Error:
+                _logger
+                    .ForContext("UserName", userName)
+                    .ForContext("UserRole", userRole)
+                    .ForContext("LogType", (int)logType)
+                    .Error(message);
+                break;
+
+            case EnLevel.Warnning:
+                _logger
+                    .ForContext("UserName", userName)
+                    .ForContext("UserRole", userRole)
+                    .ForContext("LogType", (int)logType)
+                    .Warning(message);
+                break;
+        }
     }
     #endregion
+}
+
+public enum EnLogType
+{
+    Normal = 1,
+    Logs = 2,
+}
+
+
+public enum EnLevel
+{
+    Information = 1,
+    Warnning = 2,
+    Error = 3,
 }

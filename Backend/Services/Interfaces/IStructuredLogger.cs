@@ -2,5 +2,5 @@
 
 public interface IStructuredLogger
 {
-    void LogInfo(string message);
+    public void LogInfo(string message, EnLevel level = EnLevel.Information, EnLogType logType = EnLogType.Normal);
 }

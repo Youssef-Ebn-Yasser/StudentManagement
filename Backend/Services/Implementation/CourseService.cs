@@ -1,5 +1,4 @@
-﻿using Backend.Models.Enums;
-using Hangfire;
+﻿using Hangfire;
 
 
 namespace Backend.Services.Implementation;
@@ -45,6 +44,7 @@ public class CourseService : ResponseHandler, ICourseService
             _logger.LogInfo("No Courses");
             BadRequest<List<ShowAllCoursesDto>>("Courses is null");
         }
+        _logger.LogInfo("get all Courses");
 
         var result = _mapper.Map<List<ShowAllCoursesDto>>(courses);
         return Success(result);

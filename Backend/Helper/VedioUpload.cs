@@ -1,7 +1,6 @@
 ﻿using Backend.DTOs.VedioDTOs;
 using System.Diagnostics;
 using System.Text.Json;
-
 namespace Backend.Helper;
 
 public class VedioUpload : ResponseHandler, IVedioUpload
@@ -17,7 +16,7 @@ public class VedioUpload : ResponseHandler, IVedioUpload
     public VedioUpload(IWebHostEnvironment env, ApplicationDbContext context)
     {
         _env = env;
-        _hlsRoot = Path.Combine(env.ContentRootPath, "HlsStorage");
+        _hlsRoot = Path.Combine(env.ContentRootPath, "wwwroot");
         if (!Directory.Exists(_hlsRoot))
             Directory.CreateDirectory(_hlsRoot);
         _context = context;
@@ -25,6 +24,41 @@ public class VedioUpload : ResponseHandler, IVedioUpload
     #endregion
 
     #region    Method
+
+    //private async Task ConvertToHLS(string inputFilePath, string videoFolder)
+    //{
+    //    try
+    //    {
+    //        Directory.CreateDirectory(videoFolder);
+
+    //        var ffmpegFolder = Path.Combine(_env.ContentRootPath, "tool");
+    //        Directory.CreateDirectory(ffmpegFolder);
+
+    //        await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Official); // remove folder param
+    //        FFmpeg.SetExecutablesPath(ffmpegFolder);
+
+    //        var outputM3u8 = Path.Combine(videoFolder, "index.m3u8");
+
+    //        var conversion = await FFmpeg.Conversions.New()
+    //            .AddParameter($"-i \"{inputFilePath}\"")
+    //            .AddParameter("-c:v libx264")
+    //            .AddParameter("-c:a aac")
+    //            .AddParameter("-strict -2")
+    //            .AddParameter("-profile:v baseline -level 3.0 -start_number 0")
+    //            .AddParameter("-hls_time 10")
+    //            .AddParameter("-hls_list_size 0")
+    //            .AddParameter("-hls_segment_filename \"" + Path.Combine(videoFolder, "segment_%03d.ts") + "\"")
+    //            .AddParameter($"\"{outputM3u8}\"")
+    //            .Start();
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Console.WriteLine("Error converting video: " + ex.Message);
+    //    }
+    //}
+
+
+
     public async Task<(bool, string)> uploadVedio(IFormFile file, EnVedioPermision vedioPermision, EnVedioFor vedioFor, int? relatedBy,
                                               EnVedioUploadedBy vedioUploadedBy, int uploadedById, EnSavedInType savedInType)
     {
@@ -61,12 +95,14 @@ public class VedioUpload : ResponseHandler, IVedioUpload
         if (savedInType == EnSavedInType.local)
         {
             ChuncksVedioUsingFFmpeg(inputFilePath, videoFolder);
+            //ConvertToHLS(inputFilePath, videoFolder);
             vedioDetails.DisableDownloadedFile = $"index.m3u8";
             vedioDetails.DisableDownloadedFolder = folderName;
         }
         else if (savedInType == EnSavedInType.openVedio)
         {
             var opeVedioPath = await UploadToApiVideo(file);
+            //var opeVedioPath = await UploadVideoSecureAsync(file);
 
             vedioDetails.ThirdPartyLink = opeVedioPath;
         }
@@ -166,7 +202,7 @@ public class VedioUpload : ResponseHandler, IVedioUpload
             try
             {
                 var outputM3u8 = Path.Combine(videoFolder, "index.m3u8");
-                var ffmpegPath = Path.Combine(_env.ContentRootPath, "tools", "ffmpeg.exe");
+                var ffmpegPath = Path.Combine(_env.ContentRootPath, "wwwroot", "tool", "ffmpeg.exe");
 
                 var ffmpegArgs = $"-i \"{inputFilePath}\" -profile:v baseline -level 3.0 -start_number 0 " +
                                  $"-hls_time 10 -hls_list_size 0 -f hls \"{outputM3u8}\"";
@@ -264,7 +300,56 @@ public class VedioUpload : ResponseHandler, IVedioUpload
         // 3. Return HLS playback URL
         return $"https://embed.api.video/vod/{videoId}/manifest.m3u8";
     }
+    public async Task<string> UploadVideoSecureAsync(IFormFile file)
+    {
+        using var httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", "mJBi15X5DCXMgc9U59ipXKZFpJzevs2wO4uQiIlFqT9");
 
+        // 1️⃣ Create video object as PRIVATE
+        var videoMetadata = new
+        {
+            title = Path.GetFileNameWithoutExtension(file.FileName),
+            description = "Uploaded from .NET backend",
+            @public = false  // PRIVATE video
+        };
+
+        var jsonContent = new StringContent(JsonConvert.SerializeObject(videoMetadata), Encoding.UTF8, "application/json");
+        var createResponse = await httpClient.PostAsync("https://ws.api.video/videos", jsonContent);
+        createResponse.EnsureSuccessStatusCode();
+
+        var createJson = await createResponse.Content.ReadAsStringAsync();
+        var createDoc = JsonDocument.Parse(createJson);
+        var videoId = createDoc.RootElement.GetProperty("videoId").GetString();
+
+        // 2️⃣ Upload file to created video
+        using var content = new MultipartFormDataContent();
+        using var fileStream = file.OpenReadStream();
+        content.Add(new StreamContent(fileStream), "file", file.FileName);
+
+        var uploadResponse = await httpClient.PostAsync($"https://ws.api.video/videos/{videoId}/source", content);
+        uploadResponse.EnsureSuccessStatusCode();
+
+        // 3️⃣ Create a token for secure playback (valid for X seconds)
+        var tokenRequest = new
+        {
+            type = "playback",
+            expiresIn = 3600 // token valid for 1 hour
+        };
+
+        var tokenContent = new StringContent(JsonConvert.SerializeObject(tokenRequest), Encoding.UTF8, "application/json");
+        var tokenResponse = await httpClient.PostAsync($"https://ws.api.video/videos/{videoId}/token", tokenContent);
+        tokenResponse.EnsureSuccessStatusCode();
+
+        var tokenJson = await tokenResponse.Content.ReadAsStringAsync();
+        var tokenDoc = JsonDocument.Parse(tokenJson);
+        var token = tokenDoc.RootElement.GetProperty("token").GetString();
+
+        // 4️⃣ Return secure HLS URL with token
+        var secureHlsUrl = $"https://embed.api.video/vod/{videoId}/manifest.m3u8?token={token}";
+
+        return secureHlsUrl;
+    }
     public async Task<Response<List<CreateVedioDependencies>>> createVedioDependencies(EnVedioFor vedioFor)
     {
         var list = new List<CreateVedioDependencies>();

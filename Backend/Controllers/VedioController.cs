@@ -16,7 +16,7 @@ public class HlsVideoController : ControllerBase
     public HlsVideoController(IWebHostEnvironment env, IVedioUpload vedioUpload, ApplicationDbContext context)
     {
         _env = env;
-        _hlsRoot = Path.Combine(env.ContentRootPath, "HlsStorage");
+        _hlsRoot = Path.Combine(env.ContentRootPath, "wwwroot");
         if (!Directory.Exists(_hlsRoot))
             Directory.CreateDirectory(_hlsRoot);
         _vedioUpload = vedioUpload;

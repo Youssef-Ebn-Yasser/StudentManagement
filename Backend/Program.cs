@@ -1,9 +1,13 @@
 using AspNetCore.JsonLocalization;
 using Hangfire;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.MSSqlServer;
 using Stripe;
+using System.Collections.ObjectModel;
+using System.Data;
 using static Backend.Services.Implementation.AuthenticationService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +29,8 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<IPaymobService, PaymobService>();
 builder.Services.AddScoped<IReportServices, ReportServices>();
 builder.Services.AddTransient<IStructuredLogger, StructuredLogger>();
+
+
 
 #region Payment stripe
 
@@ -111,12 +117,6 @@ builder.Services.AddSingleton<IStringLocalizer>(sp =>
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.Configure<ApplicationSettings>(builder.Configuration.GetSection("ApplicationSettings"));
 
-//public class ApplicationSettings
-//{
-//    public string BaseUrl { get; set; }
-//}
-
-
 
 
 #region authorize
@@ -148,11 +148,46 @@ builder.Services.AddSwaggerGen(c =>
 
 
 #endregion
-Console.WriteLine("Running in: " + builder.Environment.EnvironmentName);
+
+
+
+
+#region   Serilog
+var columnOptions = new ColumnOptions
+{
+    AdditionalColumns = new Collection<SqlColumn>
+    {
+        new SqlColumn { ColumnName = "UserName", DataType = SqlDbType.NVarChar, DataLength = 100, AllowNull = true },
+        new SqlColumn { ColumnName = "UserRole", DataType = SqlDbType.NVarChar, DataLength = 100, AllowNull = true },
+        new SqlColumn { ColumnName = "LogType", DataType = SqlDbType.Int, AllowNull = true },
+
+    }
+};
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
+    .MinimumLevel.Information()
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.MSSqlServer(
+        connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
+        sinkOptions: new MSSqlServerSinkOptions
+        {
+            TableName = "SystemLogs",
+            AutoCreateSqlTable = true
+        },
+        columnOptions: columnOptions
+    )
+    .CreateLogger();
+#endregion
+
+builder.Services.AddControllers();
+
+
+
+
 
 var app = builder.Build();
-
-
 
 
 
@@ -165,36 +200,12 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseCors(CORS);
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-    Path.Combine(builder.Environment.ContentRootPath, "HlsStorage")),
-    RequestPath = "/videos"
-});
-//app.UseStaticFiles(new StaticFileOptions
-//{
-//    ServeUnknownFileTypes = true,
-//    ContentTypeProvider = new FileExtensionContentTypeProvider
-//    {
-//        Mappings = {
-//            [".m3u8"] = "application/vnd.apple.mpegurl",
-//            [".ts"] = "video/mp2t"
-//        }
-//    }
-//});
 
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(builder.Environment.ContentRootPath, "HlsStorage")
-    ),
-    RequestPath = "/hls",
-    ServeUnknownFileTypes = true, // serve .ts files
-    DefaultContentType = "application/octet-stream"
-});
+
+app.UseStaticFiles();
 
 // Auth Middleware
 app.UseAuthentication();
