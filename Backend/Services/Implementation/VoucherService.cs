@@ -1,6 +1,4 @@
-﻿using Backend.Controllers;
-
-namespace Backend.Services.Implementation;
+﻿namespace Backend.Services.Implementation;
 
 public class VoucherService : ResponseHandler, IVoucherService
 {
@@ -177,7 +175,7 @@ public class VoucherService : ResponseHandler, IVoucherService
         return Success(result);
     }
 
-    private async Task<(string?, Voucher?)> ValidateVoucher(string code, List<int>? coursesId)
+    public async Task<(string?, Voucher?)> ValidateVoucher(string code, List<int>? coursesId)
     {
         var voucher = await _unitOfWork.Repository<Voucher>()
                                     .GetTableNoTracking()

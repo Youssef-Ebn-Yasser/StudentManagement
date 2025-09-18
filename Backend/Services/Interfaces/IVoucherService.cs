@@ -1,6 +1,4 @@
-﻿using Backend.Controllers;
-
-namespace Backend.Services.Interfaces;
+﻿namespace Backend.Services.Interfaces;
 
 public interface IVoucherService
 {
@@ -8,4 +6,5 @@ public interface IVoucherService
     public Task<Response<string>> CreateVoucher(CreateVaoucherDto dto);
     public Task<Response<CartAfterDiscountDto>> ApplayVoucher(applayCodeRequestDto dto);
     public Task<Response<List<GetAllValidVouchersDto>>> GetAllValiableVouchers();
+    public Task<(string?, Voucher?)> ValidateVoucher(string code, List<int>? coursesId);
 }

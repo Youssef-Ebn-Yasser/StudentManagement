@@ -1,11 +1,6 @@
-﻿namespace Backend.Services.Interfaces
-{
-    public interface IPaymobService
-    {
+﻿namespace Backend.Services.Interfaces;
 
-        Task<string> GetAuthTokenAsync();
-        Task<int> CreateOrderAsync(string authToken, int amountCents);
-        Task<string> GetPaymentKeyAsync(string token, int amountCents, int orderId, string firstName, string lastName, string email, string phone);
-        Task<string> StartPaymentAsync(int amountInCents, string firstName, string lastName, string email, string phone);
-    }
+public interface IPaymobService
+{
+    public Task<(string, int)> StartPaymentAsync(int amount, string firstName, string lastName, string email, string phone);
 }

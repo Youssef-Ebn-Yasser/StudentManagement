@@ -14,13 +14,14 @@ public class OrderTable
 
     [Column(TypeName = "decimal(10, 2)")]
     public decimal FinalPrice { get; set; }
-    public DateTime OrderDateTime { get; set; }
     public string? CodeDiscount { get; set; }
     public int? VoucherId { get; set; }
     public string UserName { get; set; } = string.Empty;
     public int UserId { get; set; }
     public EnOrderStatus OrderStatus { get; set; }
-    public bool IsDeleted { get; set; } = false;
+    public bool IsCompleted { get; set; } = false;
 
-    public List<OrderTable> OrderItems { get; set; } = new List<OrderTable>();
+    public int ServiceOrderID { get; set; }
+
+    public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }

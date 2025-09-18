@@ -16,5 +16,5 @@ public class Payment
     public User User { get; set; }
 
     [ForeignKey("OrderID")]
-    public OrderTable Order { get; set; } = new OrderTable();
+    public OrderTable Order { get; set; }
 }

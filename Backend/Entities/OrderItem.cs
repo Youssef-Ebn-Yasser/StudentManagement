@@ -12,8 +12,8 @@ public class OrderItem
     public double? DiscountAmount { get; set; }
 
     [ForeignKey("OrderId")]
-    public OrderTable Order { get; set; } = new OrderTable();
+    public OrderTable Order { get; set; }
 
     [ForeignKey("CourseId")]
-    public Course Course { get; set; } = new Course();
+    public Course Course { get; set; }
 }

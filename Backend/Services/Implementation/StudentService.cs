@@ -328,6 +328,16 @@ public class StudentService : ResponseHandler, IStudentService
 
         return Success(studentCourses);
     }
+
+
+    private async Task<bool> _isExistById(int id)
+    {
+        var exist = await _unitOfWork.Repository<User>()
+                                           .GetTableNoTracking()
+                                           .AnyAsync(s => s.Id == id && s.IsDeleted == false);
+
+        return exist;
+    }
     public async Task<Response<string>> EnrollToCourse(StudentEnrollDto studentEnrollDto)
     {
         // check this student is exist 
@@ -336,10 +346,6 @@ public class StudentService : ResponseHandler, IStudentService
         // this course is exist
         if (!await _isCourseExistById(studentEnrollDto.CourseId))
             return BadRequest<string>($"this Course with this id : {studentEnrollDto.CourseId} not exist");
-
-        // check if in payment table  
-        //var isPaid = await IsEnrolledInCourse(studentEnrollDto);
-        // if (!isPaid.Succeeded) return BadRequest<string>("Student Should Pay First");
 
         var isEnroll = await IsEnrolledInCourse(studentEnrollDto);
 
@@ -505,14 +511,7 @@ public class StudentService : ResponseHandler, IStudentService
 
         return exist;
     }
-    private async Task<bool> _isExistById(int id)
-    {
-        var exist = await _unitOfWork.Repository<Student>()
-                                           .GetTableNoTracking()
-                                           .AnyAsync(s => s.Id == id && s.IsDeleted == false);
 
-        return exist;
-    }
     private async Task<bool> _isEmailExist(string email)
     {
         var exist = await _unitOfWork.Repository<Student>()

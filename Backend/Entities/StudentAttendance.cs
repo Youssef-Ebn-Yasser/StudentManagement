@@ -8,7 +8,7 @@
         public StudentStatusType Status { get; set; }
         public string? Note { get; set; }
         public DateTime Date { get; set; }
-
+        [ForeignKey("StudentId")]
         public Student Student { get; set; }
         public Meeting Meeting { get; set; }
     }
