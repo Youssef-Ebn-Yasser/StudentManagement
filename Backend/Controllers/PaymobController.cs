@@ -46,6 +46,20 @@ public class PaymobController : AppControllerBase
             return BadRequest(new { error = ex.Message });
         }
     }
+    [HttpPost("test")]
+
+    public async Task<IActionResult> getAll()
+    {
+        try
+        {
+            var result = await _context.SystemLogs.ToListAsync();
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
 
     [HttpPost("weebHook")]
     public async Task<IActionResult> Webhook()

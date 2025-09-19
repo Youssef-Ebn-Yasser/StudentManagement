@@ -47,6 +47,8 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Backend.Entities.OrderTable> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<SystemLog> SystemLogs { get; set; }
+
 
 
 
@@ -81,6 +83,11 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
         modelBuilder.Entity<IdentityUserToken<int>>().ToTable("UserTokens");
 
         modelBuilder.ConfigureVoucher();
+
+
+
+
+
         #region chat 
         // Configure ChatRoom relationships
         modelBuilder.Entity<ChatRoom>()

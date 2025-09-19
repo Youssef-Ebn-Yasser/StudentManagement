@@ -36,7 +36,7 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("testTable");
+                    b.ToTable("testTable", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.Category", b =>
@@ -60,7 +60,7 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.ChatEntities.ChatMessage", b =>
@@ -97,7 +97,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("ChatMessages");
+                    b.ToTable("ChatMessages", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.ChatEntities.ChatRoom", b =>
@@ -127,7 +127,7 @@ namespace Backend.Migrations
                     b.HasIndex("TeacherId", "StudentId")
                         .IsUnique();
 
-                    b.ToTable("ChatRooms");
+                    b.ToTable("ChatRooms", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.Comment", b =>
@@ -174,7 +174,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Comment");
+                    b.ToTable("Comment", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.Course", b =>
@@ -243,7 +243,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("TecherId");
 
-                    b.ToTable("Courses");
+                    b.ToTable("Courses", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.Lesson", b =>
@@ -282,7 +282,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Lessons");
+                    b.ToTable("Lessons", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.ManualPayment", b =>
@@ -322,7 +322,7 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ManualPayments");
+                    b.ToTable("ManualPayments", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.Material", b =>
@@ -365,7 +365,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("Materials");
+                    b.ToTable("Materials", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.Meetings.Meeting", b =>
@@ -429,7 +429,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("CourseID");
 
-                    b.ToTable("Meetings");
+                    b.ToTable("Meetings", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.Meetings.MeetingAttendance", b =>
@@ -472,7 +472,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("MeetingAttendances");
+                    b.ToTable("MeetingAttendances", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.Meetings.ZoomParticipant", b =>
@@ -511,7 +511,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("MeetingId1");
 
-                    b.ToTable("ZoomParticipants");
+                    b.ToTable("ZoomParticipants", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.Message", b =>
@@ -556,7 +556,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Message");
+                    b.ToTable("Message", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.OrderItem", b =>
@@ -595,7 +595,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderItems");
+                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.OrderTable", b =>
@@ -645,7 +645,7 @@ namespace Backend.Migrations
 
                     b.HasKey("OrderTableId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.Payment", b =>
@@ -696,7 +696,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.PaymentSettings", b =>
@@ -713,7 +713,7 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentSettings");
+                    b.ToTable("PaymentSettings", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.QuizeEntities.Question", b =>
@@ -761,7 +761,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("QuizId");
 
-                    b.ToTable("Questions");
+                    b.ToTable("Questions", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.QuizeEntities.QuestionOption", b =>
@@ -786,7 +786,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("QuestionOptions");
+                    b.ToTable("QuestionOptions", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.QuizeEntities.Quiz", b =>
@@ -837,7 +837,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("Quizzes");
+                    b.ToTable("Quizzes", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.QuizeEntities.StudentQuestionAnswer", b =>
@@ -866,7 +866,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("studentQuizeAnswerId");
 
-                    b.ToTable("StudentQuestionAnswers");
+                    b.ToTable("StudentQuestionAnswers", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.QuizeEntities.StudentQuestionOption", b =>
@@ -892,7 +892,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("StudentQuestionAnswerId");
 
-                    b.ToTable("StudentQuestionOptions");
+                    b.ToTable("StudentQuestionOptions", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.QuizeEntities.StudentQuizeAnswer", b =>
@@ -924,7 +924,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("studentQuizeAnswers");
+                    b.ToTable("studentQuizeAnswers", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.RefreshToken", b =>
@@ -958,7 +958,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.Slider", b =>
@@ -987,7 +987,7 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sliders");
+                    b.ToTable("Sliders", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.StudentAssignment", b =>
@@ -1029,7 +1029,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StudentAssignments");
+                    b.ToTable("StudentAssignments", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.StudentAttendance", b =>
@@ -1065,7 +1065,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StudentAttendances");
+                    b.ToTable("StudentAttendances", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.StudentCourse", b =>
@@ -1094,7 +1094,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("studentCourses");
+                    b.ToTable("studentCourses", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.User", b =>
@@ -1233,7 +1233,7 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("VedioesDetails");
+                    b.ToTable("VedioesDetails", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Entities.Voucher", b =>
@@ -1291,7 +1291,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("isUsedById");
 
-                    b.ToTable("vouchers");
+                    b.ToTable("vouchers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1453,7 +1453,7 @@ namespace Backend.Migrations
                     b.Property<string>("NationalId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("AspNetUsers", t =>
+                    b.ToTable("AspNetUsers", null, t =>
                         {
                             t.Property("NationalId")
                                 .HasColumnName("Admin_NationalId");
@@ -1491,7 +1491,7 @@ namespace Backend.Migrations
                     b.Property<long>("RandomCode")
                         .HasColumnType("bigint");
 
-                    b.ToTable("AspNetUsers", t =>
+                    b.ToTable("AspNetUsers", null, t =>
                         {
                             t.Property("Phone")
                                 .HasColumnName("Student_Phone");
