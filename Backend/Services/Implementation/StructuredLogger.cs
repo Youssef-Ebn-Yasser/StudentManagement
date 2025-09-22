@@ -8,18 +8,20 @@ public class StructuredLogger : IStructuredLogger
     #region    Fields
     private readonly Serilog.ILogger _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IUnitOfWork _unitOfWork;
     #endregion
 
     #region     Constructor
-    public StructuredLogger(IHttpContextAccessor httpContextAccessor)
+    public StructuredLogger(IHttpContextAccessor httpContextAccessor, IUnitOfWork unitOfWork)
     {
         _logger = Log.Logger;
         _httpContextAccessor = httpContextAccessor;
+        _unitOfWork = unitOfWork;
     }
     #endregion
 
     #region    Methods
-    public void LogInfo(string message, EnLevel level = EnLevel.Information, EnLogType logType = EnLogType.Normal)
+    public async Task LogInfo(string message, string email = "", EnLevel level = EnLevel.Information, EnLogType logType = EnLogType.Normal)
     {
         var user = _httpContextAccessor.HttpContext?.User;
 
@@ -30,6 +32,18 @@ public class StructuredLogger : IStructuredLogger
         var userRole = user?.FindFirst(ClaimTypes.Role)?.Value ?? "Unknown";
 
 
+        if (userRole == "Unknown")
+        {
+            var role = await _unitOfWork.Repository<User>()
+                                               .GetTableNoTracking()
+                                               .Where(u => u.Email == email)
+                                               .Select(u => u.UserType)
+                                               .FirstOrDefaultAsync();
+
+            if (role != null)
+                userRole = role;
+        }
+
 
         switch (level)
         {
@@ -38,6 +52,7 @@ public class StructuredLogger : IStructuredLogger
                     .ForContext("UserName", userName)
                     .ForContext("UserRole", userRole)
                     .ForContext("LogType", (int)logType)
+                    .ForContext("Email", email)
                     .Information(message);
                 break;
 

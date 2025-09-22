@@ -160,6 +160,8 @@ var columnOptions = new ColumnOptions
         new SqlColumn { ColumnName = "UserName", DataType = SqlDbType.NVarChar, DataLength = 100, AllowNull = true },
         new SqlColumn { ColumnName = "UserRole", DataType = SqlDbType.NVarChar, DataLength = 100, AllowNull = true },
         new SqlColumn { ColumnName = "LogType", DataType = SqlDbType.Int, AllowNull = true },
+        new SqlColumn { ColumnName = "Email", DataType = SqlDbType.NVarChar, DataLength = 100, AllowNull = true },
+
 
     }
 };

@@ -1,10 +1,8 @@
-using Backend.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
 public class CourseController : AppControllerBase
 {
     #region Fields

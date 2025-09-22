@@ -9,7 +9,7 @@ public class StatisticUsersLogin
     public int TotalUniqueUsersToday { get; set; }
     public int TotalUniqueUsersLastWeek { get; set; }
     public int TotalUniqueUsersLastMonth { get; set; }
-    public RolePercentageDto? PercentageByRoleTotal { get; set; }
+    public RolePercentageDto? PercentageByRoleLastMonth { get; set; }
     public RolePercentageDto? PercentageByRoleLastDay { get; set; }
     public RolePercentageDto? PercentageByRoleLastWeek { get; set; }
 }

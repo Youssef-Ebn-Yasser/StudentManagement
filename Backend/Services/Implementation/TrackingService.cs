@@ -1,6 +1,4 @@
-﻿using Backend.Models.Enums.Users;
-
-namespace Backend.Services.Implementation;
+﻿namespace Backend.Services.Implementation;
 
 public class TrackingService : ResponseHandler, ITrackingService
 {
@@ -8,6 +6,9 @@ public class TrackingService : ResponseHandler, ITrackingService
     private readonly IUnitOfWork _unitOfWork;
     private readonly ApplicationDbContext _context;
     private DateTime _lastDay = DateTime.Now.AddDays(-1);
+    private DateTime _lastWeek = DateTime.Now.AddDays(-7);
+    private DateTime _lastMonth = DateTime.Now.AddDays(-30);
+
 
     #endregion
 
@@ -32,27 +33,30 @@ public class TrackingService : ResponseHandler, ITrackingService
         var dateLastWeek = DateTime.Now.AddDays(-7);
         var dateLastMonth = DateTime.Now.AddDays(-30);
 
+        var totalUniqUserToday = result.Where(l => l.Timestamp >= dateLast24h).DistinctBy(u => u.UserName).Count();
+        var totalUniqueUsersLastWeek = result.Where(l => l.Timestamp >= dateLastWeek).DistinctBy(u => u.UserName).Count();
+        var totalUniqueUsersLastMonth = result.Where(l => l.Timestamp >= dateLastMonth).DistinctBy(u => u.UserName).Count();
 
-        var totalUniqUserToday = result.Where(l => l.Timestamp >= dateLast24h).DistinctBy(l => l.UserName).Count();
-        var totalUniqueUsersLastWeek = result.Where(l => l.Timestamp >= dateLastWeek).DistinctBy(l => l.UserName).Count();
-        var totalUniqueUsersLastMonth = result.Where(l => l.Timestamp >= dateLastMonth).DistinctBy(l => l.UserName).Count();
+        var totalUserToday = result.Where(l => l.Timestamp >= dateLast24h).Count();
+        var totalUsersLastWeek = result.Where(l => l.Timestamp >= dateLastWeek).Count();
+        var totalUsersLastMonth = result.Where(l => l.Timestamp >= dateLastMonth).Count();
 
-        var totalUniqueAdminToday = result.Where(l => l.Timestamp >= dateLast24h && l.UserRole == "Admin").DistinctBy(l => l.UserName).Count();
-        var totalUniqueStudentToday = result.Where(l => l.Timestamp >= dateLast24h && l.UserRole == "Student").DistinctBy(l => l.UserName).Count();
-        var totalUniqueTeacherToday = result.Where(l => l.Timestamp >= dateLast24h && l.UserRole == "Teacher").DistinctBy(l => l.UserName).Count();
-        var totalUniqueUnkownToday = result.Where(l => l.Timestamp >= dateLast24h && l.UserRole == "UnKnown").DistinctBy(l => l.UserName).Count();
-
-
-        var totalUniqueAdminLastWeek = result.Where(l => l.Timestamp >= dateLastWeek && l.UserRole == "Admin").DistinctBy(l => l.UserName).Count();
-        var totalUniqueStudentLastWeek = result.Where(l => l.Timestamp >= dateLastWeek && l.UserRole == "Student").DistinctBy(l => l.UserName).Count();
-        var totalUniqueTeacherLastWeek = result.Where(l => l.Timestamp >= dateLastWeek && l.UserRole == "Teacher").DistinctBy(l => l.UserName).Count();
-        var totalUniqueUnkownLastWeek = result.Where(l => l.Timestamp >= dateLastWeek && l.UserRole == "UnKnown").DistinctBy(l => l.UserName).Count();
+        var totalAdminToday = result.Where(l => l.Timestamp >= dateLast24h && l.UserRole == "Admin").Count();
+        var totalStudentToday = result.Where(l => l.Timestamp >= dateLast24h && l.UserRole == "Student").Count();
+        var totalTeacherToday = result.Where(l => l.Timestamp >= dateLast24h && l.UserRole == "Teacher").Count();
+        var totalUnkownToday = result.Where(l => l.Timestamp >= dateLast24h && l.UserRole == "Unknown").Count();
 
 
-        var totalUniqueAdminLastMonth = result.Where(l => l.Timestamp >= dateLastMonth && l.UserRole == "Admin").DistinctBy(l => l.UserName).Count();
-        var totalUniqueStudentLastMonth = result.Where(l => l.Timestamp >= dateLastMonth && l.UserRole == "Student").DistinctBy(l => l.UserName).Count();
-        var totalUniqueTeacherLastMonth = result.Where(l => l.Timestamp >= dateLastMonth && l.UserRole == "Teacher").DistinctBy(l => l.UserName).Count();
-        var totalUniqueUnkownLastMonth = result.Where(l => l.Timestamp >= dateLastMonth && l.UserRole == "UnKnown").DistinctBy(l => l.UserName).Count();
+        var totalAdminLastWeek = result.Where(l => l.Timestamp >= dateLastWeek && l.UserRole == "Admin").Count();
+        var totalStudentLastWeek = result.Where(l => l.Timestamp >= dateLastWeek && l.UserRole == "Student").Count();
+        var totalTeacherLastWeek = result.Where(l => l.Timestamp >= dateLastWeek && l.UserRole == "Teacher").Count();
+        var totalUnkownLastWeek = result.Where(l => l.Timestamp >= dateLastWeek && l.UserRole == "Unknown").Count();
+
+
+        var totalAdminLastMonth = result.Where(l => l.Timestamp >= dateLastMonth && l.UserRole == "Admin").Count();
+        var totalStudentLastMonth = result.Where(l => l.Timestamp >= dateLastMonth && l.UserRole == "Student").Count();
+        var totalTeacherLastMonth = result.Where(l => l.Timestamp >= dateLastMonth && l.UserRole == "Teacher").Count();
+        var totalUnkownLastMonth = result.Where(l => l.Timestamp >= dateLastMonth && l.UserRole == "Unknown").Count();
 
 
         var dto = new StatisticUsersLogin()
@@ -68,27 +72,28 @@ public class TrackingService : ResponseHandler, ITrackingService
             TotalUniqueUsersLastMonth = totalUniqueUsersLastMonth,
 
 
+
             PercentageByRoleLastDay = new RolePercentageDto
             {
-                Admins = totalUniqueAdminToday / totalUniqUserToday,
-                Students = totalUniqueStudentToday / totalUniqUserToday,
-                Teachers = totalUniqueTeacherToday / totalUniqUserToday,
-                Unknown = totalUniqueUnkownToday / totalUniqUserToday,
+                Admins = (double)totalAdminToday / (double)totalUserToday,
+                Students = (double)totalStudentToday / (double)totalUserToday,
+                Teachers = (double)totalTeacherToday / (double)totalUserToday,
+                Unknown = (double)totalUnkownToday / (double)totalUserToday,
             },
 
             PercentageByRoleLastWeek = new RolePercentageDto
             {
-                Admins = totalUniqueAdminLastWeek / totalUniqueUsersLastWeek,
-                Students = totalUniqueStudentLastWeek / totalUniqueUsersLastWeek,
-                Teachers = totalUniqueTeacherLastWeek / totalUniqueUsersLastWeek,
-                Unknown = totalUniqueUnkownLastWeek / totalUniqueUsersLastWeek,
+                Admins = (double)totalAdminLastWeek / (double)totalUsersLastWeek,
+                Students = (double)totalStudentLastWeek / (double)totalUsersLastWeek,
+                Teachers = (double)totalTeacherLastWeek / (double)totalUsersLastWeek,
+                Unknown = (double)totalUnkownLastWeek / (double)totalUsersLastWeek,
             },
-            PercentageByRoleTotal = new RolePercentageDto
+            PercentageByRoleLastMonth = new RolePercentageDto
             {
-                Admins = totalUniqueAdminLastMonth / totalUniqueUsersLastMonth,
-                Students = totalUniqueStudentLastMonth / totalUniqueUsersLastMonth,
-                Teachers = totalUniqueTeacherLastMonth / totalUniqueUsersLastMonth,
-                Unknown = totalUniqueUnkownLastMonth / totalUniqueUsersLastMonth,
+                Admins = (double)totalAdminLastMonth / (double)totalUsersLastMonth,
+                Students = (double)totalStudentLastMonth / (double)totalUsersLastMonth,
+                Teachers = (double)totalTeacherLastMonth / (double)totalUsersLastMonth,
+                Unknown = (double)totalUnkownLastMonth / (double)totalUsersLastMonth,
             },
         };
 
@@ -96,15 +101,12 @@ public class TrackingService : ResponseHandler, ITrackingService
         return Success(dto);
     }
 
-    //,DateTime? StartDate,DateTime? EndDate
-
-
-    private async Task<PaginateResult<TrackUsersLoginDto>> GetUserPaginatedBasedOnRole(int pageNumber, int pageSize, string role)
+    private async Task<PaginateResult<TrackUsersLoginDto>> GetUserPaginatedBasedOnRole(int pageNumber, int pageSize, string role, DateTime lastDateType)
     {
 
         var users = await _unitOfWork.Repository<SystemLog>()
                                       .GetTableNoTracking()
-                                      .Where(sl => sl.Timestamp >= _lastDay && sl.UserRole == role)
+                                      .Where(sl => sl.Timestamp >= lastDateType && sl.UserRole == role && sl.LogType == EnLogType.Logs)
                                       .Select(l => new TrackUsersLoginDto
                                       {
                                           Message = l.Message,
@@ -117,30 +119,46 @@ public class TrackingService : ResponseHandler, ITrackingService
         return users;
     }
 
-    public async Task<Response<PaginateResult<TrackUsersLoginDto>>> AllUsersLoginLastDay(int pageNumber, int pageSize, EnUsersType? usersType)
+    public async Task<Response<PaginateResult<TrackUsersLoginDto>>> AllUsersLoginLastPeriod(int pageNumber, int pageSize,
+                                                                    EnUsersType? usersType, EnLastDateType lastDateType)
     {
+        DateTime last = DateTime.Now;
+        switch (lastDateType)
+        {
+            case EnLastDateType.day:
+                last = _lastDay;
+                break;
+            case EnLastDateType.week:
+                last = _lastWeek;
+                break;
+            case EnLastDateType.month:
+                last = _lastMonth;
+                break;
+        }
+
+
         PaginateResult<TrackUsersLoginDto>? users = null;
         if (usersType == EnUsersType.Student)
         {
-            users = await GetUserPaginatedBasedOnRole(pageNumber, pageSize, "Student");
+            users = await GetUserPaginatedBasedOnRole(pageNumber, pageSize, "Student", last);
         }
         else if (usersType == EnUsersType.Teacher)
         {
-            users = await GetUserPaginatedBasedOnRole(pageNumber, pageSize, "Teacher");
+            users = await GetUserPaginatedBasedOnRole(pageNumber, pageSize, "Teacher", last);
         }
         else if (usersType == EnUsersType.Admin)
         {
-            users = await GetUserPaginatedBasedOnRole(pageNumber, pageSize, "Admin");
+            users = await GetUserPaginatedBasedOnRole(pageNumber, pageSize, "Admin", last);
         }
         else if (usersType == EnUsersType.UnKown)
         {
-            users = await GetUserPaginatedBasedOnRole(pageNumber, pageSize, "Unkown");
+            users = await GetUserPaginatedBasedOnRole(pageNumber, pageSize, "Unknown", last);
         }
         else
         {
             users = await _unitOfWork.Repository<SystemLog>()
                                     .GetTableNoTracking()
-                                    .Where(sl => sl.Timestamp >= _lastDay)
+                                    .Where(sl => sl.Timestamp >= last && sl.LogType == EnLogType.Logs)
                                     .Select(l => new TrackUsersLoginDto
                                     {
                                         Message = l.Message,
@@ -160,14 +178,82 @@ public class TrackingService : ResponseHandler, ITrackingService
         return Success(users);
     }
 
+    private async Task<PaginateResult<TrackUsersLoginDto>> GetUserPaginatedBetweenBasedOnRole(int pageNumber, int pageSize, string role,
+                                                                                                DateTime startDate, DateTime endDate)
+    {
 
+        var users = await _unitOfWork.Repository<SystemLog>()
+                                      .GetTableNoTracking()
+                                      .Where(sl => sl.Timestamp >= startDate && sl.Timestamp <= endDate && sl.UserRole == role && sl.LogType == EnLogType.Logs)
+                                      .Select(l => new TrackUsersLoginDto
+                                      {
+                                          Message = l.Message,
+                                          Role = l.UserRole,
+                                          Time = l.Timestamp,
+                                          Email = l.Email,
+                                      }).OrderByDescending(l => l.Time)
+                                      .ToPaginatedListAsync(pageNumber, pageSize);
+
+        return users;
+    }
+    public async Task<Response<PaginateResult<TrackUsersLoginDto>>> AllUsersLoginBetween(int pageNumber, int pageSize,
+                                                                    EnUsersType? usersType, DateTime startDate, DateTime endDate)
+    {
+        PaginateResult<TrackUsersLoginDto>? users = null;
+        if (usersType == EnUsersType.Student)
+        {
+            users = await GetUserPaginatedBetweenBasedOnRole(pageNumber, pageSize, "Student", startDate, endDate);
+        }
+        else if (usersType == EnUsersType.Teacher)
+        {
+            users = await GetUserPaginatedBetweenBasedOnRole(pageNumber, pageSize, "Teacher", startDate, endDate);
+        }
+        else if (usersType == EnUsersType.Admin)
+        {
+            users = await GetUserPaginatedBetweenBasedOnRole(pageNumber, pageSize, "Admin", startDate, endDate);
+        }
+        else if (usersType == EnUsersType.UnKown)
+        {
+            users = await GetUserPaginatedBetweenBasedOnRole(pageNumber, pageSize, "Unknown", startDate, endDate);
+        }
+        else
+        {
+            users = await _unitOfWork.Repository<SystemLog>()
+            .GetTableNoTracking()
+                                    .Where(sl => sl.Timestamp >= startDate && sl.Timestamp <= endDate && sl.LogType == EnLogType.Logs)
+                                    .Select(l => new TrackUsersLoginDto
+                                    {
+                                        Message = l.Message,
+                                        Role = l.UserRole,
+                                        Time = l.Timestamp,
+                                        Email = l.Email,
+                                    }).OrderByDescending(l => l.Time)
+                                    .ToPaginatedListAsync(pageNumber, pageSize);
+        }
+
+
+        if (users == null)
+        {
+            return BadRequest<PaginateResult<TrackUsersLoginDto>>("no data yet");
+        }
+
+        return Success(users);
+
+    }
     #endregion
 }
 
 public class TrackUsersLoginDto
 {
-    public string Email { get; set; }
-    public string Message { get; set; }
+    public string? Email { get; set; }
+    public string? Message { get; set; }
     public string? Role { get; set; }
-    public DateTime Time { get; set; }
+    public DateTime? Time { get; set; }
+}
+
+public enum EnLastDateType
+{
+    day = 1,
+    week = 2,
+    month = 3
 }
