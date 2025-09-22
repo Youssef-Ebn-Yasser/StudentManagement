@@ -2,7 +2,7 @@
 
 [Route("api/video")]
 [ApiController]
-public class HlsVideoController : ControllerBase
+public class HlsVideoController : AppControllerBase
 {
     #region   Fields
     private readonly string _hlsRoot;
@@ -25,6 +25,64 @@ public class HlsVideoController : ControllerBase
     #endregion
 
     #region  Methods
+    [HttpGet("All")]
+    public async Task<IActionResult> GetAllVedios()
+    {
+        try
+        {
+            var result = await _vedioUpload.GetAllVedios();
+
+            return NewResult(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetVedioById(int id)
+    {
+        try
+        {
+            var result = await _vedioUpload.GetVedioDetails(id);
+
+            return NewResult(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateVedio(int id, EnVedioPermision Permision)
+    {
+        try
+        {
+            var result = await _vedioUpload.UpdateVedioPermision(id, Permision);
+
+            return NewResult(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteVedio(int id)
+    {
+        try
+        {
+            var result = await _vedioUpload.DeleteVedio(id);
+
+            return NewResult(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpPost("upload")]
     [RequestSizeLimit(1_000_000_000)] // 1 GB max
     public async Task<IActionResult> Upload(IFormFile file, EnVedioPermision vedioPermision, EnVedioFor VedioFor, int? relatedBy,

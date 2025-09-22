@@ -1,7 +1,4 @@
-﻿using Backend.DTOs.VedioDTOs;
-using System.Diagnostics;
-using System.Text.Json;
-namespace Backend.Helper;
+﻿namespace Backend.Helper;
 
 public class VedioUpload : ResponseHandler, IVedioUpload
 {
@@ -159,6 +156,110 @@ public class VedioUpload : ResponseHandler, IVedioUpload
         return (null, linksDto);
     }
 
+
+    public async Task<Response<List<GetVediosDto>>> GetAllVedios()
+    {
+        var result = await _context.VedioesDetails
+                               .AsNoTracking()
+                               .Where(v => !v.IsDeleted)
+                               .Select(v => new GetVediosDto
+                               {
+                                   Id = v.Id,
+                                   EnableDownloadedUrl = v.EnableDownloadedUrl,
+                                   VedioPermision = v.VedioPermision,
+                                   CreatedAt = v.CreatedAt,
+                                   VedioFor = v.VedioFor,
+                                   VedioUploadedBy = v.VedioUploadedBy,
+                               }).ToListAsync();
+
+        if (result.Count < 0)
+        {
+            BadRequest<List<GetVediosDto>>("there is no vedios");
+        }
+
+        return Success(result);
+    }
+
+    public async Task<Response<GetVedioDetailsDto>> GetVedioDetails(int id)
+    {
+        var result = await _context.VedioesDetails
+                                         .AsNoTracking()
+                                         .Where(v => v.Id == id && !v.IsDeleted)
+                                         .Select(v => new GetVedioDetailsDto
+                                         {
+                                             Id = v.Id,
+                                             EnableDownloadedUrl = v.EnableDownloadedUrl,
+                                             VedioPermision = v.VedioPermision,
+                                             CreatedAt = v.CreatedAt,
+                                             VedioFor = v.VedioFor,
+                                             VedioUploadedBy = v.VedioUploadedBy,
+                                             RelatedById = v.RelatedById,
+                                             UploadedById = v.UploadedById,
+                                         }).FirstOrDefaultAsync();
+
+        if (result == null)
+        {
+            return BadRequest<GetVedioDetailsDto>("this vedio not exist");
+        }
+
+        var uploadedName = await _context.Users.Where(u => u.Id == result.UploadedById).Select(u => u.NameEn).FirstOrDefaultAsync();
+        result.UploadedByName = uploadedName ?? "user not exist now";
+
+
+        string? relatedByName = string.Empty;
+        switch (result.VedioFor)
+        {
+            case EnVedioFor.Course:
+                relatedByName = await _context.Courses.AsNoTracking().Where(c => c.Id == result.RelatedById && c.IsDeleted == false).Select(c => c.TitleEn).FirstOrDefaultAsync();
+                break;
+            case EnVedioFor.Lession:
+                relatedByName = await _context.Lessons.AsNoTracking().Where(l => l.Id == result.RelatedById && !l.IsDeleted).Select(l => l.TitleEn).FirstOrDefaultAsync();
+                break;
+            case EnVedioFor.TeacherProfile:
+                relatedByName = await _context.Courses.AsNoTracking().Where(t => t.Id == result.RelatedById && t.IsDeleted == false).Select(t => t.TitleEn).FirstOrDefaultAsync();
+                break;
+            case EnVedioFor.StudentProfile:
+                relatedByName = await _context.Courses.AsNoTracking().Where(s => s.Id == result.RelatedById && s.IsDeleted == false).Select(s => s.TitleEn).FirstOrDefaultAsync();
+                break;
+        }
+
+
+        result.RelatedByName = relatedByName ?? "was deleted";
+
+        return Success(result);
+
+    }
+
+    public async Task<Response<string>> DeleteVedio(int id)
+    {
+        var vedio = await _context.VedioesDetails.FirstOrDefaultAsync(v => v.Id == id && v.IsDeleted == false);
+
+        if (vedio == null)
+        {
+            return BadRequest<string>("this vedio not exist");
+        }
+
+        vedio.IsDeleted = true;
+
+        await _context.SaveChangesAsync();
+
+        return Success("Deleted Successfully");
+    }
+    public async Task<Response<string>> UpdateVedioPermision(int id, EnVedioPermision Permision)
+    {
+        var vedio = await _context.VedioesDetails.FirstOrDefaultAsync(v => v.Id == id && v.IsDeleted == false);
+
+        if (vedio == null)
+        {
+            return BadRequest<string>("this vedio not exist");
+        }
+
+        vedio.VedioPermision = Permision;
+
+        await _context.SaveChangesAsync();
+
+        return Success("Updated Successfully");
+    }
     private string GenerateFolderName(string fileName)
     {
         var folderName = Path.GetFileNameWithoutExtension(fileName)
@@ -393,6 +494,23 @@ public class VedioUpload : ResponseHandler, IVedioUpload
     #endregion
 }
 
+public class GetVediosDto
+{
+    public int Id { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public string EnableDownloadedUrl { get; set; } = string.Empty;
+    public EnVedioPermision VedioPermision { get; set; }
+    public EnVedioUploadedBy VedioUploadedBy { get; set; }
+    public EnVedioFor? VedioFor { get; set; } = null;
+}
+
+public class GetVedioDetailsDto() : GetVediosDto
+{
+    public string RelatedByName { get; set; } = string.Empty;
+    public string? UploadedByName { get; set; } = string.Empty;
+    public int? RelatedById { get; set; }
+    public int UploadedById { get; set; }
+}
 
 
 // steps

@@ -14,4 +14,5 @@ public class VedioesDetails
     public int UploadedById { get; set; }
     public EnVedioUploadedBy VedioUploadedBy { get; set; }
     public EnVedioFor? VedioFor { get; set; } = null;
+    public bool IsDeleted { get; set; }
 }

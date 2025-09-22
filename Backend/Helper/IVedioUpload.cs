@@ -1,6 +1,4 @@
-﻿using Backend.DTOs.VedioDTOs;
-
-namespace Backend.Helper;
+﻿namespace Backend.Helper;
 
 public interface IVedioUpload
 {
@@ -9,4 +7,8 @@ public interface IVedioUpload
     public Task<(string?, List<GetVedioLinksDto>?)> getLinks(EnVedioFor VedioFor, int? relatedBy);
 
     public Task<Response<List<CreateVedioDependencies>>> createVedioDependencies(EnVedioFor vedioFor);
+    public Task<Response<List<GetVediosDto>>> GetAllVedios();
+    public Task<Response<GetVedioDetailsDto>> GetVedioDetails(int id);
+    public Task<Response<string>> DeleteVedio(int id);
+    public Task<Response<string>> UpdateVedioPermision(int id, EnVedioPermision Permision);
 }
