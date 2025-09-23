@@ -42,6 +42,7 @@ public class CourseService : ResponseHandler, ICourseService
                 LoghappenIn = EnLogHappenIn.Course,
                 Message = "try get All Courses and No Courses found",
                 LogsIn = "Courses",
+                Level = EnLevel.Warnning,
             });
             BadRequest<List<ShowAllCoursesDto>>("Courses is null");
         }
@@ -102,6 +103,7 @@ public class CourseService : ResponseHandler, ICourseService
                 LoghappenIn = EnLogHappenIn.Course,
                 Message = "try get All Courses by category and No Courses found",
                 LogsIn = "Courses",
+                Level = EnLevel.Warnning,
             });
 
             BadRequest<List<ShowAllCoursesDto>>("Courses is null in this category");
@@ -126,6 +128,7 @@ public class CourseService : ResponseHandler, ICourseService
                 LoghappenIn = EnLogHappenIn.Course,
                 Message = $"try get All Courses for teacher and No Courses found for this teacher with id {teacherId}",
                 LogsIn = "Courses",
+                Level = EnLevel.Warnning,
             });
 
             return NotFound<List<ShowCourseDto>>("Course not found");
@@ -153,6 +156,7 @@ public class CourseService : ResponseHandler, ICourseService
                 LoghappenIn = EnLogHappenIn.Course,
                 Message = $"No Course with this id => {id} in GetCourseByIdAsync",
                 LogsIn = "Courses",
+                Level = EnLevel.Warnning,
             });
 
             return NotFound<ShowCourseDto>("Course not found");
@@ -192,6 +196,7 @@ public class CourseService : ResponseHandler, ICourseService
                 LoghappenIn = EnLogHappenIn.Course,
                 Message = $"No Courses in GetPaginatedCourse in this page",
                 LogsIn = "Course",
+                Level = EnLevel.Warnning,
             });
 
             return NotFound<PaginateResult<HomeCourses>>("Course not found");
@@ -311,6 +316,7 @@ public class CourseService : ResponseHandler, ICourseService
                 {
                     LoghappenIn = EnLogHappenIn.Course,
                     Message = $"Can not upload physical image course with title {createCourseDto.Title}",
+                    Level = EnLevel.Warnning,
                     LogsIn = "Courses",
                 });
 
@@ -346,6 +352,7 @@ public class CourseService : ResponseHandler, ICourseService
         {
             LoghappenIn = EnLogHappenIn.Course,
             Message = $"faild add course with name {createCourseDto.Title}",
+            Level = EnLevel.Warnning,
             LogsIn = "Courses",
         });
 
@@ -383,6 +390,7 @@ public class CourseService : ResponseHandler, ICourseService
                 {
                     LoghappenIn = EnLogHappenIn.Course,
                     Message = $"faild upload physical image in update with course id {updateCourseDto.Id}",
+                    Level = EnLevel.Warnning,
                     LogsIn = "Courses",
                     HappenInId = course.Id,
                 });
@@ -433,6 +441,7 @@ public class CourseService : ResponseHandler, ICourseService
                 LoghappenIn = EnLogHappenIn.Course,
                 Message = $"try to delete this course with id {id} but can not because he have lessions",
                 LogsIn = "Courses",
+                Level = EnLevel.Warnning,
                 HappenInId = id,
             });
 
@@ -495,6 +504,7 @@ public class CourseService : ResponseHandler, ICourseService
             {
                 LoghappenIn = EnLogHappenIn.Course,
                 Message = $"no student with courses",
+                Level = EnLevel.Warnning,
                 LogsIn = "Courses",
             });
             return NotFound<List<ShowStudentAndCourse>>("No students and courses found");

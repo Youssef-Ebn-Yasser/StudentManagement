@@ -1,7 +1,3 @@
-using Backend.DTOs.AuthDTOs;
-using Microsoft.AspNetCore.WebUtilities;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Cryptography;
 namespace Backend.Services.Implementation;
 
 public class AuthenticationService : IAuthenticationService
@@ -304,7 +300,7 @@ public class AuthenticationService : IAuthenticationService
         var claims = new List<Claim>()
         {
             new Claim(ClaimTypes.Name,user.UserName!),
-            new Claim(ClaimTypes.NameIdentifier,user.UserName!),
+            new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()!),
             new Claim(ClaimTypes.Email,user.Email!),
         };
         foreach (var role in roles)

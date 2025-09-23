@@ -1,7 +1,4 @@
-﻿using Backend.DTOs.CategoryDTOOS;
-using Microsoft.Extensions.Localization;
-
-namespace Backend.Services.Implementation;
+﻿namespace Backend.Services.Implementation;
 
 public class CategoryService : ResponseHandler, ICategoryService
 {
@@ -39,7 +36,14 @@ public class CategoryService : ResponseHandler, ICategoryService
 
         if (allCategories == null)
         {
-            _logger.LogInfo("No Category Exist");
+            await _logger.LogInfo(new LogInfoData()
+            {
+                LoghappenIn = EnLogHappenIn.category,
+                Message = $"no category to return",
+                Level = EnLevel.Warnning,
+                LogsIn = "Category",
+            });
+
             return BadRequest<List<CategoryDto>>("No Category Found");
         }
         var lang = cultureInfo.TwoLetterISOLanguageName.ToLower();
@@ -48,13 +52,19 @@ public class CategoryService : ResponseHandler, ICategoryService
 
         return Success(mapped);
     }
-
     public async Task<Response<CategoryDto>> GetByIdAsync(int id)
     {
         var category = await _unitOfWork.Repository<Category>().GetByIdAsync(id);
         if (category == null || category.IsDeleted)
         {
-            _logger.LogInfo($"No Category with this Id = {id} found");
+            await _logger.LogInfo(new LogInfoData()
+            {
+                LoghappenIn = EnLogHappenIn.category,
+                Message = $"No Category with this Id = {id} found",
+                Level = EnLevel.Warnning,
+                LogsIn = "Category",
+            });
+
             return NotFound<CategoryDto>("Category not found");
         }
 
@@ -71,44 +81,118 @@ public class CategoryService : ResponseHandler, ICategoryService
         var mapped = _mapper.Map<CategoryDto>(category);
         return Success(mapped);
     }
+    public async Task Translate(string title, int categoryId, string language)
+    {
+        var category = _unitOfWork.Repository<Category>().GetTableAsTracking().FirstOrDefault(c => c.Id == categoryId);
+
+        if (category == null) return;
+
+        await _logger.LogInfo(new LogInfoData()
+        {
+            LoghappenIn = EnLogHappenIn.category,
+            Message = $"Start hangfire service to translate Category with id {categoryId} and name {title}",
+            LogsIn = "Category",
+            HappenInId = categoryId,
+        });
+
+        if (language == "en")
+        {
+            title = await _translator.TranslateObjectAsync<string>(title, "English", "Arabic") ?? "can not translate";
+
+            category.CategoryNameAr = title;
+        }
+        else
+        {
+            title = await _translator.TranslateObjectAsync<string>(title, "Arabic", "English") ?? "can not translate";
+
+            category.CategoryNameEn = title;
+
+        }
+        _unitOfWork.Repository<Category>().Update(category);
+        var result = _unitOfWork.Complete();
+
+        await _logger.LogInfo(new LogInfoData()
+        {
+            LoghappenIn = EnLogHappenIn.category,
+            Message = $"end hangfire service to translate Category with id {categoryId} and name {title} with status {result > 0}",
+            LogsIn = "Category",
+            HappenInId = categoryId,
+        });
+    }
     public async Task<Response<string>> CreateAsync(CreateCategoryDto dto)
     {
         var IsExistCategory = await _isNameExist(dto.Name);
         if (IsExistCategory)
         {
-            _logger.LogInfo("Error happen When Create a Category this Category Name Exist");
+            await _logger.LogInfo(new LogInfoData()
+            {
+                LoghappenIn = EnLogHappenIn.category,
+                Message = $"Error happen When Create a Category this Category Name Exist {dto.Name}",
+                LogsIn = "Category",
+                Level = EnLevel.Error,
+            });
+
             return BadRequest<string>("Student Name is already exist");
         }
 
         var category = _mapper.Map<Category>(dto);
 
-        //var category = new Category()
-        //{
-        //    CategoryNameEn = dto.Name,
-        //    IsDeleted = false
-        //};
 
         await _unitOfWork.Repository<Category>().AddAsync(category);
         var result = _unitOfWork.Complete();
 
         if (result < 0)
         {
-            _logger.LogInfo("Error happen When Create a Category can not save in database");
+            await _logger.LogInfo(new LogInfoData()
+            {
+                LoghappenIn = EnLogHappenIn.category,
+                Message = $"Error happen When Create a Category can not save in database",
+                LogsIn = "Category",
+                Level = EnLevel.Error,
+            });
+
             return BadRequest<string>("Error happen when try create");
         }
 
-        _logger.LogInfo("Create category done successfully");
+        BackgroundJob.Enqueue<ICategoryService>(x =>
+                        x.Translate(dto.Name, category.Id, cultureInfo.TwoLetterISOLanguageName.ToLower()));
+
+        await _logger.LogInfo(new LogInfoData()
+        {
+            LoghappenIn = EnLogHappenIn.category,
+            Message = $"Create category done successfully with id {category.Id}",
+            LogsIn = "Category",
+            HappenInId = category.Id,
+        });
+
         return Success("Category Created Successfully");
     }
     public async Task<Response<string>> UpdateAsync(int id, UpdateCategoryDto dto)
     {
         var category = await _unitOfWork.Repository<Category>().GetByIdAsync(id);
         if (category == null)
-            return NotFound<string>("Category not found");
+        {
+            await _logger.LogInfo(new LogInfoData()
+            {
+                LoghappenIn = EnLogHappenIn.category,
+                Message = $"Category not found to update with this id {id}",
+                LogsIn = "Category",
+                Level = EnLevel.Error,
+            });
 
+            return NotFound<string>("Category not found");
+        }
         _mapper.Map(dto, category);
         _unitOfWork.Repository<Category>().Update(category);
-        _unitOfWork.Complete();
+        var result = _unitOfWork.Complete();
+
+        await _logger.LogInfo(new LogInfoData()
+        {
+            LoghappenIn = EnLogHappenIn.category,
+            Message = $"Category updated with status {result > 0}",
+            LogsIn = "Category",
+            Level = EnLevel.Error,
+        });
 
         return Success("Category updated successfully");
     }

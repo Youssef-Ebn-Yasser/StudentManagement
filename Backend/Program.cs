@@ -1,3 +1,5 @@
+using QuestPDF.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -18,7 +20,7 @@ builder.Services.AddScoped<IPaymobService, PaymobService>();
 builder.Services.AddScoped<IReportServices, ReportServices>();
 builder.Services.AddTransient<IStructuredLogger, StructuredLogger>();
 
-
+QuestPDF.Settings.License = LicenseType.Community;
 
 #region Payment stripe
 

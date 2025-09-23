@@ -277,6 +277,37 @@ public class TrackingService : ResponseHandler, ITrackingService
 
         return Success(response);
     }
+
+    public async Task<Response<SystemLogDto>> GetLogsPerCourse(int courseId)
+    {
+
+
+        var logDetails = await _context.SystemLogs
+                                   .Where(s => s.LogHappenInId == courseId && s.LogHappenIn == EnLogHappenIn.Course)
+                                   .Select(s => new SystemLogDetailsDto
+                                   {
+                                       Email = s.Email,
+                                       Message = s.Message,
+                                       UserRole = s.UserRole,
+                                       Timestamp = s.Timestamp,
+                                       Level = s.Level,
+                                       LogType = s.LogType,
+                                       City = s.City,
+                                       IPAddress = s.IPAddress,
+                                   })
+                                   .OrderByDescending(s => s.Timestamp)
+                                   .ToListAsync();
+        var response = new SystemLogDto
+        {
+            SystemLogDetailsDtos = logDetails,
+            NumberOfTotalLogs = logDetails.Count,
+            NumberOfTotalLogsLastDay = logDetails.Where(l => l.Timestamp >= _lastDay).Count()
+        };
+
+        return Success(response);
+    }
+
+
     #endregion
 }
 

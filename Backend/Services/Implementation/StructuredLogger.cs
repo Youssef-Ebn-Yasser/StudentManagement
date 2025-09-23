@@ -25,15 +25,15 @@ public class StructuredLogger : IStructuredLogger
         public string? Message { get; set; } = string.Empty;
         public string? Email { get; set; } = string.Empty;
         public string? LogsIn { get; set; } = string.Empty;
-        public EnLevel? Level { get; set; }
-        public EnLogType? TypeLog { get; set; }
-        public EnLogHappenIn? LoghappenIn { get; set; }
+        public EnLevel? Level { get; set; } = EnLevel.Information;
+        public EnLogType? TypeLog { get; set; } = EnLogType.Normal;
+        public EnLogHappenIn? LoghappenIn { get; set; } = EnLogHappenIn.NotDetermine;
     }
 
     public async Task LogInfo(LogInfoData logInfoData)
     {
         await LogInfo(logInfoData.Message, logInfoData.Email, logInfoData.LogsIn,
-        logInfoData.Level, logInfoData.TypeLog, logInfoData.LoghappenIn, logInfoData.HappenInId);
+        logInfoData.Level, logInfoData.TypeLog = EnLogType.Normal, logInfoData.LoghappenIn, logInfoData.HappenInId);
     }
     public async Task LogInfo(string? message, string? email = "", string? logsIn = "",
     EnLevel? level = EnLevel.Information, EnLogType? logType = EnLogType.Normal, EnLogHappenIn? logHappenIn = EnLogHappenIn.NotDetermine, int? HappenInId = null)
@@ -43,15 +43,24 @@ public class StructuredLogger : IStructuredLogger
         var method = _httpContextAccessor.HttpContext?.Request?.Method ?? "Unknown";
         var info = await GetRegionFromIpAsync(ipAddress);
 
+
         var user = _httpContextAccessor.HttpContext?.User;
 
         var userName = user?.Identity?.IsAuthenticated == true
             ? user.Identity.Name
             : "Anonymous";
 
+
+        string mail = "";
+        string userId = "";
+        if (user != null)
+        {
+            mail = user.FindFirst(ClaimTypes.Email)?.Value;
+            userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        }
+
+
         var userRole = user?.FindFirst(ClaimTypes.Role)?.Value ?? "Unknown";
-
-
         if (userRole == "Unknown")
         {
             var role = await _unitOfWork.Repository<User>()
@@ -64,37 +73,50 @@ public class StructuredLogger : IStructuredLogger
                 userRole = role;
         }
 
+        email = mail;
 
-        var logContext = _logger
-    .ForContext("UserName", userName)
-    .ForContext("UserRole", userRole)
-    .ForContext("LogType", (int)logType)
-    .ForContext("Email", email)
-    .ForContext("IPAddress", ipAddress)
-    .ForContext("Path", path)
-    .ForContext("Method", method)
-    .ForContext("City", info.City)
-    .ForContext("Region", info.Region)
-    .ForContext("Country", info.Country)
-    .ForContext("Location", info.Loc)
-    .ForContext("Organization", info.Org)
-
-    .ForContext("Location", info.Loc)
-    .ForContext("Organization", info.Org);
-        switch (level)
+        try
         {
-            case EnLevel.Information:
-                logContext.Information(message);
-                break;
 
-            case EnLevel.Error:
-                logContext.Error(message);
-                break;
 
-            case EnLevel.Warnning:
-                logContext.Warning(message);
-                break;
+            var logContext = _logger
+        .ForContext("UserName", userName)
+        .ForContext("UserRole", userRole)
+        .ForContext("LogType", (int?)logType ?? default)
+        .ForContext("Email", email)
+        .ForContext("IPAddress", ipAddress)
+        .ForContext("Path", path)
+        .ForContext("Method", method)
+        .ForContext("City", info.City)
+        .ForContext("Region", info.Region)
+        .ForContext("Country", info.Country)
+        .ForContext("Location", info.Loc)
+        .ForContext("Organization", info.Org)
+            .ForContext("LogHappenIn", (int?)(logHappenIn ?? default))
+            .ForContext("LogHappenInId", HappenInId);
+
+            level = level ?? default;
+            switch (level)
+            {
+                case EnLevel.Information:
+                    logContext.Information(message);
+                    break;
+
+                case EnLevel.Error:
+                    logContext.Error(message);
+                    break;
+
+                case EnLevel.Warnning:
+                    logContext.Warning(message);
+                    break;
+            }
         }
+
+        catch (Exception ex)
+        {
+
+        }
+
     }
     private async Task<IpInfo> GetRegionFromIpAsync(string ip)
     {
@@ -138,8 +160,6 @@ public class StructuredLogger : IStructuredLogger
         }
     }
 
-
-
     #endregion
 }
 public enum EnLogHappenIn
@@ -150,6 +170,7 @@ public enum EnLogHappenIn
     Material = 3,
     teacher = 4,
     Vedio = 5,
+    category = 6,
 }
 public class IpInfo
 {

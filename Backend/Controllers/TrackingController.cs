@@ -62,11 +62,24 @@ public class TrackingController : AppControllerBase
     }
 
     [HttpGet("GetLoginPerUser")]
-    public async Task<IActionResult> GetLoginPerUser(int studentUser, DateTime? startDate, DateTime? endDate)
+    public async Task<IActionResult> GetLoginPerUser(int UserId, DateTime? startDate, DateTime? endDate)
     {
         try
         {
-            var result = await _trackingService.GetLogsPerUser(studentUser, startDate, endDate);
+            var result = await _trackingService.GetLogsPerUser(UserId, startDate, endDate);
+            return NewResult(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    [HttpGet("GetLoginPerCourse")]
+    public async Task<IActionResult> GetLoginPerCourse(int courseId)
+    {
+        try
+        {
+            var result = await _trackingService.GetLogsPerCourse(courseId);
             return NewResult(result);
         }
         catch (Exception ex)
