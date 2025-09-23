@@ -4,6 +4,7 @@ using Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250922221954_CourseBrochures")]
+    partial class CourseBrochures
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -267,9 +270,17 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("SavedIn")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserUploadedId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
+
+                    b.HasIndex("UserUploadedId");
 
                     b.ToTable("CourseBrochures");
                 });
@@ -1376,13 +1387,10 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Services.Implementation.AllStudentsDto", b =>
                 {
-                    b.Property<int?>("UserId")
+                    b.Property<int?>("StudentId")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserRole")
+                    b.Property<string>("StudentName")
                         .HasColumnType("nvarchar(max)");
 
                     b.ToTable((string)null);
@@ -1703,7 +1711,15 @@ namespace Backend.Migrations
                         .WithMany()
                         .HasForeignKey("CourseId");
 
+                    b.HasOne("Backend.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserUploadedId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Course");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Backend.Entities.Lesson", b =>

@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Localization;
-
-namespace Backend.Dependencies;
+﻿namespace Backend.Dependencies;
 
 public static class ClassesDependencies
 {
@@ -42,11 +40,8 @@ public static class ClassesDependencies
         services.AddTransient<IVoucherService, VoucherService>();
         services.AddTransient<IOrderService, OrderService>();
         services.AddTransient<ITrackingService, TrackingService>();
-
-
-
-
-
+        services.AddTransient<IPaymentReportingService, PaymentReportingService>();
+        services.AddTransient<IBrochuresService, BrochuresService>();
 
 
         services.AddTransient<IGeminiObjectTranslator, GeminiObjectTranslator>();

@@ -3,20 +3,22 @@
 [Route("api/[controller]")]
 
 [ApiController]
-public class FileController : ControllerBase
+public class FileController : AppControllerBase
 {
     #region Fields
     private readonly IFileService _cloudinaryService;
-    private readonly PhysicalFileUpload physicalFileUpload;
+    private readonly IPhysicalFileUpload physicalFileUpload;
     private readonly IStructuredLogger _logger;
+    private readonly IEmailSender _emailSender;
     #endregion
 
     #region Constructor
-    public FileController(IFileService cloudinaryService, PhysicalFileUpload physicalFileUpload, IStructuredLogger logger)
+    public FileController(IFileService cloudinaryService, IPhysicalFileUpload physicalFileUpload, IStructuredLogger logger, IEmailSender emailSender)
     {
         _cloudinaryService = cloudinaryService;
         this.physicalFileUpload = physicalFileUpload;
         _logger = logger;
+        _emailSender = emailSender;
     }
     #endregion
 

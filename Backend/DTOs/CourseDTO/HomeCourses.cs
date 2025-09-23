@@ -9,4 +9,7 @@ public class HomeCourses
     public double? Price { get; set; }
     public string? Hours { get; set; }
     public string? ImagePath { get; set; }
+    public string? CategoryName { get; set; }
+    public string? TeacherName { get; set; }
+
 }

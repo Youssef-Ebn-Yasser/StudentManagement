@@ -1,15 +1,3 @@
-using AspNetCore.JsonLocalization;
-using Hangfire;
-using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
-using Serilog;
-using Serilog.Events;
-using Serilog.Sinks.MSSqlServer;
-using Stripe;
-using System.Collections.ObjectModel;
-using System.Data;
-using static Backend.Services.Implementation.AuthenticationService;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();

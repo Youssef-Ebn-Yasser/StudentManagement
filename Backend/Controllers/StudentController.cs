@@ -1,5 +1,4 @@
-﻿using ClosedXML.Excel;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers;
 
@@ -206,7 +205,7 @@ public class StudentController : AppControllerBase
         }
     }
 
-    [Authorize(Roles = "Student")]
+    [Authorize(Roles = "Student,Admin")]
     [HttpGet(Routing.StudentRouting.GetAllEnrolledStudentCourses)]
     public async Task<IActionResult> GetAllEnrolledStudentCourses(int studentId)
     {

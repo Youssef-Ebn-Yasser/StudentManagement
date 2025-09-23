@@ -108,6 +108,10 @@ public class CourseMapping : Profile
         // Course → HomeCourses
         CreateMap<Course, HomeCourses>()
                    .ForMember(dest => dest.Title, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.TitleAr, src.TitleEn)))
+                   .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.Category.CategoryNameAr, src.Category.CategoryNameEn)))
+                   .ForMember(dest => dest.TeacherName, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.Teacher.NameAr, src.Teacher.NameEn)))
+
+
            .ForMember(dest => dest.Description, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.DescriptionAr, src.DescriptionEn)))
                       .ForMember(dest => dest.Level, opt => opt.MapFrom(src => GeneralLocalizableEntity.Localized(src.LevelAr, src.LevelEn)));
     }

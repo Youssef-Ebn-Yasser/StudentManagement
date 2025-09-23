@@ -1,6 +1,6 @@
 ﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
-using Microsoft.Extensions.Options;
+using Account = CloudinaryDotNet.Account;
 
 namespace Backend.Helper;
 

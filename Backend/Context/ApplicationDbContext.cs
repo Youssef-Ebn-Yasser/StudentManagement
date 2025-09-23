@@ -48,14 +48,16 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
     public DbSet<Backend.Entities.OrderTable> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<SystemLog> SystemLogs { get; set; }
+    public DbSet<CourseBrochures> CourseBrochures { get; set; }
 
 
 
-
+    public DbSet<AllStudentsDto> StudentsInCourse { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<AllStudentsDto>().HasNoKey().ToView(null); // ?? ensures EF knows it's query-only
 
         modelBuilder.Entity<User>()
        .HasDiscriminator<string>("UserType")

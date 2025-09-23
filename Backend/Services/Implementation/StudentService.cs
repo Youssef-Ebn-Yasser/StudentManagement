@@ -1,6 +1,4 @@
-﻿using ClosedXML.Excel;
-
-namespace Backend.Services.Implementation;
+﻿namespace Backend.Services.Implementation;
 
 public class StudentService : ResponseHandler, IStudentService
 {
@@ -74,7 +72,7 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (students == null)
         {
-            _logger.LogInfo("No Students in GetAllAsync");
+            await _logger.LogInfo("No Students in GetAllAsync");
             BadRequest<List<ShowAllCoursesDto>>("Students is null");
         }
 
@@ -234,7 +232,7 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (students == null)
         {
-            _logger.LogInfo("No Students in GetAllAsync");
+            await _logger.LogInfo("No Students in GetAllAsync");
             BadRequest<List<ShowAllCoursesDto>>("Students is null");
         }
 
@@ -248,7 +246,7 @@ public class StudentService : ResponseHandler, IStudentService
         var student = await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => s.Id == id && s.IsDeleted == false);
         if (student == null)
         {
-            _logger.LogInfo($"No Students with this id {id}");
+            await _logger.LogInfo($"No Students with this id {id}");
             return NotFound<ShowStudentDto>("Student Not Found");
         }
 
@@ -275,7 +273,7 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (student == null)
         {
-            _logger.LogInfo("Student Not Found trying with student name");
+            await _logger.LogInfo("Student Not Found trying with student name");
             return NotFound<ShowStudentDto>("Student Not Found");
         }
 
@@ -291,7 +289,7 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (students == null)
         {
-            _logger.LogInfo("Student Not Found trying with GetPaginatedListOfStudentAsync");
+            await _logger.LogInfo("Student Not Found trying with GetPaginatedListOfStudentAsync");
             return NotFound<PaginateResult<ShowStudentDto>>("Students Not Found");
         }
 
@@ -320,9 +318,40 @@ public class StudentService : ResponseHandler, IStudentService
                        TeacherName = GeneralLocalizableEntity.Localized(_.Course.Teacher.NameAr, _.Course.Teacher.NameEn)
                    }).ToListAsync();
 
+        for (int i = 0; i < studentCourses.Count; i++)
+        {
+            var result = _unitOfWork.Repository<Payment>()
+                              .GetTableNoTracking()
+                              .Include(p => p.Order)
+                              .ThenInclude(o => o.OrderItems)
+                              .Where(p => p.UserId == studentId && p.Order.OrderItems.Select(oi => oi.CourseId).Contains(studentCourses[i].Id))
+                              .Select(p => new
+                              {
+                                  PaymentMethod = p.PaymentProviderUsed,
+                                  DiscountValue = p.Order.DiscountAmount,
+                              }).FirstOrDefault();
+            if (result != null)
+            {
+                studentCourses[i].VaoucherValue = result.DiscountValue;
+                studentCourses[i].IsApplyedVoucher = true;
+
+
+                switch (result.PaymentMethod)
+                {
+                    case EnPaymentProviderUsed.paymob:
+                        studentCourses[i].PaymentMethod = "Paymob";
+                        break;
+                    default:
+                        studentCourses[i].PaymentMethod = "not determine";
+                        break;
+                }
+            }
+        }
+
+
         if (studentCourses == null)
         {
-            _logger.LogInfo("Student Not with id {id} not enroll in any courses");
+            await _logger.LogInfo("Student Not with id {id} not enroll in any courses");
             return NotFound<List<ShowStudentCourseDto>>("no enroll courses");
         }
 
@@ -351,7 +380,7 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (isEnroll.Data)
         {
-            _logger.LogInfo($"Student with id : {studentEnrollDto.StudentId} is enroll in course with id :{studentEnrollDto.CourseId}");
+            await _logger.LogInfo($"Student with id : {studentEnrollDto.StudentId} is enroll in course with id :{studentEnrollDto.CourseId}");
             return BadRequest<string>($"this student Already in this course");
         }
         //i want to assign the courseId to the StudentEnrollDto to be assigned by default
@@ -369,12 +398,12 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (result > 0)
         {
-            _logger.LogInfo($"eroll success for Student with id : {studentEnrollDto.StudentId} and course with id :{studentEnrollDto.CourseId}");
+            await _logger.LogInfo($"eroll success for Student with id : {studentEnrollDto.StudentId} and course with id :{studentEnrollDto.CourseId}");
             return Success("Enroll Success");
         }
         else
         {
-            _logger.LogInfo($"Error Student with id : {studentEnrollDto.StudentId} can not  enroll in course with id :{studentEnrollDto.CourseId}");
+            await _logger.LogInfo($"Error Student with id : {studentEnrollDto.StudentId} can not  enroll in course with id :{studentEnrollDto.CourseId}");
             return BadRequest<string>("Can not enroll to course");
         }
     }
@@ -400,13 +429,13 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (updateStudentDto.Image != null)
         {
-            _logger.LogInfo("Satrt Upload physical file");
+            await _logger.LogInfo("Satrt Upload physical file");
             var path = await _physicalFileUpload.UploadFileAsync("Students", updateStudentDto.Image);
 
             if (string.IsNullOrEmpty(path))
-                _logger.LogInfo("Upload file faild");
+                await _logger.LogInfo("Upload file faild");
 
-            _logger.LogInfo("Upload physical file Success");
+            await _logger.LogInfo("Upload physical file Success");
             student.ImageUrl = path;
         }
         _unitOfWork.Repository<Student>().Update(student);
@@ -414,12 +443,12 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (result > 0)
         {
-            _logger.LogInfo($"Student Updated Successfully");
+            await _logger.LogInfo($"Student Updated Successfully");
             return Success("Student Updated Successfully");
         }
         else
         {
-            _logger.LogInfo($"Error can not Updated this student error happen when trying");
+            await _logger.LogInfo($"Error can not Updated this student error happen when trying");
             return BadRequest<string>("can not Updated this student error happen when trying");
         }
     }
@@ -428,7 +457,7 @@ public class StudentService : ResponseHandler, IStudentService
         var isNameExist = await _isExistById(id);
         if (!isNameExist)
         {
-            _logger.LogInfo($"try to delete student with id : {id} but not found");
+            await _logger.LogInfo($"try to delete student with id : {id} but not found");
             return NotFound<string>($"Student with this id = {id} not exist");
         }
 
@@ -442,12 +471,12 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (result > 0)
         {
-            _logger.LogInfo($"Student Deleted Successfully with id : {id}");
+            await _logger.LogInfo($"Student Deleted Successfully with id : {id}");
             return Success("Student Deleted Successfully");
         }
         else
         {
-            _logger.LogInfo($"Error Student with id : {id} can not deleted");
+            await _logger.LogInfo($"Error Student with id : {id} can not deleted");
             return BadRequest<string>("can not delete this student error happen when try deleting");
         }
     }
@@ -456,14 +485,14 @@ public class StudentService : ResponseHandler, IStudentService
         var StudentExist = await _studentExistByName(deleteStudent.StudentName);
         if (StudentExist == null)
         {
-            _logger.LogInfo($"try to delete student with name : {deleteStudent.StudentName} from course {deleteStudent.CourseName} but not found student");
+            await _logger.LogInfo($"try to delete student with name : {deleteStudent.StudentName} from course {deleteStudent.CourseName} but not found student");
             return NotFound<string>($"Student with this name = {deleteStudent.StudentName} not exist");
         }
 
         var CourseExist = await _courseExistByName(deleteStudent.CourseName);
         if (CourseExist == null)
         {
-            _logger.LogInfo($"try to delete course with name : {deleteStudent.CourseName} for  student with name : {deleteStudent.StudentName} but not found course");
+            await _logger.LogInfo($"try to delete course with name : {deleteStudent.CourseName} for  student with name : {deleteStudent.StudentName} but not found course");
             return NotFound<string>($"Course with this name = {deleteStudent.CourseName} not exist");
         }
 
@@ -482,44 +511,16 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (result > 0)
         {
-            _logger.LogInfo($"Student delete from course with name : {deleteStudent.CourseName} for  student with name : {deleteStudent.StudentName}");
+            await _logger.LogInfo($"Student delete from course with name : {deleteStudent.CourseName} for  student with name : {deleteStudent.StudentName}");
             return Success("Student Deleted From Course Successfully");
         }
         else
         {
-            _logger.LogInfo($"Error can not Student delete from course with name : {deleteStudent.CourseName} for  student with name : {deleteStudent.StudentName}");
+            await _logger.LogInfo($"Error can not Student delete from course with name : {deleteStudent.CourseName} for  student with name : {deleteStudent.StudentName}");
             return BadRequest<string>("can not delete this student from course error happen when try deleting");
         }
     }
 
-    private async Task<bool> _isNameExist(string name)
-    {
-        bool exist = false;
-
-        if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
-        {
-            exist = await _unitOfWork.Repository<Student>()
-                                           .GetTableNoTracking()
-                                           .AnyAsync(s => s.NameAr == name && s.IsDeleted == false);
-        }
-        else
-        {
-            exist = await _unitOfWork.Repository<Student>()
-                                           .GetTableNoTracking()
-                                           .AnyAsync(s => s.NameEn == name && s.IsDeleted == false);
-        }
-
-        return exist;
-    }
-
-    private async Task<bool> _isEmailExist(string email)
-    {
-        var exist = await _unitOfWork.Repository<Student>()
-                                           .GetTableNoTracking()
-                                           .AnyAsync(s => s.Email == email && s.IsDeleted == false);
-
-        return exist;
-    }
     private async Task<bool> _isCourseExistById(int id) =>
     await _unitOfWork.Repository<Course>().GetTableNoTracking().AnyAsync(s => s.Id == id);
     private async Task<Course> _courseExistByName(string Name)

@@ -1,7 +1,4 @@
-﻿using Hangfire;
-
-
-namespace Backend.Services.Implementation;
+﻿namespace Backend.Services.Implementation;
 
 public class CourseService : ResponseHandler, ICourseService
 {
@@ -153,7 +150,8 @@ public class CourseService : ResponseHandler, ICourseService
     }
 
 
-    public async Task<Response<PaginateResult<HomeCourses>>> GetPaginatedCourse(int pageNumber, int pageSize, enOrderBy? orderBy = null, EnFilterBy? filterBy = null, string? value = null)
+    public async Task<Response<PaginateResult<HomeCourses>>> GetPaginatedCourse(int pageNumber, int pageSize, enOrderBy? orderBy = null,
+    EnFilterBy? filterBy = null, string? value = null)
     {
         var querable = GetCourseQuerable();
 

@@ -63,7 +63,7 @@ public class VoucherController : AppControllerBase
 
     }
 
-    [HttpPost("all")]
+    [HttpGet("all")]
     public async Task<IActionResult> GetAllVoucher()
     {
         try

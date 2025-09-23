@@ -4,6 +4,7 @@ using Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250922213104_fix03")]
+    partial class fix03
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -244,34 +247,6 @@ namespace Backend.Migrations
                     b.HasIndex("TecherId");
 
                     b.ToTable("Courses");
-                });
-
-            modelBuilder.Entity("Backend.Entities.CourseBrochures", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("CourseId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Link")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.ToTable("CourseBrochures");
                 });
 
             modelBuilder.Entity("Backend.Entities.Lesson", b =>
@@ -1374,15 +1349,12 @@ namespace Backend.Migrations
                     b.ToTable("vouchers");
                 });
 
-            modelBuilder.Entity("Backend.Services.Implementation.AllStudentsDto", b =>
+            modelBuilder.Entity("Backend.Services.Implementation.depend", b =>
                 {
-                    b.Property<int?>("UserId")
+                    b.Property<int?>("Id")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserRole")
+                    b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.ToTable((string)null);
@@ -1695,15 +1667,6 @@ namespace Backend.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Teacher");
-                });
-
-            modelBuilder.Entity("Backend.Entities.CourseBrochures", b =>
-                {
-                    b.HasOne("Backend.Entities.Course", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId");
-
-                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("Backend.Entities.Lesson", b =>

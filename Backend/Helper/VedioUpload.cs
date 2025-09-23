@@ -75,7 +75,7 @@ public class VedioUpload : ResponseHandler, IVedioUpload
 
 
         var baseUrl = _env.IsDevelopment() ? "https://localhost:7099" : "http://e-learn-v2.runasp.net";
-        var publicUrl = $"{baseUrl}/videos/{folderName}/{Path.GetFileName(inputFilePath)}";
+        var publicUrl = $"{baseUrl}/{folderName}/{Path.GetFileName(inputFilePath)}";
 
         var vedioDetails = new VedioesDetails()
         {

@@ -8,5 +8,7 @@ public class UpdateStudentDto
     [Required]
     [Phone]
     public string Phone { get; set; }
+    public string? education { get; set; }
+    public int? Age { get; set; }
     public IFormFile? Image { get; set; }
 }

@@ -4,6 +4,7 @@ using Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250922232424_UpdateCourseBrochures")]
+    partial class UpdateCourseBrochures
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -266,6 +269,9 @@ namespace Backend.Migrations
                     b.Property<string>("Link")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SavedIn")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -1376,13 +1382,10 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Services.Implementation.AllStudentsDto", b =>
                 {
-                    b.Property<int?>("UserId")
+                    b.Property<int?>("StudentId")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserRole")
+                    b.Property<string>("StudentName")
                         .HasColumnType("nvarchar(max)");
 
                     b.ToTable((string)null);
