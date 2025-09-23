@@ -7,4 +7,5 @@ public interface ITrackingService
                                                                 EnUsersType? usersType, EnLastDateType lastDateType);
     public Task<Response<PaginateResult<TrackUsersLoginDto>>> AllUsersLoginBetween(int pageNumber, int pageSize,
                                                                 EnUsersType? usersType, DateTime startDate, DateTime endDate);
+    public Task<Response<SystemLogDto>> GetLogsPerUser(int userId, DateTime? startDate, DateTime? endDate);
 }

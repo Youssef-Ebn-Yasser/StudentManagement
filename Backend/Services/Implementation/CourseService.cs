@@ -27,7 +27,6 @@ public class CourseService : ResponseHandler, ICourseService
     #endregion
 
     #region   Handle Methods
-
     public async Task<Response<List<ShowAllCoursesDto>>> GetAllAsync()
     {
         var courses = await _unitOfWork.Repository<Course>()
@@ -38,10 +37,14 @@ public class CourseService : ResponseHandler, ICourseService
                                                   .ToListAsync();
         if (courses == null)
         {
-            _logger.LogInfo("No Courses");
+            await _logger.LogInfo(new LogInfoData()
+            {
+                LoghappenIn = EnLogHappenIn.Course,
+                Message = "try get All Courses and No Courses found",
+                LogsIn = "Courses",
+            });
             BadRequest<List<ShowAllCoursesDto>>("Courses is null");
         }
-        _logger.LogInfo("get all Courses");
 
         var result = _mapper.Map<List<ShowAllCoursesDto>>(courses);
         return Success(result);
@@ -76,7 +79,7 @@ public class CourseService : ResponseHandler, ICourseService
 
         return Success(response);
     }
-    public async Task<Response<List<HomeCourses>>> GetAllByCategoryAsync(int categoryId)
+    public async Task<Response<List<HomeCourses>?>> GetAllByCategoryAsync(int categoryId)
     {
         var courses = await _unitOfWork.Repository<Course>()
                                                       .GetTableNoTracking()
@@ -85,7 +88,7 @@ public class CourseService : ResponseHandler, ICourseService
                                                       .Select(c => new HomeCourses
                                                       {
                                                           Id = c.Id,
-                                                          Title = GeneralLocalizableEntity.Localized(c.TitleAr, c.TitleEn),
+                                                          Title = GeneralLocalizableEntity.Localized(c.TitleAr, c.TitleEn) ?? "no title",
                                                           Description = GeneralLocalizableEntity.Localized(c.DescriptionAr, c.DescriptionEn),
                                                           Level = GeneralLocalizableEntity.Localized(c.LevelAr, c.LevelEn),
                                                           Price = c.Price,
@@ -94,7 +97,13 @@ public class CourseService : ResponseHandler, ICourseService
                                                       .ToListAsync();
         if (courses == null)
         {
-            _logger.LogInfo("No Courses in GetAllByCategoryAsync");
+            await _logger.LogInfo(new LogInfoData()
+            {
+                LoghappenIn = EnLogHappenIn.Course,
+                Message = "try get All Courses by category and No Courses found",
+                LogsIn = "Courses",
+            });
+
             BadRequest<List<ShowAllCoursesDto>>("Courses is null in this category");
         }
 
@@ -112,7 +121,13 @@ public class CourseService : ResponseHandler, ICourseService
 
         if (courses == null)
         {
-            _logger.LogInfo($"No Courses in GetAllCoursesOfTeacherAsync");
+            await _logger.LogInfo(new LogInfoData()
+            {
+                LoghappenIn = EnLogHappenIn.Course,
+                Message = $"try get All Courses for teacher and No Courses found for this teacher with id {teacherId}",
+                LogsIn = "Courses",
+            });
+
             return NotFound<List<ShowCourseDto>>("Course not found");
         }
 
@@ -133,22 +148,37 @@ public class CourseService : ResponseHandler, ICourseService
 
         if (course == null)
         {
-            _logger.LogInfo($"No Course with this id => {id} in GetCourseByIdAsync");
+            await _logger.LogInfo(new LogInfoData()
+            {
+                LoghappenIn = EnLogHappenIn.Course,
+                Message = $"No Course with this id => {id} in GetCourseByIdAsync",
+                LogsIn = "Courses",
+            });
+
             return NotFound<ShowCourseDto>("Course not found");
         }
         if (cultureInfo.TwoLetterISOLanguageName.ToLower() == "ar" && course.LevelAr == null)
         {
-            course.LevelAr = await _translator.TranslateObjectAsync<string>(course.LevelEn, "English", "Arabic");
+            course.LevelAr = await _translator.TranslateObjectAsync<string>(course.LevelEn ?? course.LevelAr ?? "no name", "English", "Arabic");
             course.TitleAr = await _translator.TranslateObjectAsync<string>(course.TitleEn, "English", "Arabic");
-            course.DescriptionAr = await _translator.TranslateObjectAsync<string>(course.DescriptionEn, "English", "Arabic");
+            course.DescriptionAr = await _translator.TranslateObjectAsync<string>(course.DescriptionEn ?? course.DescriptionAr ?? "no name", "English", "Arabic");
         }
 
         course.lessons = course.lessons?.Where(l => !l.IsDeleted).ToList();
 
         var result = _mapper.Map<ShowCourseDto>(course);
+
+        await _logger.LogInfo(new LogInfoData()
+        {
+            LoghappenIn = EnLogHappenIn.Course,
+            Message = $"get this course with name {course.TitleEn}",
+            HappenInId = course.Id,
+            LogsIn = "Course",
+        });
+
+
         return Success(result);
     }
-
 
     public async Task<Response<PaginateResult<HomeCourses>>> GetPaginatedCourse(int pageNumber, int pageSize, enOrderBy? orderBy = null,
     EnFilterBy? filterBy = null, string? value = null)
@@ -157,7 +187,13 @@ public class CourseService : ResponseHandler, ICourseService
 
         if (querable == null)
         {
-            _logger.LogInfo($"No Courses in GetPaginatedCourse in this page");
+            await _logger.LogInfo(new LogInfoData()
+            {
+                LoghappenIn = EnLogHappenIn.Course,
+                Message = $"No Courses in GetPaginatedCourse in this page",
+                LogsIn = "Course",
+            });
+
             return NotFound<PaginateResult<HomeCourses>>("Course not found");
         }
 
@@ -166,13 +202,13 @@ public class CourseService : ResponseHandler, ICourseService
             switch (filterBy)
             {
                 case EnFilterBy.name:
-                    querable = querable.Where(c => c.TitleEn.Contains(value) || c.TitleAr.Contains(value));
+                    querable = querable.Where(c => c.TitleEn.Contains(value) || c.TitleAr!.Contains(value));
                     break;
                 case EnFilterBy.duration:
                     querable = querable.Where(c => c.DurationBDays.ToString() == value);
                     break;
                 case EnFilterBy.content:
-                    querable = querable.OrderBy(c => c.DescriptionEn.Contains(value) || c.DescriptionAr.Contains(value));
+                    querable = querable.OrderBy(c => c.DescriptionEn!.Contains(value) || c.DescriptionAr!.Contains(value));
                     break;
                 default:
                     break;
@@ -199,12 +235,22 @@ public class CourseService : ResponseHandler, ICourseService
     public async Task Translate(string level, string title, string desc, int courseId, string language)
     {
         var course = _unitOfWork.Repository<Course>().GetTableAsTracking().FirstOrDefault(c => c.Id == courseId);
-        _logger.LogInfo("Start hangfire service");
+
+        if (course == null) return;
+
+        await _logger.LogInfo(new LogInfoData()
+        {
+            LoghappenIn = EnLogHappenIn.Course,
+            Message = $"Start hangfire service to translate course with id {courseId} and name {title}",
+            LogsIn = "Courses",
+            HappenInId = courseId,
+        });
+
         if (language == "en")
         {
-            level = await _translator.TranslateObjectAsync<string>(level, "English", "Arabic");
-            title = await _translator.TranslateObjectAsync<string>(title, "English", "Arabic");
-            desc = await _translator.TranslateObjectAsync<string>(desc, "English", "Arabic");
+            level = await _translator.TranslateObjectAsync<string>(level, "English", "Arabic") ?? "can not translate";
+            title = await _translator.TranslateObjectAsync<string>(title, "English", "Arabic") ?? "can not translate";
+            desc = await _translator.TranslateObjectAsync<string>(desc, "English", "Arabic") ?? "can not translate";
 
 
             course.LevelAr = level;
@@ -213,15 +259,23 @@ public class CourseService : ResponseHandler, ICourseService
         }
         else
         {
-            level = await _translator.TranslateObjectAsync<string>(level, "Arabic", "English");
-            title = await _translator.TranslateObjectAsync<string>(title, "Arabic", "English");
-            desc = await _translator.TranslateObjectAsync<string>(desc, "Arabic", "English");
+            level = await _translator.TranslateObjectAsync<string>(level, "Arabic", "English") ?? "can not translate";
+            title = await _translator.TranslateObjectAsync<string>(title, "Arabic", "English") ?? "can not translate";
+            desc = await _translator.TranslateObjectAsync<string>(desc, "Arabic", "English") ?? "can not translate";
             course.LevelEn = level;
             course.TitleEn = title;
             course.DescriptionEn = desc;
         }
         _unitOfWork.Repository<Course>().Update(course);
-        _unitOfWork.Complete();
+        var result = _unitOfWork.Complete();
+
+        await _logger.LogInfo(new LogInfoData()
+        {
+            LoghappenIn = EnLogHappenIn.Course,
+            Message = $"end hangfire service to translate course with id {courseId} and name {title} with status {result > 0}",
+            LogsIn = "Courses",
+            HappenInId = courseId,
+        });
     }
 
     public async Task<Response<string>> CreateAsync(CreateCourseDto createCourseDto)
@@ -242,12 +296,24 @@ public class CourseService : ResponseHandler, ICourseService
 
         if (createCourseDto.Image != null)
         {
-            _logger.LogInfo("start upload physical image");
+            await _logger.LogInfo(new LogInfoData()
+            {
+                LoghappenIn = EnLogHappenIn.Course,
+                Message = $"start upload physical image for course with title {createCourseDto.Title}",
+                LogsIn = "Courses",
+            });
+
             imageUrl = await _physicalFileUpload.UploadFileAsync("Courses", createCourseDto.Image);
 
             if (imageUrl == null)
             {
-                _logger.LogInfo("Can not upload physical image");
+                await _logger.LogInfo(new LogInfoData()
+                {
+                    LoghappenIn = EnLogHappenIn.Course,
+                    Message = $"Can not upload physical image course with title {createCourseDto.Title}",
+                    LogsIn = "Courses",
+                });
+
                 return BadRequest<string>("Image upload failed");
             }
         }
@@ -264,11 +330,26 @@ public class CourseService : ResponseHandler, ICourseService
                 x.Translate(createCourseDto.Level, createCourseDto.Title, createCourseDto.Description,
                     course.Id, cultureInfo.TwoLetterISOLanguageName.ToLower()));
 
-            _logger.LogInfo("Course Added Successfully");
+
+            await _logger.LogInfo(new LogInfoData()
+            {
+                LoghappenIn = EnLogHappenIn.Course,
+                Message = $"Course Added Successfully with id {course.Id}",
+                LogsIn = "Courses",
+                HappenInId = course.Id,
+            });
+
             return Created<string>("Course created successfully");
         }
-        _logger.LogInfo("Error when try add course");
-        return Created<string>("can not crate course try later");
+
+        await _logger.LogInfo(new LogInfoData()
+        {
+            LoghappenIn = EnLogHappenIn.Course,
+            Message = $"faild add course with name {createCourseDto.Title}",
+            LogsIn = "Courses",
+        });
+
+        return BadRequest<string>("can not crate course try later");
     }
 
     public async Task<Response<string>> UpdateAsync(UpdateCourseDto updateCourseDto)
@@ -286,14 +367,48 @@ public class CourseService : ResponseHandler, ICourseService
 
         if (updateCourseDto.Image != null)
         {
-            _logger.LogInfo("start upload physical image in update");
+            await _logger.LogInfo(new LogInfoData()
+            {
+                LoghappenIn = EnLogHappenIn.Course,
+                Message = $"start upload physical image in update with course id {updateCourseDto.Id}",
+                LogsIn = "Courses",
+                HappenInId = course.Id,
+            });
+
             imageUrl = await _physicalFileUpload.UploadFileAsync("Courses", updateCourseDto.Image);
-            if (!string.IsNullOrEmpty(imageUrl))
-                course.ImagePath = imageUrl;
+
+            if (string.IsNullOrEmpty(imageUrl))
+            {
+                await _logger.LogInfo(new LogInfoData()
+                {
+                    LoghappenIn = EnLogHappenIn.Course,
+                    Message = $"faild upload physical image in update with course id {updateCourseDto.Id}",
+                    LogsIn = "Courses",
+                    HappenInId = course.Id,
+                });
+
+            }
+            await _logger.LogInfo(new LogInfoData()
+            {
+                LoghappenIn = EnLogHappenIn.Course,
+                Message = $"Success upload physical image in update with course id {updateCourseDto.Id}",
+                LogsIn = "Courses",
+                HappenInId = course.Id,
+            });
+
+            course.ImagePath = imageUrl;
         }
 
         _unitOfWork.Repository<Course>().Update(course);
-        _unitOfWork.Complete();
+        var result = _unitOfWork.Complete();
+
+        await _logger.LogInfo(new LogInfoData()
+        {
+            LoghappenIn = EnLogHappenIn.Course,
+            Message = $"update  course with id has status =>  {result > 0}",
+            LogsIn = "Courses",
+            HappenInId = course.Id,
+        });
 
         return Success("Course updated successfully");
     }
@@ -313,16 +428,29 @@ public class CourseService : ResponseHandler, ICourseService
 
         if (course.lessons != null && course.lessons.Any())
         {
-            foreach (var lesson in course.lessons)
+            await _logger.LogInfo(new LogInfoData()
             {
-                lesson.IsDeleted = true;
-            }
+                LoghappenIn = EnLogHappenIn.Course,
+                Message = $"try to delete this course with id {id} but can not because he have lessions",
+                LogsIn = "Courses",
+                HappenInId = id,
+            });
+
+            return BadRequest<string>("this course has lession can not deleted");
         }
 
         course.IsDeleted = true;
 
         _unitOfWork.Repository<Course>().Update(course);
-        _unitOfWork.Complete();
+        var result = _unitOfWork.Complete();
+
+        await _logger.LogInfo(new LogInfoData()
+        {
+            LoghappenIn = EnLogHappenIn.Course,
+            Message = $"try to delete this course with id {id} with status {result > 0}",
+            LogsIn = "Courses",
+            HappenInId = id,
+        });
 
         return Success("Course deleted successfully");
     }
@@ -355,15 +483,20 @@ public class CourseService : ResponseHandler, ICourseService
             .Select(sc => new ShowStudentAndCourse
             {
                 StudentId = sc.Student.Id,
-                StudentName = sc.Student.NameEn,
+                StudentName = sc.Student.NameEn ?? "no student title",
                 CourseId = sc.Course.Id,
-                CourseTitle = GeneralLocalizableEntity.Localized(sc.Course.TitleAr, sc.Course.TitleEn),
+                CourseTitle = GeneralLocalizableEntity.Localized(sc.Course.TitleAr, sc.Course.TitleEn) ?? "no course title",
 
             })
             .ToListAsync();
         if (studentCourses == null || !studentCourses.Any())
         {
-            _logger.LogInfo("No Students and Courses found in GetAllStudentAndCourse");
+            await _logger.LogInfo(new LogInfoData()
+            {
+                LoghappenIn = EnLogHappenIn.Course,
+                Message = $"no student with courses",
+                LogsIn = "Courses",
+            });
             return NotFound<List<ShowStudentAndCourse>>("No students and courses found");
         }
         return Success(studentCourses);

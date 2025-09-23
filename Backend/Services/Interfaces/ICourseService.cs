@@ -1,6 +1,4 @@
-﻿using Backend.Models.Enums;
-
-namespace Backend.Services.Interfaces;
+﻿namespace Backend.Services.Interfaces;
 
 public interface ICourseService
 {
@@ -9,7 +7,7 @@ public interface ICourseService
     public Task<Response<ShowCourseDto>> GetCourseByIdAsync(int id);
     public Task<Response<List<ShowAllCoursesDto>>> GetAllAsync();
     public Task<Response<ForAddCourseDependenciesDto>> GetDependenciesForAddCourse();
-    public Task<Response<List<HomeCourses>>> GetAllByCategoryAsync(int categoryId);
+    public Task<Response<List<HomeCourses>?>> GetAllByCategoryAsync(int categoryId);
 
     public Task<Response<PaginateResult<HomeCourses>>> GetPaginatedCourse(int pageNumber, int pageSize, enOrderBy? orderBy = null, EnFilterBy? filterBy = null, string? value = null);
     public Task<Response<string>> CreateAsync(CreateCourseDto createCourseDto);

@@ -149,8 +149,16 @@ var columnOptions = new ColumnOptions
         new SqlColumn { ColumnName = "UserRole", DataType = SqlDbType.NVarChar, DataLength = 100, AllowNull = true },
         new SqlColumn { ColumnName = "LogType", DataType = SqlDbType.Int, AllowNull = true },
         new SqlColumn { ColumnName = "Email", DataType = SqlDbType.NVarChar, DataLength = 100, AllowNull = true },
-
-
+        new SqlColumn { ColumnName = "IPAddress", DataType = SqlDbType.NVarChar, DataLength = 300, AllowNull = true },
+        new SqlColumn { ColumnName = "Path", DataType = SqlDbType.NVarChar, DataLength = 300, AllowNull = true },
+        new SqlColumn { ColumnName = "Method", DataType = SqlDbType.NVarChar, DataLength = 300, AllowNull = true },
+        new SqlColumn { ColumnName = "City", DataType = SqlDbType.NVarChar, DataLength = 300, AllowNull = true },
+        new SqlColumn { ColumnName = "Region", DataType = SqlDbType.NVarChar, DataLength = 300, AllowNull = true },
+        new SqlColumn { ColumnName = "Country", DataType = SqlDbType.NVarChar, DataLength = 300, AllowNull = true },
+        new SqlColumn { ColumnName = "Location", DataType = SqlDbType.NVarChar, DataLength = 300, AllowNull = true },
+        new SqlColumn { ColumnName = "Organization", DataType = SqlDbType.NVarChar, DataLength = 300, AllowNull = true },
+        new SqlColumn { ColumnName = "LogHappenIn", DataType = SqlDbType.Int, AllowNull = true },
+        new SqlColumn { ColumnName = "LogHappenInId", DataType = SqlDbType.Int, AllowNull = true },
     }
 };
 

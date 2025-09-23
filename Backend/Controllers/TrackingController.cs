@@ -60,5 +60,19 @@ public class TrackingController : AppControllerBase
             return BadRequest(ex.Message);
         }
     }
+
+    [HttpGet("GetLoginPerUser")]
+    public async Task<IActionResult> GetLoginPerUser(int studentUser, DateTime? startDate, DateTime? endDate)
+    {
+        try
+        {
+            var result = await _trackingService.GetLogsPerUser(studentUser, startDate, endDate);
+            return NewResult(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
     #endregion
 }

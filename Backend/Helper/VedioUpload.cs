@@ -129,7 +129,13 @@ public class VedioUpload : ResponseHandler, IVedioUpload
             // check permision 
             if (vedio.VedioPermision == EnVedioPermision.enable)
             {
-                linkDto.links.Add(vedio.EnableDownloadedUrl);
+                var link = new LinkProp
+                {
+                    LinkId = vedio.Id,
+                    LinkUrl = vedio.EnableDownloadedUrl,
+                };
+
+                linkDto.links.Add(link);
             }
             else
             {
@@ -138,11 +144,26 @@ public class VedioUpload : ResponseHandler, IVedioUpload
                     string folder = vedio.DisableDownloadedFolder;
                     string file = vedio.DisableDownloadedFile;
 
-                    linkDto.links.Add($"{folder}/{file}");
+                    var link = new LinkProp
+                    {
+                        LinkId = vedio.Id,
+                        LinkUrl = vedio.EnableDownloadedUrl,
+                    };
+
+                    linkDto.links.Add(link);
+
+                    //linkDto.links.Add($"{folder}/{file}");
                 }
                 else if (vedio.SavedIn == EnSavedInType.openVedio)
                 {
-                    linkDto.links.Add(vedio.ThirdPartyLink);
+                    var link = new LinkProp
+                    {
+                        LinkId = vedio.Id,
+                        LinkUrl = vedio.EnableDownloadedUrl,
+                    };
+
+                    linkDto.links.Add(link);
+                    //linkDto.links.Add(vedio.ThirdPartyLink);
                 }
 
             }

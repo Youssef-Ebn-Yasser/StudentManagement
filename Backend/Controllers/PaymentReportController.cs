@@ -30,5 +30,19 @@ public class PaymentReportController : AppControllerBase
             return BadRequest("error happen in server");
         }
     }
+    [HttpGet("paymentPerStudent")]
+    public async Task<IActionResult> GetpaymentPerStudent(int studentId)
+    {
+        try
+        {
+            var result = await _reportServices.GetPaymentsPerStudents(studentId);
+
+            return NewResult(result);
+        }
+        catch
+        {
+            return BadRequest("error happen in server");
+        }
+    }
     #endregion
 }

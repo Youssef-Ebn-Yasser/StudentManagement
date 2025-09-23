@@ -140,7 +140,7 @@ public class StudentController : AppControllerBase
         }
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpGet(Routing.StudentRouting.Prefix)]
     public async Task<IActionResult> GetById(int id)
     {
@@ -156,7 +156,7 @@ public class StudentController : AppControllerBase
         }
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin,Teacher")]
     [HttpGet(Routing.StudentRouting.GetByName)]
     public async Task<IActionResult> GetByName(string name)
     {
@@ -221,7 +221,7 @@ public class StudentController : AppControllerBase
         }
     }
 
-    [Authorize]
+    [Authorize(Roles = "Student,Admin")]
     [HttpGet(Routing.StudentRouting.Profile)]
     public async Task<IActionResult> GetStudentProfile(int studentId)
     {

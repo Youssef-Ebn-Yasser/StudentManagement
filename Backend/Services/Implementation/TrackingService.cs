@@ -1,4 +1,6 @@
-﻿namespace Backend.Services.Implementation;
+﻿using System.Linq.Expressions;
+
+namespace Backend.Services.Implementation;
 
 public class TrackingService : ResponseHandler, ITrackingService
 {
@@ -240,8 +242,65 @@ public class TrackingService : ResponseHandler, ITrackingService
         return Success(users);
 
     }
+
+
+    public async Task<Response<SystemLogDto>> GetLogsPerUser(int userId, DateTime? startDate, DateTime? endDate)
+    {
+        var studentEmail = await _context.Users
+                                               .Where(s => s.Id == userId)
+                                               .Select(s => s.Email)
+                                               .FirstOrDefaultAsync();
+
+        var spec = new SystemLogSpecification(studentEmail, startDate, endDate);
+
+        var logDetails = await _context.SystemLogs
+                                   .Where(spec.Criteria)
+                                   .Select(s => new SystemLogDetailsDto
+                                   {
+                                       Email = s.Email,
+                                       Message = s.Message,
+                                       UserRole = s.UserRole,
+                                       Timestamp = s.Timestamp,
+                                       Level = s.Level,
+                                       LogType = s.LogType,
+                                       City = s.City,
+                                       IPAddress = s.IPAddress,
+                                   })
+                                   .OrderByDescending(s => s.Timestamp)
+                                   .ToListAsync();
+        var response = new SystemLogDto
+        {
+            SystemLogDetailsDtos = logDetails,
+            NumberOfTotalLogs = logDetails.Count,
+            NumberOfTotalLogsLastDay = logDetails.Where(l => l.Timestamp >= _lastDay).Count()
+        };
+
+        return Success(response);
+    }
     #endregion
 }
+
+
+public class SystemLogDto
+{
+    public int NumberOfTotalLogs { get; set; }
+    public int NumberOfTotalLogsLastDay { get; set; }
+
+    public List<SystemLogDetailsDto> SystemLogDetailsDtos { get; set; }
+
+}
+public class SystemLogDetailsDto
+{
+    public string? Email { get; set; }
+    public string? Message { get; set; }
+    public string? UserRole { get; set; }
+    public DateTime? Timestamp { get; set; }
+    public string? Level { get; set; }
+    public EnLogType? LogType { get; set; }
+    public string? City { get; set; }
+    public string? IPAddress { get; set; }
+}
+
 
 public class TrackUsersLoginDto
 {
@@ -256,4 +315,23 @@ public enum EnLastDateType
     day = 1,
     week = 2,
     month = 3
+}
+
+
+public interface ISpecification<T>
+{
+    Expression<Func<T, bool>> Criteria { get; }
+}
+
+public class SystemLogSpecification : ISpecification<SystemLog>
+{
+    public Expression<Func<SystemLog, bool>> Criteria { get; }
+
+    public SystemLogSpecification(string? email = null, DateTime? startDate = null, DateTime? endDate = null)
+    {
+        Criteria = s =>
+            (string.IsNullOrEmpty(email) || s.Email == email) &&
+            (!startDate.HasValue || s.Timestamp >= startDate.Value) &&
+            (!endDate.HasValue || s.Timestamp <= endDate.Value);
+    }
 }

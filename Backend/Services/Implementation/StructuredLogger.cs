@@ -1,7 +1,4 @@
-﻿using Serilog;
-using System.Security.Claims;
-
-namespace Backend.Services.Implementation;
+﻿namespace Backend.Services.Implementation;
 
 public class StructuredLogger : IStructuredLogger
 {
@@ -21,8 +18,31 @@ public class StructuredLogger : IStructuredLogger
     #endregion
 
     #region    Methods
-    public async Task LogInfo(string message, string email = "", EnLevel level = EnLevel.Information, EnLogType logType = EnLogType.Normal)
+
+    public class LogInfoData
     {
+        public int? HappenInId { get; set; }
+        public string? Message { get; set; } = string.Empty;
+        public string? Email { get; set; } = string.Empty;
+        public string? LogsIn { get; set; } = string.Empty;
+        public EnLevel? Level { get; set; }
+        public EnLogType? TypeLog { get; set; }
+        public EnLogHappenIn? LoghappenIn { get; set; }
+    }
+
+    public async Task LogInfo(LogInfoData logInfoData)
+    {
+        await LogInfo(logInfoData.Message, logInfoData.Email, logInfoData.LogsIn,
+        logInfoData.Level, logInfoData.TypeLog, logInfoData.LoghappenIn, logInfoData.HappenInId);
+    }
+    public async Task LogInfo(string? message, string? email = "", string? logsIn = "",
+    EnLevel? level = EnLevel.Information, EnLogType? logType = EnLogType.Normal, EnLogHappenIn? logHappenIn = EnLogHappenIn.NotDetermine, int? HappenInId = null)
+    {
+        var ipAddress = _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown";
+        var path = _httpContextAccessor.HttpContext?.Request?.Path.ToString() ?? "Unknown";
+        var method = _httpContextAccessor.HttpContext?.Request?.Method ?? "Unknown";
+        var info = await GetRegionFromIpAsync(ipAddress);
+
         var user = _httpContextAccessor.HttpContext?.User;
 
         var userName = user?.Identity?.IsAuthenticated == true
@@ -45,35 +65,101 @@ public class StructuredLogger : IStructuredLogger
         }
 
 
+        var logContext = _logger
+    .ForContext("UserName", userName)
+    .ForContext("UserRole", userRole)
+    .ForContext("LogType", (int)logType)
+    .ForContext("Email", email)
+    .ForContext("IPAddress", ipAddress)
+    .ForContext("Path", path)
+    .ForContext("Method", method)
+    .ForContext("City", info.City)
+    .ForContext("Region", info.Region)
+    .ForContext("Country", info.Country)
+    .ForContext("Location", info.Loc)
+    .ForContext("Organization", info.Org)
+
+    .ForContext("Location", info.Loc)
+    .ForContext("Organization", info.Org);
         switch (level)
         {
             case EnLevel.Information:
-                _logger
-                    .ForContext("UserName", userName)
-                    .ForContext("UserRole", userRole)
-                    .ForContext("LogType", (int)logType)
-                    .ForContext("Email", email)
-                    .Information(message);
+                logContext.Information(message);
                 break;
 
             case EnLevel.Error:
-                _logger
-                    .ForContext("UserName", userName)
-                    .ForContext("UserRole", userRole)
-                    .ForContext("LogType", (int)logType)
-                    .Error(message);
+                logContext.Error(message);
                 break;
 
             case EnLevel.Warnning:
-                _logger
-                    .ForContext("UserName", userName)
-                    .ForContext("UserRole", userRole)
-                    .ForContext("LogType", (int)logType)
-                    .Warning(message);
+                logContext.Warning(message);
                 break;
         }
     }
+    private async Task<IpInfo> GetRegionFromIpAsync(string ip)
+    {
+        using var httpClient = new HttpClient
+        {
+            Timeout = TimeSpan.FromSeconds(5) // avoid hanging requests
+        };
+
+        try
+        {
+            var response = await httpClient.GetStringAsync($"https://ipinfo.io/{ip}/json");
+            return JsonConvert.DeserializeObject<IpInfo>(response);
+        }
+        catch (HttpRequestException)
+        {
+            // network / DNS / blocked service issue
+            return new IpInfo
+            {
+                Ip = ip,
+                City = "Unknown",
+                Region = "Unknown",
+                Country = "Unknown",
+                Loc = "Unknown",
+                Org = "Unknown",
+                Timezone = "Unknown"
+            };
+        }
+        catch (TaskCanceledException)
+        {
+            // timeout
+            return new IpInfo
+            {
+                Ip = ip,
+                City = "Unknown",
+                Region = "Unknown",
+                Country = "Unknown",
+                Loc = "Unknown",
+                Org = "Unknown",
+                Timezone = "Unknown"
+            };
+        }
+    }
+
+
+
     #endregion
+}
+public enum EnLogHappenIn
+{
+    NotDetermine = 0,
+    Course = 1,
+    Lession = 2,
+    Material = 3,
+    teacher = 4,
+    Vedio = 5,
+}
+public class IpInfo
+{
+    public string Ip { get; set; }
+    public string City { get; set; }
+    public string Region { get; set; }
+    public string Country { get; set; }
+    public string Loc { get; set; }
+    public string Org { get; set; }
+    public string Timezone { get; set; }
 }
 
 public enum EnLogType

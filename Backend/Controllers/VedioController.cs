@@ -99,8 +99,8 @@ public class HlsVideoController : AppControllerBase
         }
     }
 
-    [HttpGet("getPlaylist")]
-    public async Task<IActionResult> GetPlaylist([FromQuery] EnVedioFor VedioFor, [FromQuery] int? relatedBy)
+    [HttpGet("GetVedio")]
+    public async Task<IActionResult> GetVedio([FromQuery] EnVedioFor VedioFor, [FromQuery] int? relatedBy)
     {
         try
         {
