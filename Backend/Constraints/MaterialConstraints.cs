@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-namespace Backend.Constraints;
+﻿namespace Backend.Constraints;
 
 public class MaterialConstraints : IEntityTypeConfiguration<Material>
 {
@@ -16,10 +14,6 @@ public class MaterialConstraints : IEntityTypeConfiguration<Material>
 
         builder.Property(m => m.IsDeleted)
                 .IsRequired();
-
-        builder.Property(m => m.Path)
-               .IsRequired()
-               .HasMaxLength (250);
 
         builder.Property(m => m.CreatedAt)
                .IsRequired();

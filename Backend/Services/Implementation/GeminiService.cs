@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-
-namespace Backend.Services.Implementation;
+﻿namespace Backend.Services.Implementation;
 
 public class GeminiService
 {

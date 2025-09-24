@@ -72,7 +72,14 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (students == null)
         {
-            await _logger.LogInfo("No Students in GetAllAsync");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Error,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = "Students is null",
+                TypeLog = EnLogType.Normal,
+            });
             BadRequest<List<ShowAllCoursesDto>>("Students is null");
         }
 
@@ -89,12 +96,12 @@ public class StudentService : ResponseHandler, IStudentService
                                                                         .Select(s => new StudentDependencies
                                                                         {
                                                                             StudentId = s.Id,
-                                                                            StudentName = s.NameEn,
+                                                                            StudentName = s.NameEn ?? "no name",
                                                                         }).ToListAsync();
 
         var Coursependencies = await _unitOfWork.Repository<Course>()
                                                                     .GetTableNoTracking()
-                                                                    .Where(c => (bool)!c.IsDeleted)
+                                                                    .Where(c => (bool)c.IsDeleted!)
                                                                     .Select(c => new CourseDependencies
                                                                     {
                                                                         CourseId = c.Id,
@@ -109,68 +116,49 @@ public class StudentService : ResponseHandler, IStudentService
 
 
         return Success(response);
-
     }
 
     public async Task<Response<StudentProfDTO>> GetStudentProfileAsync(int studentId)
     {
         var student = await _studentExistById(studentId);
         if (student == null)
-            return NotFound<StudentProfDTO>($"Student with ID {studentId} not found");
+        {
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Error,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"try get student with id {studentId} but no student with this id to his Profile",
+                TypeLog = EnLogType.Normal,
+            });
 
+            return NotFound<StudentProfDTO>($"Student with ID {studentId} not found");
+        }
         // Get student basic info
         var studentInfo = _mapper.Map<ShowStudentDto>(student);
 
-        var listOfAssignment = _unitOfWork.Repository<Lesson>()
-            .GetTableNoTracking()
-            .Include(sa => sa.StudentAssignments)
-            .Include(l => l.Quizs)
-        .Select(l => new
+        await _logger.LogInfo(new LogInfoData
         {
-            AssignmentDetails = l.StudentAssignments.Where(sa => sa.LessonId == l.Id)
-                                   .Select(sa => new
-                                   {
-                                       StudentDegreePercentage = sa.DegreePercentage,
-                                       StudentAssignmentId = sa.Id,
-                                       AssignmentName = l.materials.Where(m => m.LessonId == l.Id)
-                                                                   .Select(m => m.TitleEn)
-                                                                   .FirstOrDefault(),
-                                   }).FirstOrDefault(),
-
-            numberOfQuizesInLesson = l.Quizs.Where(q => q.LessonId == l.Id).Count(),
-            TotalQuizesDegreeInLessons = l.Quizs.Where(q => q.LessonId == l.Id).Sum(q => q.PossiblePoints),
-            StudentDegreeOfQuizesInLessons = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Sum(qa => qa.GradingRating),
-            quizLestDetails = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Select(qa => new
-            {
-                studentQuizAnswerId = qa.Id,
-                quizPercentageDegree = qa.GradingRating,
-                IsPass = qa.IsPassed,
-                PossiblePoints = qa.Quiz.PossiblePoints,
-                NumberOfAswered = qa.NumberOfAswered,
-                quizName = qa.Quiz.TitleEn,
-
-            })
+            Level = EnLevel.Error,
+            LoghappenIn = EnLogHappenIn.Student,
+            LogsIn = "Student get All",
+            Message = $"get student with id {studentId} and name {studentInfo.Name} his profile info",
+            TypeLog = EnLogType.Normal,
         });
-
-
-
-
-
-
 
 
         // Get assignments
         var assignments = await _unitOfWork.Repository<StudentAssignment>()
             .GetTableNoTracking()
             .Include(sa => sa.Lesson)
-            .ThenInclude(l => l.Course)
+            .ThenInclude(l => l!.Course)
             .Where(sa => sa.StudentId == studentId)
             .Select(sa => new DTOs.StudentProfileDto.StudentAssignmentDto
             {
                 Id = sa.Id,
-                CourseName = sa.Lesson.Course.TitleEn,
+                CourseName = sa.Lesson!.Course!.TitleEn ?? "no title",
                 LessonName = sa.Lesson.TitleEn,
-                Path = sa.Path,
+                Path = sa.Path ?? "no path",
                 DegreePercentage = sa.DegreePercentage
 
             })
@@ -185,12 +173,11 @@ public class StudentService : ResponseHandler, IStudentService
         .Select(sqa => new StudentQuizDto
         {
             QuizId = sqa.Id,
-            QuizTitle = sqa.Quiz.TitleEn,
+            QuizTitle = sqa.Quiz.TitleEn ?? "no title",
             GradingRating = sqa.GradingRating,
             IsPassed = sqa.IsPassed,
 
-        })
-      .ToListAsync();
+        }).ToListAsync();
         var attendance = await GetStudentAttendance(studentId);
 
         // Create the profile DTO
@@ -205,48 +192,55 @@ public class StudentService : ResponseHandler, IStudentService
         return Success(profile);
     }
 
-    public async Task<Response<List<ShowStudentWithCoursesDto>>> GetAllInCourseByCourseNameAsync(string courseName)
-    {
+    //public async Task<Response<List<ShowStudentWithCoursesDto>>> GetAllInCourseByCourseNameAsync(string courseName)
+    //{
 
-        List<Student> students = new List<Student>();
+    //    List<Student> students = new List<Student>();
 
-        if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
-        {
-            students = await _unitOfWork.Repository<Student>()
-                                                       .GetTableNoTracking()
-                                                       .Where(s => s.StudentCourses.Any(sc => sc.Course.TitleAr.ToLower().Contains(courseName.ToLower())) && s.IsDeleted == false)
-                                                       .Include(s => s.StudentCourses)
-                                                       .ThenInclude(sc => sc.Course)
-                                                       .ToListAsync();
-        }
-        else
-        {
-            students = await _unitOfWork.Repository<Student>()
-                                                       .GetTableNoTracking()
-                                                       .Where(s => s.StudentCourses.Any(sc => sc.Course.TitleEn.ToLower().Contains(courseName.ToLower())) && s.IsDeleted == false)
-                                                       .Include(s => s.StudentCourses)
-                                                       .ThenInclude(sc => sc.Course)
-                                                       .ToListAsync();
-        }
-
-
-        if (students == null)
-        {
-            await _logger.LogInfo("No Students in GetAllAsync");
-            BadRequest<List<ShowAllCoursesDto>>("Students is null");
-        }
+    //    if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
+    //    {
+    //        students = await _unitOfWork.Repository<Student>()
+    //                                                   .GetTableNoTracking()
+    //                                                   .Where(s => s.StudentCourses.Any(sc => sc.Course.TitleAr.ToLower().Contains(courseName.ToLower())) && s.IsDeleted == false)
+    //                                                   .Include(s => s.StudentCourses)
+    //                                                   .ThenInclude(sc => sc.Course)
+    //                                                   .ToListAsync();
+    //    }
+    //    else
+    //    {
+    //        students = await _unitOfWork.Repository<Student>()
+    //                                                   .GetTableNoTracking()
+    //                                                   .Where(s => s.StudentCourses.Any(sc => sc.Course.TitleEn.ToLower().Contains(courseName.ToLower())) && s.IsDeleted == false)
+    //                                                   .Include(s => s.StudentCourses)
+    //                                                   .ThenInclude(sc => sc.Course)
+    //                                                   .ToListAsync();
+    //    }
 
 
-        var mappedStudents = _mapper.Map<List<ShowStudentWithCoursesDto>>(students);
-        return Success(mappedStudents);
-    }
+    //    if (students == null)
+    //    {
+    //        await _logger.LogInfo("No Students in GetAllAsync");
+    //        BadRequest<List<ShowAllCoursesDto>>("Students is null");
+    //    }
+
+
+    //    var mappedStudents = _mapper.Map<List<ShowStudentWithCoursesDto>>(students);
+    //    return Success(mappedStudents);
+    //}
 
     public async Task<Response<ShowStudentDto>> GetByIdAsync(int id)
     {
         var student = await _unitOfWork.Repository<Student>().GetTableNoTracking().FirstOrDefaultAsync(s => s.Id == id && s.IsDeleted == false);
         if (student == null)
         {
-            await _logger.LogInfo($"No Students with this id {id}");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Error,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"try get student with id {id} but no student with this id",
+                TypeLog = EnLogType.Normal,
+            });
             return NotFound<ShowStudentDto>("Student Not Found");
         }
 
@@ -254,32 +248,32 @@ public class StudentService : ResponseHandler, IStudentService
         return Success(mappedStudent);
     }
 
-    public async Task<Response<ShowStudentDto>> GetByNameAsync(string name)
-    {
-        Student? student = new Student();
+    //public async Task<Response<ShowStudentDto>> GetByNameAsync(string name)
+    //{
+    //    Student? student = new Student();
 
-        if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
-        {
-            student = await _unitOfWork.Repository<Student>()
-                                       .GetTableNoTracking()
-                                       .FirstOrDefaultAsync(s => s.NameAr == name && s.IsDeleted == false);
-        }
-        else
-        {
-            student = await _unitOfWork.Repository<Student>()
-                                       .GetTableNoTracking()
-                                       .FirstOrDefaultAsync(s => s.NameEn == name && s.IsDeleted == false);
-        }
+    //    if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
+    //    {
+    //        student = await _unitOfWork.Repository<Student>()
+    //                                   .GetTableNoTracking()
+    //                                   .FirstOrDefaultAsync(s => s.NameAr == name && s.IsDeleted == false);
+    //    }
+    //    else
+    //    {
+    //        student = await _unitOfWork.Repository<Student>()
+    //                                   .GetTableNoTracking()
+    //                                   .FirstOrDefaultAsync(s => s.NameEn == name && s.IsDeleted == false);
+    //    }
 
-        if (student == null)
-        {
-            await _logger.LogInfo("Student Not Found trying with student name");
-            return NotFound<ShowStudentDto>("Student Not Found");
-        }
+    //    if (student == null)
+    //    {
+    //        await _logger.LogInfo("Student Not Found trying with student name");
+    //        return NotFound<ShowStudentDto>("Student Not Found");
+    //    }
 
-        var mappedStudent = _mapper.Map<ShowStudentDto>(student);
-        return Success(mappedStudent);
-    }
+    //    var mappedStudent = _mapper.Map<ShowStudentDto>(student);
+    //    return Success(mappedStudent);
+    //}
 
     public async Task<Response<PaginateResult<ShowStudentDto>>> GetPaginatedListOfStudentAsync(int pageNumber, int pageSize)
     {
@@ -289,7 +283,16 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (students == null)
         {
-            await _logger.LogInfo("Student Not Found trying with GetPaginatedListOfStudentAsync");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Error,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"Student Not Found trying with PaginatedListOfStudent",
+                TypeLog = EnLogType.Normal,
+            });
+
+            await _logger.LogInfo("");
             return NotFound<PaginateResult<ShowStudentDto>>("Students Not Found");
         }
 
@@ -315,7 +318,7 @@ public class StudentService : ResponseHandler, IStudentService
                        CategoryName = GeneralLocalizableEntity.Localized(_.Course.Category.CategoryNameAr, _.Course.Category.CategoryNameEn),
                        ImagePath = _.Course.ImagePath,
                        Hours = _.Course.Hours,
-                       TeacherName = GeneralLocalizableEntity.Localized(_.Course.Teacher.NameAr, _.Course.Teacher.NameEn)
+                       TeacherName = GeneralLocalizableEntity.Localized(_.Course.Teacher!.NameAr ?? "na arabic name", _.Course.Teacher.NameEn)
                    }).ToListAsync();
 
         for (int i = 0; i < studentCourses.Count; i++)
@@ -351,22 +354,22 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (studentCourses == null)
         {
-            await _logger.LogInfo("Student Not with id {id} not enroll in any courses");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Error,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"Student Not with id {studentId} not enroll in any courses",
+                TypeLog = EnLogType.Normal,
+                HappenInId = studentId,
+            });
+
             return NotFound<List<ShowStudentCourseDto>>("no enroll courses");
         }
 
         return Success(studentCourses);
     }
 
-
-    private async Task<bool> _isExistById(int id)
-    {
-        var exist = await _unitOfWork.Repository<User>()
-                                           .GetTableNoTracking()
-                                           .AnyAsync(s => s.Id == id && s.IsDeleted == false);
-
-        return exist;
-    }
     public async Task<Response<string>> EnrollToCourse(StudentEnrollDto studentEnrollDto)
     {
         // check this student is exist 
@@ -380,7 +383,16 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (isEnroll.Data)
         {
-            await _logger.LogInfo($"Student with id : {studentEnrollDto.StudentId} is enroll in course with id :{studentEnrollDto.CourseId}");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Error,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"Student with id : {studentEnrollDto.StudentId} is enroll in course with id :{studentEnrollDto.CourseId}",
+                TypeLog = EnLogType.Normal,
+                HappenInId = studentEnrollDto.StudentId,
+            });
+
             return BadRequest<string>($"this student Already in this course");
         }
         //i want to assign the courseId to the StudentEnrollDto to be assigned by default
@@ -398,12 +410,30 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (result > 0)
         {
-            await _logger.LogInfo($"eroll success for Student with id : {studentEnrollDto.StudentId} and course with id :{studentEnrollDto.CourseId}");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Information,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"eroll success for Student with id : {studentEnrollDto.StudentId} and course with id :{studentEnrollDto.CourseId}",
+                TypeLog = EnLogType.Normal,
+                HappenInId = studentEnrollDto.StudentId,
+            });
+
             return Success("Enroll Success");
         }
         else
         {
-            await _logger.LogInfo($"Error Student with id : {studentEnrollDto.StudentId} can not  enroll in course with id :{studentEnrollDto.CourseId}");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Error,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"Error Student with id : {studentEnrollDto.StudentId} can not  enroll in course with id :{studentEnrollDto.CourseId}",
+                TypeLog = EnLogType.Normal,
+                HappenInId = studentEnrollDto.StudentId,
+            });
+
             return BadRequest<string>("Can not enroll to course");
         }
     }
@@ -429,13 +459,41 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (updateStudentDto.Image != null)
         {
-            await _logger.LogInfo("Satrt Upload physical file");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Information,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"Satrt Upload physical file",
+                TypeLog = EnLogType.Normal,
+                HappenInId = updateStudentDto.Id,
+            });
+
             var path = await _physicalFileUpload.UploadFileAsync("Students", updateStudentDto.Image);
 
             if (string.IsNullOrEmpty(path))
-                await _logger.LogInfo("Upload file faild");
+            {
+                await _logger.LogInfo(new LogInfoData
+                {
+                    Level = EnLevel.Information,
+                    LoghappenIn = EnLogHappenIn.Student,
+                    LogsIn = "Student get All",
+                    Message = $"Upload file faild",
+                    TypeLog = EnLogType.Normal,
+                    HappenInId = updateStudentDto.Id,
+                });
+            }
 
-            await _logger.LogInfo("Upload physical file Success");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Information,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"Upload physical file Success",
+                TypeLog = EnLogType.Normal,
+                HappenInId = updateStudentDto.Id,
+            });
+
             student.ImageUrl = path;
         }
         _unitOfWork.Repository<Student>().Update(student);
@@ -443,12 +501,30 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (result > 0)
         {
-            await _logger.LogInfo($"Student Updated Successfully");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Information,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"Student Updated Successfully with id {updateStudentDto.Id}",
+                TypeLog = EnLogType.Normal,
+                HappenInId = updateStudentDto.Id,
+            });
+
             return Success("Student Updated Successfully");
         }
         else
         {
-            await _logger.LogInfo($"Error can not Updated this student error happen when trying");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Error,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"Error can not Updated this student with id {updateStudentDto.Id}",
+                TypeLog = EnLogType.Normal,
+                HappenInId = updateStudentDto.Id,
+            });
+
             return BadRequest<string>("can not Updated this student error happen when trying");
         }
     }
@@ -457,7 +533,15 @@ public class StudentService : ResponseHandler, IStudentService
         var isNameExist = await _isExistById(id);
         if (!isNameExist)
         {
-            await _logger.LogInfo($"try to delete student with id : {id} but not found");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Error,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"try to delete student with id : {id} but not found",
+                TypeLog = EnLogType.Normal,
+            });
+
             return NotFound<string>($"Student with this id = {id} not exist");
         }
 
@@ -471,12 +555,28 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (result > 0)
         {
-            await _logger.LogInfo($"Student Deleted Successfully with id : {id}");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Information,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"Student Deleted Successfully with id : {id}",
+                TypeLog = EnLogType.Normal,
+            });
+
             return Success("Student Deleted Successfully");
         }
         else
         {
-            await _logger.LogInfo($"Error Student with id : {id} can not deleted");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Error,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"Error Student with id : {id} can not deleted",
+                TypeLog = EnLogType.Normal,
+            });
+
             return BadRequest<string>("can not delete this student error happen when try deleting");
         }
     }
@@ -485,14 +585,30 @@ public class StudentService : ResponseHandler, IStudentService
         var StudentExist = await _studentExistByName(deleteStudent.StudentName);
         if (StudentExist == null)
         {
-            await _logger.LogInfo($"try to delete student with name : {deleteStudent.StudentName} from course {deleteStudent.CourseName} but not found student");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Error,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"try to delete student with name : {deleteStudent.StudentName} from course {deleteStudent.CourseName} but not found student",
+                TypeLog = EnLogType.Normal,
+            });
+
             return NotFound<string>($"Student with this name = {deleteStudent.StudentName} not exist");
         }
 
         var CourseExist = await _courseExistByName(deleteStudent.CourseName);
         if (CourseExist == null)
         {
-            await _logger.LogInfo($"try to delete course with name : {deleteStudent.CourseName} for  student with name : {deleteStudent.StudentName} but not found course");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Error,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"try to delete course with name : {deleteStudent.CourseName} for  student with name : {deleteStudent.StudentName} but not found course",
+                TypeLog = EnLogType.Normal,
+            });
+
             return NotFound<string>($"Course with this name = {deleteStudent.CourseName} not exist");
         }
 
@@ -511,19 +627,35 @@ public class StudentService : ResponseHandler, IStudentService
 
         if (result > 0)
         {
-            await _logger.LogInfo($"Student delete from course with name : {deleteStudent.CourseName} for  student with name : {deleteStudent.StudentName}");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Information,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"Student delete from course with name : {deleteStudent.CourseName} for  student with name : {deleteStudent.StudentName}",
+                TypeLog = EnLogType.Normal,
+            });
+
             return Success("Student Deleted From Course Successfully");
         }
         else
         {
-            await _logger.LogInfo($"Error can not Student delete from course with name : {deleteStudent.CourseName} for  student with name : {deleteStudent.StudentName}");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Level = EnLevel.Error,
+                LoghappenIn = EnLogHappenIn.Student,
+                LogsIn = "Student get All",
+                Message = $"Error can not Student delete from course with name : {deleteStudent.CourseName} for  student with name : {deleteStudent.StudentName}",
+                TypeLog = EnLogType.Normal,
+            });
+
             return BadRequest<string>("can not delete this student from course error happen when try deleting");
         }
     }
 
     private async Task<bool> _isCourseExistById(int id) =>
     await _unitOfWork.Repository<Course>().GetTableNoTracking().AnyAsync(s => s.Id == id);
-    private async Task<Course> _courseExistByName(string Name)
+    private async Task<Course?> _courseExistByName(string Name)
     {
         Course? course = new Course();
 
@@ -542,7 +674,7 @@ public class StudentService : ResponseHandler, IStudentService
 
         return course;
     }
-    private async Task<Student> _studentExistByName(string name)
+    private async Task<Student?> _studentExistByName(string name)
     {
         Student? student = new Student();
 
@@ -697,27 +829,13 @@ public class StudentService : ResponseHandler, IStudentService
 
         return success;
     }
+    private async Task<bool> _isExistById(int id)
+    {
+        var exist = await _unitOfWork.Repository<User>()
+                                           .GetTableNoTracking()
+                                           .AnyAsync(s => s.Id == id && s.IsDeleted == false);
+
+        return exist;
+    }
     #endregion
-}
-
-
-public class ForAddStudentToCourseDependenciesDto
-{
-    public List<CourseDependencies> CourseDependencies { get; set; }
-    public List<StudentDependencies> StudentDependencies { get; set; }
-
-
-}
-
-public class StudentDependencies
-{
-    public int StudentId { get; set; }
-    public string StudentName { get; set; }
-
-}
-
-public class CourseDependencies
-{
-    public int CourseId { get; set; }
-    public string Coursename { get; set; }
 }

@@ -171,6 +171,7 @@ public enum EnLogHappenIn
     teacher = 4,
     Vedio = 5,
     category = 6,
+    Student = 7,
 }
 public class IpInfo
 {

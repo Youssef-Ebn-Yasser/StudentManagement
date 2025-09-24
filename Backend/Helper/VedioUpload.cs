@@ -114,7 +114,7 @@ public class VedioUpload : ResponseHandler, IVedioUpload
     {
         // return depend on permision
         var vedioes = await _context.VedioesDetails
-                                                  .Where(v => v.RelatedById == relatedBy && v.VedioFor == VedioFor)
+                                                  .Where(v => v.RelatedById == relatedBy && v.VedioFor == VedioFor && v.IsDeleted == false)
                                                   .ToListAsync();
 
         if (vedioes == null)

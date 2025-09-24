@@ -1,5 +1,3 @@
-using Backend.DTOs.MaterialDTOs;
-
 namespace Backend.Services.Implementation;
 
 public class MaterialService : ResponseHandler, IMaterialService
@@ -35,7 +33,16 @@ public class MaterialService : ResponseHandler, IMaterialService
 
         if (materials == null)
         {
-            _logger.LogInfo($"No material in lesson with id {lessonId}");
+            await _logger.LogInfo(new LogInfoData
+            {
+
+                Message = $"No material in lesson with id {lessonId}",
+                HappenInId = lessonId,
+                Level = EnLevel.Error,
+                TypeLog = EnLogType.Normal,
+                LogsIn = "Materials",
+                LoghappenIn = EnLogHappenIn.Material,
+            });
             return BadRequest<List<ShowMaterialDto>>($"No material in lesson with id {lessonId}");
         }
         var mappedMaterials = _mapper.Map<List<ShowMaterialDto>>(materials);
@@ -60,7 +67,6 @@ public class MaterialService : ResponseHandler, IMaterialService
         var result = _unitOfWork.Complete();
         return result > 0 ? Success("Material Created Successfully") :
                          BadRequest<string>("make link shorter to save it");
-
     }
 
     public async Task<Response<string>> CreateAsync(CreateMaterialDto createMaterialDto)
@@ -82,7 +88,6 @@ public class MaterialService : ResponseHandler, IMaterialService
             material.IsDeleted = false;
         }
 
-
         else
         {
 
@@ -97,8 +102,6 @@ public class MaterialService : ResponseHandler, IMaterialService
         }
         ;
 
-
-        // var material = _mapper.Map<Material>(createMaterialDto);
         await _unitOfWork.Repository<Material>().AddAsync(material);
         _unitOfWork.Complete();
         return Success("Material Created Successfully");
@@ -145,7 +148,16 @@ public class MaterialService : ResponseHandler, IMaterialService
         var material = await _unitOfWork.Repository<Material>().GetByIdAsync(materialId);
         if (material == null)
         {
-            _logger.LogInfo($"Material Not Found when try delete with id {materialId}");
+            await _logger.LogInfo(new LogInfoData
+            {
+
+                Message = $"Material Not Found when try delete with id {materialId}",
+                HappenInId = materialId,
+                Level = EnLevel.Error,
+                TypeLog = EnLogType.Normal,
+                LogsIn = "Materials",
+                LoghappenIn = EnLogHappenIn.Material,
+            });
             return NotFound<string>("Material Not Found");
         }
 
@@ -154,12 +166,32 @@ public class MaterialService : ResponseHandler, IMaterialService
 
         if (isSuccess > 0)
         {
-            _logger.LogInfo($"Material  deleted success with id {materialId}");
+            await _logger.LogInfo(new LogInfoData
+            {
+
+                Message = $"Material  deleted success with id {materialId}",
+                HappenInId = materialId,
+                Level = EnLevel.Information,
+                TypeLog = EnLogType.Normal,
+                LogsIn = "Materials",
+                LoghappenIn = EnLogHappenIn.Material,
+            });
+
             return Success("Material Deleted Successfully");
         }
         else
         {
-            _logger.LogInfo($"Material with id {materialId} can not deleted try later");
+            await _logger.LogInfo(new LogInfoData
+            {
+
+                Message = $"Material with id {materialId} can not deleted try later",
+                HappenInId = materialId,
+                Level = EnLevel.Error,
+                TypeLog = EnLogType.Normal,
+                LogsIn = "Materials",
+                LoghappenIn = EnLogHappenIn.Material,
+            });
+
             return Success("Material Deleted Faild");
         }
     }

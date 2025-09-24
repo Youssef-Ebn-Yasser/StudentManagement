@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Backend.Helper.Attendance;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers;
 
@@ -122,12 +123,17 @@ public class AttendanceController : AppControllerBase
     [HttpGet("student-attendance-pdf")]
     public async Task<IActionResult> GetStudentAttendancePdf(int studentId, int courseId)
     {
-        // Normally you’d fetch dto from DB/service
         var dto = await _attendanceSevice.GetStudentAttendancePerCourse(studentId, courseId);
 
-        var pdfBytes = AttendancePdfGenerator.Generate(dto.Data);
-
-        return File(pdfBytes, "application/pdf", $"StudentAttendance_{studentId}.pdf");
+        if (dto.Data != null)
+        {
+            var pdfBytes = AttendancePdfGeneratorForStudent.Generate(dto.Data);
+            return File(pdfBytes, "application/pdf", $"StudentAttendance_{studentId}.pdf");
+        }
+        else
+        {
+            return BadRequest("there is no data");
+        }
     }
 
     [AllowAnonymous]

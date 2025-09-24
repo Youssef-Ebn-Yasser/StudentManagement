@@ -431,7 +431,7 @@ public class CourseService : ResponseHandler, ICourseService
         if (course == null)
             return NotFound<string>("Course not found");
 
-        if (course.IsDeleted.GetValueOrDefault())
+        if (course.IsDeleted)
             return BadRequest<string>("Course is already deleted");
 
         if (course.lessons != null && course.lessons.Any())

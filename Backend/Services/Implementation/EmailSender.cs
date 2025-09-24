@@ -1,6 +1,5 @@
 using MailKit.Net.Smtp;
 using MailKit.Security;
-using Microsoft.Extensions.Options;
 using MimeKit;
 
 namespace Backend.Services.Implementation;
@@ -8,9 +7,8 @@ namespace Backend.Services.Implementation;
 public class EmailSender : IEmailSender
 {
     #region Fields
-    private readonly ILogger<EmailSender> _logger;
     private readonly EmailSettings _emailSettings;
-    private readonly IStructuredLogger _Logger;
+    private readonly IStructuredLogger _logger;
     #endregion
 
     #region Constructor
@@ -19,9 +17,8 @@ public class EmailSender : IEmailSender
         IOptions<EmailSettings> emailSettingsOptions,
         IStructuredLogger Logger)
     {
-        _logger = logger;
         _emailSettings = emailSettingsOptions.Value;
-        _Logger = Logger;
+        _logger = Logger;
     }
     #endregion
 
@@ -44,20 +41,32 @@ public class EmailSender : IEmailSender
             email.Body = builder.ToMessageBody();
 
             using var smtp = new SmtpClient();
-            await smtp.ConnectAsync(_emailSettings.Host, _emailSettings.Port, SecureSocketOptions.StartTls);
 
-            await smtp.AuthenticateAsync(_emailSettings.Email, _emailSettings.Password);
+            await _logger.LogInfo(new LogInfoData
+            {
+                Email = _emailSettings.Email,
+                Level = EnLevel.Error,
+                Message = $"email = {_emailSettings.Email} && pass = {_emailSettings.Password}",
+            });
+
+            await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(_emailSettings.Email, "ucpf cylv nqfh awqc");
+
 
             var result = await smtp.SendAsync(email);
 
             await smtp.DisconnectAsync(true);
 
-            _logger.LogInformation($"Email sent successfully to {mailTo}");
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Failed to send email to {mailTo}");
+            await _logger.LogInfo(new LogInfoData
+            {
+                Email = _emailSettings.Email,
+                Level = EnLevel.Error,
+                Message = ex.Message,
+            });
             return false;
         }
     }

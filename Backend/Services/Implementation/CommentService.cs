@@ -1,7 +1,4 @@
-﻿using Backend.DTOs.CommentDTOs;
-using System.Globalization;
-
-namespace Backend.Services.Implementation;
+﻿namespace Backend.Services.Implementation;
 
 public class CommentService : ResponseHandler, ICommentService
 {
@@ -32,8 +29,8 @@ public class CommentService : ResponseHandler, ICommentService
 
 
 
-        var comment = new Comment {};
-    CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+        var comment = new Comment { };
+        CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
 
         if (cultureInfo.TwoLetterISOLanguageName.ToLower().Equals("ar"))
         {
@@ -51,7 +48,7 @@ public class CommentService : ResponseHandler, ICommentService
             comment.CourseId = createCommentDto.CourseId;
             comment.CreatedAt = DateTime.UtcNow;
         }
-        
+
 
         await _unitOfWork.Repository<Comment>().AddAsync(comment);
         var response = _unitOfWork.Complete();
@@ -83,7 +80,7 @@ public class CommentService : ResponseHandler, ICommentService
         var result = comments.Select(c => new ShowAllCommentByLessonIdOrderByDateDto
         {
             Id = c.Id,
-            Content = GeneralLocalizableEntity.Localized(c.ContentAr,c.ContentEn),
+            Content = GeneralLocalizableEntity.Localized(c.ContentAr, c.ContentEn),
             StudentName = c.Student != null ? GeneralLocalizableEntity.Localized(c.Student.NameAr, c.Student.NameEn) : "Unknown"
         }).ToList();
 
@@ -101,7 +98,7 @@ public class CommentService : ResponseHandler, ICommentService
         var result = comments.Select(c => new ShowAllCommentForStudentInLessonOrderByDateDto
         {
             Id = c.Id,
-            Content = GeneralLocalizableEntity.Localized(c.ContentAr,c.ContentEn),
+            Content = GeneralLocalizableEntity.Localized(c.ContentAr, c.ContentEn),
             StudentName = c.Student != null ? GeneralLocalizableEntity.Localized(c.Student.NameAr, c.Student.NameEn) : "Unknown"
         }).ToList();
 

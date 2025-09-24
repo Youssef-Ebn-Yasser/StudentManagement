@@ -1,8 +1,4 @@
-﻿using System.Globalization;
-using System.Text.Json;
-using static System.Net.Mime.MediaTypeNames;
-
-namespace Backend.Services.Implementation;
+﻿namespace Backend.Services.Implementation;
 
 public class MeetingService : ResponseHandler, IMeetingService
 {

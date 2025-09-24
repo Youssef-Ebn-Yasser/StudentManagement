@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-
-namespace Backend.Services.Implementation;
+﻿namespace Backend.Services.Implementation;
 
 public class TrackingService : ResponseHandler, ITrackingService
 {
@@ -312,34 +310,6 @@ public class TrackingService : ResponseHandler, ITrackingService
 }
 
 
-public class SystemLogDto
-{
-    public int NumberOfTotalLogs { get; set; }
-    public int NumberOfTotalLogsLastDay { get; set; }
-
-    public List<SystemLogDetailsDto> SystemLogDetailsDtos { get; set; }
-
-}
-public class SystemLogDetailsDto
-{
-    public string? Email { get; set; }
-    public string? Message { get; set; }
-    public string? UserRole { get; set; }
-    public DateTime? Timestamp { get; set; }
-    public string? Level { get; set; }
-    public EnLogType? LogType { get; set; }
-    public string? City { get; set; }
-    public string? IPAddress { get; set; }
-}
-
-
-public class TrackUsersLoginDto
-{
-    public string? Email { get; set; }
-    public string? Message { get; set; }
-    public string? Role { get; set; }
-    public DateTime? Time { get; set; }
-}
 
 public enum EnLastDateType
 {

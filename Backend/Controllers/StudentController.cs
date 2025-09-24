@@ -24,88 +24,87 @@ public class StudentController : AppControllerBase
     #endregion
 
     #region Method
-    [HttpGet("forTest")]
-    public async Task<IActionResult> get(int studentId)
-    {
+    // [HttpGet("forTest")]
+    // public async Task<IActionResult> get(int studentId)
+    // {
 
-        var s = _unitOfWork.Repository<Student>()
-   .GetTableNoTracking()
-   .Include(sa => sa.StudentCourses)
-   .ThenInclude(l => l.Course)
-   .ThenInclude(c => c.lessons)
-   .ThenInclude(l => l.materials)
-   .Include(s => s.StudentCourses)
-   .ThenInclude(sc => sc.Course)
-   .ThenInclude(c => c.lessons)
-   .ThenInclude(l => l.Quizs)
-   .ThenInclude(q => q.StudentQuizeAnswers)
-   .Include(s => s.StudentAssignments)
-   .Where(s => s.Id == studentId)
-   .Select(s => new
-   {
+    //     var s = _unitOfWork.Repository<Student>()
+    //.GetTableNoTracking()
+    //.Include(sa => sa.StudentCourses)
+    //.ThenInclude(l => l.Course)
+    //.ThenInclude(c => c.lessons)
+    //.ThenInclude(l => l.materials)
+    //.Include(s => s.StudentCourses)
+    //.ThenInclude(sc => sc.Course)
+    //.ThenInclude(c => c.lessons)
+    //.ThenInclude(l => l.Quizs)
+    //.ThenInclude(q => q.StudentQuizeAnswers)
+    //.Include(s => s.StudentAssignments)
+    //.Where(s => s.Id == studentId)
+    //.Select(s => new
+    //{
 
-       ImageUrl = s.ImageUrl,
-       Phone = s.PhoneNumber,
-       Id = s.Id,
-       Name = s.NameEn,
-       Email = s.Email,
-       CourseDetails = s.StudentCourses.Where(sc => sc.Student.Id == s.Id)
-                          .Select(c => c.Course)
-                        .Select(c => new
-                        {
-                            CourseName = c.TitleEn,
-                            CourseId = c.Id,
-                            AssignmentCountInCourse = c.lessons.SelectMany(l => l.materials).Where(m => m.Type == MaterialTypeId.Assignment).Count(),
-                            TotalPercentageDegreeInCourse = c.lessons.SelectMany(l => l.StudentAssignments).Where(sa => sa.Id == s.Id).Sum(sa => sa.DegreePercentage),
-                            NumberOfDeliverAssignment = c.lessons.SelectMany(l => l.StudentAssignments).Where(sa => sa.Id == s.Id).Count(),
-                            TotalPercentage = (c.lessons.SelectMany(l => l.materials).Where(m => m.Type == MaterialTypeId.Assignment).Count() == 0 ? 0
-                                            : (c.lessons.SelectMany(l => l.StudentAssignments).Where(sa => sa.Id == s.Id).Sum(sa => sa.DegreePercentage)
-                                            / (c.lessons.SelectMany(l => l.materials).Where(m => m.Type == MaterialTypeId.Assignment).Count() * 100))),
-
-
-
-                            TotalDegreeQuizInCourse = c.lessons.SelectMany(l => l.Quizs).Sum(q => q.PossiblePoints),
-                            TotalStudentDegreeInCourse = c.lessons.SelectMany(l => l.Quizs).SelectMany(q => q.StudentQuizeAnswers).Sum(s => s.GradingRating),
-                            TotalQuizPercentage = (c.lessons.SelectMany(l => l.Quizs).Sum(q => q.PossiblePoints) == 0 ? 0
-                                                 : c.lessons.SelectMany(l => l.Quizs).SelectMany(q => q.StudentQuizeAnswers).Sum(s => s.GradingRating)
-                                                 / c.lessons.SelectMany(l => l.Quizs).Sum(q => q.PossiblePoints)),
+    //    ImageUrl = s.ImageUrl,
+    //    Phone = s.PhoneNumber,
+    //    Id = s.Id,
+    //    Name = s.NameEn,
+    //    Email = s.Email,
+    //    CourseDetails = s.StudentCourses.Where(sc => sc.Student.Id == s.Id)
+    //                       .Select(c => c.Course)
+    //                     .Select(c => new
+    //                     {
+    //                         CourseName = c.TitleEn,
+    //                         CourseId = c.Id,
+    //                         AssignmentCountInCourse = c.lessons.SelectMany(l => l.materials).Where(m => m.Type == MaterialTypeId.Assignment).Count(),
+    //                         TotalPercentageDegreeInCourse = c.lessons.SelectMany(l => l.StudentAssignments).Where(sa => sa.Id == s.Id).Sum(sa => sa.DegreePercentage),
+    //                         NumberOfDeliverAssignment = c.lessons.SelectMany(l => l.StudentAssignments).Where(sa => sa.Id == s.Id).Count(),
+    //                         TotalPercentage = (c.lessons.SelectMany(l => l.materials).Where(m => m.Type == MaterialTypeId.Assignment).Count() == 0 ? 0
+    //                                         : (c.lessons.SelectMany(l => l.StudentAssignments).Where(sa => sa.Id == s.Id).Sum(sa => sa.DegreePercentage)
+    //                                         / (c.lessons.SelectMany(l => l.materials).Where(m => m.Type == MaterialTypeId.Assignment).Count() * 100))),
 
 
-                            x = c.lessons.Select(l => new
-                            {
-                                LessonId = l.Id,
-                                AssignmentDetails = l.StudentAssignments.Where(sa => sa.LessonId == l.Id)
-                               .Select(sa => new
-                               {
-                                   StudentDegreePercentage = sa.DegreePercentage,
-                                   StudentAssignmentId = sa.Id,
-                                   AssignmentName = l.materials.Where(m => m.LessonId == l.Id)
-                                                               .Select(m => m.TitleEn)
-                                                               .FirstOrDefault(),
-                               }).FirstOrDefault(),
 
-                                NumberOfQuizesInLesson = l.Quizs.Where(q => q.LessonId == l.Id).Count(),
-                                TotalQuizesDegreeInLessons = l.Quizs.Where(q => q.LessonId == l.Id).Sum(q => q.PossiblePoints),
-                                StudentDegreeOfQuizesInLessons = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Sum(qa => qa.GradingRating),
-                                quizLestDetails = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Select(qa => new
-                                {
-                                    QuizId = qa.QuizId,
-                                    StudentQuizAnswerId = qa.Id,
-                                    QuizPercentageDegree = qa.GradingRating,
-                                    IsPass = qa.IsPassed,
-                                    PossiblePoints = qa.Quiz.PossiblePoints,
-                                    NumberOfAswered = qa.NumberOfAswered,
-                                    QuizName = qa.Quiz.TitleEn,
+    //                         TotalDegreeQuizInCourse = c.lessons.SelectMany(l => l.Quizs).Sum(q => q.PossiblePoints),
+    //                         TotalStudentDegreeInCourse = c.lessons.SelectMany(l => l.Quizs).SelectMany(q => q.StudentQuizeAnswers).Sum(s => s.GradingRating),
+    //                         TotalQuizPercentage = (c.lessons.SelectMany(l => l.Quizs).Sum(q => q.PossiblePoints) == 0 ? 0
+    //                                              : c.lessons.SelectMany(l => l.Quizs).SelectMany(q => q.StudentQuizeAnswers).Sum(s => s.GradingRating)
+    //                                              / c.lessons.SelectMany(l => l.Quizs).Sum(q => q.PossiblePoints)),
 
-                                })
-                            })
-                        })
 
-   });
-        return Ok(s);
+    //                         x = c.lessons.Select(l => new
+    //                         {
+    //                             LessonId = l.Id,
+    //                             AssignmentDetails = l.StudentAssignments.Where(sa => sa.LessonId == l.Id)
+    //                            .Select(sa => new
+    //                            {
+    //                                StudentDegreePercentage = sa.DegreePercentage,
+    //                                StudentAssignmentId = sa.Id,
+    //                                AssignmentName = l.materials.Where(m => m.LessonId == l.Id)
+    //                                                            .Select(m => m.TitleEn)
+    //                                                            .FirstOrDefault(),
+    //                            }).FirstOrDefault(),
 
-    }
+    //                             NumberOfQuizesInLesson = l.Quizs.Where(q => q.LessonId == l.Id).Count(),
+    //                             TotalQuizesDegreeInLessons = l.Quizs.Where(q => q.LessonId == l.Id).Sum(q => q.PossiblePoints),
+    //                             StudentDegreeOfQuizesInLessons = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Sum(qa => qa.GradingRating),
+    //                             quizLestDetails = l.Quizs.SelectMany(q => q.StudentQuizeAnswers).Select(qa => new
+    //                             {
+    //                                 QuizId = qa.QuizId,
+    //                                 StudentQuizAnswerId = qa.Id,
+    //                                 QuizPercentageDegree = qa.GradingRating,
+    //                                 IsPass = qa.IsPassed,
+    //                                 PossiblePoints = qa.Quiz.PossiblePoints,
+    //                                 NumberOfAswered = qa.NumberOfAswered,
+    //                                 QuizName = qa.Quiz.TitleEn,
 
+    //                             })
+    //                         })
+    //                     })
+
+    //});
+    //     return Ok(s);
+
+    // }
 
 
     [Authorize(Roles = "Admin")]
@@ -154,39 +153,6 @@ public class StudentController : AppControllerBase
             _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
             return NewResult(ErrorHappen.ErrorInServer());
         }
-    }
-
-    [Authorize(Roles = "Admin,Teacher")]
-    [HttpGet(Routing.StudentRouting.GetByName)]
-    public async Task<IActionResult> GetByName(string name)
-    {
-        try
-        {
-            var result = await _studentService.GetByNameAsync(name);
-            return NewResult(result);
-        }
-        catch
-        {
-            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
-            return NewResult(ErrorHappen.ErrorInServer());
-        }
-    }
-
-    [Authorize(Roles = "Admin,Teacher")]
-    [HttpGet(Routing.StudentRouting.PagGetAllInCourseByCourseName)]
-    public async Task<IActionResult> GetAllInCourseByCourseName(string courseName)
-    {
-        try
-        {
-            var result = await _studentService.GetAllInCourseByCourseNameAsync(courseName);
-            return NewResult(result);
-        }
-        catch
-        {
-            _logger.LogInfo("Error happen when mapping or by network in GetAll Teacher");
-            return NewResult(ErrorHappen.ErrorInServer());
-        }
-
     }
 
     [Authorize(Roles = "Admin,Teacher")]

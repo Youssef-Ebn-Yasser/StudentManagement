@@ -34,7 +34,6 @@ public class TeacherService : ResponseHandler, ITeacherService
                                                .GetTableNoTracking()
                                                .Where(t => !t.IsDeleted);
 
-        _logger.LogInfo($"Send to GetAllPaginatedAsync with order by number => {orderBy}");
 
         if (orderBy == enTeacherOrderBy.Name)
             query = query.OrderBy(t => GeneralLocalizableEntity.Localized(t.NameAr, t.NameEn));

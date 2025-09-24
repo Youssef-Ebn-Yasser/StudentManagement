@@ -22,7 +22,7 @@ public class VoucherService : ResponseHandler, IVoucherService
             case EnVoucherCourseType.Live:
                 result = await _unitOfWork.Repository<Course>()
                                       .GetTableNoTracking()
-                                      .Where(c => c.CourseType == EnCourseType.liveSessions && !(bool)c.IsDeleted)
+                                      .Where(c => c.CourseType == EnCourseType.liveSessions && (bool)c.IsDeleted)
                                       .Select(c => new CreateVoucherDependenciesDto
                                       {
                                           Id = c.Id,
@@ -33,7 +33,7 @@ public class VoucherService : ResponseHandler, IVoucherService
             case EnVoucherCourseType.Recorded:
                 result = await _unitOfWork.Repository<Course>()
                                       .GetTableNoTracking()
-                                      .Where(c => c.CourseType == EnCourseType.recorded && !(bool)c.IsDeleted)
+                                      .Where(c => c.CourseType == EnCourseType.recorded && (bool)c.IsDeleted)
                                       .Select(c => new CreateVoucherDependenciesDto
                                       {
                                           Id = c.Id,
@@ -44,7 +44,7 @@ public class VoucherService : ResponseHandler, IVoucherService
             case EnVoucherCourseType.Both:
                 result = await _unitOfWork.Repository<Course>()
                                       .GetTableNoTracking()
-                                      .Where(c => !(bool)c.IsDeleted)
+                                      .Where(c => (bool)c.IsDeleted)
                                       .Select(c => new CreateVoucherDependenciesDto
                                       {
                                           Id = c.Id,
@@ -71,7 +71,7 @@ public class VoucherService : ResponseHandler, IVoucherService
 
         var userExist = _unitOfWork.Repository<User>()
                                        .GetTableNoTracking()
-                                       .Any(s => s.Id == dto.CreatedById && !(bool)s.IsDeleted);
+                                       .Any(s => s.Id == dto.CreatedById && (bool)s.IsDeleted);
 
         if (!userExist)
             return BadRequest<string>("this created user id not exist");
@@ -80,7 +80,7 @@ public class VoucherService : ResponseHandler, IVoucherService
         {
             var isExist = _unitOfWork.Repository<Course>()
                                                     .GetTableNoTracking()
-                                                    .Any(c => c.Id == courseId && !(bool)c.IsDeleted);
+                                                    .Any(c => c.Id == courseId && (bool)c.IsDeleted);
             if (!isExist)
             {
                 return BadRequest<string>("there is an course Id not exist");
@@ -198,7 +198,13 @@ public class VoucherService : ResponseHandler, IVoucherService
         }
 
         var voucherAvaliableIds = JsonConvert.DeserializeObject<List<int>>(voucher.TargetCourses);
-        var isAvaliableIds = voucherAvaliableIds?.Intersect(coursesId).Any();
+
+        bool? isAvaliableIds = null;
+        if (coursesId != null)
+        {
+            isAvaliableIds = voucherAvaliableIds?.Intersect(coursesId).Any();
+        }
+
 
         if (isAvaliableIds == null || isAvaliableIds == false)
         {

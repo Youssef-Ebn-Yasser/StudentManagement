@@ -16,7 +16,7 @@ public class EmailController : AppControllerBase
     #endregion
 
     #region    Handle Methods
-    [HttpGet("test/mail")]
+    [HttpGet()]
     public async Task<IActionResult> UploadFile(string mailTo, string subject, string HtmlMessage)
     {
         var result = await _emailSender.SendEmailAsync(mailTo, subject, HtmlMessage);
