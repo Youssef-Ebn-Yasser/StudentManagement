@@ -66,7 +66,8 @@ public class VoucherService : ResponseHandler, IVoucherService
 
     public async Task<Response<string>> CreateVoucher(CreateVaoucherDto dto)
     {
-        if (dto.DiscountPercentage != null || dto.DiscountPercentage > 100 || dto.DiscountPercentage < 0)
+        bool notValidDiscount = dto.DiscountPercentage > 100 || dto.DiscountPercentage < 0;
+        if (dto.DiscountPercentage == null || notValidDiscount)
             return BadRequest<string>("this percentage must be equal or under 100 and more than 0");
 
         var userExist = _unitOfWork.Repository<User>()

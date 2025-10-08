@@ -2,7 +2,7 @@
 
 [Route("api/video")]
 [ApiController]
-public class HlsVideoController : AppControllerBase
+public class VideoController : AppControllerBase
 {
     #region   Fields
     private readonly string _hlsRoot;
@@ -13,7 +13,7 @@ public class HlsVideoController : AppControllerBase
 
 
     #region   Constructor
-    public HlsVideoController(IWebHostEnvironment env, IVedioUpload vedioUpload, ApplicationDbContext context)
+    public VideoController(IWebHostEnvironment env, IVedioUpload vedioUpload, ApplicationDbContext context)
     {
         _env = env;
         _hlsRoot = Path.Combine(env.ContentRootPath, "wwwroot");

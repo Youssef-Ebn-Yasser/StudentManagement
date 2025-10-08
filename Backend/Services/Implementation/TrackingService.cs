@@ -8,8 +8,6 @@ public class TrackingService : ResponseHandler, ITrackingService
     private DateTime _lastDay = DateTime.Now.AddDays(-1);
     private DateTime _lastWeek = DateTime.Now.AddDays(-7);
     private DateTime _lastMonth = DateTime.Now.AddDays(-30);
-
-
     #endregion
 
     #region    Constructor
@@ -249,10 +247,10 @@ public class TrackingService : ResponseHandler, ITrackingService
                                                .Select(s => s.Email)
                                                .FirstOrDefaultAsync();
 
-        var spec = new SystemLogSpecification(studentEmail, startDate, endDate);
+        var spec = new ActiveSystemLogSpecification(studentEmail, startDate, endDate);
 
         var logDetails = await _context.SystemLogs
-                                   .Where(spec.Criteria)
+                                   .Where(spec.Condition)
                                    .Select(s => new SystemLogDetailsDto
                                    {
                                        Email = s.Email,
@@ -321,18 +319,62 @@ public enum EnLastDateType
 
 public interface ISpecification<T>
 {
-    Expression<Func<T, bool>> Criteria { get; }
+    Expression<Func<T, bool>> Condition { get; }
+    List<Expression<Func<T, object>>> Includes { get; }
+
 }
-
-public class SystemLogSpecification : ISpecification<SystemLog>
+public abstract class BaseSpecification<T> : ISpecification<T>
 {
-    public Expression<Func<SystemLog, bool>> Criteria { get; }
+    public Expression<Func<T, bool>> Condition { get; protected set; }
+    public List<Expression<Func<T, object>>> Includes { get; }
+        = new List<Expression<Func<T, object>>>();
 
-    public SystemLogSpecification(string? email = null, DateTime? startDate = null, DateTime? endDate = null)
+    protected void AddInclude(Expression<Func<T, object>> includeExpression)
     {
-        Criteria = s =>
-            (string.IsNullOrEmpty(email) || s.Email == email) &&
-            (!startDate.HasValue || s.Timestamp >= startDate.Value) &&
-            (!endDate.HasValue || s.Timestamp <= endDate.Value);
+        Includes.Add(includeExpression);
     }
 }
+
+public static class SpecificationEvaluator<T> where T : class
+{
+    public static IQueryable<T> GetQuery(IQueryable<T> inputQuery, ISpecification<T> spec)
+    {
+        var query = inputQuery;
+
+        // Apply filter
+        if (spec.Condition != null)
+            query = query.Where(spec.Condition);
+
+        // Apply includes
+        query = spec.Includes.Aggregate(query, (current, include) => current.Include(include));
+
+        return query;
+    }
+}
+
+
+public class ActiveSystemLogSpecification : BaseSpecification<SystemLog>
+{
+    public ActiveSystemLogSpecification(string? email = null, DateTime? startDate = null, DateTime? endDate = null)
+    {
+        Condition = s =>
+            (string.IsNullOrEmpty(email) || s.Email == email) &&
+        (!startDate.HasValue || s.Timestamp >= startDate.Value) &&
+            (!endDate.HasValue || s.Timestamp <= endDate.Value);
+
+    }
+}
+
+
+//public class SystemLogSpecification : ISpecification<SystemLog>
+//{
+//    public Expression<Func<SystemLog, bool>> Condition { get; }
+
+//    public SystemLogSpecification(string? email = null, DateTime? startDate = null, DateTime? endDate = null)
+//    {
+//        Condition = s =>
+//            (string.IsNullOrEmpty(email) || s.Email == email) &&
+//            (!startDate.HasValue || s.Timestamp >= startDate.Value) &&
+//            (!endDate.HasValue || s.Timestamp <= endDate.Value);
+//    }
+//}

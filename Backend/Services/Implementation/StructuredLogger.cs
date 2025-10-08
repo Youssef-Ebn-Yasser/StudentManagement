@@ -38,12 +38,20 @@ public class StructuredLogger : IStructuredLogger
     public async Task LogInfo(string? message, string? email = "", string? logsIn = "",
     EnLevel? level = EnLevel.Information, EnLogType? logType = EnLogType.Normal, EnLogHappenIn? logHappenIn = EnLogHappenIn.NotDetermine, int? HappenInId = null)
     {
+        #region     request
+        string? pageUrl = _httpContextAccessor.HttpContext?.Request.Headers["X-Page-Url"].ToString();
+
+        var url = pageUrl;
+        #endregion
+
+
+
         var ipAddress = _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown";
         var path = _httpContextAccessor.HttpContext?.Request?.Path.ToString() ?? "Unknown";
         var method = _httpContextAccessor.HttpContext?.Request?.Method ?? "Unknown";
         var info = await GetRegionFromIpAsync(ipAddress);
-
-
+        //var url = _httpContextAccessor.HttpContext?.Request.Path;
+        // var url = $"{_httpContextAccessor.HttpContext?.Request?.Scheme}://{_httpContextAccessor.HttpContext?.Request?.Host}{_httpContextAccessor.HttpContext?.Request?.Path}{_httpContextAccessor.HttpContext?.Request?.QueryString}";
         var user = _httpContextAccessor.HttpContext?.User;
 
         var userName = user?.Identity?.IsAuthenticated == true
@@ -93,7 +101,8 @@ public class StructuredLogger : IStructuredLogger
         .ForContext("Location", info.Loc)
         .ForContext("Organization", info.Org)
             .ForContext("LogHappenIn", (int?)(logHappenIn ?? default))
-            .ForContext("LogHappenInId", HappenInId);
+            .ForContext("LogHappenInId", HappenInId)
+            .ForContext("URl", url);
 
             level = level ?? default;
             switch (level)

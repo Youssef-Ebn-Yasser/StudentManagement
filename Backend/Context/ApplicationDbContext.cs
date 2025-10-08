@@ -1,4 +1,5 @@
 using Backend.Constraints;
+using Backend.MiddleWare;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Backend.Context;
@@ -53,6 +54,8 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, i
 
 
     public DbSet<AllStudentsDto> StudentsInCourse { get; set; }
+
+    public DbSet<ActivityLog> ActivityLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -74,7 +74,7 @@ public class VedioUpload : ResponseHandler, IVedioUpload
         await SaveCompleteVedio(inputFilePath, file);
 
 
-        var baseUrl = _env.IsDevelopment() ? "https://localhost:7099" : "http://e-learn-v2.runasp.net";
+        var baseUrl = _env.IsDevelopment() ? "https://localhost:7099" : "https://e-learn-v2.runasp.net";
         var publicUrl = $"{baseUrl}/{folderName}/{Path.GetFileName(inputFilePath)}";
 
         var vedioDetails = new VedioesDetails()

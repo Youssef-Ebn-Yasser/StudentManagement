@@ -806,6 +806,8 @@ public class StudentService : ResponseHandler, IStudentService
             entry.State = EntityState.Detached;
         }
 
+        //  _ApplicationDbContext.ChangeTracker.Clear();       more effecient
+
         foreach (var student in students)
         {
             var updatedStudent = await _unitOfWork.Repository<Student>()

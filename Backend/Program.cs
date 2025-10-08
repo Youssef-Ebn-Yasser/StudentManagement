@@ -1,3 +1,4 @@
+using Backend.MiddleWare;
 using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -161,6 +162,8 @@ var columnOptions = new ColumnOptions
         new SqlColumn { ColumnName = "Organization", DataType = SqlDbType.NVarChar, DataLength = 300, AllowNull = true },
         new SqlColumn { ColumnName = "LogHappenIn", DataType = SqlDbType.Int, AllowNull = true },
         new SqlColumn { ColumnName = "LogHappenInId", DataType = SqlDbType.Int, AllowNull = true },
+        new SqlColumn { ColumnName = "URl", DataType = SqlDbType.NVarChar, AllowNull = true },
+
     }
 };
 
@@ -188,6 +191,7 @@ builder.Services.AddControllers();
 
 
 var app = builder.Build();
+
 
 
 
@@ -225,5 +229,12 @@ app.UseHangfireDashboard(); // URL: /hangfire
 app.MapHub<ChatHub>("/chatHub"); // The path clients will connect to
 
 app.MapControllers();
+
+
+#region   My middleWare
+
+app.UseMiddleware<ActivityLoggingMiddleware>();
+
+#endregion
 
 app.Run();
