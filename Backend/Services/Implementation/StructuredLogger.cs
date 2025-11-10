@@ -41,7 +41,8 @@ public class StructuredLogger : IStructuredLogger
         #region     request
         string? pageUrl = _httpContextAccessor.HttpContext?.Request.Headers["X-Page-Url"].ToString();
 
-        var url = pageUrl;
+        string action = _httpContextAccessor.HttpContext?.Request.Path;
+        var url = pageUrl + action;
         #endregion
 
 

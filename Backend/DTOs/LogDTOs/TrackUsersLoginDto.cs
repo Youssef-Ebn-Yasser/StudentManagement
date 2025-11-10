@@ -6,4 +6,5 @@ public class TrackUsersLoginDto
     public string? Message { get; set; }
     public string? Role { get; set; }
     public DateTime? Time { get; set; }
+    public string? Action { get; set; }
 }

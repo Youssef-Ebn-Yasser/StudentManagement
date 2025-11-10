@@ -48,7 +48,7 @@ public class AuthenticationService : IAuthenticationService
         var user = await _unitOfWork.Repository<User>().GetTableNoTracking().FirstOrDefaultAsync(u => u.Email == model.Email && u.IsDeleted == false);
         if (user == null)
         {
-            await _Logger.LogInfo($"this email {model.Email} and pasword {model.Password}", model.Email, "Login", EnLevel.Error, EnLogType.Logs);
+            await _Logger.LogInfo($"this email {model.Email} ", model.Email, "Login", EnLevel.Error, EnLogType.Logs);
 
             return _responseHandler.BadRequest<TokenDto>("Invalid credentials this student not exist");
         }
@@ -72,7 +72,7 @@ public class AuthenticationService : IAuthenticationService
         jwtToken.RefreshToken = refreshToken.Token;
         jwtToken.UserId = user.Id;
 
-        await _Logger.LogInfo($"this email {model.Email} and pasword {model.Password}", "Login", model.Email, EnLevel.Information, EnLogType.Logs);
+        await _Logger.LogInfo($"this email {model.Email} ", "Login", model.Email, EnLevel.Information, EnLogType.Logs);
 
         return _responseHandler.Success(jwtToken);
     }

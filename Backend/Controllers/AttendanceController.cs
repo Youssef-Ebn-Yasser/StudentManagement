@@ -11,17 +11,30 @@ public class AttendanceController : AppControllerBase
     #region   Fiels   
     private readonly IAttendanceSevice _attendanceSevice;
     private readonly IStructuredLogger _logger;
+    private readonly IStringLocalizer<Message> _localization;
     #endregion
 
     #region   Constructor
-    public AttendanceController(IAttendanceSevice attendanceSevice, IStructuredLogger logger)
+    public AttendanceController(IAttendanceSevice attendanceSevice, IStructuredLogger logger, IStringLocalizer<Message> stringLocalizer)
     {
         _attendanceSevice = attendanceSevice;
         _logger = logger;
+        _localization = stringLocalizer;
     }
     #endregion
 
     #region    Methods
+    //[AllowAnonymous]
+    //[HttpGet("test")]
+    //public async Task<ActionResult> ts()
+    //{
+    //    var mes = _localization["errorNotFound"];
+
+    //    return Ok(mes);
+    //}
+
+
+
     [HttpGet("filter")]
     public async Task<ActionResult> FilterPage()
     {

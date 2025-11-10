@@ -22,4 +22,5 @@ public class SystemLogDetailsDto
     public EnLogType? LogType { get; set; }
     public string? City { get; set; }
     public string? IPAddress { get; set; }
+    public string? Action { get; set; }
 }

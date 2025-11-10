@@ -44,3 +44,14 @@ public class ActivityLog
     public string UserAgent { get; set; }       // Browser/Device info
     public DateTime Timestamp { get; set; }
 }
+
+
+
+
+
+
+
+
+
+
+

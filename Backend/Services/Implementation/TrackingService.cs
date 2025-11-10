@@ -8,6 +8,10 @@ public class TrackingService : ResponseHandler, ITrackingService
     private DateTime _lastDay = DateTime.Now.AddDays(-1);
     private DateTime _lastWeek = DateTime.Now.AddDays(-7);
     private DateTime _lastMonth = DateTime.Now.AddDays(-30);
+    private string _teacher = "Teacher";
+    private string _student = "Student";
+    private string _admin = "Admin";
+    private string _unknown = "Unknown";
     #endregion
 
     #region    Constructor
@@ -19,48 +23,44 @@ public class TrackingService : ResponseHandler, ITrackingService
     #endregion
 
     #region    Handle Methods
-
     public async Task<Response<StatisticUsersLogin>> GetUserLoginStatistic()
     {
-        var result = await _unitOfWork.Repository<SystemLog>()
-                                                  .GetTableNoTracking()
-                                                  .Where(sl => sl.LogType == EnLogType.Logs)
-                                                  .ToListAsync();
-
-        var dateLast24h = DateTime.Now.AddDays(-1);
-        var dateLastWeek = DateTime.Now.AddDays(-7);
-        var dateLastMonth = DateTime.Now.AddDays(-30);
-
-        var totalUniqUserToday = result.Where(l => l.Timestamp >= dateLast24h).DistinctBy(u => u.UserName).Count();
-        var totalUniqueUsersLastWeek = result.Where(l => l.Timestamp >= dateLastWeek).DistinctBy(u => u.UserName).Count();
-        var totalUniqueUsersLastMonth = result.Where(l => l.Timestamp >= dateLastMonth).DistinctBy(u => u.UserName).Count();
-
-        var totalUserToday = result.Where(l => l.Timestamp >= dateLast24h).Count();
-        var totalUsersLastWeek = result.Where(l => l.Timestamp >= dateLastWeek).Count();
-        var totalUsersLastMonth = result.Where(l => l.Timestamp >= dateLastMonth).Count();
-
-        var totalAdminToday = result.Where(l => l.Timestamp >= dateLast24h && l.UserRole == "Admin").Count();
-        var totalStudentToday = result.Where(l => l.Timestamp >= dateLast24h && l.UserRole == "Student").Count();
-        var totalTeacherToday = result.Where(l => l.Timestamp >= dateLast24h && l.UserRole == "Teacher").Count();
-        var totalUnkownToday = result.Where(l => l.Timestamp >= dateLast24h && l.UserRole == "Unknown").Count();
+        var result = await _getLogs();
 
 
-        var totalAdminLastWeek = result.Where(l => l.Timestamp >= dateLastWeek && l.UserRole == "Admin").Count();
-        var totalStudentLastWeek = result.Where(l => l.Timestamp >= dateLastWeek && l.UserRole == "Student").Count();
-        var totalTeacherLastWeek = result.Where(l => l.Timestamp >= dateLastWeek && l.UserRole == "Teacher").Count();
-        var totalUnkownLastWeek = result.Where(l => l.Timestamp >= dateLastWeek && l.UserRole == "Unknown").Count();
+
+        var totalUniqUserToday = _DistictCountUnderDate(_lastDay, result);
+        var totalUniqueUsersLastWeek = _DistictCountUnderDate(_lastWeek, result);
+        var totalUniqueUsersLastMonth = _DistictCountUnderDate(_lastMonth, result);
 
 
-        var totalAdminLastMonth = result.Where(l => l.Timestamp >= dateLastMonth && l.UserRole == "Admin").Count();
-        var totalStudentLastMonth = result.Where(l => l.Timestamp >= dateLastMonth && l.UserRole == "Student").Count();
-        var totalTeacherLastMonth = result.Where(l => l.Timestamp >= dateLastMonth && l.UserRole == "Teacher").Count();
-        var totalUnkownLastMonth = result.Where(l => l.Timestamp >= dateLastMonth && l.UserRole == "Unknown").Count();
+
+        var totalUserToday = _CountUnderDate(_lastDay, result);
+        var totalUsersLastWeek = _CountUnderDate(_lastWeek, result);
+        var totalUsersLastMonth = _CountUnderDate(_lastMonth, result);
+
+        var totalAdminToday = _CountUnderDate(_lastDay, result, _admin);
+        var totalStudentToday = _CountUnderDate(_lastDay, result, _student);
+        var totalTeacherToday = _CountUnderDate(_lastDay, result, _teacher);
+        var totalUnkownToday = _CountUnderDate(_lastDay, result, _unknown);
+
+
+        var totalAdminLastWeek = _CountUnderDate(_lastWeek, result, _admin);
+        var totalStudentLastWeek = _CountUnderDate(_lastWeek, result, _student);
+        var totalTeacherLastWeek = _CountUnderDate(_lastWeek, result, _teacher);
+        var totalUnkownLastWeek = _CountUnderDate(_lastWeek, result, _unknown);
+
+
+        var totalAdminLastMonth = _CountUnderDate(_lastMonth, result, _admin);
+        var totalStudentLastMonth = _CountUnderDate(_lastMonth, result, _student);
+        var totalTeacherLastMonth = _CountUnderDate(_lastMonth, result, _teacher);
+        var totalUnkownLastMonth = _CountUnderDate(_lastMonth, result, _unknown);
 
 
         var dto = new StatisticUsersLogin()
         {
-            SuccessLoginAttemptsLast24h = result.Where(l => l.Timestamp >= dateLast24h).Count(),
-            FailedLoginAttemptsLast24h = result.Where(l => l.Timestamp >= dateLast24h && l.Level == "Error").Count(),
+            SuccessLoginAttemptsLast24h = result.Where(l => l.Timestamp >= _lastDay).Count(),
+            FailedLoginAttemptsLast24h = result.Where(l => l.Timestamp >= _lastDay && l.Level == "Error").Count(),
 
             TotalSuccessfulLogins = result.Where(l => l.Level != "Error").Count(),
             TotalFailedLogins = result.Where(l => l.Level == "Error").Count(),
@@ -111,6 +111,7 @@ public class TrackingService : ResponseHandler, ITrackingService
                                           Role = l.UserRole,
                                           Time = l.Timestamp,
                                           Email = l.Email,
+                                          Action = l.Path,
                                       }).OrderByDescending(l => l.Time)
                                       .ToPaginatedListAsync(pageNumber, pageSize);
 
@@ -163,6 +164,7 @@ public class TrackingService : ResponseHandler, ITrackingService
                                         Role = l.UserRole,
                                         Time = l.Timestamp,
                                         Email = l.Email,
+                                        Action = l.Path,
                                     }).OrderByDescending(l => l.Time)
                                     .ToPaginatedListAsync(pageNumber, pageSize);
         }
@@ -189,6 +191,7 @@ public class TrackingService : ResponseHandler, ITrackingService
                                           Role = l.UserRole,
                                           Time = l.Timestamp,
                                           Email = l.Email,
+                                          Action = l.Path,
                                       }).OrderByDescending(l => l.Time)
                                       .ToPaginatedListAsync(pageNumber, pageSize);
 
@@ -225,6 +228,7 @@ public class TrackingService : ResponseHandler, ITrackingService
                                         Role = l.UserRole,
                                         Time = l.Timestamp,
                                         Email = l.Email,
+                                        Action = l.Path,
                                     }).OrderByDescending(l => l.Time)
                                     .ToPaginatedListAsync(pageNumber, pageSize);
         }
@@ -261,6 +265,7 @@ public class TrackingService : ResponseHandler, ITrackingService
                                        LogType = s.LogType,
                                        City = s.City,
                                        IPAddress = s.IPAddress,
+                                       Action = s.Path,
                                    })
                                    .OrderByDescending(s => s.Timestamp)
                                    .ToListAsync();
@@ -290,6 +295,7 @@ public class TrackingService : ResponseHandler, ITrackingService
                                        LogType = s.LogType,
                                        City = s.City,
                                        IPAddress = s.IPAddress,
+                                       Action = s.Path,
                                    })
                                    .OrderByDescending(s => s.Timestamp)
                                    .ToListAsync();
@@ -303,26 +309,42 @@ public class TrackingService : ResponseHandler, ITrackingService
         return Success(response);
     }
 
+    private int _DistictCountUnderDate(DateTime lastDate, List<SystemLog> list)
+    {
+        var totalCount = list.Where(l => l.Timestamp >= lastDate)
+                                 .DistinctBy(u => u.UserName)
+                                 .Count();
+
+        return totalCount;
+    }
+    private int _CountUnderDate(DateTime lastDate, List<SystemLog> list)
+    {
+        var count = list.Where(l => l.Timestamp >= _lastDay).Count();
+        return count;
+    }
+    private int _CountUnderDate(DateTime lastDate, List<SystemLog> list, string role)
+    {
+        var count = list.Where(l => l.Timestamp >= _lastDay && l.UserRole == role).Count();
+        return count;
+    }
+    private async Task<List<SystemLog>> _getLogs()
+    {
+        var result = await _unitOfWork.Repository<SystemLog>()
+                                                 .GetTableNoTracking()
+                                                 .Where(sl => sl.LogType == EnLogType.Logs)
+                                                 .ToListAsync();
+        return result;
+    }
 
     #endregion
 }
-
-
-
-public enum EnLastDateType
-{
-    day = 1,
-    week = 2,
-    month = 3
-}
-
 
 public interface ISpecification<T>
 {
     Expression<Func<T, bool>> Condition { get; }
     List<Expression<Func<T, object>>> Includes { get; }
-
 }
+
 public abstract class BaseSpecification<T> : ISpecification<T>
 {
     public Expression<Func<T, bool>> Condition { get; protected set; }
