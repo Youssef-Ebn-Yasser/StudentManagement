@@ -251,7 +251,6 @@ Full Stack .NET Developer passionate about building scalable and secure systems 
 * SQL Server
 * React
 * SignalR
-* Clean Architecture
 
 ---
 
