@@ -8,6 +8,7 @@ The system manages the interaction between **Students**, **Teachers**, and **Adm
 The platform allows teachers to create courses, upload learning materials, assignments, and quizzes, while students can access content, submit assignments, solve quizzes, and communicate in real time.
 
 🌐 Live Demo: https://mega-project-h5z7.vercel.app/admin/profile
+
 🧪 Test Accounts
 
 Use the following accounts to test the system:
@@ -15,12 +16,15 @@ Use the following accounts to test the system:
 👨‍💼 Admin
 📧 Email: admin12345@gmail.com
 🔑 Password: Admin12345@
+
 👨‍🏫 Teacher
 📧 Email: teacherhussien12@gmail.com
 🔑 Password: Hussien12@
+
 👨‍🎓 Student
 📧 Email: ahmedssacount404@gmail.com
 🔑 Password: AhmeeD2006#
+
 The project focuses on:
 
 * Security
